@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search>
+  <entry>
+    <title>Go语言学习笔记-1：HelloWorld</title>
+    <url>/2023/09/04/Golang-1-HelloWorld/</url>
+    <content><![CDATA[<h2 id="Go语言学习笔记-1：HelloWorld"><a href="#Go语言学习笔记-1：HelloWorld" class="headerlink" title="Go语言学习笔记-1：HelloWorld"></a>Go语言学习笔记-1：HelloWorld</h2><ol>
+<li>Go语言是一种编译型语言，源代码都会编译成二进制机器码。</li>
+<li>所有 Go 源文件都应该放置在工作区里的 src 目录下。Linux 的工作区（Workspace）应该设置在 $HOME&#x2F;go，也可以通过设置 GOPATH 环境变量，用其他目录来作为工作区。<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">go</span></span><br><span class="line">  bin <span class="comment">// 编译生成的二进制文件存储位置</span></span><br><span class="line">    hello</span><br><span class="line">  src <span class="comment">// 所有 Go 源文件都应该放置在工作区里的 src 目录下</span></span><br><span class="line">    hello <span class="comment">// 为每个project新建一个文件夹</span></span><br><span class="line">      helloworld.<span class="keyword">go</span></span><br></pre></td></tr></table></figure></li>
+<li>第一个Go程序<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="string">&quot;fmt&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">  fmt.Println(<span class="string">&quot;Hello World!&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ol>
+<span id="more"></span>
+
+<p>解析：</p>
+<ul>
+<li>package main - 每一个 Go 文件都应该在开头进行 package name 的声明（译注：只有可执行程序的包名应当为 main）。包（Packages）用于代码的封装与重用，这里的包名称是main。</li>
+<li>import “fmt” - 我们引入了 fmt 包，用于在 main 函数里面打印文本到标准输出。</li>
+<li>func main() - main 是一个特殊的函数。整个程序就是从 main 函数开始运行的。main 函数必须放置在 main 包中。{ 和 } 分别表示 main 函数的开始和结束部分。</li>
+<li>fmt.Println(“Hello World”) - fmt 包中的 Println 函数用于把文本写入标准输出。</li>
+</ul>
+]]></content>
+  </entry>
+  <entry>
+    <title>Hello World</title>
+    <url>/2023/09/04/hello-world/</url>
+    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
+<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
+<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
+<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
+<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
+]]></content>
+  </entry>
+</search>
