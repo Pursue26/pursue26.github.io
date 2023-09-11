@@ -1496,7 +1496,6 @@ pre code {
 }
 .back-to-top span {
   margin-right: 8px;
-  display: none;
 }
 .back-to-top .fa {
   text-align: center;
@@ -2544,4 +2543,12 @@ header.header {
   .pagination {
     margin-bottom: 10px;
   }
+}
+code {
+  padding: 2px 4px;
+  overflow-wrap: break-word;
+  color: #c7254e;
+  background: #f9f2f4;
+  border-radius: 3px;
+  font-size: 18px;
 }
