@@ -120,6 +120,117 @@
       </tags>
   </entry>
   <entry>
+    <title>Go 笔记之变量与常量</title>
+    <url>/2023/09/07/Go%E7%AC%94%E8%AE%B0%E4%B9%8B%E5%8F%98%E9%87%8F%E4%B8%8E%E5%B8%B8%E9%87%8F/</url>
+    <content><![CDATA[<blockquote>
+<p>学习链接：<a href="https://studygolang.com/subject/2">https://studygolang.com/subject/2</a>，感谢如此优秀的教程！</p>
+</blockquote>
+<h2 id="Go 语言学习笔记 -1：HelloWorld"><a href="#Go 语言学习笔记 -1：HelloWorld" class="headerlink" title="Go 语言学习笔记 -1：HelloWorld"></a>Go 语言学习笔记 -1：HelloWorld</h2><p>Go 语言是一种编译型语言，源代码都会编译成二进制机器码。</p>
+<p>所有 Go 源文件都应该放置在工作区里的 src 目录下。Linux 的工作区（Workspace）应该设置在 $HOME&#x2F;go，也可以通过设置 GOPATH 环境变量，用其他目录来作为工作区。</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">go</span></span><br><span class="line">  bin <span class="comment">// 编译生成的二进制文件存储位置</span></span><br><span class="line">    hello</span><br><span class="line">  src <span class="comment">// 所有 Go 源文件都应该放置在工作区里的 src 目录下</span></span><br><span class="line">    hello <span class="comment">// 为每个 project 新建一个文件夹</span></span><br><span class="line">      helloworld.<span class="keyword">go</span></span><br></pre></td></tr></table></figure>
+
+<p>第一个 Go 程序</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="string">&quot;fmt&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">  fmt.Println(<span class="string">&quot;Hello World!&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<span id="more"></span>
+
+<p>解析：</p>
+<ul>
+<li><p><code>package main</code> - 每一个 Go 文件都应该在开头进行 package name 的声明（译注：只有可执行程序的包名应当为 main）。包（Packages）用于代码的封装与重用，这里的包名称是 main。</p>
+</li>
+<li><p><code>import &quot;fmt&quot;</code> - 我们引入了 fmt 包，用于在 main 函数里面打印文本到标准输出。</p>
+</li>
+<li><p><code>func main()</code> - main 是一个特殊的函数。整个程序就是从 main 函数开始运行的。main 函数必须放置在 main 包中。{和} 分别表示 main 函数的开始和结束部分。</p>
+</li>
+<li><p><code>fmt.Println(&quot;Hello World&quot;)</code> - fmt 包中的 Println 函数用于把文本写入标准输出。</p>
+</li>
+</ul>
+<hr>
+<h2 id="Go 语言学习笔记 -2：变量"><a href="#Go 语言学习笔记 -2：变量" class="headerlink" title="Go 语言学习笔记 -2：变量"></a>Go 语言学习笔记 -2：变量 </h2><p><strong> 变量 </strong> 指定了某存储单元（Memory Location）的名称，该存储单元会存储特定类型的值。</p>
+<ol>
+<li><p>声明单个变量：var name type，例如：var age int</p>
+</li>
+<li><p>声明变量并初始化：var name type &#x3D; initialValue</p>
+</li>
+<li><p>类型推断：如果变量有初始值，那么 Go 能够自动推断具有初始值的变量的类型。因此，如果变量有初始值，就可以在变量声明中省略 type， 如 var age &#x3D; 16 指 age 类型为 int 型。</p>
+</li>
+<li><p>声明多个变量：var name1, name2 type &#x3D; initialValue1, initialValue2</p>
+</li>
+<li><p>在一个语句中声明不同类型的变量，如：</p>
+</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> (</span><br><span class="line">    age = <span class="number">19</span></span><br><span class="line">    name = “laowang”</span><br><span class="line">    adult = <span class="literal">true</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<ol start="6">
+<li>变量的简短声明语法：<code>:=</code> 操作符，例如：<code>age, name := 20, &quot;zhangsan&quot;</code>。简短声明要求 <code>:=</code> 操作符左边的 <strong> 所有变量都有初始值</strong>。</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;  </span><br><span class="line">    a, b := <span class="number">20</span>, <span class="number">30</span> <span class="comment">// 声明 a 和 b</span></span><br><span class="line">    fmt.Println(<span class="string">&quot;a is&quot;</span>, a, <span class="string">&quot;b is&quot;</span>, b)</span><br><span class="line">    a, b := <span class="number">40</span>, <span class="number">50</span> <span class="comment">// 错误，没有尚未声明的变量</span></span><br><span class="line">    a, c := <span class="number">40</span>, <span class="number">60</span> <span class="comment">// 正确，有新的尚未声明的变量</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="7">
+<li><p>变量也可以在运行时进行赋值，如 <code>a := math.Min(15, 20)</code></p>
+</li>
+<li><p>由于 Go 是强类型（Strongly Typed）语言，因此不允许某一类型的变量赋值为其他类型的值。</p>
+</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;  </span><br><span class="line">    age := <span class="number">29</span>      <span class="comment">// age 是 int 类型</span></span><br><span class="line">    age = <span class="string">&quot;naveen&quot;</span> <span class="comment">// 错误，尝试赋值一个字符串给 int 类型变量</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="Go 语言学习笔记 -3：变量类型"><a href="#Go 语言学习笔记 -3：变量类型" class="headerlink" title="Go 语言学习笔记 -3：变量类型"></a>Go 语言学习笔记 -3：变量类型</h2><ol>
+<li>Go 语言支持的变量类型：</li>
+</ol>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">bool</span><br><span class="line">数字类型</span><br><span class="line">    int8, int16, int32, int64, int</span><br><span class="line">    uint8, uint16, uint32, uint64, uint</span><br><span class="line">    float32, float64</span><br><span class="line">    complex64, complex128 // 复数型</span><br><span class="line">    byte</span><br><span class="line">    rune</span><br><span class="line">string</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>在 Printf 方法中，使用 <code>%T</code> 格式说明符（Format Specifier），可以打印出变量的类型。Go 的 <code>unsafe</code> 包提供了一个 <code>Sizeof</code> 函数，该函数接收变量并返回它的字节大小。如：</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line">fmt.Printf(<span class="string">&quot;type of age is %T, size of age is %d&quot;</span>, age, unsafe.Sizeof(age))</span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li>复数类型：<code>complex64</code> 表示实部和虚部都是 <code>float32</code> 类型，<code>complex128</code> 表示实部和虚部都是 <code>float64</code> 类型。</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line">c1 := <span class="built_in">complex</span>(<span class="number">5</span>, <span class="number">7</span>) <span class="comment">// 通过内置函数声明复数变量 c1</span></span><br><span class="line">c2 := <span class="number">8</span> + <span class="number">27i</span> <span class="comment">// 通过简短声明声明复数变量 c2</span></span><br></pre></td></tr></table></figure>
+
+<ol start="4">
+<li><p>其它变量类型：<code>byte</code> 是 <code>uint8</code> 的别名， <code>rune</code> 是 <code>int32</code> 的别名。</p>
+</li>
+<li><p>Go 是强类型（Strongly Typed）语言， Go 没有自动类型提升或类型转换：</p>
+</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> i, j <span class="type">int</span>, float = <span class="number">5</span>, <span class="number">10.2</span></span><br><span class="line">diff := i - j <span class="comment">// 错误， int - float 不被允许</span></span><br><span class="line">diff := i - <span class="type">int</span>(j) <span class="comment">// 正确</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="Go 语言学习笔记 -4：常量"><a href="#Go 语言学习笔记 -4：常量" class="headerlink" title="Go 语言学习笔记 -4：常量"></a>Go 语言学习笔记 -4：常量</h2><ol>
+<li><p>关键字：<code>const</code>，常量不能再重新赋值为其他的值。</p>
+</li>
+<li><p>常量的值会在 <strong> 编译的时候 </strong> 确定。因为函数调用发生在 <strong> 运行时</strong>，所以不能将函数的返回值赋值给常量。如：</p>
+</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> a := math.Sqrt(<span class="number">4</span>) <span class="comment">// 允许</span></span><br><span class="line"><span class="keyword">const</span> b := math.Sqrt(<span class="number">9</span>) <span class="comment">// 不允许，编译先于运行</span></span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li><p>常量是可以没有类型的，如：<code>const name = &quot;zhangsan&quot;</code>；常量也可以是有类型的，如：<code>const name string = &quot;lisi&quot;</code>，即 name 是一个 string 类型的 <strong> 常量</strong>。</p>
+</li>
+<li><p>Go 的类型策略不允许将一种类型的变量赋值给另一种类型的变量。</p>
+</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;  </span><br><span class="line">    <span class="keyword">var</span> defaultName = <span class="string">&quot;Sam&quot;</span> <span class="comment">// 允许</span></span><br><span class="line">    <span class="keyword">type</span> myString <span class="type">string</span></span><br><span class="line">    <span class="keyword">var</span> customName myString = <span class="string">&quot;Sam&quot;</span> <span class="comment">// 允许</span></span><br><span class="line">    customName = defaultName <span class="comment">// 不允许，即使 myString 是 string 类型的别名</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="5">
+<li><strong>布尔常量</strong>：字符串常量的规则适用于布尔常量。</li>
+</ol>
+<p><code>var name = &quot;Sam&quot;</code> 无类型的 <strong> 常量 </strong> Sam 是如何赋值给<strong> 变量</strong> name 的？</p>
+<blockquote>
+<p>答案是 <strong> 无类型的常量有一个与它们相关联的默认类型，并且当且仅当一行代码需要时才提供它</strong>（常量可以赋值给 “合适的” 类型，而不需要类型转换）。在声明变量时，如果使用常量来赋值，变量会从常量的默认类型中获取类型。在这种情况下，常量 “Sam” 的默认类型是字符串，所以变量 name 的类型也是字符串。</p>
+</blockquote>
+]]></content>
+      <categories>
+        <category>学习笔记 - Golang</category>
+      </categories>
+      <tags>
+        <tag>Go变量与常量</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Go 笔记之数组与切片</title>
     <url>/2023/09/12/Go%E7%AC%94%E8%AE%B0%E4%B9%8B%E6%95%B0%E7%BB%84%E4%B8%8E%E5%88%87%E7%89%87/</url>
     <content><![CDATA[<blockquote>
