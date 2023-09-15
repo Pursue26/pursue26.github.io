@@ -27,7 +27,7 @@
 <meta property="og:description" content="宏定义 #define 和 const 关键字在 C 语言中有不同的用途：  #define 用于定义宏常量，它在编译前进行简单的文本替换，没有类型检查和作用域限制。宏常量的值可以是任意的表达式，包括函数调用和运算符操作，但容易导致代码的可读性和可维护性降低。  const 关键字用于定义常量变量，具有类型检查和作用域限制的特性。常量变量的值在定义后不能被修改，提高了代码的可读性和可维护性。常量变">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2023-09-13T12:07:29.000Z">
-<meta property="article:modified_time" content="2023-09-14T09:54:40.245Z">
+<meta property="article:modified_time" content="2023-09-15T08:41:49.822Z">
 <meta property="article:author" content="aha">
 <meta property="article:tag" content="const关键字">
 <meta property="article:tag" content="下限定">
@@ -154,7 +154,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">8</span>
+          <span class="site-state-item-count">9</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -165,7 +165,7 @@
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">16</span>
+        <span class="site-state-item-count">18</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -228,7 +228,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2023-09-14 17:54:40" itemprop="dateModified" datetime="2023-09-14T17:54:40+08:00">2023-09-14</time>
+      <time title="修改时间：2023-09-15 16:41:49" itemprop="dateModified" datetime="2023-09-15T16:41:49+08:00">2023-09-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -310,8 +310,10 @@
 <p>变量 <code>i</code> 本身就是常量：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// C program to demonstrate that the pointer to point to any other integer variable, </span></span><br><span class="line"><span class="comment">// but the value of the object (entity) pointed can not be changed</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">/* i is stored in read only area*/</span></span><br><span class="line">    <span class="type">int</span> <span class="type">const</span> i = <span class="number">10</span>;</span><br><span class="line">    <span class="type">int</span> j = <span class="number">20</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* pointer to integer constant. Here i</span></span><br><span class="line"><span class="comment">    is of type &quot;const int&quot;, and &amp;i is of</span></span><br><span class="line"><span class="comment">    type &quot;const int *&quot;. And ptr is of type</span></span><br><span class="line"><span class="comment">    &quot;const int *&quot;, types are matching no issue */</span></span><br><span class="line">    <span class="type">int</span> <span class="type">const</span>* ptr = &amp;i;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;ptr: %d\n&quot;</span>, *ptr);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* error: assignment of read-only location &#x27;*ptr&#x27; */</span></span><br><span class="line">    *ptr = <span class="number">100</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* valid. We call it up qualification. In</span></span><br><span class="line"><span class="comment">    C/C++, the type of &quot;int *&quot; is allowed to up</span></span><br><span class="line"><span class="comment">    qualify to the type &quot;const int *&quot;. The type of</span></span><br><span class="line"><span class="comment">    &amp;j is &quot;int *&quot; and is implicitly up qualified by</span></span><br><span class="line"><span class="comment">    the compiler to &quot;const int *&quot; */</span></span><br><span class="line"></span><br><span class="line">    ptr = &amp;j;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;ptr: %d\n&quot;</span>, *ptr);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
+<blockquote>
 <p>在 C++ 中，不允许进行下限定（down qualification）操作，而在 C 中进行此操作可能会导致警告。下限定是指将已经限定了类型的变量赋值给没有限定类型的变量的情况。</p>
 <p>在 C++ 和 C 中，上限定（up qualification）是允许的，不会引发警告或错误。上限定是指将没有限定类型的变量赋值给已经限定了类型的变量的情况。这意味着可以将一个没有限定类型的变量赋值给一个已经限定了类型的变量，而编译器会自动进行类型转换。上限定操作可以用于提升变量的类型精度或实现类型转换。例如，将一个整数赋值给一个浮点数变量，编译器会自动将整数转换为浮点数类型。</p>
+</blockquote>
 <p>下限定操作示例：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// C program to demonstrate the down qualification</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> i = <span class="number">10</span>;</span><br><span class="line">    <span class="type">int</span> <span class="type">const</span> j = <span class="number">20</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* ptr is pointing an integer object */</span></span><br><span class="line">    <span class="type">int</span>* ptr = &amp;i;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;*ptr: %d\n&quot;</span>, *ptr);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* The below assignment is invalid in C++, results in</span></span><br><span class="line"><span class="comment">    error In C, the compiler *may* throw a warning, but</span></span><br><span class="line"><span class="comment">    casting is implicitly allowed */</span></span><br><span class="line">    ptr = &amp;j;  <span class="comment">/* warning: assignment discards ‘const’ qualifier from pointer target type [-Wdiscarded-qualifiers] */</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/* In C++, it is called &#x27;down qualification&#x27;. The type</span></span><br><span class="line"><span class="comment">    of expression &amp;j is &quot;const int *&quot; and the type of ptr</span></span><br><span class="line"><span class="comment">    is &quot;int *&quot;. The assignment &quot;ptr = &amp;j&quot; causes to</span></span><br><span class="line"><span class="comment">    implicitly remove const-ness from the expression &amp;j.</span></span><br><span class="line"><span class="comment">    C++ being more type restrictive, will not allow</span></span><br><span class="line"><span class="comment">    implicit down qualification. However, C++ allows</span></span><br><span class="line"><span class="comment">    implicit up qualification. The reason being, const</span></span><br><span class="line"><span class="comment">    qualified identifiers are bound to be placed in</span></span><br><span class="line"><span class="comment">    read-only memory (but not always). If C++ allows</span></span><br><span class="line"><span class="comment">    above kind of assignment (ptr = &amp;j), we can use &#x27;ptr&#x27;</span></span><br><span class="line"><span class="comment">    to modify value of j which is in read-only memory.</span></span><br><span class="line"><span class="comment">    The consequences are implementation dependent, the</span></span><br><span class="line"><span class="comment">    program may fail</span></span><br><span class="line"><span class="comment">    at runtime. So strict type checking helps clean code.</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;*ptr: %d\n&quot;</span>, *ptr);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
@@ -370,9 +372,9 @@
 </tbody></table>
 <p>注：</p>
 <ol>
-<li><p>Pointer Value Change（指向的值的改变），如 *ptr &#x3D; 100</p>
+<li><p>Pointer Value Change（指向的值的改变），如 <code>*ptr = 100</code></p>
 </li>
-<li><p>Pointing Value Change（指针的值的改变），如 ptr &#x3D; &amp;a</p>
+<li><p>Pointing Value Change（指针的值的改变），如 <code>ptr = &amp;a</code></p>
 </li>
 <li><p><strong>将 <code>*</code> 与变量名 <code>ptr</code> 结合（<code>*ptr</code>），观察 <code>const</code> 靠近什么类型</strong>：</p>
 <ul>
@@ -391,7 +393,7 @@
 </li>
 </ol>
 <blockquote>
-<p>参考连接：<a target="_blank" rel="noopener" href="https://www.geeksforgeeks.org/const-qualifier-in-c/">https://www.geeksforgeeks.org/const-qualifier-in-c/</a></p>
+<p>参考链接：<a target="_blank" rel="noopener" href="https://www.geeksforgeeks.org/const-qualifier-in-c/">https://www.geeksforgeeks.org/const-qualifier-in-c/</a></p>
 </blockquote>
 <hr>
 
@@ -417,6 +419,9 @@
                 </a>
             </div>
             <div class="post-nav-item">
+                <a href="/2023/09/15/Go%E7%AC%94%E8%AE%B0%E4%B9%8B%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%92%8C%E6%8C%87%E9%92%88/" rel="next" title="Go 笔记之字符串和指针">
+                  Go 笔记之字符串和指针 <i class="fa fa-angle-right"></i>
+                </a>
             </div>
           </div>
     </footer>
@@ -447,13 +452,13 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-line"></i>
     </span>
-    <span title="站点总字数">43k</span>
+    <span title="站点总字数">46k</span>
   </span>
   <span class="post-meta-item">
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">1:19</span>
+    <span title="站点阅读时长">1:24</span>
   </span>
 </div>
 <div class="busuanzi-count">
