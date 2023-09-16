@@ -1,6 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>C 语言之 main 函数参数</title>
+    <url>/2023/09/16/C%E8%AF%AD%E8%A8%80%E4%B9%8Bmain%E5%87%BD%E6%95%B0%E5%8F%82%E6%95%B0/</url>
+    <content><![CDATA[<h2 id="指令行操作"><a href="# 指令行操作" class="headerlink" title="指令行操作"></a> 指令行操作 </h2><p>C 语言支持从 CLI（指令行）传入参数给 main() 函数，多个命令行参数之间用空格分隔，但是如果参数本身带有空格，那么就使用双引号或单引号。</p>
+<p>C 语言的 main 函数是程序的入口函数，它可以有两种形式的参数：</p>
+<ol>
+<li><p> 无参数形式：main 函数的原型可以是 <code>int main(void)</code>。这表示不接受任何参数，程序执行时不需要从命令行传递参数给 main 函数。</p>
+</li>
+<li><p> 带参数形式：main 函数的原型可以是 <code>int main(int argc, char *argv[])</code>。其中，<code>argc</code> 表示命令行参数的个数，而 <code>argv</code> 是一个字符串指针数组，每个元素都是一个命令行参数的字符串。</p>
+<ul>
+<li><code>argc</code> 标识传入的参数个数。如果没有提供任何参数，<code>argc</code> 将被设置为 1；否则，<code>argc</code> 将被设置为传入的参数个数加 1。</li>
+<li><code>argv[0]</code> 通常是程序的名称或路径的字符串。</li>
+<li><code>argv[1]</code> 到 <code>argv[argc - 1]</code> 是命令行传递给程序的参数，以空格分隔。</li>
+</ul>
+</li>
+</ol>
+<span id="more"></span>
+
+<p> 值得注意的是，也可以使用 <code>char **argv</code> 来代替 <code>char *argv[]</code> 形参，两者具有相同的类型含义。因为数组变量名 <code>argv</code> 就是指向 <code>argv[]</code> 数组的第一个元素的指针，同时又因为第一个元素的数值就是一个指针，所以此时的数组变量名 <code>argv</code> 的本质就是一个指针的指针（双重指针）。</p>
+<p> 下面是一个例子，演示如何使用带参数的 main 函数来接收命令行参数：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span> &#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;number of params: %d\n&quot;</span>, argc);</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; argc; i++) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;param-%d: %s\n&quot;</span>, i, argv[i]);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p> 如果编译并运行这个程序，并在命令行中输入参数，例如 <code>./a.out arg1 arg2 3 arg4</code>，则输出如下：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">number of params: 5</span><br><span class="line">param-0: ./a.out</span><br><span class="line">param-1: arg1</span><br><span class="line">param-2: arg2</span><br><span class="line">param-3: 3</span><br><span class="line">param-4: arg4</span><br></pre></td></tr></table></figure>
+
+<p> 参考链接：<a href="https://is-cloud.blog.csdn.net/article/details/105347737">https://is-cloud.blog.csdn.net/article/details/105347737</a></p>
+]]></content>
+      <categories>
+        <category>学习笔记</category>
+        <category>C语言</category>
+      </categories>
+      <tags>
+        <tag>main函数参数</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>C 语言之 const 关键字</title>
     <url>/2023/09/13/C%E8%AF%AD%E8%A8%80%E4%B9%8Bconst%E5%85%B3%E9%94%AE%E5%AD%97/</url>
     <content><![CDATA[<p>宏定义 <code>#define</code> 和 <code>const</code> 关键字在 C 语言中有不同的用途：</p>
@@ -133,126 +168,6 @@
         <tag>const关键字</tag>
         <tag>下限定</tag>
         <tag>上限定</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Go 笔记之函数 &amp; 包 &amp; 判断 &amp; 循环</title>
-    <url>/2023/09/09/Go%E7%AC%94%E8%AE%B0%E4%B9%8B%E5%87%BD%E6%95%B0-%E5%8C%85-%E5%88%A4%E6%96%AD-%E5%BE%AA%E7%8E%AF/</url>
-    <content><![CDATA[<blockquote>
-<p>学习链接：<a href="https://studygolang.com/subject/2">https://studygolang.com/subject/2</a>，感谢如此优秀的教程！</p>
-</blockquote>
-<h2 id="Go 语言学习笔记 -5：函数"><a href="#Go 语言学习笔记 -5：函数" class="headerlink" title="Go 语言学习笔记 -5：函数"></a>Go 语言学习笔记 -5：函数</h2><ol>
-<li>函数声明语法：</li>
-</ol>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">functionname</span><span class="params">(parametername1 <span class="keyword">type</span>, parametername2 <span class="keyword">type</span>)</span></span> returntype &#123;  </span><br><span class="line">    <span class="comment">// 函数体（具体实现的功能）</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<ol start="2">
-<li>如果有连续若干个参数，它们的类型一致，那么我们无须一一罗列，只需在最后一个参数后添加该类型。</li>
-</ol>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">functionname</span><span class="params">(parametername1, parametername2 <span class="keyword">type</span>)</span></span> returntype &#123;  </span><br><span class="line">    <span class="comment">// 函数体（具体实现的功能）</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<ol start="3">
-<li>Go 语言支持一个函数可以有 <strong> 多个返回值</strong>。</li>
-</ol>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">functionname</span><span class="params">(para1 type1, para2 type2)</span></span> (returntype1, returntype2, ...) &#123;</span><br><span class="line">    <span class="comment">// 函数体（具体实现的功能）</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<span id="more"></span>
-
-<ol start="4">
-<li><strong>命名返回值 </strong>：从函数中可以返回一个命名值。一旦命名了返回值，可以认为<strong> 这些值在函数第一行就被声明为变量了</strong>，在函数 return 时不必再跟随命名值。如<code>area, perimeter</code>：</li>
-</ol>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">rectProps</span><span class="params">(length, width <span class="type">float64</span>)</span></span> (area, perimeter <span class="type">float64</span>) &#123;  </span><br><span class="line">    area = length * width</span><br><span class="line">    perimeter = (length + width) * <span class="number">2</span></span><br><span class="line">    <span class="keyword">return</span> <span class="comment">// 不需要明确指定返回值，默认返回 area, perimeter 的值</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<ol start="5">
-<li><strong>空白符</strong>：<code>_</code> 在 Go 中被用作空白符，可以用作表示任何类型的任何值。</li>
-</ol>
-<p><code>area, _ := rectProps(10.8, 5.6) // 返回值周长被丢弃</code>。</p>
-<hr>
-<h2 id="Go 语言学习笔记 -6：包"><a href="#Go 语言学习笔记 -6：包" class="headerlink" title="Go 语言学习笔记 -6：包"></a>Go 语言学习笔记 -6：包</h2><ol>
-<li><p><code>package packagename</code> 指定了某一源文件属于一个包，它应该放在每一个源文件的第一行。</p>
-</li>
-<li><p><code>main</code> 包和自定义包目录结构（属于某一个包的源文件都应该放置于一个单独命名的文件夹里，且应该用包名命名文件夹名）：</p>
-</li>
-</ol>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line">src</span><br><span class="line">    geometry  <span class="comment">// 自定义 main 包</span></span><br><span class="line">        geometry.<span class="keyword">go</span> <span class="comment">// main 函数</span></span><br><span class="line">        rectangle <span class="comment">// 自定义包，文件名为包名</span></span><br><span class="line">            rectprops.<span class="keyword">go</span> <span class="comment">// 属于 rectangle 包的源文件</span></span><br><span class="line">bin</span><br><span class="line">    <span class="comment">// 通过执行 go build geometry/geometry.go 编译得到 </span></span><br><span class="line">    geometry (Linux)</span><br><span class="line">    geometry.exe (Windows)</span><br></pre></td></tr></table></figure>
-
-<ol start="3">
-<li><p>导入自定义包：<code>import packagepath</code>，必须指定自定义包 <code>packagename</code> 相对于工作区 <code>src</code> 文件夹的相对路径，如：<code>import &quot;geometry/rectangle&quot;</code>。</p>
-</li>
-<li><p>导出名字：在 Go 中，任何 <strong> 以大写字母开头的变量或者函数都是被导出的名字，其它包只能访问被导出的函数和变量</strong>（即，如果想在包外访问一个函数，它应该首首字母大写）。</p>
-</li>
-<li><p><code>init</code> 函数：所有包都可以包含一个 <code>init</code> 函数，<code>init</code> 函数不应该有任何返回值类型和参数。</p>
-</li>
-</ol>
-<ul>
-<li><p>包的初始化顺序：1）首先初始化 <strong> 被导入的 </strong> 包；2）然后初始化 <strong> 包级别（package level）的变量 </strong>；3）紧接着<strong> 调用 <code>init</code> 函数</strong>，按照编译器解析它们的顺序进行调用。</p>
-</li>
-<li><p>如果一个包导入了另一个包，会先初始化 <strong> 被导入的 </strong> 包。</p>
-</li>
-<li><p>尽管一个包可能会被导入多次，但是它们只会被初始化一次。</p>
-</li>
-</ul>
-<ol start="6">
-<li>空白标识符导入包中的使用：导入了包，却不在代码中使用它，这在 Go 中是非法的，会抛出 <code>xxx.go:6: imported and not used: packagename_yyy</code>。</li>
-</ol>
-<ul>
-<li><p>为了避免这种程序错误，通常会在函数外调用其中的一个函数，并将返回值赋给 <code>_</code> 变量，把这一操作称为 <code> 错误屏蔽器</code>。</p>
-</li>
-<li><p>同时，有时我们并不想使用导入的包中的任一函数或变量，只是为了 <strong> 确保它进行初始化</strong>，这种情况可以使用空白标识符 <code>_</code>，如 <code>import _ &quot;geometry/rectangle&quot;</code>。这样在不调用包中的函数或变量时，也不会报错。</p>
-</li>
-</ul>
-<hr>
-<h2 id="Go 语言学习笔记 -7：if-else"><a href="#Go 语言学习笔记 -7：if-else" class="headerlink" title="Go 语言学习笔记 -7：if-else"></a>Go 语言学习笔记 -7：if-else</h2><ol>
-<li>即使 <code>if</code> 状态下仅有一条语句，也必须加 <code>&#123; &#125;</code></li>
-</ol>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> condition &#123;</span><br><span class="line"></span><br><span class="line">&#125; <span class="keyword">else</span> <span class="keyword">if</span> condition &#123;</span><br><span class="line"></span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<ol start="2">
-<li><code>if</code> 还有另外一种形式，它包含一个 <code>statement</code> 可选语句部分，该组件在条件判断之前运行，语法为：<code>if statement; condition &#123;  &#125;</code>，其中 <code>statement</code> 的作用域仅在 <code>if-else</code> 范围内。</li>
-</ol>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123; <span class="comment">// num 的范围仅限于 if else 代码块</span></span><br><span class="line">  <span class="keyword">if</span> num:= <span class="number">10</span>; num % <span class="number">2</span> == <span class="number">0</span> &#123;</span><br><span class="line">    fmt.Println(num, <span class="string">&quot;is even.&quot;</span>)</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    fmt.Println(num, <span class="string">&quot;is odd.&quot;</span>)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<ol start="3">
-<li><strong>一个注意点</strong>：<code>else</code> 必须键入在 <code>&#125;</code> 后面，不能另取一行键入，因为 Go 语言默认在每条语句结束时插入一个分号，但 <code>if else</code> 是一个整体。</li>
-</ol>
-<h2 id="Go 语言学习笔记 -8：循环"><a href="#Go 语言学习笔记 -8：循环" class="headerlink" title="Go 语言学习笔记 -8：循环"></a>Go 语言学习笔记 -8：循环</h2><ol>
-<li>Go 语言中唯一的循环语句是 <code>for</code>，没有 <code>while</code> 和 <code>do while</code> 循环。</li>
-</ol>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">for</span> initialisation; condition; post &#123;  </span><br><span class="line">    <span class="comment">// 循环体</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li><code>for</code> 循环的三个组成部分，即初始化，条件和 post 都是可选的（可有可无），如：<code>for ;i &lt;= 10; &#123;...&#125;</code>、<code>for &#123;...&#125;</code> 或 <code>for i &lt;= 10 &#123;... i += 2&#125;</code>，即 <code>;</code> 也是可以省略的。</li>
-</ul>
-<ol start="2">
-<li><code>break</code> 为跳出循环，<code>continue</code> 为不执行后续语句，进入下一次循环。</li>
-</ol>
-<hr>
-<h2 id="Go 语言学习笔记 -9：switch 语句"><a href="#Go 语言学习笔记 -9：switch 语句" class="headerlink" title="Go 语言学习笔记 -9：switch 语句"></a>Go 语言学习笔记 -9：switch 语句</h2><ol>
-<li><code>switch</code>是一个条件语句，它可以被认为是替代多个 <code>if else</code> 子句的常用方式，<code>case</code> 不允许出现重复项。</li>
-</ol>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    finger := <span class="number">4</span></span><br><span class="line">    <span class="keyword">switch</span> finger &#123;</span><br><span class="line">        <span class="keyword">case</span> <span class="number">1</span>:</span><br><span class="line">            fmt.Println(<span class="string">&quot;Thumb&quot;</span>)</span><br><span class="line">        <span class="keyword">case</span> <span class="number">2</span>:</span><br><span class="line">            fmt.Println(<span class="string">&quot;Index&quot;</span>)</span><br><span class="line">        <span class="keyword">case</span> <span class="number">3</span>:</span><br><span class="line">            fmt.Println(<span class="string">&quot;Middle&quot;</span>)</span><br><span class="line">        <span class="keyword">case</span> <span class="number">4</span>, <span class="number">5</span>: <span class="comment">// 一个选项多个表达式</span></span><br><span class="line">            fmt.Println(<span class="string">&quot;Ring or Pinky&quot;</span>)</span><br><span class="line">        <span class="keyword">default</span>: <span class="comment">// 默认情况</span></span><br><span class="line">            fmt.Println(<span class="string">&quot;incorrect finger number&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<ol start="2">
-<li><p><strong>先声明变量再使用</strong>：<code>switch varname := xxx; varname &#123;...&#125;</code>，此时的 <code>varname</code> 变量的作用域仅限于当前 <code>switch</code> 内。</p>
-</li>
-<li><p><strong>无表达式的 <code>switch</code><strong>：在 switch 语句中，表达式是可选的，可以被省略。如果省略表达式，则表示这个 switch 语句 </strong> 等同于 switch true</strong>，并且 <strong> 每个 case 表达式都被认定为有效，相应的代码块也会被执行</strong>。</p>
-</li>
-<li><p><strong>fallthrough</strong>：fallthrough 语句可以在已经执行完成的 case 之后，把控制权转移到下一个 case 的执行代码中，而不会跳出 switch。</p>
-</li>
-</ol>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span>  <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">switch</span> num := <span class="number">3</span>; &#123;</span><br><span class="line">        <span class="keyword">case</span> num == <span class="number">3</span>:</span><br><span class="line">            fmt.Println(<span class="string">&quot;==&quot;</span>)</span><br><span class="line">            <span class="keyword">fallthrough</span></span><br><span class="line">        <span class="keyword">case</span> num &lt; <span class="number">10</span>:</span><br><span class="line">            fmt.Println(<span class="string">&quot;yes&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<ol start="5">
-<li>switch 和 case 的表达式不一定是常量。</li>
-</ol>
-]]></content>
-      <categories>
-        <category>学习笔记</category>
-        <category>Golang</category>
-      </categories>
-      <tags>
-        <tag>Go函数</tag>
-        <tag>Go判断</tag>
-        <tag>Go循环</tag>
       </tags>
   </entry>
   <entry>
@@ -810,6 +725,126 @@
       </tags>
   </entry>
   <entry>
+    <title>Go 笔记之函数 &amp; 包 &amp; 判断 &amp; 循环</title>
+    <url>/2023/09/09/Go%E7%AC%94%E8%AE%B0%E4%B9%8B%E5%87%BD%E6%95%B0-%E5%8C%85-%E5%88%A4%E6%96%AD-%E5%BE%AA%E7%8E%AF/</url>
+    <content><![CDATA[<blockquote>
+<p>学习链接：<a href="https://studygolang.com/subject/2">https://studygolang.com/subject/2</a>，感谢如此优秀的教程！</p>
+</blockquote>
+<h2 id="Go 语言学习笔记 -5：函数"><a href="#Go 语言学习笔记 -5：函数" class="headerlink" title="Go 语言学习笔记 -5：函数"></a>Go 语言学习笔记 -5：函数</h2><ol>
+<li>函数声明语法：</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">functionname</span><span class="params">(parametername1 <span class="keyword">type</span>, parametername2 <span class="keyword">type</span>)</span></span> returntype &#123;  </span><br><span class="line">    <span class="comment">// 函数体（具体实现的功能）</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>如果有连续若干个参数，它们的类型一致，那么我们无须一一罗列，只需在最后一个参数后添加该类型。</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">functionname</span><span class="params">(parametername1, parametername2 <span class="keyword">type</span>)</span></span> returntype &#123;  </span><br><span class="line">    <span class="comment">// 函数体（具体实现的功能）</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li>Go 语言支持一个函数可以有 <strong> 多个返回值</strong>。</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">functionname</span><span class="params">(para1 type1, para2 type2)</span></span> (returntype1, returntype2, ...) &#123;</span><br><span class="line">    <span class="comment">// 函数体（具体实现的功能）</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<span id="more"></span>
+
+<ol start="4">
+<li><strong>命名返回值 </strong>：从函数中可以返回一个命名值。一旦命名了返回值，可以认为<strong> 这些值在函数第一行就被声明为变量了</strong>，在函数 return 时不必再跟随命名值。如<code>area, perimeter</code>：</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">rectProps</span><span class="params">(length, width <span class="type">float64</span>)</span></span> (area, perimeter <span class="type">float64</span>) &#123;  </span><br><span class="line">    area = length * width</span><br><span class="line">    perimeter = (length + width) * <span class="number">2</span></span><br><span class="line">    <span class="keyword">return</span> <span class="comment">// 不需要明确指定返回值，默认返回 area, perimeter 的值</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="5">
+<li><strong>空白符</strong>：<code>_</code> 在 Go 中被用作空白符，可以用作表示任何类型的任何值。</li>
+</ol>
+<p><code>area, _ := rectProps(10.8, 5.6) // 返回值周长被丢弃</code>。</p>
+<hr>
+<h2 id="Go 语言学习笔记 -6：包"><a href="#Go 语言学习笔记 -6：包" class="headerlink" title="Go 语言学习笔记 -6：包"></a>Go 语言学习笔记 -6：包</h2><ol>
+<li><p><code>package packagename</code> 指定了某一源文件属于一个包，它应该放在每一个源文件的第一行。</p>
+</li>
+<li><p><code>main</code> 包和自定义包目录结构（属于某一个包的源文件都应该放置于一个单独命名的文件夹里，且应该用包名命名文件夹名）：</p>
+</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line">src</span><br><span class="line">    geometry  <span class="comment">// 自定义 main 包</span></span><br><span class="line">        geometry.<span class="keyword">go</span> <span class="comment">// main 函数</span></span><br><span class="line">        rectangle <span class="comment">// 自定义包，文件名为包名</span></span><br><span class="line">            rectprops.<span class="keyword">go</span> <span class="comment">// 属于 rectangle 包的源文件</span></span><br><span class="line">bin</span><br><span class="line">    <span class="comment">// 通过执行 go build geometry/geometry.go 编译得到 </span></span><br><span class="line">    geometry (Linux)</span><br><span class="line">    geometry.exe (Windows)</span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li><p>导入自定义包：<code>import packagepath</code>，必须指定自定义包 <code>packagename</code> 相对于工作区 <code>src</code> 文件夹的相对路径，如：<code>import &quot;geometry/rectangle&quot;</code>。</p>
+</li>
+<li><p>导出名字：在 Go 中，任何 <strong> 以大写字母开头的变量或者函数都是被导出的名字，其它包只能访问被导出的函数和变量</strong>（即，如果想在包外访问一个函数，它应该首首字母大写）。</p>
+</li>
+<li><p><code>init</code> 函数：所有包都可以包含一个 <code>init</code> 函数，<code>init</code> 函数不应该有任何返回值类型和参数。</p>
+</li>
+</ol>
+<ul>
+<li><p>包的初始化顺序：1）首先初始化 <strong> 被导入的 </strong> 包；2）然后初始化 <strong> 包级别（package level）的变量 </strong>；3）紧接着<strong> 调用 <code>init</code> 函数</strong>，按照编译器解析它们的顺序进行调用。</p>
+</li>
+<li><p>如果一个包导入了另一个包，会先初始化 <strong> 被导入的 </strong> 包。</p>
+</li>
+<li><p>尽管一个包可能会被导入多次，但是它们只会被初始化一次。</p>
+</li>
+</ul>
+<ol start="6">
+<li>空白标识符导入包中的使用：导入了包，却不在代码中使用它，这在 Go 中是非法的，会抛出 <code>xxx.go:6: imported and not used: packagename_yyy</code>。</li>
+</ol>
+<ul>
+<li><p>为了避免这种程序错误，通常会在函数外调用其中的一个函数，并将返回值赋给 <code>_</code> 变量，把这一操作称为 <code> 错误屏蔽器</code>。</p>
+</li>
+<li><p>同时，有时我们并不想使用导入的包中的任一函数或变量，只是为了 <strong> 确保它进行初始化</strong>，这种情况可以使用空白标识符 <code>_</code>，如 <code>import _ &quot;geometry/rectangle&quot;</code>。这样在不调用包中的函数或变量时，也不会报错。</p>
+</li>
+</ul>
+<hr>
+<h2 id="Go 语言学习笔记 -7：if-else"><a href="#Go 语言学习笔记 -7：if-else" class="headerlink" title="Go 语言学习笔记 -7：if-else"></a>Go 语言学习笔记 -7：if-else</h2><ol>
+<li>即使 <code>if</code> 状态下仅有一条语句，也必须加 <code>&#123; &#125;</code></li>
+</ol>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> condition &#123;</span><br><span class="line"></span><br><span class="line">&#125; <span class="keyword">else</span> <span class="keyword">if</span> condition &#123;</span><br><span class="line"></span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li><code>if</code> 还有另外一种形式，它包含一个 <code>statement</code> 可选语句部分，该组件在条件判断之前运行，语法为：<code>if statement; condition &#123;  &#125;</code>，其中 <code>statement</code> 的作用域仅在 <code>if-else</code> 范围内。</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123; <span class="comment">// num 的范围仅限于 if else 代码块</span></span><br><span class="line">  <span class="keyword">if</span> num:= <span class="number">10</span>; num % <span class="number">2</span> == <span class="number">0</span> &#123;</span><br><span class="line">    fmt.Println(num, <span class="string">&quot;is even.&quot;</span>)</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    fmt.Println(num, <span class="string">&quot;is odd.&quot;</span>)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li><strong>一个注意点</strong>：<code>else</code> 必须键入在 <code>&#125;</code> 后面，不能另取一行键入，因为 Go 语言默认在每条语句结束时插入一个分号，但 <code>if else</code> 是一个整体。</li>
+</ol>
+<h2 id="Go 语言学习笔记 -8：循环"><a href="#Go 语言学习笔记 -8：循环" class="headerlink" title="Go 语言学习笔记 -8：循环"></a>Go 语言学习笔记 -8：循环</h2><ol>
+<li>Go 语言中唯一的循环语句是 <code>for</code>，没有 <code>while</code> 和 <code>do while</code> 循环。</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">for</span> initialisation; condition; post &#123;  </span><br><span class="line">    <span class="comment">// 循环体</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>for</code> 循环的三个组成部分，即初始化，条件和 post 都是可选的（可有可无），如：<code>for ;i &lt;= 10; &#123;...&#125;</code>、<code>for &#123;...&#125;</code> 或 <code>for i &lt;= 10 &#123;... i += 2&#125;</code>，即 <code>;</code> 也是可以省略的。</li>
+</ul>
+<ol start="2">
+<li><code>break</code> 为跳出循环，<code>continue</code> 为不执行后续语句，进入下一次循环。</li>
+</ol>
+<hr>
+<h2 id="Go 语言学习笔记 -9：switch 语句"><a href="#Go 语言学习笔记 -9：switch 语句" class="headerlink" title="Go 语言学习笔记 -9：switch 语句"></a>Go 语言学习笔记 -9：switch 语句</h2><ol>
+<li><code>switch</code>是一个条件语句，它可以被认为是替代多个 <code>if else</code> 子句的常用方式，<code>case</code> 不允许出现重复项。</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    finger := <span class="number">4</span></span><br><span class="line">    <span class="keyword">switch</span> finger &#123;</span><br><span class="line">        <span class="keyword">case</span> <span class="number">1</span>:</span><br><span class="line">            fmt.Println(<span class="string">&quot;Thumb&quot;</span>)</span><br><span class="line">        <span class="keyword">case</span> <span class="number">2</span>:</span><br><span class="line">            fmt.Println(<span class="string">&quot;Index&quot;</span>)</span><br><span class="line">        <span class="keyword">case</span> <span class="number">3</span>:</span><br><span class="line">            fmt.Println(<span class="string">&quot;Middle&quot;</span>)</span><br><span class="line">        <span class="keyword">case</span> <span class="number">4</span>, <span class="number">5</span>: <span class="comment">// 一个选项多个表达式</span></span><br><span class="line">            fmt.Println(<span class="string">&quot;Ring or Pinky&quot;</span>)</span><br><span class="line">        <span class="keyword">default</span>: <span class="comment">// 默认情况</span></span><br><span class="line">            fmt.Println(<span class="string">&quot;incorrect finger number&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li><p><strong>先声明变量再使用</strong>：<code>switch varname := xxx; varname &#123;...&#125;</code>，此时的 <code>varname</code> 变量的作用域仅限于当前 <code>switch</code> 内。</p>
+</li>
+<li><p><strong>无表达式的 <code>switch</code><strong>：在 switch 语句中，表达式是可选的，可以被省略。如果省略表达式，则表示这个 switch 语句 </strong> 等同于 switch true</strong>，并且 <strong> 每个 case 表达式都被认定为有效，相应的代码块也会被执行</strong>。</p>
+</li>
+<li><p><strong>fallthrough</strong>：fallthrough 语句可以在已经执行完成的 case 之后，把控制权转移到下一个 case 的执行代码中，而不会跳出 switch。</p>
+</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span>  <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">switch</span> num := <span class="number">3</span>; &#123;</span><br><span class="line">        <span class="keyword">case</span> num == <span class="number">3</span>:</span><br><span class="line">            fmt.Println(<span class="string">&quot;==&quot;</span>)</span><br><span class="line">            <span class="keyword">fallthrough</span></span><br><span class="line">        <span class="keyword">case</span> num &lt; <span class="number">10</span>:</span><br><span class="line">            fmt.Println(<span class="string">&quot;yes&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="5">
+<li>switch 和 case 的表达式不一定是常量。</li>
+</ol>
+]]></content>
+      <categories>
+        <category>学习笔记</category>
+        <category>Golang</category>
+      </categories>
+      <tags>
+        <tag>Go函数</tag>
+        <tag>Go判断</tag>
+        <tag>Go循环</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>C 语言之 pthread 多线程</title>
     <url>/2023/09/11/C%E8%AF%AD%E8%A8%80%E4%B9%8Bpthread%E5%A4%9A%E7%BA%BF%E7%A8%8B/</url>
     <content><![CDATA[<h2 id="多线程"><a href="# 多线程" class="headerlink" title="多线程"></a>多线程 </h2><h3 id="进程与线程"><a href="# 进程与线程" class="headerlink" title="进程与线程"></a> 进程与线程 </h3><p><strong> 进程</strong>：是一个具有一定独立功能的程序在一个数据集上的一次动态执行的过程，是操作系统进行资源分配和调度的一个独立单元，是应用程序运行的载体。进程一般由程序、数据集合和进程控制块三部分组成：</p>
@@ -830,6 +865,8 @@
 <li><p>一个标准的线程由线程 ID、当前指令指针 PC、寄存器和堆栈组成。（每个孩子有其自身的成长轨迹）</p>
 </li>
 </ul>
+<span id="more"></span>
+
 <p><strong>进程与线程的区别</strong>：</p>
 <ul>
 <li><p>线程是程序执行的最小单位，而进程是操作系统分配资源的最小单位。</p>
@@ -841,8 +878,6 @@
 <li><p><strong>线程上下文切换比进程上下文切换要快得多</strong>。</p>
 </li>
 </ul>
-<span id="more"></span>
-
 <h3 id="上下文切换"><a href="# 上下文切换" class="headerlink" title="上下文切换"></a>上下文切换 </h3><h4 id="时间片"><a href="# 时间片" class="headerlink" title="时间片"></a> 时间片 </h4><p> 多任务系统往往需要同时执行多道作业。作业数往往大于机器的 CPU 数，然而一颗 CPU 同时只能执行一项任务，如何让用户感觉这些任务正在同时进行呢? 操作系统的设计者巧妙地利用了 <strong> 时间片轮转的方式</strong>。</p>
 <p><strong>时间片是 CPU 分配给各个任务（线程）的时间</strong>。</p>
 <blockquote>
