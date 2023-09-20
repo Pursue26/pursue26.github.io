@@ -1672,6 +1672,14 @@ pre code {
     text-align: justify;
   }
 }
+.post-body a:not(.btn) {
+  color: #2a1eb1;
+  border-bottom: none;
+}
+.post-body a:not(.btn):hover {
+  color: #f00;
+  text-decoration: underline;
+}
 .post-body h1 .header-anchor,
 .post-body h2 .header-anchor,
 .post-body h3 .header-anchor,
