@@ -137,38 +137,82 @@
       </tags>
   </entry>
   <entry>
-    <title>C 语言之 main 函数参数</title>
-    <url>/posts/230916171929.html</url>
-    <content><![CDATA[<h2 id="指令行操作"><a href="# 指令行操作" class="headerlink" title="指令行操作"></a> 指令行操作 </h2><p>C 语言支持从 CLI（指令行）传入参数给 main() 函数，多个命令行参数之间用空格分隔，但是如果参数本身带有空格，那么就使用双引号或单引号。</p>
-<p>C 语言的 main 函数是程序的入口函数，它可以有两种形式的参数：</p>
+    <title>C 语言之 typedef 实践</title>
+    <url>/posts/230920172849.html</url>
+    <content><![CDATA[<p>在 <a href="https://pursue26.github.io/posts/230918174223.html">C 语言之 typedef 自定义类型基础</a> 中介绍了 <code>typedef</code> 的使用，下面介绍一些 <code>typedef</code> 的实践。</p>
 <span id="more"></span>
 
-<ol>
-<li><p> 无参数形式：main 函数的原型可以是 <code>int main(void)</code>。这表示不接受任何参数，程序执行时不需要从命令行传递参数给 main 函数。</p>
-</li>
-<li><p> 带参数形式：main 函数的原型可以是 <code>int main(int argc, char *argv[])</code>。其中，<code>argc</code> 表示命令行参数的个数，而 <code>argv</code> 是一个字符串指针数组，每个元素都是一个命令行参数的字符串。</p>
+<h2 id="两大陷阱"><a href="# 两大陷阱" class="headerlink" title="两大陷阱"></a>两大陷阱 </h2><h3 id="不是简单的字符串替换"><a href="# 不是简单的字符串替换" class="headerlink" title="不是简单的字符串替换"></a> 不是简单的字符串替换</h3><p><code>typedef</code> 是定义了一种类型的新别名，不同于宏，它不是简单的字符串替换。</p>
+<p>当 <code>const</code> 与 <code>typedef</code> 相结合时，如定义：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="type">char</span>* PSTR;</span><br><span class="line"><span class="type">int</span> <span class="title function_">mystrcmp</span><span class="params">(<span class="type">const</span> PSTR, <span class="type">const</span> PSTR)</span>;</span><br></pre></td></tr></table></figure>
+
+<p><code>const PSTR</code> 实际上相当于指针常量 <code>const char*</code> 吗？</p>
+<p>不是的，它实际上相当于 <code>char* const</code>。这是因为 <code>const</code> 给予了整个指针本身以常量性，也就是形成了常量指针。简单来说，记住当 <code>const</code> 和 <code>typedef</code> 一起出现时，<code>typedef</code> 不会是简单的字符串替换就行。</p>
+<h3 id="与其它存储类关键字不共存"><a href="# 与其它存储类关键字不共存" class="headerlink" title="与其它存储类关键字不共存"></a>与其它存储类关键字不共存 </h3><p><code>typedef</code> 在语法上是一个<strong> 存储类关键字</strong>，虽然它并不真正影响对象的存储特性，但变量只能被一种储类的关键字修饰。</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="type">static</span> <span class="type">int</span> SINT_t;</span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">auto</span> <span class="type">int</span> AINT_t;</span><br><span class="line"><span class="keyword">extern</span> <span class="keyword">typedef</span> <span class="type">int</span> INT_t;</span><br></pre></td></tr></table></figure>
+
+<p>上述代码中，有两个存储类关键字，会编译将失败，报错 error: multiple storage classes in declaration specifiers</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="type">int</span> INT_t;</span><br><span class="line"><span class="type">static</span> INT_t a = <span class="number">10</span>;</span><br></pre></td></tr></table></figure>
+
+<p>这种写法是合法的。</p>
+<blockquote>
+<p>其它存储类关键字有 <code>auto</code>、<code>extern</code>、<code>mutable</code>、<code>static</code>、<code>register</code> 等。</p>
+</blockquote>
+<h2 id="typedef、const 与 define 结合"><a href="#typedef、const 与 define 结合" class="headerlink" title="typedef、const 与 define 结合"></a>typedef、const 与 define 结合 </h2><p> 示例 1：通常讲，<code>typedef</code> 要比 <code>define</code> 要好，<strong>特别是在有指针的场合</strong>。</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> pStr2 char*</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">char</span>* pStr1;</span><br><span class="line"></span><br><span class="line">pStr1 s1, s2;  </span><br><span class="line">pStr2 s3, s4;</span><br></pre></td></tr></table></figure>
+
+<p>在上述的变量定义中，<code>s1</code>、<code>s2</code>、<code>s3</code>都被定义为 <code>char *</code>，而<code>s4</code> 则定义成了 <code>char</code>，不是我们所预期的指针变量，根本原因就在于<code>define</code> 只是简单的字符串替换而 <code>typedef</code> 则是为一个类型起新名字。</p>
+<p>示例 2：当 <code>const</code> 和<code>typedef</code>一起出现时，<code>typedef</code>不会是简单的字符串替换。</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="type">char</span>* pStr;</span><br><span class="line"><span class="type">char</span> s[<span class="number">4</span>] = <span class="string">&quot;abc&quot;</span>;</span><br><span class="line"><span class="type">const</span> <span class="type">char</span> *p1 = s;</span><br><span class="line"><span class="type">const</span> pStr p2 = s; <span class="comment">// 实际为 char* const p2 = s;</span></span><br><span class="line"></span><br><span class="line">p1++;  <span class="comment">// 指针常量的指针可变</span></span><br><span class="line">p2++;  <span class="comment">// 编译报错, 常量指针的指针不可变</span></span><br><span class="line">*p1 = <span class="string">&#x27;m&#x27;</span>;  <span class="comment">// 编译报错, 指针常量的值不可变</span></span><br><span class="line"></span><br><span class="line">s[<span class="number">0</span>] = <span class="string">&#x27;d&#x27;</span>;</span><br><span class="line">s[<span class="number">1</span>] = <span class="string">&#x27;e&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="built_in">printf</span>(<span class="string">&quot;s = %s, %c\r\n&quot;</span>, s, *p1, *p2);  <span class="comment">//dec, e, d</span></span><br><span class="line">*p2 = <span class="string">&#x27;m&#x27;</span>;</span><br><span class="line"><span class="built_in">printf</span>(<span class="string">&quot;s = %s, %c\r\n&quot;</span>, s, *p1, *p2);  <span class="comment">//mec, e, m</span></span><br></pre></td></tr></table></figure>
+
+<p>示例中，</p>
 <ul>
-<li><code>argc</code> 标识传入的参数个数。如果没有提供任何参数，<code>argc</code> 将被设置为 1；否则，<code>argc</code> 将被设置为传入的参数个数加 1。</li>
-<li><code>argv[0]</code> 通常是程序的名称或路径的字符串。</li>
-<li><code>argv[1]</code> 到 <code>argv[argc - 1]</code> 是命令行传递给程序的参数，以空格分隔。</li>
+<li><code>const char *p1</code>是限定数据类型为 <code>char *</code> 的指针变量可变，指针变量指向的对象不可变，所以 <code>p1++</code> 正确；</li>
+<li><code>p2++</code>出错了，这个问题再一次提醒我们：<code>typedef</code>和 <code>define</code> 不同，它不是简单的文本替换；</li>
+<li><code>const pStr p2</code>并不等于 <code>const char *p2</code>，<code>const pStr p2</code> 和<code>const long x</code>本质上没有区别，都是对变量进行只读限制，只不过此处变量 <code>p2</code> 的数据类型是我们自己定义的，而不是系统固有类型。因此，<code>const pStr p2</code>的含义是：限定数据类型为 <code>char *</code> 的指针变量 <code>p2</code> 为只读，因此 <code>p2++</code> 错误。</li>
 </ul>
-</li>
-</ol>
-<p> 值得注意的是，也可以使用 <code>char **argv</code> 来代替 <code>char *argv[]</code> 形参，两者具有相同的类型含义。因为数组变量名 <code>argv</code> 就是指向 <code>argv[]</code> 数组的第一个元素的指针，同时又因为第一个元素的数值就是一个指针，所以此时的数组变量名 <code>argv</code> 的本质就是一个指针的指针（双重指针）。</p>
-<p> 下面是一个例子，演示如何使用带参数的 main 函数来接收命令行参数：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span> &#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;number of params: %d\n&quot;</span>, argc);</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; argc; i++) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;param-%d: %s\n&quot;</span>, i, argv[i]);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="抑制劣质代码"><a href="# 抑制劣质代码" class="headerlink" title="抑制劣质代码"></a>抑制劣质代码 </h2><p> 人们常常使用 <code>typedef</code> 来编写更美观和可读的代码。所谓美观，意指 <code>typedef</code> 能隐藏笨拙的语法构造以及平台相关的数据类型，从而增强可移植性以及未来的可维护性。在编程中使用 <code>typedef</code> 目的一般有两个，一个是给变量一个易记且意义明确的新名字，另一个是简化一些比较复杂的类型声明。</p>
+<h3 id="定义易于记忆的类型名"><a href="# 定义易于记忆的类型名" class="headerlink" title="定义易于记忆的类型名"></a>定义易于记忆的类型名</h3><p><code>typedef</code> 使用最多的地方是创建易于记忆的类型名，用它来归档程序员的意图。类型出现在所声明的变量名字中，位于 <code>typedef</code> 关键字右边。例如：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="type">int</span> size;</span><br></pre></td></tr></table></figure>
 
-<p> 如果编译并运行这个程序，并在命令行中输入参数，例如 <code>./a.out arg1 arg2 3 arg4</code>，则输出如下：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">number of params: 5</span><br><span class="line">param-0: ./a.out</span><br><span class="line">param-1: arg1</span><br><span class="line">param-2: arg2</span><br><span class="line">param-3: 3</span><br><span class="line">param-4: arg4</span><br></pre></td></tr></table></figure>
+<p>此声明定义了一个 <code>int</code> 的同义字，名字为 <code>size</code>。注意 <code>typedef</code> 并不创建新的类型，它仅仅为现有类型添加一个同义字。因此，你可以在任何需要 <code>int</code> 的上下文中使用 <code>size</code>：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">measure</span><span class="params">(size *pSize)</span>;</span><br><span class="line">size <span class="built_in">array</span>[<span class="number">4</span>];</span><br><span class="line">size len = file.getlength();</span><br></pre></td></tr></table></figure>
 
-<p> 参考链接：<a href="https://is-cloud.blog.csdn.net/article/details/105347737">https://is-cloud.blog.csdn.net/article/details/105347737</a></p>
+<p><code>typedef</code> 还可以掩饰复合类型，如指针和数组。例如，你不用像下面这样重复定义有 81 个字符元素的数组：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">char</span> line[<span class="number">81</span>];</span><br><span class="line"><span class="type">char</span> text[<span class="number">81</span>];</span><br></pre></td></tr></table></figure>
+
+<p>定义一个 <code>typedef</code>，每当要用到相同类型和大小的数组时，可以这样：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="type">char</span> Line[<span class="number">81</span>];</span><br><span class="line">Line text, secondline;</span><br><span class="line">getline(text);</span><br></pre></td></tr></table></figure>
+
+<p>同样，也可以像下面这样隐藏指针语法：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="type">const</span> <span class="type">char</span> *<span class="type">pstr_t</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">mystrcmp</span><span class="params">(<span class="type">pstr_t</span>, <span class="type">pstr_t</span>)</span>;</span><br></pre></td></tr></table></figure>
+
+<p><strong>记住</strong>，不管什么时候，只要为指针声明 <code>typedef</code>，都要在最终的 <code>typedef</code> 名称中加一个 <code>const</code>，比如：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="type">const</span> <span class="type">char</span> *<span class="type">cpstr_t</span>;  <span class="comment">// 指针常量, 使得该指针可变, 而指针指向的对象不可变（只读）</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">char</span>* <span class="type">const</span> <span class="type">cpstr_t</span>;  <span class="comment">// 常量指针, 使得该指针不可变（只读）, 但指针指向的对象可变的</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="简化代码"><a href="# 简化代码" class="headerlink" title="简化代码"></a>简化代码 </h3><p> 上面讨论的 <code>typedef</code> 行为有点像 <code>define</code> 宏，用其实际类型替代同义字。不同点是 <code>typedef</code> 在编译时被解释，因此可以让编译器来应付超越预处理器能力的文本替换。例如：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="title function_">int</span> <span class="params">(*PF)</span> <span class="params">(<span class="type">const</span> <span class="type">char</span> *, <span class="type">const</span> <span class="type">char</span> *)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>这个声明引入了 <code>PF</code> 类型作为函数指针的同义字，该函数有两个 <code>const char *</code> 类型的参数以及一个 <code>int</code> 类型的返回值。如果要使用下列形式的函数声明，那么上述这个 <code>typedef</code> 是不可或缺的：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">PF <span class="title function_">Register</span><span class="params">(PF pf)</span>;</span><br></pre></td></tr></table></figure>
+
+<p><code>Register()</code> 的参数是一个 <code>PF</code> 类型的回调函数，返回某个函数的地址，其署名与先前注册的名字相同。下面我展示一下如果不用 <code>typedef</code>，我们是如何实现这个声明的：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> (*Register (<span class="type">int</span> (*pf)(<span class="type">const</span> <span class="type">char</span> *, <span class="type">const</span> <span class="type">char</span> *))) (<span class="type">const</span> <span class="type">char</span> *, <span class="type">const</span> <span class="type">char</span> *); </span><br></pre></td></tr></table></figure>
+
+<p>很少有程序员理解它是什么意思，更不用说这种费解的代码所带来的出错风险了。显然，这里使用 <code>typedef</code> 不是一种特权，而是一种必需。</p>
+<p>持怀疑态度的人可能会问：“OK，还会有人写这样的代码吗？”，快速浏览一下揭示 <code>signal()</code> 函数的头文件 <code>&lt;csinal&gt;</code>，有一个同样接口的函数：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="comment">// signal 原型</span></span><br><span class="line"><span class="type">void</span> (*signal(<span class="type">int</span> sig, <span class="type">void</span> (*func)(<span class="type">int</span>)))(<span class="type">int</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// typedef 优化后</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="title function_">void</span> <span class="params">(*pFun)</span><span class="params">(<span class="type">int</span>)</span>;</span><br><span class="line">pFun <span class="title function_">signal</span><span class="params">(<span class="type">int</span> sig, pFun func)</span>;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>参考链接：<a href="https://www.cnblogs.com/a-s-m/p/10995722.html">https://www.cnblogs.com/a-s-m/p/10995722.html</a></p>
+</blockquote>
 ]]></content>
       <categories>
         <category>学习笔记</category>
         <category>C语言</category>
       </categories>
       <tags>
-        <tag>main函数参数</tag>
+        <tag>自定义类型</tag>
       </tags>
   </entry>
   <entry>
@@ -288,82 +332,110 @@
       </tags>
   </entry>
   <entry>
-    <title>C 语言之 typedef 实践</title>
-    <url>/posts/230920172849.html</url>
-    <content><![CDATA[<p>在 <a href="https://pursue26.github.io/posts/230918174223.html">C 语言之 typedef 自定义类型基础</a> 中介绍了 <code>typedef</code> 的使用，下面介绍一些 <code>typedef</code> 的实践。</p>
+    <title>C 语言之锁与原子操作基础</title>
+    <url>/posts/230921094127.html</url>
+    <content><![CDATA[<h2 id="常见锁介绍"><a href="# 常见锁介绍" class="headerlink" title="常见锁介绍"></a>常见锁介绍 </h2><p> 在 C 语言中，常见的用于解决多线程访问数据的锁包括互斥锁、读写锁、条件变量、自旋锁、屏蔽等。</p>
 <span id="more"></span>
 
-<h2 id="两大陷阱"><a href="# 两大陷阱" class="headerlink" title="两大陷阱"></a>两大陷阱 </h2><h3 id="不是简单的字符串替换"><a href="# 不是简单的字符串替换" class="headerlink" title="不是简单的字符串替换"></a> 不是简单的字符串替换</h3><p><code>typedef</code> 是定义了一种类型的新别名，不同于宏，它不是简单的字符串替换。</p>
-<p>当 <code>const</code> 与 <code>typedef</code> 相结合时，如定义：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="type">char</span>* PSTR;</span><br><span class="line"><span class="type">int</span> <span class="title function_">mystrcmp</span><span class="params">(<span class="type">const</span> PSTR, <span class="type">const</span> PSTR)</span>;</span><br></pre></td></tr></table></figure>
-
-<p><code>const PSTR</code> 实际上相当于指针常量 <code>const char*</code> 吗？</p>
-<p>不是的，它实际上相当于 <code>char* const</code>。这是因为 <code>const</code> 给予了整个指针本身以常量性，也就是形成了常量指针。简单来说，记住当 <code>const</code> 和 <code>typedef</code> 一起出现时，<code>typedef</code> 不会是简单的字符串替换就行。</p>
-<h3 id="与其它存储类关键字不共存"><a href="# 与其它存储类关键字不共存" class="headerlink" title="与其它存储类关键字不共存"></a>与其它存储类关键字不共存 </h3><p><code>typedef</code> 在语法上是一个<strong> 存储类关键字</strong>，虽然它并不真正影响对象的存储特性，但变量只能被一种储类的关键字修饰。</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="type">static</span> <span class="type">int</span> SINT_t;</span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">auto</span> <span class="type">int</span> AINT_t;</span><br><span class="line"><span class="keyword">extern</span> <span class="keyword">typedef</span> <span class="type">int</span> INT_t;</span><br></pre></td></tr></table></figure>
-
-<p>上述代码中，有两个存储类关键字，会编译将失败，报错 error: multiple storage classes in declaration specifiers</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="type">int</span> INT_t;</span><br><span class="line"><span class="type">static</span> INT_t a = <span class="number">10</span>;</span><br></pre></td></tr></table></figure>
-
-<p>这种写法是合法的。</p>
+<ol>
+<li><p>互斥锁（mutex）：互斥锁是一种 <strong> 最基本的锁机制 </strong>，用于<strong> 保护共享资源</strong>，防止多个线程同时访问和修改同一个资源。当一个线程持有了互斥锁后，其他线程需要等待该线程释放锁之后才能访问共享资源。</p>
+</li>
+<li><p>读写锁（read-write lock）：读写锁是一种 <strong> 特殊的锁机制 </strong>，它允许多个线程同时读取共享资源，但是<strong> 只允许一个线程写入共享资源</strong>。这种锁可以提高读取操作的并发度，同时保证写入操作的正确性和一致性。如果一个线程获取了写锁，其他线程就必须等待它释放锁后才能继续访问；如果一个线程获取了读锁，其他线程也可以获取读锁并访问资源。</p>
+</li>
+<li><p>条件变量（condition variable）：条件变量是一种 <strong> 用于线程之间通信的同步机制</strong>，它允许线程在某个条件成立时才能继续执行。通常与互斥锁一起使用，当条件变量不满足时，线程释放互斥锁并等待条件变量被激活（通过另一个线程来激活条件变量）；当条件变量满足时，通知线程重新获取互斥锁并继续执行。</p>
+</li>
+<li><p>自旋锁（spinlock）：自旋锁是一种 <strong> 忙等待锁机制 </strong>，当一个线程尝试获取锁时，如果锁已经被占用，它会一直循环等待直到锁被释放。<strong> 自旋锁适用于锁的持有时间很短的情况</strong>，因为长时间占用 CPU 会影响系统性能。</p>
+</li>
+<li><p>屏障（barrier）：屏障是一种 <strong> 用于多线程协同的同步机制 </strong>，它允许多个线程在某个点上等待，直到所有线程都到达该点后再继续执行。屏障通常用于<strong> 一组线程 </strong> 需要在某个点进行 <strong> 同步操作 </strong> 的情况，例如多线程排序算法。</p>
+</li>
+</ol>
 <blockquote>
-<p>其它存储类关键字有 <code>auto</code>、<code>extern</code>、<code>mutable</code>、<code>static</code>、<code>register</code> 等。</p>
+<p>需要根据具体的应用场景选择合适的锁。</p>
 </blockquote>
-<h2 id="typedef、const 与 define 结合"><a href="#typedef、const 与 define 结合" class="headerlink" title="typedef、const 与 define 结合"></a>typedef、const 与 define 结合 </h2><p> 示例 1：通常讲，<code>typedef</code> 要比 <code>define</code> 要好，<strong>特别是在有指针的场合</strong>。</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> pStr2 char*</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">char</span>* pStr1;</span><br><span class="line"></span><br><span class="line">pStr1 s1, s2;  </span><br><span class="line">pStr2 s3, s4;</span><br></pre></td></tr></table></figure>
-
-<p>在上述的变量定义中，<code>s1</code>、<code>s2</code>、<code>s3</code>都被定义为 <code>char *</code>，而<code>s4</code> 则定义成了 <code>char</code>，不是我们所预期的指针变量，根本原因就在于<code>define</code> 只是简单的字符串替换而 <code>typedef</code> 则是为一个类型起新名字。</p>
-<p>示例 2：当 <code>const</code> 和<code>typedef</code>一起出现时，<code>typedef</code>不会是简单的字符串替换。</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="type">char</span>* pStr;</span><br><span class="line"><span class="type">char</span> s[<span class="number">4</span>] = <span class="string">&quot;abc&quot;</span>;</span><br><span class="line"><span class="type">const</span> <span class="type">char</span> *p1 = s;</span><br><span class="line"><span class="type">const</span> pStr p2 = s; <span class="comment">// 实际为 char* const p2 = s;</span></span><br><span class="line"></span><br><span class="line">p1++;  <span class="comment">// 指针常量的指针可变</span></span><br><span class="line">p2++;  <span class="comment">// 编译报错, 常量指针的指针不可变</span></span><br><span class="line">*p1 = <span class="string">&#x27;m&#x27;</span>;  <span class="comment">// 编译报错, 指针常量的值不可变</span></span><br><span class="line"></span><br><span class="line">s[<span class="number">0</span>] = <span class="string">&#x27;d&#x27;</span>;</span><br><span class="line">s[<span class="number">1</span>] = <span class="string">&#x27;e&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="built_in">printf</span>(<span class="string">&quot;s = %s, %c\r\n&quot;</span>, s, *p1, *p2);  <span class="comment">//dec, e, d</span></span><br><span class="line">*p2 = <span class="string">&#x27;m&#x27;</span>;</span><br><span class="line"><span class="built_in">printf</span>(<span class="string">&quot;s = %s, %c\r\n&quot;</span>, s, *p1, *p2);  <span class="comment">//mec, e, m</span></span><br></pre></td></tr></table></figure>
-
-<p>示例中，</p>
+<h2 id="互斥锁"><a href="# 互斥锁" class="headerlink" title="互斥锁"></a>互斥锁 </h2><p> 互斥锁原理：互斥锁属于 sleep-waiting 类型的锁。例如，在一个双核的机器上有两个线程（线程 A 和线程 B），它们分别运行在 Core0 和 Core1 上。假设线程 A 想要通过 <code>pthread_mutex_lock</code> 操作去得到一个临界区的锁，而此时这个锁正被线程 B 所持有，那么线程 A 就会被阻塞，Core0 会在此时进行上下文切换（Context Switch）将线程 A<strong>置于等待队列中</strong>，此时 Core0 就可以运行其它的任务而不必进行忙等待。</p>
+<p>互斥锁的实现：通常使用了操作系统提供的原子操作或者硬件提供的锁机制，保证锁的正确性和高效性。</p>
+<p>互斥锁有两种类型：递归锁和非递归锁。递归锁允许同一线程在不释放锁的情况下多次获取锁，而非递归锁不允许这种情况发生。</p>
+<p>互斥锁使用场景：因互斥锁会引起线程的切换，效率较低；使用互斥锁会引起线程阻塞等待，不会一直占用着 CPU。因此，当锁的内容较多、切换不频繁时，建议使用互斥锁。</p>
+<p>互斥锁使用笔记：互斥锁的使用非常简单，主要包括以下几个步骤：</p>
 <ul>
-<li><code>const char *p1</code>是限定数据类型为 <code>char *</code> 的指针变量可变，指针变量指向的对象不可变，所以 <code>p1++</code> 正确；</li>
-<li><code>p2++</code>出错了，这个问题再一次提醒我们：<code>typedef</code>和 <code>define</code> 不同，它不是简单的文本替换；</li>
-<li><code>const pStr p2</code>并不等于 <code>const char *p2</code>，<code>const pStr p2</code> 和<code>const long x</code>本质上没有区别，都是对变量进行只读限制，只不过此处变量 <code>p2</code> 的数据类型是我们自己定义的，而不是系统固有类型。因此，<code>const pStr p2</code>的含义是：限定数据类型为 <code>char *</code> 的指针变量 <code>p2</code> 为只读，因此 <code>p2++</code> 错误。</li>
+<li>定义互斥锁变量，一般使用 <code>pthread_mutex_t</code> 类型；</li>
+<li>在需要保护的代码段前调用 <code>pthread_mutex_lock</code> 函数获取锁；</li>
+<li>在代码段执行完毕后调用 <code>pthread_mutex_unlock</code> 函数释放锁；</li>
+<li>释放锁之后其他线程就可以获取锁并访问共享资源。</li>
 </ul>
-<h2 id="抑制劣质代码"><a href="# 抑制劣质代码" class="headerlink" title="抑制劣质代码"></a>抑制劣质代码 </h2><p> 人们常常使用 <code>typedef</code> 来编写更美观和可读的代码。所谓美观，意指 <code>typedef</code> 能隐藏笨拙的语法构造以及平台相关的数据类型，从而增强可移植性以及未来的可维护性。在编程中使用 <code>typedef</code> 目的一般有两个，一个是给变量一个易记且意义明确的新名字，另一个是简化一些比较复杂的类型声明。</p>
-<h3 id="定义易于记忆的类型名"><a href="# 定义易于记忆的类型名" class="headerlink" title="定义易于记忆的类型名"></a>定义易于记忆的类型名</h3><p><code>typedef</code> 使用最多的地方是创建易于记忆的类型名，用它来归档程序员的意图。类型出现在所声明的变量名字中，位于 <code>typedef</code> 关键字右边。例如：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="type">int</span> size;</span><br></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;pthread.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">pthread_mutex_t</span> mutex = PTHREAD_MUTEX_INITIALIZER;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 初始化互斥锁</span></span><br><span class="line">pthread_mutex_init(&amp;mutex, <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 在需要保护的代码块前加锁</span></span><br><span class="line">pthread_mutex_lock(&amp;mutex);</span><br><span class="line"><span class="comment">// 访问共享资源</span></span><br><span class="line"><span class="comment">// ...</span></span><br><span class="line"><span class="comment">// 访问完毕后解锁</span></span><br><span class="line">pthread_mutex_unlock(&amp;mutex);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 在使用完互斥锁后销毁</span></span><br><span class="line">pthread_mutex_destroy(&amp;mutex);</span><br></pre></td></tr></table></figure>
 
-<p>此声明定义了一个 <code>int</code> 的同义字，名字为 <code>size</code>。注意 <code>typedef</code> 并不创建新的类型，它仅仅为现有类型添加一个同义字。因此，你可以在任何需要 <code>int</code> 的上下文中使用 <code>size</code>：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">measure</span><span class="params">(size *pSize)</span>;</span><br><span class="line">size <span class="built_in">array</span>[<span class="number">4</span>];</span><br><span class="line">size len = file.getlength();</span><br></pre></td></tr></table></figure>
+<h2 id="读写锁"><a href="# 读写锁" class="headerlink" title="读写锁"></a>读写锁 </h2><p> 读写锁的实现：通常使用了计数器和互斥锁等机制，通过控制读写访问的次数和顺序来保证数据的正确性和一致性。</p>
+<p>读写锁使用笔记：读写锁的使用也非常简单，主要包括以下几个步骤：</p>
+<ul>
+<li>定义读写锁变量，一般使用 <code>pthread_rwlock_t</code> 类型；</li>
+<li>在需要读取共享资源的代码段前调用 <code>pthread_rwlock_rdlock</code> 函数获取读锁；</li>
+<li>在需要写入共享资源的代码段前调用 <code>pthread_rwlock_wrlock</code> 函数获取写锁；</li>
+<li>在代码段执行完毕后调用 <code>pthread_rwlock_unlock</code> 函数释放锁；</li>
+<li>释放锁之后其他线程就可以获取锁并访问共享资源。</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;pthread.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">pthread_rwlock_t</span> rwlock = PTHREAD_RWLOCK_INITIALIZER;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 初始化读写锁</span></span><br><span class="line">pthread_rwlock_init(&amp;rwlock, <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 在需要读取共享资源的代码块前加读锁</span></span><br><span class="line">pthread_rwlock_rdlock(&amp;rwlock);</span><br><span class="line"><span class="comment">// 读取共享资源</span></span><br><span class="line"><span class="comment">// ...</span></span><br><span class="line"><span class="comment">// 读取完毕后释放读锁</span></span><br><span class="line">pthread_rwlock_unlock(&amp;rwlock);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 在需要写入共享资源的代码块前加写锁</span></span><br><span class="line">pthread_rwlock_wrlock(&amp;rwlock);</span><br><span class="line"><span class="comment">// 写入共享资源</span></span><br><span class="line"><span class="comment">// ...</span></span><br><span class="line"><span class="comment">// 写入完毕后释放写锁</span></span><br><span class="line">pthread_rwlock_unlock(&amp;rwlock);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 在使用完读写锁后销毁</span></span><br><span class="line">pthread_rwlock_destroy(&amp;rwlock);</span><br></pre></td></tr></table></figure>
 
-<p><code>typedef</code> 还可以掩饰复合类型，如指针和数组。例如，你不用像下面这样重复定义有 81 个字符元素的数组：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">char</span> line[<span class="number">81</span>];</span><br><span class="line"><span class="type">char</span> text[<span class="number">81</span>];</span><br></pre></td></tr></table></figure>
+<h2 id="自旋锁"><a href="# 自旋锁" class="headerlink" title="自旋锁"></a>自旋锁 </h2><p> 自旋锁原理：自旋锁属于 busy-waiting 类型的锁。例如，在一个双核的机器上有两个线程（线程 A 和线程 B），它们分别运行在 Core0 和 Core1 上。如果线程 A 是使用 <code>pthread_spin_lock</code> 操作去请求锁，那么线程 A 就会一直在 Core0 上进行忙等待并 <strong> 不停的进行 </strong> 锁请求，直到得到这个锁为止。自旋锁不会引起调用者睡眠，如果自旋锁已经被别的执行单元保持，调用者就 <strong> 一直循环 </strong> 在那里看是否该自旋锁的保持者已经释放了锁。</p>
+<p>自旋锁使用场景：</p>
+<ul>
+<li><p>自旋锁的作用是为了解决某项资源的 <strong> 互斥使用</strong>。因为自旋锁不会引起调用者睡眠，所以自旋锁的效率远高于互斥锁。因此，如果锁的内容较少、阻塞的时间较短，使用自旋锁比较好。</p>
+</li>
+<li><p>自旋锁在未获得锁的情况下，一直运行（自旋），占用着 CPU，如果不能在很短的时间内获得锁，这无疑会使 CPU 效率降低。因此，要慎重使用自旋锁，<strong>自旋锁只有在内核可抢占式或 SMP 的情况下才真正需要</strong>。在单 CPU 且不可抢占式的内核下，自旋锁的操作为空操作。自旋锁适用于锁使用者保持锁时间比较短的情况下。</p>
+</li>
+</ul>
+<p>自旋锁使用笔记：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;pthread.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 定义自旋锁</span></span><br><span class="line"><span class="type">pthread_spinlock_t</span> spinlock = PTHREAD_PROCESS_PRIVATE;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 初始化自旋锁</span></span><br><span class="line">pthread_spin_init(&amp;spinlock, PTHREAD_PROCESS_PRIVATE);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 加锁，如果锁已被其他线程占用，则该函数会一直循环忙等待直到获取到锁</span></span><br><span class="line">pthread_spin_lock(&amp;spinlock);</span><br><span class="line"><span class="comment">// 访问共享资源</span></span><br><span class="line"><span class="comment">// ...</span></span><br><span class="line"><span class="comment">// 解锁，使其他线程可以获取锁并访问共享资源</span></span><br><span class="line">pthread_spin_unlock(&amp;spinlock);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 销毁自旋锁</span></span><br><span class="line">pthread_spin_destroy(&amp;lock);</span><br></pre></td></tr></table></figure>
 
-<p>定义一个 <code>typedef</code>，每当要用到相同类型和大小的数组时，可以这样：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="type">char</span> Line[<span class="number">81</span>];</span><br><span class="line">Line text, secondline;</span><br><span class="line">getline(text);</span><br></pre></td></tr></table></figure>
+<h2 id="条件变量"><a href="# 条件变量" class="headerlink" title="条件变量"></a>条件变量 </h2><p> 条件变量（condition variable）：条件变量是一种 <strong> 用于线程之间通信的同步机制</strong>，它允许线程在某个条件成立时才能继续执行。通常与互斥锁一起使用，当条件变量不满足时，线程释放互斥锁并等待条件变量被激活（通过另一个线程来激活条件变量）；当条件变量满足时，通知线程重新获取互斥锁并继续执行。</p>
+<p>条件变量使用笔记：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;pthread.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 定义互斥锁和定义条件变量</span></span><br><span class="line"><span class="type">pthread_mutex_t</span> mutex = PTHREAD_MUTEX_INITIALIZER;</span><br><span class="line"><span class="type">pthread_cond_t</span> cond = PTHREAD_COND_INITIALIZER;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 初始化条件变量和自旋锁</span></span><br><span class="line">pthread_cond_init(&amp;cond, <span class="literal">NULL</span>);</span><br><span class="line">pthread_mutex_init(&amp;mutex, <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 加锁</span></span><br><span class="line">pthread_mutex_lock(&amp;mutex);</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> (条件不满足预期条件) &#123;</span><br><span class="line">    <span class="comment">// 等待条件变量通知</span></span><br><span class="line">    pthread_cond_wait(&amp;cond, &amp;mutex);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 条件满足，访问共享资源</span></span><br><span class="line"><span class="comment">// ...</span></span><br><span class="line"><span class="comment">// 解锁</span></span><br><span class="line">pthread_mutex_unlock(&amp;mutex);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 在使用完条件变量后销毁</span></span><br><span class="line">pthread_cond_destroy(&amp;cond);</span><br><span class="line"><span class="comment">// 在使用完互斥锁后销毁</span></span><br><span class="line">pthread_mutex_destroy(&amp;mutex);</span><br><span class="line"></span><br><span class="line"><span class="comment">//----------------------------------------------</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 在其他线程中通知条件变量</span></span><br><span class="line"><span class="comment">// ...</span></span><br><span class="line"><span class="comment">// 加锁</span></span><br><span class="line">pthread_mutex_lock(&amp;mutex);</span><br><span class="line"><span class="comment">// 访问共享资源</span></span><br><span class="line"><span class="comment">// ...</span></span><br><span class="line"><span class="comment">// 解锁后再发送通知</span></span><br><span class="line">pthread_mutex_unlock(&amp;mutex);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 条件满足，发送条件变量通知</span></span><br><span class="line">pthread_cond_signal(&amp;cond);</span><br></pre></td></tr></table></figure>
 
-<p>同样，也可以像下面这样隐藏指针语法：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="type">const</span> <span class="type">char</span> *<span class="type">pstr_t</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">mystrcmp</span><span class="params">(<span class="type">pstr_t</span>, <span class="type">pstr_t</span>)</span>;</span><br></pre></td></tr></table></figure>
+<h3 id="生产消费者同步示例代码"><a href="# 生产消费者同步示例代码" class="headerlink" title="生产消费者同步示例代码"></a>生产消费者同步示例代码 </h3><p> 一个生产者、消费者同步的多线程示例代码：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;pthread.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> BUFFER_SIZE (4)</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> buffer[BUFFER_SIZE];</span><br><span class="line"><span class="type">int</span> count = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">pthread_mutex_t</span> mutex = PTHREAD_MUTEX_INITIALIZER;</span><br><span class="line"><span class="type">pthread_cond_t</span> cond = PTHREAD_COND_INITIALIZER;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span>* <span class="title function_">producer</span><span class="params">(<span class="type">void</span>* arg)</span> &#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5</span>; i++) &#123;</span><br><span class="line">        pthread_mutex_lock(&amp;mutex);</span><br><span class="line">        <span class="comment">// 预期条件是 buffer 不能满（当 buffer 满时为条件不满足预期）</span></span><br><span class="line">        <span class="keyword">while</span> (count == BUFFER_SIZE) &#123;</span><br><span class="line">            pthread_cond_wait(&amp;cond, &amp;mutex);</span><br><span class="line">        &#125;</span><br><span class="line">        buffer[count++] = i;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Producer produced: %d\n&quot;</span>, i);</span><br><span class="line">        pthread_mutex_unlock(&amp;mutex);</span><br><span class="line">        pthread_cond_signal(&amp;cond);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span>* <span class="title function_">consumer</span><span class="params">(<span class="type">void</span>* arg)</span> &#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5</span>; i++) &#123;</span><br><span class="line">        pthread_mutex_lock(&amp;mutex);</span><br><span class="line">        <span class="comment">// 预期条件是 buffer 不能空（当 buffer 空时为条件不满足预期）</span></span><br><span class="line">        <span class="keyword">while</span> (count == <span class="number">0</span>) &#123;</span><br><span class="line">            pthread_cond_wait(&amp;cond, &amp;mutex);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="type">int</span> value = buffer[--count];</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Consumer consumed: %d\n&quot;</span>, value);</span><br><span class="line">        pthread_mutex_unlock(&amp;mutex);</span><br><span class="line">        pthread_cond_signal(&amp;cond);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">pthread_t</span> producer_thread, consumer_thread;</span><br><span class="line"></span><br><span class="line">    pthread_create(&amp;producer_thread, <span class="literal">NULL</span>, producer, <span class="literal">NULL</span>);</span><br><span class="line">    pthread_create(&amp;consumer_thread, <span class="literal">NULL</span>, consumer, <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">    pthread_join(producer_thread, <span class="literal">NULL</span>);</span><br><span class="line">    pthread_join(consumer_thread, <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">    pthread_cond_destroy(&amp;cond);</span><br><span class="line">    pthread_mutex_destroy(&amp;mutex);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p><strong>记住</strong>，不管什么时候，只要为指针声明 <code>typedef</code>，都要在最终的 <code>typedef</code> 名称中加一个 <code>const</code>，比如：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="type">const</span> <span class="type">char</span> *<span class="type">cpstr_t</span>;  <span class="comment">// 指针常量, 使得该指针可变, 而指针指向的对象不可变（只读）</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">char</span>* <span class="type">const</span> <span class="type">cpstr_t</span>;  <span class="comment">// 常量指针, 使得该指针不可变（只读）, 但指针指向的对象可变的</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="简化代码"><a href="# 简化代码" class="headerlink" title="简化代码"></a>简化代码 </h3><p> 上面讨论的 <code>typedef</code> 行为有点像 <code>define</code> 宏，用其实际类型替代同义字。不同点是 <code>typedef</code> 在编译时被解释，因此可以让编译器来应付超越预处理器能力的文本替换。例如：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="title function_">int</span> <span class="params">(*PF)</span> <span class="params">(<span class="type">const</span> <span class="type">char</span> *, <span class="type">const</span> <span class="type">char</span> *)</span>;</span><br></pre></td></tr></table></figure>
-
-<p>这个声明引入了 <code>PF</code> 类型作为函数指针的同义字，该函数有两个 <code>const char *</code> 类型的参数以及一个 <code>int</code> 类型的返回值。如果要使用下列形式的函数声明，那么上述这个 <code>typedef</code> 是不可或缺的：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">PF <span class="title function_">Register</span><span class="params">(PF pf)</span>;</span><br></pre></td></tr></table></figure>
-
-<p><code>Register()</code> 的参数是一个 <code>PF</code> 类型的回调函数，返回某个函数的地址，其署名与先前注册的名字相同。下面我展示一下如果不用 <code>typedef</code>，我们是如何实现这个声明的：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> (*Register (<span class="type">int</span> (*pf)(<span class="type">const</span> <span class="type">char</span> *, <span class="type">const</span> <span class="type">char</span> *))) (<span class="type">const</span> <span class="type">char</span> *, <span class="type">const</span> <span class="type">char</span> *); </span><br></pre></td></tr></table></figure>
-
-<p>很少有程序员理解它是什么意思，更不用说这种费解的代码所带来的出错风险了。显然，这里使用 <code>typedef</code> 不是一种特权，而是一种必需。</p>
-<p>持怀疑态度的人可能会问：“OK，还会有人写这样的代码吗？”，快速浏览一下揭示 <code>signal()</code> 函数的头文件 <code>&lt;csinal&gt;</code>，有一个同样接口的函数：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="comment">// signal 原型</span></span><br><span class="line"><span class="type">void</span> (*signal(<span class="type">int</span> sig, <span class="type">void</span> (*func)(<span class="type">int</span>)))(<span class="type">int</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// typedef 优化后</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="title function_">void</span> <span class="params">(*pFun)</span><span class="params">(<span class="type">int</span>)</span>;</span><br><span class="line">pFun <span class="title function_">signal</span><span class="params">(<span class="type">int</span> sig, pFun func)</span>;</span><br></pre></td></tr></table></figure>
-
+<p>在这个示例代码中，有一个容量为 4 的缓冲区，生产者线程负责往缓冲区中添加数据，消费者线程负责从缓冲区中取出数据。使用互斥锁和条件变量来保证生产者和消费者的同步。</p>
+<p>生产者线程通过加锁后检查缓冲区是否已满，如果已满则等待条件变量通知，否则将数据添加到缓冲区，并发送条件变量通知消费者线程。消费者线程通过加锁后检查缓冲区是否为空，如果为空则等待条件变量通知，否则从缓冲区中取出数据，并发送条件变量通知生产者线程。</p>
 <blockquote>
-<p>参考链接：<a href="https://www.cnblogs.com/a-s-m/p/10995722.html">https://www.cnblogs.com/a-s-m/p/10995722.html</a></p>
+<p>注意，生产者和消费者线程之间的同步是通过互斥锁和条件变量来实现的。互斥锁用于保护共享资源，条件变量用于线程间的通信和同步。</p>
 </blockquote>
+<p>一种可能的运行结果：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Producer produced (from buffer index: 0): 0</span><br><span class="line">Producer produced (from buffer index: 1): 1</span><br><span class="line">Consumer consumed (from buffer index: 1): 1</span><br><span class="line">Consumer consumed (from buffer index: 0): 0</span><br><span class="line">Producer produced (from buffer index: 0): 2</span><br><span class="line">Producer produced (from buffer index: 1): 3</span><br><span class="line">Producer produced (from buffer index: 2): 4</span><br><span class="line">Consumer consumed (from buffer index: 2): 4</span><br><span class="line">Consumer consumed (from buffer index: 1): 3</span><br><span class="line">Consumer consumed (from buffer index: 0): 2</span><br><span class="line">[root@localhost del]#</span><br><span class="line">[root@localhost del]# ./a.out</span><br><span class="line">Producer produced (from buffer index: 0): 0</span><br><span class="line">Producer produced (from buffer index: 1): 1</span><br><span class="line">Producer produced (from buffer index: 2): 2</span><br><span class="line">Producer produced (from buffer index: 3): 3</span><br><span class="line">Consumer consumed (from buffer index: 3): 3</span><br><span class="line">Consumer consumed (from buffer index: 2): 2</span><br><span class="line">Consumer consumed (from buffer index: 1): 1</span><br><span class="line">Consumer consumed (from buffer index: 0): 0</span><br><span class="line">Producer produced (from buffer index: 0): 4</span><br><span class="line">Consumer consumed (from buffer index: 0): 4</span><br><span class="line">[root@localhost del]#</span><br></pre></td></tr></table></figure>
+
+<h2 id="屏障"><a href="# 屏障" class="headerlink" title="屏障"></a>屏障 </h2><p> 屏障（barrier）：屏障是一种 <strong> 用于多线程协同的同步机制 </strong>，它允许多个线程在某个点上等待，直到所有线程都到达该点后再继续执行。屏障通常用于<strong> 一组线程 </strong> 需要在某个点进行 <strong> 同步操作 </strong> 的情况，例如多线程排序算法。</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;pthread.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 定义屏障</span></span><br><span class="line"><span class="type">pthread_barrier_t</span> barrier;</span><br><span class="line"><span class="type">int</span> thread_nums = <span class="number">5</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 初始化屏障</span></span><br><span class="line">pthread_barrier_init(&amp;barrier, <span class="literal">NULL</span>, thread_nums);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 在每个线程中执行以下代码</span></span><br><span class="line">pthread_barrier_wait(&amp;barrier); <span class="comment">// 等待屏障</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 所有线程都到达屏障后，继续执行以下代码</span></span><br><span class="line"><span class="comment">// ...</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 在使用完屏障后销毁</span></span><br><span class="line">pthread_barrier_destroy(&amp;barrier);</span><br></pre></td></tr></table></figure>
+
+<h3 id="屏蔽实现线程同步示例代码"><a href="# 屏蔽实现线程同步示例代码" class="headerlink" title="屏蔽实现线程同步示例代码"></a>屏蔽实现线程同步示例代码 </h3><p> 下面是一个完整的示例代码，演示了如何使用 <code>pthread</code> 库中的屏障实现线程同步：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;pthread.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 定义屏障</span></span><br><span class="line"><span class="type">pthread_barrier_t</span> barrier;</span><br><span class="line"><span class="type">int</span> thread_nums = <span class="number">5</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 线程函数</span></span><br><span class="line"><span class="type">void</span>* <span class="title function_">thread_func</span><span class="params">(<span class="type">void</span>* arg)</span> &#123;</span><br><span class="line">    <span class="comment">// 线程执行的一些操作...</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Thread %ld operation\n&quot;</span>, (<span class="type">long</span>)arg);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 等待屏障</span></span><br><span class="line">    pthread_barrier_wait(&amp;barrier);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 所有线程都到达屏障后，继续执行以下代码</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Thread %ld continues after the barrier\n&quot;</span>, (<span class="type">long</span>)arg);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 线程执行的其他操作...</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">pthread_t</span> threads[thread_nums];</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 初始化屏障</span></span><br><span class="line">    pthread_barrier_init(&amp;barrier, <span class="literal">NULL</span>, thread_nums);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 创建线程</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">long</span> i = <span class="number">0</span>; i &lt; thread_nums; i++) &#123;</span><br><span class="line">        pthread_create(&amp;threads[i], <span class="literal">NULL</span>, thread_func, (<span class="type">void</span>*)i);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 等待线程结束</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; thread_nums; i++) &#123;</span><br><span class="line">        pthread_join(threads[i], <span class="literal">NULL</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 销毁屏障</span></span><br><span class="line">    pthread_barrier_destroy(&amp;barrier);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例代码中，我们定义了一个屏障 <code>pthread_barrier_t</code> 和一个线程数 <code>thread_nums</code>。在主函数中，</p>
+<ul>
+<li>首先调用 <code>pthread_barrier_init</code> 函数初始化屏障。</li>
+<li>然后，创建指定数量的线程，并通过 <code>pthread_create</code> 函数将线程函数 <code>thread_func</code> 分配给每个线程。</li>
+<li>在线程函数中，线程首先执行一些操作，然后调用 <code>pthread_barrier_wait</code> 函数等待屏障。<strong>当所有线程都到达屏障后，屏障解除，所有线程继续执行后续的代码</strong>。</li>
+<li>最后，我们使用 <code>pthread_join</code> 等待所有线程结束，并使用 <code>pthread_barrier_destroy</code> 销毁屏障。</li>
+</ul>
+<h2 id="原子操作"><a href="# 原子操作" class="headerlink" title="原子操作"></a>原子操作 </h2><p> 所谓原子操作，就是该操作绝不会在执行完毕前被任何其他任务或事件打断，也就说，它是 <strong> 最小的执行单位</strong>，不可能有比它更小的执行单位。因此这里的原子实际是使用了物理学里的物质微粒的概念。</p>
+<p>原子操作需要硬件的支持，因此是架构相关的，其 API 和原子类型的定义都定义在内核源码树的 <code>include/asm/atomic.h</code> 文件中，它们 <strong> 都使用汇编语言实现，因为 C 语言并不能实现这样的操作</strong>。</p>
+<p>原子操作主要用于实现资源计数，很多引用计数（Reference Count, refcnt）就是通过原子操作实现的。</p>
+<h2 id="总结分析"><a href="# 总结分析" class="headerlink" title="总结分析"></a>总结分析 </h2><p> 互斥锁（Mutex lock），sleep-waiting 类型的锁：与自旋锁相比它需要消耗大量的系统资源来建立锁；随后当线程被阻塞等待时，线程的调度状态被修改，并且线程被加入等待线程队列；最后当锁可用时，在获取锁之前，线程会被从等待队列取出并更改其调度状态；但是在线程被阻塞期间，它不消耗 CPU 资源。</p>
+<p>互斥锁适用于那些可能会阻塞很长时间的场景：</p>
+<ul>
+<li>临界区有 IO 操作</li>
+<li>临界区代码复杂或者循环量大</li>
+<li>临界区竞争非常激烈</li>
+<li>单核处理器</li>
+</ul>
+<p>自旋锁（Spin lock），busy-waiting 类型的锁：对于自旋锁来说，它只需要消耗很少的资源来建立锁；随后当线程被阻塞时，它就会一直重复检查看锁是否可用了，也就是说当自旋锁处于等待状态时它会一直消耗 CPU 时间。  </p>
+<p>自旋锁适用于那些仅需要阻塞很短时间的场景。</p>
 ]]></content>
       <categories>
         <category>学习笔记</category>
         <category>C语言</category>
       </categories>
       <tags>
-        <tag>自定义类型</tag>
+        <tag>锁</tag>
+        <tag>原子操作</tag>
       </tags>
   </entry>
   <entry>
@@ -441,6 +513,153 @@
         <tag>大小端</tag>
         <tag>字节序</tag>
         <tag>网络字节序</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>C 语言之 main 函数参数</title>
+    <url>/posts/230916171929.html</url>
+    <content><![CDATA[<h2 id="指令行操作"><a href="# 指令行操作" class="headerlink" title="指令行操作"></a> 指令行操作 </h2><p>C 语言支持从 CLI（指令行）传入参数给 main() 函数，多个命令行参数之间用空格分隔，但是如果参数本身带有空格，那么就使用双引号或单引号。</p>
+<p>C 语言的 main 函数是程序的入口函数，它可以有两种形式的参数：</p>
+<span id="more"></span>
+
+<ol>
+<li><p> 无参数形式：main 函数的原型可以是 <code>int main(void)</code>。这表示不接受任何参数，程序执行时不需要从命令行传递参数给 main 函数。</p>
+</li>
+<li><p> 带参数形式：main 函数的原型可以是 <code>int main(int argc, char *argv[])</code>。其中，<code>argc</code> 表示命令行参数的个数，而 <code>argv</code> 是一个字符串指针数组，每个元素都是一个命令行参数的字符串。</p>
+<ul>
+<li><code>argc</code> 标识传入的参数个数。如果没有提供任何参数，<code>argc</code> 将被设置为 1；否则，<code>argc</code> 将被设置为传入的参数个数加 1。</li>
+<li><code>argv[0]</code> 通常是程序的名称或路径的字符串。</li>
+<li><code>argv[1]</code> 到 <code>argv[argc - 1]</code> 是命令行传递给程序的参数，以空格分隔。</li>
+</ul>
+</li>
+</ol>
+<p> 值得注意的是，也可以使用 <code>char **argv</code> 来代替 <code>char *argv[]</code> 形参，两者具有相同的类型含义。因为数组变量名 <code>argv</code> 就是指向 <code>argv[]</code> 数组的第一个元素的指针，同时又因为第一个元素的数值就是一个指针，所以此时的数组变量名 <code>argv</code> 的本质就是一个指针的指针（双重指针）。</p>
+<p> 下面是一个例子，演示如何使用带参数的 main 函数来接收命令行参数：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span> &#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;number of params: %d\n&quot;</span>, argc);</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; argc; i++) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;param-%d: %s\n&quot;</span>, i, argv[i]);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p> 如果编译并运行这个程序，并在命令行中输入参数，例如 <code>./a.out arg1 arg2 3 arg4</code>，则输出如下：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">number of params: 5</span><br><span class="line">param-0: ./a.out</span><br><span class="line">param-1: arg1</span><br><span class="line">param-2: arg2</span><br><span class="line">param-3: 3</span><br><span class="line">param-4: arg4</span><br></pre></td></tr></table></figure>
+
+<p> 参考链接：<a href="https://is-cloud.blog.csdn.net/article/details/105347737">https://is-cloud.blog.csdn.net/article/details/105347737</a></p>
+]]></content>
+      <categories>
+        <category>学习笔记</category>
+        <category>C语言</category>
+      </categories>
+      <tags>
+        <tag>main函数参数</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Go 笔记之变量与常量</title>
+    <url>/posts/230907162612.html</url>
+    <content><![CDATA[<blockquote>
+<p>学习链接：<a href="https://studygolang.com/subject/2">https://studygolang.com/subject/2</a>，感谢如此优秀的教程！</p>
+</blockquote>
+<h2 id="Go 语言学习笔记 -1：HelloWorld"><a href="#Go 语言学习笔记 -1：HelloWorld" class="headerlink" title="Go 语言学习笔记 -1：HelloWorld"></a>Go 语言学习笔记 -1：HelloWorld</h2><p>Go 语言是一种编译型语言，源代码都会编译成二进制机器码。</p>
+<p>所有 Go 源文件都应该放置在工作区里的 src 目录下。Linux 的工作区（Workspace）应该设置在 $HOME&#x2F;go，也可以通过设置 GOPATH 环境变量，用其他目录来作为工作区。</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">go</span></span><br><span class="line">  bin <span class="comment">// 编译生成的二进制文件存储位置</span></span><br><span class="line">    hello</span><br><span class="line">  src <span class="comment">// 所有 Go 源文件都应该放置在工作区里的 src 目录下</span></span><br><span class="line">    hello <span class="comment">// 为每个 project 新建一个文件夹</span></span><br><span class="line">      helloworld.<span class="keyword">go</span></span><br></pre></td></tr></table></figure>
+
+<p>第一个 Go 程序</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="string">&quot;fmt&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">  fmt.Println(<span class="string">&quot;Hello World!&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<span id="more"></span>
+
+<p>解析：</p>
+<ul>
+<li><p><code>package main</code> - 每一个 Go 文件都应该在开头进行 package name 的声明（译注：只有可执行程序的包名应当为 main）。包（Packages）用于代码的封装与重用，这里的包名称是 main。</p>
+</li>
+<li><p><code>import &quot;fmt&quot;</code> - 我们引入了 fmt 包，用于在 main 函数里面打印文本到标准输出。</p>
+</li>
+<li><p><code>func main()</code> - main 是一个特殊的函数。整个程序就是从 main 函数开始运行的。main 函数必须放置在 main 包中。{和} 分别表示 main 函数的开始和结束部分。</p>
+</li>
+<li><p><code>fmt.Println(&quot;Hello World&quot;)</code> - fmt 包中的 Println 函数用于把文本写入标准输出。</p>
+</li>
+</ul>
+<hr>
+<h2 id="Go 语言学习笔记 -2：变量"><a href="#Go 语言学习笔记 -2：变量" class="headerlink" title="Go 语言学习笔记 -2：变量"></a>Go 语言学习笔记 -2：变量 </h2><p><strong> 变量 </strong> 指定了某存储单元（Memory Location）的名称，该存储单元会存储特定类型的值。</p>
+<ol>
+<li><p>声明单个变量：var name type，例如：var age int</p>
+</li>
+<li><p>声明变量并初始化：var name type &#x3D; initialValue</p>
+</li>
+<li><p>类型推断：如果变量有初始值，那么 Go 能够自动推断具有初始值的变量的类型。因此，如果变量有初始值，就可以在变量声明中省略 type， 如 var age &#x3D; 16 指 age 类型为 int 型。</p>
+</li>
+<li><p>声明多个变量：var name1, name2 type &#x3D; initialValue1, initialValue2</p>
+</li>
+<li><p>在一个语句中声明不同类型的变量，如：</p>
+</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> (</span><br><span class="line">    age = <span class="number">19</span></span><br><span class="line">    name = “laowang”</span><br><span class="line">    adult = <span class="literal">true</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<ol start="6">
+<li>变量的简短声明语法：<code>:=</code> 操作符，例如：<code>age, name := 20, &quot;zhangsan&quot;</code>。简短声明要求 <code>:=</code> 操作符左边的 <strong> 所有变量都有初始值</strong>。</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;  </span><br><span class="line">    a, b := <span class="number">20</span>, <span class="number">30</span> <span class="comment">// 声明 a 和 b</span></span><br><span class="line">    fmt.Println(<span class="string">&quot;a is&quot;</span>, a, <span class="string">&quot;b is&quot;</span>, b)</span><br><span class="line">    a, b := <span class="number">40</span>, <span class="number">50</span> <span class="comment">// 错误，没有尚未声明的变量</span></span><br><span class="line">    a, c := <span class="number">40</span>, <span class="number">60</span> <span class="comment">// 正确，有新的尚未声明的变量</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="7">
+<li><p>变量也可以在运行时进行赋值，如 <code>a := math.Min(15, 20)</code></p>
+</li>
+<li><p>由于 Go 是强类型（Strongly Typed）语言，因此不允许某一类型的变量赋值为其他类型的值。</p>
+</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;  </span><br><span class="line">    age := <span class="number">29</span>      <span class="comment">// age 是 int 类型</span></span><br><span class="line">    age = <span class="string">&quot;naveen&quot;</span> <span class="comment">// 错误，尝试赋值一个字符串给 int 类型变量</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="Go 语言学习笔记 -3：变量类型"><a href="#Go 语言学习笔记 -3：变量类型" class="headerlink" title="Go 语言学习笔记 -3：变量类型"></a>Go 语言学习笔记 -3：变量类型</h2><ol>
+<li>Go 语言支持的变量类型：</li>
+</ol>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">bool</span><br><span class="line">数字类型</span><br><span class="line">    int8, int16, int32, int64, int</span><br><span class="line">    uint8, uint16, uint32, uint64, uint</span><br><span class="line">    float32, float64</span><br><span class="line">    complex64, complex128 // 复数型</span><br><span class="line">    byte</span><br><span class="line">    rune</span><br><span class="line">string</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>在 Printf 方法中，使用 <code>%T</code> 格式说明符（Format Specifier），可以打印出变量的类型。Go 的 <code>unsafe</code> 包提供了一个 <code>Sizeof</code> 函数，该函数接收变量并返回它的字节大小。如：</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line">fmt.Printf(<span class="string">&quot;type of age is %T, size of age is %d&quot;</span>, age, unsafe.Sizeof(age))</span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li>复数类型：<code>complex64</code> 表示实部和虚部都是 <code>float32</code> 类型，<code>complex128</code> 表示实部和虚部都是 <code>float64</code> 类型。</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line">c1 := <span class="built_in">complex</span>(<span class="number">5</span>, <span class="number">7</span>) <span class="comment">// 通过内置函数声明复数变量 c1</span></span><br><span class="line">c2 := <span class="number">8</span> + <span class="number">27i</span> <span class="comment">// 通过简短声明声明复数变量 c2</span></span><br></pre></td></tr></table></figure>
+
+<ol start="4">
+<li><p>其它变量类型：<code>byte</code> 是 <code>uint8</code> 的别名， <code>rune</code> 是 <code>int32</code> 的别名。</p>
+</li>
+<li><p>Go 是强类型（Strongly Typed）语言， Go 没有自动类型提升或类型转换：</p>
+</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> i, j <span class="type">int</span>, float = <span class="number">5</span>, <span class="number">10.2</span></span><br><span class="line">diff := i - j <span class="comment">// 错误， int - float 不被允许</span></span><br><span class="line">diff := i - <span class="type">int</span>(j) <span class="comment">// 正确</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="Go 语言学习笔记 -4：常量"><a href="#Go 语言学习笔记 -4：常量" class="headerlink" title="Go 语言学习笔记 -4：常量"></a>Go 语言学习笔记 -4：常量</h2><ol>
+<li><p>关键字：<code>const</code>，常量不能再重新赋值为其他的值。</p>
+</li>
+<li><p>常量的值会在 <strong> 编译的时候 </strong> 确定。因为函数调用发生在 <strong> 运行时</strong>，所以不能将函数的返回值赋值给常量。如：</p>
+</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> a := math.Sqrt(<span class="number">4</span>) <span class="comment">// 允许</span></span><br><span class="line"><span class="keyword">const</span> b := math.Sqrt(<span class="number">9</span>) <span class="comment">// 不允许，编译先于运行</span></span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li><p>常量是可以没有类型的，如：<code>const name = &quot;zhangsan&quot;</code>；常量也可以是有类型的，如：<code>const name string = &quot;lisi&quot;</code>，即 name 是一个 string 类型的 <strong> 常量</strong>。</p>
+</li>
+<li><p>Go 的类型策略不允许将一种类型的变量赋值给另一种类型的变量。</p>
+</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;  </span><br><span class="line">    <span class="keyword">var</span> defaultName = <span class="string">&quot;Sam&quot;</span> <span class="comment">// 允许</span></span><br><span class="line">    <span class="keyword">type</span> myString <span class="type">string</span></span><br><span class="line">    <span class="keyword">var</span> customName myString = <span class="string">&quot;Sam&quot;</span> <span class="comment">// 允许</span></span><br><span class="line">    customName = defaultName <span class="comment">// 不允许，即使 myString 是 string 类型的别名</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="5">
+<li><strong>布尔常量</strong>：字符串常量的规则适用于布尔常量。</li>
+</ol>
+<p><code>var name = &quot;Sam&quot;</code> 无类型的 <strong> 常量 </strong> Sam 是如何赋值给<strong> 变量</strong> name 的？</p>
+<blockquote>
+<p>答案是 <strong> 无类型的常量有一个与它们相关联的默认类型，并且当且仅当一行代码需要时才提供它</strong>（常量可以赋值给 “合适的” 类型，而不需要类型转换）。在声明变量时，如果使用常量来赋值，变量会从常量的默认类型中获取类型。在这种情况下，常量 “Sam” 的默认类型是字符串，所以变量 name 的类型也是字符串。</p>
+</blockquote>
+]]></content>
+      <categories>
+        <category>学习笔记</category>
+        <category>Golang</category>
+      </categories>
+      <tags>
+        <tag>Go变量与常量</tag>
       </tags>
   </entry>
   <entry>
@@ -564,118 +783,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Go 笔记之变量与常量</title>
-    <url>/posts/230907162612.html</url>
-    <content><![CDATA[<blockquote>
-<p>学习链接：<a href="https://studygolang.com/subject/2">https://studygolang.com/subject/2</a>，感谢如此优秀的教程！</p>
-</blockquote>
-<h2 id="Go 语言学习笔记 -1：HelloWorld"><a href="#Go 语言学习笔记 -1：HelloWorld" class="headerlink" title="Go 语言学习笔记 -1：HelloWorld"></a>Go 语言学习笔记 -1：HelloWorld</h2><p>Go 语言是一种编译型语言，源代码都会编译成二进制机器码。</p>
-<p>所有 Go 源文件都应该放置在工作区里的 src 目录下。Linux 的工作区（Workspace）应该设置在 $HOME&#x2F;go，也可以通过设置 GOPATH 环境变量，用其他目录来作为工作区。</p>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">go</span></span><br><span class="line">  bin <span class="comment">// 编译生成的二进制文件存储位置</span></span><br><span class="line">    hello</span><br><span class="line">  src <span class="comment">// 所有 Go 源文件都应该放置在工作区里的 src 目录下</span></span><br><span class="line">    hello <span class="comment">// 为每个 project 新建一个文件夹</span></span><br><span class="line">      helloworld.<span class="keyword">go</span></span><br></pre></td></tr></table></figure>
-
-<p>第一个 Go 程序</p>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="string">&quot;fmt&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">  fmt.Println(<span class="string">&quot;Hello World!&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<span id="more"></span>
-
-<p>解析：</p>
-<ul>
-<li><p><code>package main</code> - 每一个 Go 文件都应该在开头进行 package name 的声明（译注：只有可执行程序的包名应当为 main）。包（Packages）用于代码的封装与重用，这里的包名称是 main。</p>
-</li>
-<li><p><code>import &quot;fmt&quot;</code> - 我们引入了 fmt 包，用于在 main 函数里面打印文本到标准输出。</p>
-</li>
-<li><p><code>func main()</code> - main 是一个特殊的函数。整个程序就是从 main 函数开始运行的。main 函数必须放置在 main 包中。{和} 分别表示 main 函数的开始和结束部分。</p>
-</li>
-<li><p><code>fmt.Println(&quot;Hello World&quot;)</code> - fmt 包中的 Println 函数用于把文本写入标准输出。</p>
-</li>
-</ul>
-<hr>
-<h2 id="Go 语言学习笔记 -2：变量"><a href="#Go 语言学习笔记 -2：变量" class="headerlink" title="Go 语言学习笔记 -2：变量"></a>Go 语言学习笔记 -2：变量 </h2><p><strong> 变量 </strong> 指定了某存储单元（Memory Location）的名称，该存储单元会存储特定类型的值。</p>
-<ol>
-<li><p>声明单个变量：var name type，例如：var age int</p>
-</li>
-<li><p>声明变量并初始化：var name type &#x3D; initialValue</p>
-</li>
-<li><p>类型推断：如果变量有初始值，那么 Go 能够自动推断具有初始值的变量的类型。因此，如果变量有初始值，就可以在变量声明中省略 type， 如 var age &#x3D; 16 指 age 类型为 int 型。</p>
-</li>
-<li><p>声明多个变量：var name1, name2 type &#x3D; initialValue1, initialValue2</p>
-</li>
-<li><p>在一个语句中声明不同类型的变量，如：</p>
-</li>
-</ol>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> (</span><br><span class="line">    age = <span class="number">19</span></span><br><span class="line">    name = “laowang”</span><br><span class="line">    adult = <span class="literal">true</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
-
-<ol start="6">
-<li>变量的简短声明语法：<code>:=</code> 操作符，例如：<code>age, name := 20, &quot;zhangsan&quot;</code>。简短声明要求 <code>:=</code> 操作符左边的 <strong> 所有变量都有初始值</strong>。</li>
-</ol>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;  </span><br><span class="line">    a, b := <span class="number">20</span>, <span class="number">30</span> <span class="comment">// 声明 a 和 b</span></span><br><span class="line">    fmt.Println(<span class="string">&quot;a is&quot;</span>, a, <span class="string">&quot;b is&quot;</span>, b)</span><br><span class="line">    a, b := <span class="number">40</span>, <span class="number">50</span> <span class="comment">// 错误，没有尚未声明的变量</span></span><br><span class="line">    a, c := <span class="number">40</span>, <span class="number">60</span> <span class="comment">// 正确，有新的尚未声明的变量</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<ol start="7">
-<li><p>变量也可以在运行时进行赋值，如 <code>a := math.Min(15, 20)</code></p>
-</li>
-<li><p>由于 Go 是强类型（Strongly Typed）语言，因此不允许某一类型的变量赋值为其他类型的值。</p>
-</li>
-</ol>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;  </span><br><span class="line">    age := <span class="number">29</span>      <span class="comment">// age 是 int 类型</span></span><br><span class="line">    age = <span class="string">&quot;naveen&quot;</span> <span class="comment">// 错误，尝试赋值一个字符串给 int 类型变量</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<hr>
-<h2 id="Go 语言学习笔记 -3：变量类型"><a href="#Go 语言学习笔记 -3：变量类型" class="headerlink" title="Go 语言学习笔记 -3：变量类型"></a>Go 语言学习笔记 -3：变量类型</h2><ol>
-<li>Go 语言支持的变量类型：</li>
-</ol>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">bool</span><br><span class="line">数字类型</span><br><span class="line">    int8, int16, int32, int64, int</span><br><span class="line">    uint8, uint16, uint32, uint64, uint</span><br><span class="line">    float32, float64</span><br><span class="line">    complex64, complex128 // 复数型</span><br><span class="line">    byte</span><br><span class="line">    rune</span><br><span class="line">string</span><br></pre></td></tr></table></figure>
-
-<ol start="2">
-<li>在 Printf 方法中，使用 <code>%T</code> 格式说明符（Format Specifier），可以打印出变量的类型。Go 的 <code>unsafe</code> 包提供了一个 <code>Sizeof</code> 函数，该函数接收变量并返回它的字节大小。如：</li>
-</ol>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line">fmt.Printf(<span class="string">&quot;type of age is %T, size of age is %d&quot;</span>, age, unsafe.Sizeof(age))</span><br></pre></td></tr></table></figure>
-
-<ol start="3">
-<li>复数类型：<code>complex64</code> 表示实部和虚部都是 <code>float32</code> 类型，<code>complex128</code> 表示实部和虚部都是 <code>float64</code> 类型。</li>
-</ol>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line">c1 := <span class="built_in">complex</span>(<span class="number">5</span>, <span class="number">7</span>) <span class="comment">// 通过内置函数声明复数变量 c1</span></span><br><span class="line">c2 := <span class="number">8</span> + <span class="number">27i</span> <span class="comment">// 通过简短声明声明复数变量 c2</span></span><br></pre></td></tr></table></figure>
-
-<ol start="4">
-<li><p>其它变量类型：<code>byte</code> 是 <code>uint8</code> 的别名， <code>rune</code> 是 <code>int32</code> 的别名。</p>
-</li>
-<li><p>Go 是强类型（Strongly Typed）语言， Go 没有自动类型提升或类型转换：</p>
-</li>
-</ol>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> i, j <span class="type">int</span>, float = <span class="number">5</span>, <span class="number">10.2</span></span><br><span class="line">diff := i - j <span class="comment">// 错误， int - float 不被允许</span></span><br><span class="line">diff := i - <span class="type">int</span>(j) <span class="comment">// 正确</span></span><br></pre></td></tr></table></figure>
-
-<hr>
-<h2 id="Go 语言学习笔记 -4：常量"><a href="#Go 语言学习笔记 -4：常量" class="headerlink" title="Go 语言学习笔记 -4：常量"></a>Go 语言学习笔记 -4：常量</h2><ol>
-<li><p>关键字：<code>const</code>，常量不能再重新赋值为其他的值。</p>
-</li>
-<li><p>常量的值会在 <strong> 编译的时候 </strong> 确定。因为函数调用发生在 <strong> 运行时</strong>，所以不能将函数的返回值赋值给常量。如：</p>
-</li>
-</ol>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> a := math.Sqrt(<span class="number">4</span>) <span class="comment">// 允许</span></span><br><span class="line"><span class="keyword">const</span> b := math.Sqrt(<span class="number">9</span>) <span class="comment">// 不允许，编译先于运行</span></span><br></pre></td></tr></table></figure>
-
-<ol start="3">
-<li><p>常量是可以没有类型的，如：<code>const name = &quot;zhangsan&quot;</code>；常量也可以是有类型的，如：<code>const name string = &quot;lisi&quot;</code>，即 name 是一个 string 类型的 <strong> 常量</strong>。</p>
-</li>
-<li><p>Go 的类型策略不允许将一种类型的变量赋值给另一种类型的变量。</p>
-</li>
-</ol>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;  </span><br><span class="line">    <span class="keyword">var</span> defaultName = <span class="string">&quot;Sam&quot;</span> <span class="comment">// 允许</span></span><br><span class="line">    <span class="keyword">type</span> myString <span class="type">string</span></span><br><span class="line">    <span class="keyword">var</span> customName myString = <span class="string">&quot;Sam&quot;</span> <span class="comment">// 允许</span></span><br><span class="line">    customName = defaultName <span class="comment">// 不允许，即使 myString 是 string 类型的别名</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<ol start="5">
-<li><strong>布尔常量</strong>：字符串常量的规则适用于布尔常量。</li>
-</ol>
-<p><code>var name = &quot;Sam&quot;</code> 无类型的 <strong> 常量 </strong> Sam 是如何赋值给<strong> 变量</strong> name 的？</p>
-<blockquote>
-<p>答案是 <strong> 无类型的常量有一个与它们相关联的默认类型，并且当且仅当一行代码需要时才提供它</strong>（常量可以赋值给 “合适的” 类型，而不需要类型转换）。在声明变量时，如果使用常量来赋值，变量会从常量的默认类型中获取类型。在这种情况下，常量 “Sam” 的默认类型是字符串，所以变量 name 的类型也是字符串。</p>
-</blockquote>
-]]></content>
-      <categories>
-        <category>学习笔记</category>
-        <category>Golang</category>
-      </categories>
-      <tags>
-        <tag>Go变量与常量</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Go 笔记之可变参数函数与 Map 集合</title>
     <url>/posts/230913161326.html</url>
     <content><![CDATA[<blockquote>
@@ -733,99 +840,6 @@
       <tags>
         <tag>Go可变参数函数</tag>
         <tag>Go集合Map</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Go 笔记之字符串和指针</title>
-    <url>/posts/230915155105.html</url>
-    <content><![CDATA[<h2 id="Go 语言学习笔记 -14：字符串"><a href="#Go 语言学习笔记 -14：字符串" class="headerlink" title="Go 语言学习笔记 -14：字符串"></a>Go 语言学习笔记 -14：字符串</h2><ol>
-<li><p>Go 语言中的字符串是一个 <strong> 字节切片</strong>。</p>
-</li>
-<li><p><code>%x</code> 格式限定符用于指定 16 进制编码，<code>%c</code> 格式限定符用于打印字符串的字符。</p>
-</li>
-<li><p>在 UTF-8 编码中，一个代码点（字符的编码）可能会占用超过一个字节的空间，所以使用 <code>%c</code> 格式打印时可能会出错，可以用 <code>rune</code> 解决。</p>
-</li>
-<li><p><code>rune</code> 是 Go 语言的内建类型，它也是 <code>int32</code> 的别称。在 Go 语言中，<code>rune</code> 表示一个代码点。代码点无论占用多少个字节，都可以用一个 <code>rune</code> 来表示。</p>
-</li>
-</ol>
-<span id="more"></span>
-
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line">s := <span class="string">&quot;Señor&quot;</span></span><br><span class="line"><span class="keyword">for</span> i:= <span class="number">0</span>; i &lt; <span class="built_in">len</span>(s); i++ &#123;</span><br><span class="line">    fmt.Printf(<span class="string">&quot;%c &quot;</span>,s[i]) <span class="comment">// 打印出错，S e Ã ± o r</span></span><br><span class="line">&#125;</span><br><span class="line">fmt.Printf(<span class="string">&quot;\n&quot;</span>)</span><br><span class="line"></span><br><span class="line">runes := []<span class="type">rune</span>(s)</span><br><span class="line"><span class="keyword">for</span> i:= <span class="number">0</span>; i &lt; <span class="built_in">len</span>(runes); i++ &#123; <span class="comment">// 字符串被转化为一个 rune 切片</span></span><br><span class="line">    fmt.Printf(<span class="string">&quot;%c &quot;</span>,runes[i]) <span class="comment">// 打印正确，S e ñ o r</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<ol start="5">
-<li>字符串的 for range 循环更简单。</li>
-</ol>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">printCharsAndBytes</span><span class="params">(s <span class="type">string</span>)</span></span> &#123;</span><br><span class="line">    <span class="keyword">for</span> index, <span class="type">rune</span> := <span class="keyword">range</span> s &#123;</span><br><span class="line">        fmt.Printf(<span class="string">&quot;%c starts at byte %d\n&quot;</span>, <span class="type">rune</span>, index)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    name := <span class="string">&quot;Señor&quot;</span></span><br><span class="line">    printCharsAndBytes(name)</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">S starts at byte 0  </span></span><br><span class="line"><span class="comment">e starts at byte 1  </span></span><br><span class="line"><span class="comment">ñ starts at byte 2  // ñ 占了两个字节</span></span><br><span class="line"><span class="comment">o starts at byte 4  </span></span><br><span class="line"><span class="comment">r starts at byte 5</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
-
-<ol start="6">
-<li>用字节切片构造字符串：</li>
-</ol>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 包含字符串 Café 用 UTF-8 编码后的 16 进制字节</span></span><br><span class="line">byteSlice := []<span class="type">byte</span>&#123;<span class="number">0x43</span>, <span class="number">0x61</span>, <span class="number">0x66</span>, <span class="number">0xC3</span>, <span class="number">0xA9</span>&#125;</span><br><span class="line">str := <span class="type">string</span>(byteSlice)</span><br><span class="line">fmt.Println(str) <span class="comment">// Café</span></span><br></pre></td></tr></table></figure>
-
-<ol start="7">
-<li>用 <code>rune</code> 切片构造字符串：</li>
-</ol>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 包含字符串 Señor 的 16 进制的 Unicode 代码点</span></span><br><span class="line">runeSlice := []<span class="type">rune</span>&#123;<span class="number">0x0053</span>, <span class="number">0x0065</span>, <span class="number">0x00f1</span>, <span class="number">0x006f</span>, <span class="number">0x0072</span>&#125;</span><br><span class="line">str := <span class="type">string</span>(runeSlice)</span><br><span class="line">fmt.Println(str) <span class="comment">// Señor</span></span><br></pre></td></tr></table></figure>
-
-<ol start="8">
-<li>字符串的长度：utf-8 package 包中的 <code>func RuneCountInString(s string) (n int)</code> 方法用来 <strong> 获取字符串的长度 </strong>。这个方法传入一个字符串参数然后<strong> 返回字符串中的 rune 的数量</strong>。</li>
-</ol>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line">word1 := <span class="string">&quot;Señor&quot;</span> </span><br><span class="line">fmt.Println(utf8.RuneCountInString(word1)) <span class="comment">// 5</span></span><br><span class="line">word2 := <span class="string">&quot;Pets&quot;</span></span><br><span class="line">fmt.Println(utf8.RuneCountInString(word2)) <span class="comment">// 4</span></span><br></pre></td></tr></table></figure>
-
-<ol start="9">
-<li>字符串是不可变的：一旦一个字符串被创建，它将不可被修改。为了修改字符串，可以把字符串转化为一个 rune 切片，这个切片可以进行任何想要的改变，最后再转化为一个字符串。</li>
-</ol>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">mutate</span><span class="params">(s []<span class="type">rune</span>)</span></span> <span class="type">string</span> &#123;  </span><br><span class="line">    s[<span class="number">0</span>] = <span class="string">&#x27;a&#x27;</span> <span class="comment">// 修改切片</span></span><br><span class="line">    <span class="keyword">return</span> <span class="type">string</span>(s) <span class="comment">// 转换为一个字符串</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;  </span><br><span class="line">    h := <span class="string">&quot;hello&quot;</span></span><br><span class="line">    fmt.Println(mutate([]<span class="type">rune</span>(h))) <span class="comment">// 用 rune 切片构造字符串，输出 aello</span></span><br><span class="line">    fmt.Println(h) <span class="comment">// 输出 hello</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<hr>
-<h2 id="Go 语言学习笔记 -15：指针"><a href="#Go 语言学习笔记 -15：指针" class="headerlink" title="Go 语言学习笔记 -15：指针"></a>Go 语言学习笔记 -15：指针</h2><ol>
-<li><p>指针是一种存储变量内存地址（Memory Address）的变量。例如，变量 b 的值为 156，而 b 的内存地址为 0x1040a124，变量 a 存储了 b 的地址。我们就称 a 指向了 b。</p>
-</li>
-<li><p>指针的声明：指针变量的类型为 <code>*T</code>，该指针指向一个 <code>T</code> 类型的变量。</p>
-</li>
-</ol>
-<ul>
-<li>&amp; 操作符用于获取变量的地址。下面的程序把 b 的地址赋值给 <code>*int</code> 类型的 a。我们称 a 指向了 b。当我们打印 a 的值时，会打印出 b 的地址。</li>
-</ul>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    b := <span class="number">255</span></span><br><span class="line">    <span class="keyword">var</span> a *<span class="type">int</span> = &amp;b</span><br><span class="line">    fmt.Printf(<span class="string">&quot;Type of a is %T\n&quot;</span>, a) <span class="comment">// *int</span></span><br><span class="line">    fmt.Println(<span class="string">&quot;address of b is&quot;</span>, a)  <span class="comment">// 0x1040a124</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<ol start="3">
-<li><p>指针的零值（Zero Value）是 <code>nil</code>。声明变量 <code>var b *int</code>，此时 <code>b == nil</code> 为 <code>true</code>。</p>
-</li>
-<li><p>指针的解引用：指针的解引用可以获取指针所指向的变量的值。将 <code>a</code> 解引用的语法是 <code>*a</code>。</p>
-</li>
-</ol>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;  </span><br><span class="line">    b := <span class="number">255</span></span><br><span class="line">    a := &amp;b</span><br><span class="line">    fmt.Println(<span class="string">&quot;address of b is&quot;</span>, a) <span class="comment">// 0x1040a124</span></span><br><span class="line">    fmt.Println(<span class="string">&quot;value of b is&quot;</span>, *a)  <span class="comment">// 255</span></span><br><span class="line">    *a++  <span class="comment">// (*a)++</span></span><br><span class="line">    fmt.Println(<span class="string">&quot;new value of b is&quot;</span>, b) <span class="comment">// 256</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<ol start="5">
-<li>向函数传递指针参数：</li>
-</ol>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">change</span><span class="params">(val *<span class="type">int</span>)</span></span> &#123;  </span><br><span class="line">    *val = <span class="number">55</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;  </span><br><span class="line">    a := <span class="number">58</span></span><br><span class="line">    fmt.Println(<span class="string">&quot;value of a before function call is&quot;</span>, a) <span class="comment">// 58</span></span><br><span class="line">    b := &amp;a</span><br><span class="line">    change(b)</span><br><span class="line">    fmt.Println(<span class="string">&quot;value of a after function call is&quot;</span>, a) <span class="comment">// 55</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<ol start="6">
-<li>假如我们想要在函数内修改一个数组，并希望调用函数的地方也能得到修改后的数组，一种解决方案是把一个指向数组的指针传递给这个函数（但 Go 语言习惯的方法是用切片处理，见序号 7）。</li>
-</ol>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">modify</span><span class="params">(arr *[3]<span class="type">int</span>)</span></span> &#123;  </span><br><span class="line">    (*arr)[<span class="number">0</span>] = <span class="number">90</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;  </span><br><span class="line">    a := [<span class="number">3</span>]<span class="type">int</span>&#123;<span class="number">89</span>, <span class="number">90</span>, <span class="number">91</span>&#125;</span><br><span class="line">    modify(&amp;a)</span><br><span class="line">    fmt.Println(a)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li><code>a[x]</code> 是 <code>(*a)[x]</code> 的简写形式，因此上面代码中的 <code>(*arr)[0]</code> 可以替换为 <code>arr[0]</code>。</li>
-</ul>
-<ol start="7">
-<li><strong>不要向函数传递数组的指针，而应该使用数组切片</strong>：</li>
-</ol>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">modify</span><span class="params">(sls []<span class="type">int</span>)</span></span> &#123;  </span><br><span class="line">    sls[<span class="number">0</span>] = <span class="number">90</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;  </span><br><span class="line">    a := [<span class="number">3</span>]<span class="type">int</span>&#123;<span class="number">89</span>, <span class="number">90</span>, <span class="number">91</span>&#125;</span><br><span class="line">    modify(a[:]) <span class="comment">// 使用切片</span></span><br><span class="line">    fmt.Println(a)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>别再传递数组指针了，而是使用切片吧。上面的代码更加简洁，也更符合 Go 语言的习惯。</li>
-</ul>
-<hr>
-]]></content>
-      <categories>
-        <category>学习笔记</category>
-        <category>Golang</category>
-      </categories>
-      <tags>
-        <tag>Go字符串</tag>
-        <tag>Go指针</tag>
       </tags>
   </entry>
   <entry>
@@ -965,6 +979,99 @@
       </tags>
   </entry>
   <entry>
+    <title>Go 笔记之字符串和指针</title>
+    <url>/posts/230915155105.html</url>
+    <content><![CDATA[<h2 id="Go 语言学习笔记 -14：字符串"><a href="#Go 语言学习笔记 -14：字符串" class="headerlink" title="Go 语言学习笔记 -14：字符串"></a>Go 语言学习笔记 -14：字符串</h2><ol>
+<li><p>Go 语言中的字符串是一个 <strong> 字节切片</strong>。</p>
+</li>
+<li><p><code>%x</code> 格式限定符用于指定 16 进制编码，<code>%c</code> 格式限定符用于打印字符串的字符。</p>
+</li>
+<li><p>在 UTF-8 编码中，一个代码点（字符的编码）可能会占用超过一个字节的空间，所以使用 <code>%c</code> 格式打印时可能会出错，可以用 <code>rune</code> 解决。</p>
+</li>
+<li><p><code>rune</code> 是 Go 语言的内建类型，它也是 <code>int32</code> 的别称。在 Go 语言中，<code>rune</code> 表示一个代码点。代码点无论占用多少个字节，都可以用一个 <code>rune</code> 来表示。</p>
+</li>
+</ol>
+<span id="more"></span>
+
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line">s := <span class="string">&quot;Señor&quot;</span></span><br><span class="line"><span class="keyword">for</span> i:= <span class="number">0</span>; i &lt; <span class="built_in">len</span>(s); i++ &#123;</span><br><span class="line">    fmt.Printf(<span class="string">&quot;%c &quot;</span>,s[i]) <span class="comment">// 打印出错，S e Ã ± o r</span></span><br><span class="line">&#125;</span><br><span class="line">fmt.Printf(<span class="string">&quot;\n&quot;</span>)</span><br><span class="line"></span><br><span class="line">runes := []<span class="type">rune</span>(s)</span><br><span class="line"><span class="keyword">for</span> i:= <span class="number">0</span>; i &lt; <span class="built_in">len</span>(runes); i++ &#123; <span class="comment">// 字符串被转化为一个 rune 切片</span></span><br><span class="line">    fmt.Printf(<span class="string">&quot;%c &quot;</span>,runes[i]) <span class="comment">// 打印正确，S e ñ o r</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="5">
+<li>字符串的 for range 循环更简单。</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">printCharsAndBytes</span><span class="params">(s <span class="type">string</span>)</span></span> &#123;</span><br><span class="line">    <span class="keyword">for</span> index, <span class="type">rune</span> := <span class="keyword">range</span> s &#123;</span><br><span class="line">        fmt.Printf(<span class="string">&quot;%c starts at byte %d\n&quot;</span>, <span class="type">rune</span>, index)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    name := <span class="string">&quot;Señor&quot;</span></span><br><span class="line">    printCharsAndBytes(name)</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">S starts at byte 0  </span></span><br><span class="line"><span class="comment">e starts at byte 1  </span></span><br><span class="line"><span class="comment">ñ starts at byte 2  // ñ 占了两个字节</span></span><br><span class="line"><span class="comment">o starts at byte 4  </span></span><br><span class="line"><span class="comment">r starts at byte 5</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<ol start="6">
+<li>用字节切片构造字符串：</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 包含字符串 Café 用 UTF-8 编码后的 16 进制字节</span></span><br><span class="line">byteSlice := []<span class="type">byte</span>&#123;<span class="number">0x43</span>, <span class="number">0x61</span>, <span class="number">0x66</span>, <span class="number">0xC3</span>, <span class="number">0xA9</span>&#125;</span><br><span class="line">str := <span class="type">string</span>(byteSlice)</span><br><span class="line">fmt.Println(str) <span class="comment">// Café</span></span><br></pre></td></tr></table></figure>
+
+<ol start="7">
+<li>用 <code>rune</code> 切片构造字符串：</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 包含字符串 Señor 的 16 进制的 Unicode 代码点</span></span><br><span class="line">runeSlice := []<span class="type">rune</span>&#123;<span class="number">0x0053</span>, <span class="number">0x0065</span>, <span class="number">0x00f1</span>, <span class="number">0x006f</span>, <span class="number">0x0072</span>&#125;</span><br><span class="line">str := <span class="type">string</span>(runeSlice)</span><br><span class="line">fmt.Println(str) <span class="comment">// Señor</span></span><br></pre></td></tr></table></figure>
+
+<ol start="8">
+<li>字符串的长度：utf-8 package 包中的 <code>func RuneCountInString(s string) (n int)</code> 方法用来 <strong> 获取字符串的长度 </strong>。这个方法传入一个字符串参数然后<strong> 返回字符串中的 rune 的数量</strong>。</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line">word1 := <span class="string">&quot;Señor&quot;</span> </span><br><span class="line">fmt.Println(utf8.RuneCountInString(word1)) <span class="comment">// 5</span></span><br><span class="line">word2 := <span class="string">&quot;Pets&quot;</span></span><br><span class="line">fmt.Println(utf8.RuneCountInString(word2)) <span class="comment">// 4</span></span><br></pre></td></tr></table></figure>
+
+<ol start="9">
+<li>字符串是不可变的：一旦一个字符串被创建，它将不可被修改。为了修改字符串，可以把字符串转化为一个 rune 切片，这个切片可以进行任何想要的改变，最后再转化为一个字符串。</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">mutate</span><span class="params">(s []<span class="type">rune</span>)</span></span> <span class="type">string</span> &#123;  </span><br><span class="line">    s[<span class="number">0</span>] = <span class="string">&#x27;a&#x27;</span> <span class="comment">// 修改切片</span></span><br><span class="line">    <span class="keyword">return</span> <span class="type">string</span>(s) <span class="comment">// 转换为一个字符串</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;  </span><br><span class="line">    h := <span class="string">&quot;hello&quot;</span></span><br><span class="line">    fmt.Println(mutate([]<span class="type">rune</span>(h))) <span class="comment">// 用 rune 切片构造字符串，输出 aello</span></span><br><span class="line">    fmt.Println(h) <span class="comment">// 输出 hello</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="Go 语言学习笔记 -15：指针"><a href="#Go 语言学习笔记 -15：指针" class="headerlink" title="Go 语言学习笔记 -15：指针"></a>Go 语言学习笔记 -15：指针</h2><ol>
+<li><p>指针是一种存储变量内存地址（Memory Address）的变量。例如，变量 b 的值为 156，而 b 的内存地址为 0x1040a124，变量 a 存储了 b 的地址。我们就称 a 指向了 b。</p>
+</li>
+<li><p>指针的声明：指针变量的类型为 <code>*T</code>，该指针指向一个 <code>T</code> 类型的变量。</p>
+</li>
+</ol>
+<ul>
+<li>&amp; 操作符用于获取变量的地址。下面的程序把 b 的地址赋值给 <code>*int</code> 类型的 a。我们称 a 指向了 b。当我们打印 a 的值时，会打印出 b 的地址。</li>
+</ul>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    b := <span class="number">255</span></span><br><span class="line">    <span class="keyword">var</span> a *<span class="type">int</span> = &amp;b</span><br><span class="line">    fmt.Printf(<span class="string">&quot;Type of a is %T\n&quot;</span>, a) <span class="comment">// *int</span></span><br><span class="line">    fmt.Println(<span class="string">&quot;address of b is&quot;</span>, a)  <span class="comment">// 0x1040a124</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li><p>指针的零值（Zero Value）是 <code>nil</code>。声明变量 <code>var b *int</code>，此时 <code>b == nil</code> 为 <code>true</code>。</p>
+</li>
+<li><p>指针的解引用：指针的解引用可以获取指针所指向的变量的值。将 <code>a</code> 解引用的语法是 <code>*a</code>。</p>
+</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;  </span><br><span class="line">    b := <span class="number">255</span></span><br><span class="line">    a := &amp;b</span><br><span class="line">    fmt.Println(<span class="string">&quot;address of b is&quot;</span>, a) <span class="comment">// 0x1040a124</span></span><br><span class="line">    fmt.Println(<span class="string">&quot;value of b is&quot;</span>, *a)  <span class="comment">// 255</span></span><br><span class="line">    *a++  <span class="comment">// (*a)++</span></span><br><span class="line">    fmt.Println(<span class="string">&quot;new value of b is&quot;</span>, b) <span class="comment">// 256</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="5">
+<li>向函数传递指针参数：</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">change</span><span class="params">(val *<span class="type">int</span>)</span></span> &#123;  </span><br><span class="line">    *val = <span class="number">55</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;  </span><br><span class="line">    a := <span class="number">58</span></span><br><span class="line">    fmt.Println(<span class="string">&quot;value of a before function call is&quot;</span>, a) <span class="comment">// 58</span></span><br><span class="line">    b := &amp;a</span><br><span class="line">    change(b)</span><br><span class="line">    fmt.Println(<span class="string">&quot;value of a after function call is&quot;</span>, a) <span class="comment">// 55</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="6">
+<li>假如我们想要在函数内修改一个数组，并希望调用函数的地方也能得到修改后的数组，一种解决方案是把一个指向数组的指针传递给这个函数（但 Go 语言习惯的方法是用切片处理，见序号 7）。</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">modify</span><span class="params">(arr *[3]<span class="type">int</span>)</span></span> &#123;  </span><br><span class="line">    (*arr)[<span class="number">0</span>] = <span class="number">90</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;  </span><br><span class="line">    a := [<span class="number">3</span>]<span class="type">int</span>&#123;<span class="number">89</span>, <span class="number">90</span>, <span class="number">91</span>&#125;</span><br><span class="line">    modify(&amp;a)</span><br><span class="line">    fmt.Println(a)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>a[x]</code> 是 <code>(*a)[x]</code> 的简写形式，因此上面代码中的 <code>(*arr)[0]</code> 可以替换为 <code>arr[0]</code>。</li>
+</ul>
+<ol start="7">
+<li><strong>不要向函数传递数组的指针，而应该使用数组切片</strong>：</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">modify</span><span class="params">(sls []<span class="type">int</span>)</span></span> &#123;  </span><br><span class="line">    sls[<span class="number">0</span>] = <span class="number">90</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;  </span><br><span class="line">    a := [<span class="number">3</span>]<span class="type">int</span>&#123;<span class="number">89</span>, <span class="number">90</span>, <span class="number">91</span>&#125;</span><br><span class="line">    modify(a[:]) <span class="comment">// 使用切片</span></span><br><span class="line">    fmt.Println(a)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>别再传递数组指针了，而是使用切片吧。上面的代码更加简洁，也更符合 Go 语言的习惯。</li>
+</ul>
+<hr>
+]]></content>
+      <categories>
+        <category>学习笔记</category>
+        <category>Golang</category>
+      </categories>
+      <tags>
+        <tag>Go字符串</tag>
+        <tag>Go指针</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>二叉树的遍历基础</title>
     <url>/posts/230905224335.html</url>
     <content><![CDATA[<h2 id="二叉树的遍历"><a href="# 二叉树的遍历" class="headerlink" title="二叉树的遍历"></a>二叉树的遍历 </h2><p> 二叉树是一种非常重要的数据结构，很多其它数据结构都是基于二叉树的基础演变而来的。</p>
@@ -1021,7 +1128,7 @@
 
 <span id="more"></span>
 
-<h1 id="C 语言系列"><a href="#C 语言系列" class="headerlink" title="C 语言系列"></a>C 语言系列</h1><p><a href="https://pursue26.github.io/posts/230916171929.html">C 语言之 main 函数参数</a><br><a href="https://pursue26.github.io/posts/230913200729.html">C 语言之 const 关键字</a><br><a href="https://pursue26.github.io/posts/230918174223.html">C 语言之 typedef 自定义类型基础</a><br><a href="https://pursue26.github.io/posts/230920172849.html">C 语言之 typedef 实践</a><br><a href="https://pursue26.github.io/posts/230911151334.html">C 语言之 pthread 多线程</a><br><a href="https://pursue26.github.io/posts/230918114841.html">C 语言之大小端知识</a></p>
+<h1 id="C 语言系列"><a href="#C 语言系列" class="headerlink" title="C 语言系列"></a>C 语言系列</h1><p><a href="https://pursue26.github.io/posts/230916171929.html">C 语言之 main 函数参数</a><br><a href="https://pursue26.github.io/posts/230913200729.html">C 语言之 const 关键字</a><br><a href="https://pursue26.github.io/posts/230918174223.html">C 语言之 typedef 自定义类型基础</a><br><a href="https://pursue26.github.io/posts/230920172849.html">C 语言之 typedef 实践</a><br><a href="https://pursue26.github.io/posts/230921094127.html">C 语言之锁与原子操作基础</a><br><a href="https://pursue26.github.io/posts/230911151334.html">C 语言之 pthread 多线程</a><br><a href="https://pursue26.github.io/posts/230918114841.html">C 语言之大小端知识</a></p>
 <h1 id="Golang 语言系列"><a href="#Golang 语言系列" class="headerlink" title="Golang 语言系列"></a>Golang 语言系列</h1><p><a href="https://pursue26.github.io/posts/230907162612.html">Go 笔记之变量与常量</a><br><a href="https://pursue26.github.io/posts/230909120145.html">Go 笔记之函数 &amp; 包 &amp; 判断 &amp; 循环</a><br><a href="https://pursue26.github.io/posts/230912152800.html">Go 笔记之数组与切片</a><br><a href="https://pursue26.github.io/posts/230913161326.html">Go 笔记之可变参数函数与 Map 集合</a><br><a href="https://pursue26.github.io/posts/230915155105.html">Go 笔记之字符串和指针</a></p>
 <h1 id="数据结构系列"><a href="# 数据结构系列" class="headerlink" title="数据结构系列"></a>数据结构系列 </h1><p><a href="https://pursue26.github.io/posts/230905224335.html"> 拓扑排序基础 </a><br><a href="https://pursue26.github.io/posts/230916094606.html"> 二叉树的遍历基础</a></p>
 <h1 id="Docker 系列"><a href="#Docker 系列" class="headerlink" title="Docker 系列"></a>Docker 系列</h1><p><a href="https://pursue26.github.io/posts/230909171809.html">Docker 学习笔记</a></p>
