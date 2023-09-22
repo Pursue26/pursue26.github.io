@@ -148,7 +148,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">16</span>
+          <span class="site-state-item-count">17</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -159,7 +159,7 @@
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">26</span>
+        <span class="site-state-item-count">28</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -176,6 +176,125 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://pursue26.github.io/posts/230913161326.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="aha">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="aha's blog">
+      <meta itemprop="description" content="经历一个过程然后成为更好的自己">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | aha's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/posts/230913161326.html" class="post-title-link" itemprop="url">Go 笔记之可变参数函数与 Map 集合</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+  
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2023-09-13 16:13:26" itemprop="dateCreated datePublished" datetime="2023-09-13T16:13:26+08:00">2023-09-13</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2023-09-22 11:53:16" itemprop="dateModified" datetime="2023-09-22T11:53:16+08:00">2023-09-22</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">学习笔记</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/Golang/" itemprop="url" rel="index"><span itemprop="name">Golang</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>1.7k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>3 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h2 id="Go语言学习笔记-12：可变参数函数"><a href="#Go语言学习笔记-12：可变参数函数" class="headerlink" title="Go语言学习笔记-12：可变参数函数"></a>Go语言学习笔记-12：可变参数函数</h2><ol>
+<li><p>可变参数函数是一种<strong>参数个数可变</strong>的函数。如果函数最后一个参数的类型被记作 <code>...T</code> ，这时函数可以接受任意个 <code>T</code> 类型的参数作为最后一个参数。<strong>只有</strong>函数的最后一个参数才允许是可变的。</p>
+</li>
+<li><p>可变参数函数的<strong>工作原理</strong>是把可变参数转换为一个新的<strong>切片</strong>。</p>
+</li>
+<li><p>有一个可以直接将切片传入可变参数函数的语法糖，你可以在切片后加上 <code>...</code> 后缀。这样切片将直接传入函数，不再创建新的切片。</p>
+</li>
+</ol>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/posts/230913161326.html#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -222,7 +341,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2023-09-20 12:35:54" itemprop="dateModified" datetime="2023-09-20T12:35:54+08:00">2023-09-20</time>
+      <time title="修改时间：2023-09-22 11:53:29" itemprop="dateModified" datetime="2023-09-22T11:53:29+08:00">2023-09-22</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -263,10 +382,7 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <blockquote>
-<p>学习链接：<a target="_blank" rel="noopener" href="https://studygolang.com/subject/2">https://studygolang.com/subject/2</a>，感谢如此优秀的教程！</p>
-</blockquote>
-<h2 id="Go语言学习笔记-10：数组"><a href="#Go语言学习笔记-10：数组" class="headerlink" title="Go语言学习笔记-10：数组"></a>Go语言学习笔记-10：数组</h2><ol>
+          <h2 id="Go语言学习笔记-10：数组"><a href="#Go语言学习笔记-10：数组" class="headerlink" title="Go语言学习笔记-10：数组"></a>Go语言学习笔记-10：数组</h2><ol>
 <li><p>数组是<strong>同一类型元素</strong>的集合，Go语言中不允许混合不同类型的元素。</p>
 </li>
 <li><p>一个数组的表示形式为 <code>[n]T</code>。n 表示数组中元素的数量，T 代表每个元素的类型。如： <code>var arr [3]int</code>。</p>
@@ -348,7 +464,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2023-09-20 12:34:54" itemprop="dateModified" datetime="2023-09-20T12:34:54+08:00">2023-09-20</time>
+      <time title="修改时间：2023-09-22 13:56:53" itemprop="dateModified" datetime="2023-09-22T13:56:53+08:00">2023-09-22</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -612,7 +728,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2023-09-20 12:35:32" itemprop="dateModified" datetime="2023-09-20T12:35:32+08:00">2023-09-20</time>
+      <time title="修改时间：2023-09-22 11:53:04" itemprop="dateModified" datetime="2023-09-22T11:53:04+08:00">2023-09-22</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -653,10 +769,7 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <blockquote>
-<p>学习链接：<a target="_blank" rel="noopener" href="https://studygolang.com/subject/2">https://studygolang.com/subject/2</a>，感谢如此优秀的教程！</p>
-</blockquote>
-<h2 id="Go语言学习笔记-5：函数"><a href="#Go语言学习笔记-5：函数" class="headerlink" title="Go语言学习笔记-5：函数"></a>Go语言学习笔记-5：函数</h2><ol>
+          <h2 id="Go语言学习笔记-5：函数"><a href="#Go语言学习笔记-5：函数" class="headerlink" title="Go语言学习笔记-5：函数"></a>Go语言学习笔记-5：函数</h2><ol>
 <li>函数声明语法：</li>
 </ol>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">functionname</span><span class="params">(parametername1 <span class="keyword">type</span>, parametername2 <span class="keyword">type</span>)</span></span> returntype &#123;  </span><br><span class="line">    <span class="comment">// 函数体（具体实现的功能）</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -740,7 +853,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2023-09-20 12:35:21" itemprop="dateModified" datetime="2023-09-20T12:35:21+08:00">2023-09-20</time>
+      <time title="修改时间：2023-09-22 11:52:46" itemprop="dateModified" datetime="2023-09-22T11:52:46+08:00">2023-09-22</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -781,10 +894,7 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <blockquote>
-<p>学习链接：<a target="_blank" rel="noopener" href="https://studygolang.com/subject/2">https://studygolang.com/subject/2</a>，感谢如此优秀的教程！</p>
-</blockquote>
-<h2 id="Go语言学习笔记-1：HelloWorld"><a href="#Go语言学习笔记-1：HelloWorld" class="headerlink" title="Go语言学习笔记-1：HelloWorld"></a>Go语言学习笔记-1：HelloWorld</h2><p>Go语言是一种编译型语言，源代码都会编译成二进制机器码。</p>
+          <h2 id="Go语言学习笔记-1：HelloWorld"><a href="#Go语言学习笔记-1：HelloWorld" class="headerlink" title="Go语言学习笔记-1：HelloWorld"></a>Go语言学习笔记-1：HelloWorld</h2><p>Go语言是一种编译型语言，源代码都会编译成二进制机器码。</p>
 <p>所有 Go 源文件都应该放置在工作区里的 src 目录下。Linux 的工作区（Workspace）应该设置在 $HOME&#x2F;go，也可以通过设置 GOPATH 环境变量，用其他目录来作为工作区。</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">go</span></span><br><span class="line">  bin <span class="comment">// 编译生成的二进制文件存储位置</span></span><br><span class="line">    hello</span><br><span class="line">  src <span class="comment">// 所有 Go 源文件都应该放置在工作区里的 src 目录下</span></span><br><span class="line">    hello <span class="comment">// 为每个project新建一个文件夹</span></span><br><span class="line">      helloworld.<span class="keyword">go</span></span><br></pre></td></tr></table></figure>
 
@@ -964,13 +1074,13 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-line"></i>
     </span>
-    <span title="站点总字数">76k</span>
+    <span title="站点总字数">79k</span>
   </span>
   <span class="post-meta-item">
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">2:19</span>
+    <span title="站点阅读时长">2:24</span>
   </span>
 </div>
 <div class="busuanzi-count">

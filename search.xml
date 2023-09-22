@@ -137,6 +137,41 @@
       </tags>
   </entry>
   <entry>
+    <title>C 语言之 main 函数参数</title>
+    <url>/posts/230916171929.html</url>
+    <content><![CDATA[<h2 id="指令行操作"><a href="# 指令行操作" class="headerlink" title="指令行操作"></a> 指令行操作 </h2><p>C 语言支持从 CLI（指令行）传入参数给 main() 函数，多个命令行参数之间用空格分隔，但是如果参数本身带有空格，那么就使用双引号或单引号。</p>
+<p>C 语言的 main 函数是程序的入口函数，它可以有两种形式的参数：</p>
+<span id="more"></span>
+
+<ol>
+<li><p> 无参数形式：main 函数的原型可以是 <code>int main(void)</code>。这表示不接受任何参数，程序执行时不需要从命令行传递参数给 main 函数。</p>
+</li>
+<li><p> 带参数形式：main 函数的原型可以是 <code>int main(int argc, char *argv[])</code>。其中，<code>argc</code> 表示命令行参数的个数，而 <code>argv</code> 是一个字符串指针数组，每个元素都是一个命令行参数的字符串。</p>
+<ul>
+<li><code>argc</code> 标识传入的参数个数。如果没有提供任何参数，<code>argc</code> 将被设置为 1；否则，<code>argc</code> 将被设置为传入的参数个数加 1。</li>
+<li><code>argv[0]</code> 通常是程序的名称或路径的字符串。</li>
+<li><code>argv[1]</code> 到 <code>argv[argc - 1]</code> 是命令行传递给程序的参数，以空格分隔。</li>
+</ul>
+</li>
+</ol>
+<p> 值得注意的是，也可以使用 <code>char **argv</code> 来代替 <code>char *argv[]</code> 形参，两者具有相同的类型含义。因为数组变量名 <code>argv</code> 就是指向 <code>argv[]</code> 数组的第一个元素的指针，同时又因为第一个元素的数值就是一个指针，所以此时的数组变量名 <code>argv</code> 的本质就是一个指针的指针（双重指针）。</p>
+<p> 下面是一个例子，演示如何使用带参数的 main 函数来接收命令行参数：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span> &#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;number of params: %d\n&quot;</span>, argc);</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; argc; i++) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;param-%d: %s\n&quot;</span>, i, argv[i]);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p> 如果编译并运行这个程序，并在命令行中输入参数，例如 <code>./a.out arg1 arg2 3 arg4</code>，则输出如下：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">number of params: 5</span><br><span class="line">param-0: ./a.out</span><br><span class="line">param-1: arg1</span><br><span class="line">param-2: arg2</span><br><span class="line">param-3: 3</span><br><span class="line">param-4: arg4</span><br></pre></td></tr></table></figure>
+
+<p> 参考链接：<a href="https://is-cloud.blog.csdn.net/article/details/105347737">https://is-cloud.blog.csdn.net/article/details/105347737</a></p>
+]]></content>
+      <categories>
+        <category>学习笔记</category>
+        <category>C语言</category>
+      </categories>
+      <tags>
+        <tag>main函数参数</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>C 语言之 typedef 实践</title>
     <url>/posts/230920172849.html</url>
     <content><![CDATA[<p>在 <a href="https://pursue26.github.io/posts/230918174223.html">C 语言之 typedef 自定义类型基础</a> 中介绍了 <code>typedef</code> 的使用，下面介绍一些 <code>typedef</code> 的实践。</p>
@@ -332,6 +367,149 @@
       </tags>
   </entry>
   <entry>
+    <title>C 语言之多维数组</title>
+    <url>/posts/230922143003.html</url>
+    <content><![CDATA[<p>本文章主要介绍 C 语言创建多维数组的方式及其排序，包括静态多维数组、<code>malloc</code> 动态申请多维数组、指针数组的多维数组和多维结构体数组的创建。</p>
+<span id="more"></span>
+
+<h2 id="排序接口"><a href="# 排序接口" class="headerlink" title="排序接口"></a>排序接口</h2><p><code>qsort</code> 函数是 C 语言标准库中的一个排序函数，用于对数组进行快速排序。它的函数原型如下：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">qsort</span><span class="params">(</span></span><br><span class="line"><span class="params">    <span class="type">void</span> *base, </span></span><br><span class="line"><span class="params">    <span class="type">size_t</span> nmemb, </span></span><br><span class="line"><span class="params">    <span class="type">size_t</span> size, </span></span><br><span class="line"><span class="params">    <span class="type">int</span> (*compar)(<span class="type">const</span> <span class="type">void</span> *, <span class="type">const</span> <span class="type">void</span> *)</span></span><br><span class="line"><span class="params">)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>参数说明：</p>
+<ul>
+<li><code>base</code>：指向需要排序的数组的第一个元素的指针。</li>
+<li><code>nmemb</code>：数组中元素的个数。</li>
+<li><code>size</code>：每个元素的大小（以字节为单位）。</li>
+<li><code>compar</code>：指向比较函数的指针，用于指定数组元素的比较规则。</li>
+</ul>
+<p><code>base</code> 指定了待排序数组的首地址，再结合 <code>nmemb * size</code> 可以确定要排序的数组的范围。</p>
+<p>比较函数 <code>compar</code> 的原型如下：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">compar</span><span class="params">(<span class="type">const</span> <span class="type">void</span> *a, <span class="type">const</span> <span class="type">void</span> *b)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>参数说明：</p>
+<ul>
+<li><code>a</code> 和 <code>b</code>：指向待比较的两个元素的指针。</li>
+</ul>
+<p>比较函数 <code>compar</code> 必须返回一个整数值，表示 <code>a</code> 和 <code>b</code> 的大小关系：</p>
+<ul>
+<li>如果 <code>a</code> 小于 <code>b</code>，则返回一个负整数。</li>
+<li>如果 <code>a</code> 等于 <code>b</code>，则返回零。</li>
+<li>如果 <code>a</code> 大于 <code>b</code>，则返回一个正整数。</li>
+</ul>
+<p>通过传入不同的比较函数，<code>qsort</code> 函数可以实现对不同类型的数组进行排序。</p>
+<h2 id="静态多维数组"><a href="# 静态多维数组" class="headerlink" title="静态多维数组"></a>静态多维数组 </h2><h3 id="多维数组创建"><a href="# 多维数组创建" class="headerlink" title="多维数组创建"></a> 多维数组创建</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> rows = <span class="number">3</span>, cols = <span class="number">4</span>;</span><br><span class="line"><span class="type">int</span> arr[rows][cols];</span><br></pre></td></tr></table></figure>
+
+<h3 id="多维数组排序"><a href="# 多维数组排序" class="headerlink" title="多维数组排序"></a>多维数组排序 </h3><p> 按照二维数组第 0 列升序排序。</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">cmp</span><span class="params">(<span class="type">const</span> <span class="type">void</span> *a, <span class="type">const</span> <span class="type">void</span> *b)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> ((<span class="type">int</span> *)a)[<span class="number">0</span>] - ((<span class="type">int</span> *)b)[<span class="number">0</span>];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 传入 cmp 函数指针的 arr 是一个一维指针</span></span><br><span class="line">qsort(arr, rows, <span class="keyword">sizeof</span>(arr[<span class="number">0</span>]), cmp);  <span class="comment">// 快速排序</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="malloc 动态申请多维数组"><a href="#malloc 动态申请多维数组" class="headerlink" title="malloc 动态申请多维数组"></a>malloc 动态申请多维数组 </h2><h3 id="多维数组创建 -1"><a href="# 多维数组创建 -1" class="headerlink" title="多维数组创建"></a> 多维数组创建</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> rows = <span class="number">3</span>, cols = <span class="number">4</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 动态申请二维数组</span></span><br><span class="line"><span class="type">int</span> **arr = (<span class="type">int</span> **)<span class="built_in">malloc</span>(rows * <span class="keyword">sizeof</span>(<span class="type">int</span> *));</span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; rows; i++) &#123;</span><br><span class="line">    arr[i] = (<span class="type">int</span> *)<span class="built_in">malloc</span>(cols * <span class="keyword">sizeof</span>(<span class="type">int</span>));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 释放内存</span></span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; rows; i++) &#123;</span><br><span class="line">    <span class="built_in">free</span>(arr[i]);</span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">free</span>(arr);</span><br></pre></td></tr></table></figure>
+
+<p>释放 <code>malloc</code> 申请的多维数组时，不能直接 <code>free(arr)</code>，因为 <code>malloc</code> 和 <code>free</code> 执行次数要一致。</p>
+<h3 id="多维数组排序 -1"><a href="# 多维数组排序 -1" class="headerlink" title="多维数组排序"></a>多维数组排序 </h3><p> 按照二维数组第 0 列升序排序，若相等，则按第 1 列升序排序。</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">cmp</span><span class="params">(<span class="type">const</span> <span class="type">void</span>* a, <span class="type">const</span> <span class="type">void</span>* b)</span> &#123;</span><br><span class="line">    <span class="comment">// a 是一个指向二维数组首行的指针</span></span><br><span class="line">    <span class="comment">// 通过类型转换和解引用操作, ap 指向了 a 所指向的整型数组的首地址</span></span><br><span class="line">    <span class="type">const</span> <span class="type">int</span>* ap = *(<span class="type">int</span> **)a;</span><br><span class="line">    <span class="type">const</span> <span class="type">int</span>* bp = *(<span class="type">int</span> **)b;</span><br><span class="line">    <span class="keyword">if</span> (ap[<span class="number">0</span>] == bp[<span class="number">0</span>]) &#123;</span><br><span class="line">        <span class="keyword">return</span> ap[<span class="number">1</span>] - bp[<span class="number">1</span>];</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> ap[<span class="number">0</span>] - bp[<span class="number">0</span>];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 传入 cmp 函数指针的 arr 是一个二维指针</span></span><br><span class="line">qsort(arr, rows, <span class="keyword">sizeof</span>(arr[<span class="number">0</span>]), cmp);</span><br></pre></td></tr></table></figure>
+
+<h2 id="malloc 动态申请多维结构体数组"><a href="#malloc 动态申请多维结构体数组" class="headerlink" title="malloc 动态申请多维结构体数组"></a>malloc 动态申请多维结构体数组 </h2><h3 id="多维结构体数组创建"><a href="# 多维结构体数组创建" class="headerlink" title="多维结构体数组创建"></a> 多维结构体数组创建</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> rows = <span class="number">3</span>, cols = <span class="number">4</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">node</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> x;</span><br><span class="line">    <span class="type">int</span> y;</span><br><span class="line">    <span class="type">int</span> z;</span><br><span class="line">&#125; Node_t;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 动态申请二维数组</span></span><br><span class="line">Node_t **arr = (Node_t **)<span class="built_in">malloc</span>(rows * <span class="keyword">sizeof</span>(Node_t *));</span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; rows; i++) &#123;</span><br><span class="line">    arr[i] = (Node_t *)<span class="built_in">malloc</span>(cols * <span class="keyword">sizeof</span>(Node_t));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 释放内存</span></span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; rows; i++) &#123;</span><br><span class="line">    <span class="comment">// 如果结构体成员中有指针且申请了空间, 则需要先释放成员的空间再释放结构体的空间</span></span><br><span class="line">    <span class="built_in">free</span>(arr[i]);</span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">free</span>(arr);</span><br></pre></td></tr></table></figure>
+
+<h3 id="多维结构体数组排序"><a href="# 多维结构体数组排序" class="headerlink" title="多维结构体数组排序"></a>多维结构体数组排序 </h3><p> 按照二维数组第 0 列的结构体成员 <code>x</code> 降序排序。</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">cmp</span><span class="params">(<span class="type">const</span> <span class="type">void</span> *a, <span class="type">const</span> <span class="type">void</span> *b)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// return (Node_t *)a-&gt;x - (Node_t *)b-&gt;x;   // 错误写法</span></span><br><span class="line">    <span class="keyword">return</span> ((Node_t *)a)-&gt;x - ((Node_t *)b)-&gt;x;   <span class="comment">// 正确写法 1</span></span><br><span class="line">    <span class="comment">// return (*(Node_t *)b).x - (*(Node_t *)a).x;     // 正确写法 2</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">qsort(arr, rows, <span class="keyword">sizeof</span>(arr[<span class="number">0</span>]), cmp);</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>-&gt;</code> 操作符的优先级高于 <code>()</code> 操作符。</li>
+</ul>
+<h2 id="指针数组的多维数组"><a href="# 指针数组的多维数组" class="headerlink" title="指针数组的多维数组"></a>指针数组的多维数组 </h2><p> 使用指针数组的多维数组：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> rows = <span class="number">3</span>, cols = <span class="number">4</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span>* arr[rows];</span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; cols; i++) &#123;</span><br><span class="line">    arr[i] = (<span class="type">int</span> *)<span class="built_in">malloc</span>(<span class="number">4</span> * <span class="keyword">sizeof</span>(<span class="type">int</span>));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 释放内存</span></span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; rows; i++) &#123;</span><br><span class="line">    <span class="built_in">free</span>(arr[i]);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这种方式创建的多维数组实际上是一个指针数组，每个指针指向一个一维数组，可以在运行时动态分配每个一维数组的大小（方便创建每行元素个数不同的多维数组）。</p>
+<h3 id="多维数组排序 -2"><a href="# 多维数组排序 -2" class="headerlink" title="多维数组排序"></a>多维数组排序 </h3><p> 按照二维数组第 0 列降序排序。</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">cmp</span><span class="params">(<span class="type">const</span> <span class="type">void</span>* a, <span class="type">const</span> <span class="type">void</span>* b)</span> &#123;</span><br><span class="line">    <span class="type">const</span> <span class="type">int</span>* ap = *(<span class="type">int</span> **)a;</span><br><span class="line">    <span class="type">const</span> <span class="type">int</span>* bp = *(<span class="type">int</span> **)b;</span><br><span class="line">    <span class="keyword">return</span> bp[<span class="number">0</span>] - ap[<span class="number">0</span>];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 传入 cmp 函数指针的 arr 是一个二维指针</span></span><br><span class="line">qsort(arr, rows, <span class="keyword">sizeof</span>(arr[<span class="number">0</span>]), cmp);</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>学习笔记</category>
+        <category>C语言</category>
+      </categories>
+      <tags>
+        <tag>多维数组</tag>
+        <tag>数组排序</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>C 语言之大小端知识</title>
+    <url>/posts/230918114841.html</url>
+    <content><![CDATA[<h2 id="字节序"><a href="# 字节序" class="headerlink" title="字节序"></a>字节序 </h2><h3 id="主机字节序"><a href="# 主机字节序" class="headerlink" title="主机字节序"></a> 主机字节序 </h3><p> 在计算机中，数据在内存中的存储是以 byte 为单位的。字节序是由于 CPU 对大于一个字节的变量，在内存中的存放顺序不同而产生的。</p>
+<p>不同的计算机体系结构使用不同的字节序，对于大于一个字节的变量表示，有如下两种方式：</p>
+<ul>
+<li><p>小端模式（Listen Endian, LE）：高位字节存储在高位地址，而低位字节存储在低位地址，与大端模式相反。</p>
+</li>
+<li><p>大端模式（Big Endian, BE）：高位字节存储在低位地址，而低位字节存储在高位地址。</p>
+</li>
+</ul>
+<span id="more"></span>
+
+<p><img src="/images/le-be-endian.png" alt="大小端模式"></p>
+<p>在小端字节序主机系统中进行字节序转换时，需要将低地址的字节和高地址的字节进行交换即可得到大端字节序。</p>
+<h3 id="网络字节序"><a href="# 网络字节序" class="headerlink" title="网络字节序"></a>网络字节序 </h3><p> 不同的机器主机字节序不相同，与 CPU 设计有关，数据的顺序是由 CPU 决定的，而与操作系统无关。我们把某个给定系统所用的字节序称为主机字节序（host byte order）。比如 x86 系列 CPU 都是 little-endian 的字节序。</p>
+<p>网络字节序是 TCP&#x2F;IP 中规定好的一种数据表示格式，它与具体的 CPU 类型、操作系统等无关，从而可以保证数据在不同主机之间传输时能够被正确解释。网络字节序采用 big-endian 排序方式。</p>
+<p>由于这个原因，为了确保数据在不同主机之间传输时能够被正确解释，需要在不同字节序之间进行转换，所以在网络通信中，一般需要将数据转换为网络字节序进行传输。</p>
+<h2 id="主机字节序类型判断"><a href="# 主机字节序类型判断" class="headerlink" title="主机字节序类型判断"></a>主机字节序类型判断 </h2><p> 可以使用共用体（union）来判断当前 CPU 平台是大端字节序还是小端字节序。这是因为共用体的特点是：使用长度最大的数据类型作为共用体的大小。</p>
+<ul>
+<li><p>建立一个联合类型 <code>BYTE_ORDER_UN</code>，用于测试字节序，可以通过成员 <code>byte</code> 来访问 <code>value</code> 变量的高字节和低字节。</p>
+</li>
+<li><p>声明一个 <code>BYTE_ORDER_UN</code> 类型的变量 <code>unByteOrder</code>，将值 <code>0xabcd</code> 赋给成员变量 <code>value</code>。由于在类型 <code>BYTE_ORDER_UN</code> 中，<code>value</code> 和 <code>byte</code> 成员 <strong> 共享一块内存</strong>，所以可以通过 <code>byte</code> 的不同成员来访问 <code>value</code> 的高字节和低字节。</p>
+</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">union</span> <span class="title">byte_order</span> &#123;</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">short</span> <span class="type">int</span> value;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">char</span> byte[<span class="keyword">sizeof</span>(<span class="type">unsigned</span> <span class="type">short</span> <span class="type">int</span>)];</span><br><span class="line">&#125; BYTE_ORDER_UN;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span> &#123;</span><br><span class="line">    BYTE_ORDER_UN unByteOrder;</span><br><span class="line">    unByteOrder.value = <span class="number">0xabcd</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> ((unByteOrder.byte[<span class="number">0</span>] ==<span class="number">0xcd</span>) &amp;&amp; (unByteOrder.byte[<span class="number">1</span>] ==<span class="number">0xab</span>)) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Listen endian byte order, byte[0]: 0x%x, byte[1]: 0x%x\n&quot;</span>, \</span><br><span class="line">        unByteOrder.byte[<span class="number">0</span>], unByteOrder.byte[<span class="number">1</span>]);</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span>((unByteOrder.byte[<span class="number">0</span>] ==<span class="number">0xab</span>) &amp;&amp; (unByteOrder.byte[<span class="number">1</span>] ==<span class="number">0xcd</span>)) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Big endian byte order, byte[0]: 0x%x, byte[1]: 0x%x\n&quot;</span>, \</span><br><span class="line">        unByteOrder.byte[<span class="number">0</span>], unByteOrder.byte[<span class="number">1</span>]);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>主机系统为小端字节序的测试结果：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">$ gcc byteOrder.c -o byteOrder</span><br><span class="line">$ ./byteOrder</span><br><span class="line">Listen endian byte order, byte[0]: 0xcd, byte[1]: 0xab</span><br></pre></td></tr></table></figure>
+
+<h2 id="主机字节序到网络字节序转换"><a href="# 主机字节序到网络字节序转换" class="headerlink" title="主机字节序到网络字节序转换"></a>主机字节序到网络字节序转换 </h2><p> 字节交换的作用是生成一个网络字节序的变量，<strong>其字节的顺序与主机类型和操作系统无关</strong>。进行网络字节序转换的时候，只要转换一次就可以了，不要进行多次的转换。如果进行多次字节序的转换，最后生成的网络字节序的值可能是错误的。例如：</p>
+<ul>
+<li><p>对于主机为小端字节序的系统，进行两次字节序转换的过程如下图所示，经过两次转换，最终的值与最初的主机字节序相同。</p>
+</li>
+<li><p>对于主机为大端字节序的系统，无论进行多少次字节序的转换，最终的值与最初的主机字节序相同。</p>
+</li>
+</ul>
+<p><img src="/images/htos-conversion.png" alt="小端系统中的变量多次字节序转换"></p>
+<p>下面的例子是对 16 位数值和 32 位数值进行字节序转换，每种类型的数值进行两次转换，最后打印结果。</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;arpa/inet.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> BITS16 16</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> BITS32 32</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">union</span> <span class="title">two_bytes_order</span> &#123;</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">short</span> <span class="type">int</span> value;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">char</span> byte[<span class="keyword">sizeof</span>(<span class="type">unsigned</span> <span class="type">short</span>)];</span><br><span class="line">&#125; TWO_BYTES_ORDER_UN;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">union</span> <span class="title">four_bytes_order</span> &#123;</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> <span class="type">int</span> value;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">char</span> byte[<span class="keyword">sizeof</span>(<span class="type">unsigned</span> <span class="type">long</span> <span class="type">int</span>)];</span><br><span class="line">&#125; FOUR_BYTES_ORDER_UN;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">showValue</span><span class="params">(<span class="type">void</span> *begin, <span class="type">int</span> flag)</span> &#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; ((flag) / <span class="number">8</span>); i++) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%x (%p) &quot;</span>, *((<span class="type">unsigned</span> <span class="type">char</span> *)begin + i), (<span class="type">unsigned</span> <span class="type">char</span> *)begin + i);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\n&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span> &#123;</span><br><span class="line">    TWO_BYTES_ORDER_UN v16_orig, v16_turn1, v16_turn2;</span><br><span class="line">    FOUR_BYTES_ORDER_UN v32_orig, v32_turn1, v32_turn2;</span><br><span class="line"></span><br><span class="line">    v16_orig.value = <span class="number">0xabcd</span>;</span><br><span class="line">    v16_turn1.value = htons(v16_orig.value);</span><br><span class="line">    v16_turn2.value = htons(v16_turn1.value);</span><br><span class="line"></span><br><span class="line">    v32_orig.value = <span class="number">0x12345678</span>;</span><br><span class="line">    v32_turn1.value = htonl(v32_orig.value);</span><br><span class="line">    v32_turn2.value = htonl(v32_turn1.value);</span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;16 host to network byte order change:\n&quot;</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\torig:    &quot;</span>);</span><br><span class="line">    showValue(v16_orig.byte, BITS16);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\t1 times: &quot;</span>);</span><br><span class="line">    showValue(v16_turn1.byte, BITS16);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\t2 times: &quot;</span>);</span><br><span class="line">    showValue(v16_turn2.byte, BITS16);</span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;32 host to network byte order change:\n&quot;</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\torig:    &quot;</span>);</span><br><span class="line">    showValue(v32_orig.byte, BITS32);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\t1 times: &quot;</span>);</span><br><span class="line">    showValue(v32_turn1.byte, BITS32);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\t2 times: &quot;</span>);</span><br><span class="line">    showValue(v32_turn2.byte, BITS32);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>小端模式到网络字节序转换的测试结果：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">$ gcc byteOrder2.c -o byteOrder2</span><br><span class="line">$ ./byteOrder2</span><br><span class="line">16 host to network byte order change:</span><br><span class="line">        orig:    cd (0x7ffcd6ad66de) ab (0x7ffcd6ad66df)</span><br><span class="line">        1 times: ab (0x7ffcd6ad66dc) cd (0x7ffcd6ad66dd)</span><br><span class="line">        2 times: cd (0x7ffcd6ad66da) ab (0x7ffcd6ad66db)</span><br><span class="line">32 host to network byte order change:</span><br><span class="line">        orig:    78 (0x7ffcd6ad66d0) 56 (0x7ffcd6ad66d1) 34 (0x7ffcd6ad66d2) 12 (0x7ffcd6ad66d3)</span><br><span class="line">        1 times: 12 (0x7ffcd6ad66c8) 34 (0x7ffcd6ad66c9) 56 (0x7ffcd6ad66ca) 78 (0x7ffcd6ad66cb)</span><br><span class="line">        2 times: 78 (0x7ffcd6ad66c0) 56 (0x7ffcd6ad66c1) 34 (0x7ffcd6ad66c2) 12 (0x7ffcd6ad66c3)</span><br></pre></td></tr></table></figure>
+
+<p>16 位变量 0xabcd 在内存中的表示方式为 cd 在前，ab 在后；进行一次字节序转换后变为 ab 在前，cd 在后。在进行第一次转换后字节序发生了变化，而进行第二次字节序转换后与原始的排列方式一致。</p>
+<h2 id="大小端的转换"><a href="# 大小端的转换" class="headerlink" title="大小端的转换"></a>大小端的转换 </h2><p> 上面的代码中 <code>htons</code> 和 <code>htonl</code>，分别给出了主机字节序到网络字节序的 <code>short</code> 和 <code>long</code> 类型的转换接口，那么这个接口是如何实现大小端转换的呢？</p>
+<p><strong>通过位运算的方式来实现大小端的转换</strong>：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">unsigned</span> <span class="type">int</span> <span class="title function_">little_endian_to_big_endian_4bytes</span><span class="params">(<span class="type">unsigned</span> <span class="type">int</span> value)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> ((value &amp; <span class="number">0x000000ff</span>) &lt;&lt; <span class="number">24</span>) | </span><br><span class="line">           ((value &amp; <span class="number">0x0000ff00</span>) &lt;&lt; <span class="number">8</span>)  | </span><br><span class="line">           ((value &amp; <span class="number">0x00ff0000</span>) &gt;&gt; <span class="number">8</span>)  | </span><br><span class="line">           ((value &amp; <span class="number">0xff000000</span>) &gt;&gt; <span class="number">24</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">unsigned</span> <span class="type">short</span> <span class="title function_">little_endian_to_big_endian_2bytes</span><span class="params">(<span class="type">unsigned</span> <span class="type">short</span> value)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> ((value &amp; <span class="number">0x00ff</span>) &lt;&lt; <span class="number">8</span>) | ((value &amp; <span class="number">0xff00</span>) &gt;&gt; <span class="number">8</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span> &#123;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> little_value4 = <span class="number">0x12345678</span>;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">short</span> little_value2 = <span class="number">0xabcd</span>;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> big_value4 = little_endian_to_big_endian_4bytes(little_value4);</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">short</span> big_value2 = little_endian_to_big_endian_2bytes(little_value2);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;LE2 value: 0x%04x\n&quot;</span>, little_value2);  <span class="comment">// LE2 value: 0xabcd</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;BE2 value: 0x%04x\n&quot;</span>, big_value2);  <span class="comment">// BE2 value: 0xcdab</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;LE4 value: 0x%08x\n&quot;</span>, little_value4);  <span class="comment">// LE4 value: 0x12345678</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;BE4 value: 0x%08x\n&quot;</span>, big_value4);  <span class="comment">// BE4 value: 0x78563412</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="多变量存储在连续内存中的字节序转换"><a href="# 多变量存储在连续内存中的字节序转换" class="headerlink" title="多变量存储在连续内存中的字节序转换"></a>多变量存储在连续内存中的字节序转换 </h2><p> 示例 1：一个 2 字节变量存储在连续的内存中，与一个 4 字节变量存储在连续的内容中，从小端主机字节序转换为大端网络字节序后的结果一样吗？一样的！</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;arpa/inet.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">four_bytes_order</span> &#123;</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">short</span> <span class="type">int</span> val1;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">short</span> <span class="type">int</span> val2;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> <span class="type">int</span> val3;</span><br><span class="line">&#125; FOUR_BYTES_ORDER_S;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> BITS16 16</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> BITS32 32</span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">showValue</span><span class="params">(<span class="type">void</span> *begin, <span class="type">int</span> flag)</span> &#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; ((flag) / <span class="number">8</span>); i++) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%x (%p) &quot;</span>, *((<span class="type">unsigned</span> <span class="type">char</span> *)begin + i), (<span class="type">unsigned</span> <span class="type">char</span> *)begin + i);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\n&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span> &#123;</span><br><span class="line">    FOUR_BYTES_ORDER_S sOrig, sTurn;</span><br><span class="line">    </span><br><span class="line">    sOrig.val1 = <span class="number">0x1234</span>;</span><br><span class="line">    sOrig.val2 = <span class="number">0x5678</span>;</span><br><span class="line">    sTurn.val1 = htons(sOrig.val1);</span><br><span class="line">    sTurn.val2 = htons(sOrig.val2);</span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;16 + 16 host to network byte order change:\n&quot;</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\thost:    &quot;</span>);</span><br><span class="line">    showValue(&amp;sOrig.val1, BITS32);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\tnetwork: &quot;</span>);</span><br><span class="line">    showValue(&amp;sTurn.val1, BITS32);</span><br><span class="line"></span><br><span class="line">    sOrig.val3 = <span class="number">0x12345678</span>;</span><br><span class="line">    sTurn.val3 = htonl(sOrig.val3);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;32 host to network byte order change:\n&quot;</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\thost:    &quot;</span>);</span><br><span class="line">    showValue(&amp;sOrig.val3, BITS32);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\tnetwork: &quot;</span>);</span><br><span class="line">    showValue(&amp;sTurn.val3, BITS32);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>对于上述连续内存的两个 2 字节变量和一个 4 字节变量，转换成的网络字节序都是 <code>0x12345678</code>：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">$ gcc byteOrder2.c -o byteOrder3</span><br><span class="line">$ ./byteOrder3</span><br><span class="line">16 + 16 host to network byte order change:</span><br><span class="line">        host:    34 (0x7fffd69b9a10) 12 (0x7fffd69b9a11) 78 (0x7fffd69b9a12) 56 (0x7fffd69b9a13)</span><br><span class="line">        network: 12 (0x7fffd69b9a00) 34 (0x7fffd69b9a01) 56 (0x7fffd69b9a02) 78 (0x7fffd69b9a03)</span><br><span class="line">32 host to network byte order change:</span><br><span class="line">        host:    78 (0x7fffd69b9a18) 56 (0x7fffd69b9a19) 34 (0x7fffd69b9a1a) 12 (0x7fffd69b9a1b)</span><br><span class="line">        network: 12 (0x7fffd69b9a08) 34 (0x7fffd69b9a09) 56 (0x7fffd69b9a0a) 78 (0x7fffd69b9a0b)</span><br></pre></td></tr></table></figure>
+
+<p>示例 2：一个变量 <code>0x12345678abcd9876</code>，分别以 <code>short + long + short</code> 和 <code>long + long</code> 变量存储在一个连续内容中，那么两种存储的小端主机字节序和大端网络字节序在内存中的存储的值顺序一致吗？一致的！</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">val_le = 0x12345678abcd9876</span><br><span class="line"></span><br><span class="line">short + long + short</span><br><span class="line">    a = 0x1234</span><br><span class="line">    b = 0x5678abcd</span><br><span class="line">    c = 0x9876</span><br><span class="line"></span><br><span class="line">分别给出其主机序和网络序：</span><br><span class="line">    内存低地址 -----------------------&gt; 内存高地址 </span><br><span class="line">    小端主机序：34 12 | cd ab 78 56 | 76 98</span><br><span class="line">    大端网络序：12 34 | 56 78 ab cd | 98 76</span><br><span class="line"></span><br><span class="line">long + long</span><br><span class="line">    d = 0x12345678</span><br><span class="line">    e = 0xabcd9876</span><br><span class="line"></span><br><span class="line"> 分别给出其主机序和网络序：</span><br><span class="line">    内存低地址 -----------------------&gt; 内存高地址</span><br><span class="line">    主机序：78 56 34 12 | 76 98 cd ab</span><br><span class="line">    网络序：12 34 56 78 | ab cd 98 76</span><br></pre></td></tr></table></figure>
+
+<p>可以看出, 两种组合变量的主机序到网络序转换后的结果是一致的！</p>
+<blockquote>
+<p>参考：</p>
+<ol>
+<li><a href="https://blog.51cto.com/u_15249901/4893764">https://blog.51cto.com/u_15249901/4893764</a></li>
+<li><a href="https://blog.csdn.net/Jmilk/article/details/106898871">https://blog.csdn.net/Jmilk/article/details/106898871</a></li>
+</ol>
+</blockquote>
+]]></content>
+      <categories>
+        <category>学习笔记</category>
+        <category>C语言</category>
+      </categories>
+      <tags>
+        <tag>大小端</tag>
+        <tag>字节序</tag>
+        <tag>网络字节序</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>C 语言之锁与原子操作基础</title>
     <url>/posts/230921094127.html</url>
     <content><![CDATA[<h2 id="常见锁介绍"><a href="# 常见锁介绍" class="headerlink" title="常见锁介绍"></a>常见锁介绍 </h2><p> 在 C 语言中，常见的用于解决多线程访问数据的锁包括互斥锁、读写锁、条件变量、自旋锁、屏蔽等。</p>
@@ -439,236 +617,9 @@
       </tags>
   </entry>
   <entry>
-    <title>C 语言之大小端知识</title>
-    <url>/posts/230918114841.html</url>
-    <content><![CDATA[<h2 id="字节序"><a href="# 字节序" class="headerlink" title="字节序"></a>字节序 </h2><h3 id="主机字节序"><a href="# 主机字节序" class="headerlink" title="主机字节序"></a> 主机字节序 </h3><p> 在计算机中，数据在内存中的存储是以 byte 为单位的。字节序是由于 CPU 对大于一个字节的变量，在内存中的存放顺序不同而产生的。</p>
-<p>不同的计算机体系结构使用不同的字节序，对于大于一个字节的变量表示，有如下两种方式：</p>
-<ul>
-<li><p>小端模式（Listen Endian, LE）：高位字节存储在高位地址，而低位字节存储在低位地址，与大端模式相反。</p>
-</li>
-<li><p>大端模式（Big Endian, BE）：高位字节存储在低位地址，而低位字节存储在高位地址。</p>
-</li>
-</ul>
-<span id="more"></span>
-
-<p><img src="/images/le-be-endian.png" alt="大小端模式"></p>
-<p>在小端字节序主机系统中进行字节序转换时，需要将低地址的字节和高地址的字节进行交换即可得到大端字节序。</p>
-<h3 id="网络字节序"><a href="# 网络字节序" class="headerlink" title="网络字节序"></a>网络字节序 </h3><p> 不同的机器主机字节序不相同，与 CPU 设计有关，数据的顺序是由 CPU 决定的，而与操作系统无关。我们把某个给定系统所用的字节序称为主机字节序（host byte order）。比如 x86 系列 CPU 都是 little-endian 的字节序。</p>
-<p>网络字节序是 TCP&#x2F;IP 中规定好的一种数据表示格式，它与具体的 CPU 类型、操作系统等无关，从而可以保证数据在不同主机之间传输时能够被正确解释。网络字节序采用 big-endian 排序方式。</p>
-<p>由于这个原因，为了确保数据在不同主机之间传输时能够被正确解释，需要在不同字节序之间进行转换，所以在网络通信中，一般需要将数据转换为网络字节序进行传输。</p>
-<h2 id="主机字节序类型判断"><a href="# 主机字节序类型判断" class="headerlink" title="主机字节序类型判断"></a>主机字节序类型判断 </h2><p> 可以使用共用体（union）来判断当前 CPU 平台是大端字节序还是小端字节序。这是因为共用体的特点是：使用长度最大的数据类型作为共用体的大小。</p>
-<ul>
-<li><p>建立一个联合类型 <code>BYTE_ORDER_UN</code>，用于测试字节序，可以通过成员 <code>byte</code> 来访问 <code>value</code> 变量的高字节和低字节。</p>
-</li>
-<li><p>声明一个 <code>BYTE_ORDER_UN</code> 类型的变量 <code>unByteOrder</code>，将值 <code>0xabcd</code> 赋给成员变量 <code>value</code>。由于在类型 <code>BYTE_ORDER_UN</code> 中，<code>value</code> 和 <code>byte</code> 成员 <strong> 共享一块内存</strong>，所以可以通过 <code>byte</code> 的不同成员来访问 <code>value</code> 的高字节和低字节。</p>
-</li>
-</ul>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">union</span> <span class="title">byte_order</span> &#123;</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">short</span> <span class="type">int</span> value;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">char</span> byte[<span class="keyword">sizeof</span>(<span class="type">unsigned</span> <span class="type">short</span> <span class="type">int</span>)];</span><br><span class="line">&#125; BYTE_ORDER_UN;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span> &#123;</span><br><span class="line">    BYTE_ORDER_UN unByteOrder;</span><br><span class="line">    unByteOrder.value = <span class="number">0xabcd</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> ((unByteOrder.byte[<span class="number">0</span>] ==<span class="number">0xcd</span>) &amp;&amp; (unByteOrder.byte[<span class="number">1</span>] ==<span class="number">0xab</span>)) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Listen endian byte order, byte[0]: 0x%x, byte[1]: 0x%x\n&quot;</span>, \</span><br><span class="line">        unByteOrder.byte[<span class="number">0</span>], unByteOrder.byte[<span class="number">1</span>]);</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span>((unByteOrder.byte[<span class="number">0</span>] ==<span class="number">0xab</span>) &amp;&amp; (unByteOrder.byte[<span class="number">1</span>] ==<span class="number">0xcd</span>)) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Big endian byte order, byte[0]: 0x%x, byte[1]: 0x%x\n&quot;</span>, \</span><br><span class="line">        unByteOrder.byte[<span class="number">0</span>], unByteOrder.byte[<span class="number">1</span>]);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>主机系统为小端字节序的测试结果：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">$ gcc byteOrder.c -o byteOrder</span><br><span class="line">$ ./byteOrder</span><br><span class="line">Listen endian byte order, byte[0]: 0xcd, byte[1]: 0xab</span><br></pre></td></tr></table></figure>
-
-<h2 id="主机字节序到网络字节序转换"><a href="# 主机字节序到网络字节序转换" class="headerlink" title="主机字节序到网络字节序转换"></a>主机字节序到网络字节序转换 </h2><p> 字节交换的作用是生成一个网络字节序的变量，<strong>其字节的顺序与主机类型和操作系统无关</strong>。进行网络字节序转换的时候，只要转换一次就可以了，不要进行多次的转换。如果进行多次字节序的转换，最后生成的网络字节序的值可能是错误的。例如：</p>
-<ul>
-<li><p>对于主机为小端字节序的系统，进行两次字节序转换的过程如下图所示，经过两次转换，最终的值与最初的主机字节序相同。</p>
-</li>
-<li><p>对于主机为大端字节序的系统，无论进行多少次字节序的转换，最终的值与最初的主机字节序相同。</p>
-</li>
-</ul>
-<p><img src="/images/htos-conversion.png" alt="小端系统中的变量多次字节序转换"></p>
-<p>下面的例子是对 16 位数值和 32 位数值进行字节序转换，每种类型的数值进行两次转换，最后打印结果。</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;arpa/inet.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> BITS16 16</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> BITS32 32</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">union</span> <span class="title">two_bytes_order</span> &#123;</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">short</span> <span class="type">int</span> value;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">char</span> byte[<span class="keyword">sizeof</span>(<span class="type">unsigned</span> <span class="type">short</span>)];</span><br><span class="line">&#125; TWO_BYTES_ORDER_UN;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">union</span> <span class="title">four_bytes_order</span> &#123;</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> <span class="type">int</span> value;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">char</span> byte[<span class="keyword">sizeof</span>(<span class="type">unsigned</span> <span class="type">long</span> <span class="type">int</span>)];</span><br><span class="line">&#125; FOUR_BYTES_ORDER_UN;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">showValue</span><span class="params">(<span class="type">void</span> *begin, <span class="type">int</span> flag)</span> &#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; ((flag) / <span class="number">8</span>); i++) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%x (%p) &quot;</span>, *((<span class="type">unsigned</span> <span class="type">char</span> *)begin + i), (<span class="type">unsigned</span> <span class="type">char</span> *)begin + i);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\n&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span> &#123;</span><br><span class="line">    TWO_BYTES_ORDER_UN v16_orig, v16_turn1, v16_turn2;</span><br><span class="line">    FOUR_BYTES_ORDER_UN v32_orig, v32_turn1, v32_turn2;</span><br><span class="line"></span><br><span class="line">    v16_orig.value = <span class="number">0xabcd</span>;</span><br><span class="line">    v16_turn1.value = htons(v16_orig.value);</span><br><span class="line">    v16_turn2.value = htons(v16_turn1.value);</span><br><span class="line"></span><br><span class="line">    v32_orig.value = <span class="number">0x12345678</span>;</span><br><span class="line">    v32_turn1.value = htonl(v32_orig.value);</span><br><span class="line">    v32_turn2.value = htonl(v32_turn1.value);</span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;16 host to network byte order change:\n&quot;</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\torig:    &quot;</span>);</span><br><span class="line">    showValue(v16_orig.byte, BITS16);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\t1 times: &quot;</span>);</span><br><span class="line">    showValue(v16_turn1.byte, BITS16);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\t2 times: &quot;</span>);</span><br><span class="line">    showValue(v16_turn2.byte, BITS16);</span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;32 host to network byte order change:\n&quot;</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\torig:    &quot;</span>);</span><br><span class="line">    showValue(v32_orig.byte, BITS32);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\t1 times: &quot;</span>);</span><br><span class="line">    showValue(v32_turn1.byte, BITS32);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\t2 times: &quot;</span>);</span><br><span class="line">    showValue(v32_turn2.byte, BITS32);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>小端模式到网络字节序转换的测试结果：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">$ gcc byteOrder2.c -o byteOrder2</span><br><span class="line">$ ./byteOrder2</span><br><span class="line">16 host to network byte order change:</span><br><span class="line">        orig:    cd (0x7ffcd6ad66de) ab (0x7ffcd6ad66df)</span><br><span class="line">        1 times: ab (0x7ffcd6ad66dc) cd (0x7ffcd6ad66dd)</span><br><span class="line">        2 times: cd (0x7ffcd6ad66da) ab (0x7ffcd6ad66db)</span><br><span class="line">32 host to network byte order change:</span><br><span class="line">        orig:    78 (0x7ffcd6ad66d0) 56 (0x7ffcd6ad66d1) 34 (0x7ffcd6ad66d2) 12 (0x7ffcd6ad66d3)</span><br><span class="line">        1 times: 12 (0x7ffcd6ad66c8) 34 (0x7ffcd6ad66c9) 56 (0x7ffcd6ad66ca) 78 (0x7ffcd6ad66cb)</span><br><span class="line">        2 times: 78 (0x7ffcd6ad66c0) 56 (0x7ffcd6ad66c1) 34 (0x7ffcd6ad66c2) 12 (0x7ffcd6ad66c3)</span><br></pre></td></tr></table></figure>
-
-<p>16 位变量 0xabcd 在内存中的表示方式为 cd 在前，ab 在后；进行一次字节序转换后变为 ab 在前，cd 在后。在进行第一次转换后字节序发生了变化，而进行第二次字节序转换后与原始的排列方式一致。</p>
-<h2 id="大小端的转换"><a href="# 大小端的转换" class="headerlink" title="大小端的转换"></a>大小端的转换 </h2><p> 上面的代码中 <code>htons</code> 和 <code>htonl</code>，分别给出了主机字节序到网络字节序的 <code>short</code> 和 <code>long</code> 类型的转换接口，那么这个接口是如何实现大小端转换的呢？</p>
-<p><strong>通过位运算的方式来实现大小端的转换</strong>：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">unsigned</span> <span class="type">int</span> <span class="title function_">little_endian_to_big_endian_4bytes</span><span class="params">(<span class="type">unsigned</span> <span class="type">int</span> value)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> ((value &amp; <span class="number">0x000000ff</span>) &lt;&lt; <span class="number">24</span>) | </span><br><span class="line">           ((value &amp; <span class="number">0x0000ff00</span>) &lt;&lt; <span class="number">8</span>)  | </span><br><span class="line">           ((value &amp; <span class="number">0x00ff0000</span>) &gt;&gt; <span class="number">8</span>)  | </span><br><span class="line">           ((value &amp; <span class="number">0xff000000</span>) &gt;&gt; <span class="number">24</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">unsigned</span> <span class="type">short</span> <span class="title function_">little_endian_to_big_endian_2bytes</span><span class="params">(<span class="type">unsigned</span> <span class="type">short</span> value)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> ((value &amp; <span class="number">0x00ff</span>) &lt;&lt; <span class="number">8</span>) | ((value &amp; <span class="number">0xff00</span>) &gt;&gt; <span class="number">8</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span> &#123;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> little_value4 = <span class="number">0x12345678</span>;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">short</span> little_value2 = <span class="number">0xabcd</span>;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> big_value4 = little_endian_to_big_endian_4bytes(little_value4);</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">short</span> big_value2 = little_endian_to_big_endian_2bytes(little_value2);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;LE2 value: 0x%04x\n&quot;</span>, little_value2);  <span class="comment">// LE2 value: 0xabcd</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;BE2 value: 0x%04x\n&quot;</span>, big_value2);  <span class="comment">// BE2 value: 0xcdab</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;LE4 value: 0x%08x\n&quot;</span>, little_value4);  <span class="comment">// LE4 value: 0x12345678</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;BE4 value: 0x%08x\n&quot;</span>, big_value4);  <span class="comment">// BE4 value: 0x78563412</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="多变量存储在连续内存中的字节序转换"><a href="# 多变量存储在连续内存中的字节序转换" class="headerlink" title="多变量存储在连续内存中的字节序转换"></a>多变量存储在连续内存中的字节序转换 </h2><p> 示例 1：一个 2 字节变量存储在连续的内存中，与一个 4 字节变量存储在连续的内容中，从小端主机字节序转换为大端网络字节序后的结果一样吗？一样的！</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;arpa/inet.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">four_bytes_order</span> &#123;</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">short</span> <span class="type">int</span> val1;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">short</span> <span class="type">int</span> val2;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> <span class="type">int</span> val3;</span><br><span class="line">&#125; FOUR_BYTES_ORDER_S;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> BITS16 16</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> BITS32 32</span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">showValue</span><span class="params">(<span class="type">void</span> *begin, <span class="type">int</span> flag)</span> &#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; ((flag) / <span class="number">8</span>); i++) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%x (%p) &quot;</span>, *((<span class="type">unsigned</span> <span class="type">char</span> *)begin + i), (<span class="type">unsigned</span> <span class="type">char</span> *)begin + i);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\n&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span> &#123;</span><br><span class="line">    FOUR_BYTES_ORDER_S sOrig, sTurn;</span><br><span class="line">    </span><br><span class="line">    sOrig.val1 = <span class="number">0x1234</span>;</span><br><span class="line">    sOrig.val2 = <span class="number">0x5678</span>;</span><br><span class="line">    sTurn.val1 = htons(sOrig.val1);</span><br><span class="line">    sTurn.val2 = htons(sOrig.val2);</span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;16 + 16 host to network byte order change:\n&quot;</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\thost:    &quot;</span>);</span><br><span class="line">    showValue(&amp;sOrig.val1, BITS32);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\tnetwork: &quot;</span>);</span><br><span class="line">    showValue(&amp;sTurn.val1, BITS32);</span><br><span class="line"></span><br><span class="line">    sOrig.val3 = <span class="number">0x12345678</span>;</span><br><span class="line">    sTurn.val3 = htonl(sOrig.val3);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;32 host to network byte order change:\n&quot;</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\thost:    &quot;</span>);</span><br><span class="line">    showValue(&amp;sOrig.val3, BITS32);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\tnetwork: &quot;</span>);</span><br><span class="line">    showValue(&amp;sTurn.val3, BITS32);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>对于上述连续内存的两个 2 字节变量和一个 4 字节变量，转换成的网络字节序都是 <code>0x12345678</code>：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">$ gcc byteOrder2.c -o byteOrder3</span><br><span class="line">$ ./byteOrder3</span><br><span class="line">16 + 16 host to network byte order change:</span><br><span class="line">        host:    34 (0x7fffd69b9a10) 12 (0x7fffd69b9a11) 78 (0x7fffd69b9a12) 56 (0x7fffd69b9a13)</span><br><span class="line">        network: 12 (0x7fffd69b9a00) 34 (0x7fffd69b9a01) 56 (0x7fffd69b9a02) 78 (0x7fffd69b9a03)</span><br><span class="line">32 host to network byte order change:</span><br><span class="line">        host:    78 (0x7fffd69b9a18) 56 (0x7fffd69b9a19) 34 (0x7fffd69b9a1a) 12 (0x7fffd69b9a1b)</span><br><span class="line">        network: 12 (0x7fffd69b9a08) 34 (0x7fffd69b9a09) 56 (0x7fffd69b9a0a) 78 (0x7fffd69b9a0b)</span><br></pre></td></tr></table></figure>
-
-<p>示例 2：一个变量 <code>0x12345678abcd9876</code>，分别以 <code>short + long + short</code> 和 <code>long + long</code> 变量存储在一个连续内容中，那么两种存储的小端主机字节序和大端网络字节序在内存中的存储的值顺序一致吗？一致的！</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">val_le = 0x12345678abcd9876</span><br><span class="line"></span><br><span class="line">short + long + short</span><br><span class="line">    a = 0x1234</span><br><span class="line">    b = 0x5678abcd</span><br><span class="line">    c = 0x9876</span><br><span class="line"></span><br><span class="line">分别给出其主机序和网络序：</span><br><span class="line">    内存低地址 -----------------------&gt; 内存高地址 </span><br><span class="line">    小端主机序：34 12 | cd ab 78 56 | 76 98</span><br><span class="line">    大端网络序：12 34 | 56 78 ab cd | 98 76</span><br><span class="line"></span><br><span class="line">long + long</span><br><span class="line">    d = 0x12345678</span><br><span class="line">    e = 0xabcd9876</span><br><span class="line"></span><br><span class="line"> 分别给出其主机序和网络序：</span><br><span class="line">    内存低地址 -----------------------&gt; 内存高地址</span><br><span class="line">    主机序：78 56 34 12 | 76 98 cd ab</span><br><span class="line">    网络序：12 34 56 78 | ab cd 98 76</span><br></pre></td></tr></table></figure>
-
-<p>可以看出, 两种组合变量的主机序到网络序转换后的结果是一致的！</p>
-<blockquote>
-<p>参考：</p>
-<ol>
-<li><a href="https://blog.51cto.com/u_15249901/4893764">https://blog.51cto.com/u_15249901/4893764</a></li>
-<li><a href="https://blog.csdn.net/Jmilk/article/details/106898871">https://blog.csdn.net/Jmilk/article/details/106898871</a></li>
-</ol>
-</blockquote>
-]]></content>
-      <categories>
-        <category>学习笔记</category>
-        <category>C语言</category>
-      </categories>
-      <tags>
-        <tag>大小端</tag>
-        <tag>字节序</tag>
-        <tag>网络字节序</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>C 语言之 main 函数参数</title>
-    <url>/posts/230916171929.html</url>
-    <content><![CDATA[<h2 id="指令行操作"><a href="# 指令行操作" class="headerlink" title="指令行操作"></a> 指令行操作 </h2><p>C 语言支持从 CLI（指令行）传入参数给 main() 函数，多个命令行参数之间用空格分隔，但是如果参数本身带有空格，那么就使用双引号或单引号。</p>
-<p>C 语言的 main 函数是程序的入口函数，它可以有两种形式的参数：</p>
-<span id="more"></span>
-
-<ol>
-<li><p> 无参数形式：main 函数的原型可以是 <code>int main(void)</code>。这表示不接受任何参数，程序执行时不需要从命令行传递参数给 main 函数。</p>
-</li>
-<li><p> 带参数形式：main 函数的原型可以是 <code>int main(int argc, char *argv[])</code>。其中，<code>argc</code> 表示命令行参数的个数，而 <code>argv</code> 是一个字符串指针数组，每个元素都是一个命令行参数的字符串。</p>
-<ul>
-<li><code>argc</code> 标识传入的参数个数。如果没有提供任何参数，<code>argc</code> 将被设置为 1；否则，<code>argc</code> 将被设置为传入的参数个数加 1。</li>
-<li><code>argv[0]</code> 通常是程序的名称或路径的字符串。</li>
-<li><code>argv[1]</code> 到 <code>argv[argc - 1]</code> 是命令行传递给程序的参数，以空格分隔。</li>
-</ul>
-</li>
-</ol>
-<p> 值得注意的是，也可以使用 <code>char **argv</code> 来代替 <code>char *argv[]</code> 形参，两者具有相同的类型含义。因为数组变量名 <code>argv</code> 就是指向 <code>argv[]</code> 数组的第一个元素的指针，同时又因为第一个元素的数值就是一个指针，所以此时的数组变量名 <code>argv</code> 的本质就是一个指针的指针（双重指针）。</p>
-<p> 下面是一个例子，演示如何使用带参数的 main 函数来接收命令行参数：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span> &#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;number of params: %d\n&quot;</span>, argc);</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; argc; i++) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;param-%d: %s\n&quot;</span>, i, argv[i]);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p> 如果编译并运行这个程序，并在命令行中输入参数，例如 <code>./a.out arg1 arg2 3 arg4</code>，则输出如下：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">number of params: 5</span><br><span class="line">param-0: ./a.out</span><br><span class="line">param-1: arg1</span><br><span class="line">param-2: arg2</span><br><span class="line">param-3: 3</span><br><span class="line">param-4: arg4</span><br></pre></td></tr></table></figure>
-
-<p> 参考链接：<a href="https://is-cloud.blog.csdn.net/article/details/105347737">https://is-cloud.blog.csdn.net/article/details/105347737</a></p>
-]]></content>
-      <categories>
-        <category>学习笔记</category>
-        <category>C语言</category>
-      </categories>
-      <tags>
-        <tag>main函数参数</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Go 笔记之变量与常量</title>
-    <url>/posts/230907162612.html</url>
-    <content><![CDATA[<blockquote>
-<p>学习链接：<a href="https://studygolang.com/subject/2">https://studygolang.com/subject/2</a>，感谢如此优秀的教程！</p>
-</blockquote>
-<h2 id="Go 语言学习笔记 -1：HelloWorld"><a href="#Go 语言学习笔记 -1：HelloWorld" class="headerlink" title="Go 语言学习笔记 -1：HelloWorld"></a>Go 语言学习笔记 -1：HelloWorld</h2><p>Go 语言是一种编译型语言，源代码都会编译成二进制机器码。</p>
-<p>所有 Go 源文件都应该放置在工作区里的 src 目录下。Linux 的工作区（Workspace）应该设置在 $HOME&#x2F;go，也可以通过设置 GOPATH 环境变量，用其他目录来作为工作区。</p>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">go</span></span><br><span class="line">  bin <span class="comment">// 编译生成的二进制文件存储位置</span></span><br><span class="line">    hello</span><br><span class="line">  src <span class="comment">// 所有 Go 源文件都应该放置在工作区里的 src 目录下</span></span><br><span class="line">    hello <span class="comment">// 为每个 project 新建一个文件夹</span></span><br><span class="line">      helloworld.<span class="keyword">go</span></span><br></pre></td></tr></table></figure>
-
-<p>第一个 Go 程序</p>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="string">&quot;fmt&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">  fmt.Println(<span class="string">&quot;Hello World!&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<span id="more"></span>
-
-<p>解析：</p>
-<ul>
-<li><p><code>package main</code> - 每一个 Go 文件都应该在开头进行 package name 的声明（译注：只有可执行程序的包名应当为 main）。包（Packages）用于代码的封装与重用，这里的包名称是 main。</p>
-</li>
-<li><p><code>import &quot;fmt&quot;</code> - 我们引入了 fmt 包，用于在 main 函数里面打印文本到标准输出。</p>
-</li>
-<li><p><code>func main()</code> - main 是一个特殊的函数。整个程序就是从 main 函数开始运行的。main 函数必须放置在 main 包中。{和} 分别表示 main 函数的开始和结束部分。</p>
-</li>
-<li><p><code>fmt.Println(&quot;Hello World&quot;)</code> - fmt 包中的 Println 函数用于把文本写入标准输出。</p>
-</li>
-</ul>
-<hr>
-<h2 id="Go 语言学习笔记 -2：变量"><a href="#Go 语言学习笔记 -2：变量" class="headerlink" title="Go 语言学习笔记 -2：变量"></a>Go 语言学习笔记 -2：变量 </h2><p><strong> 变量 </strong> 指定了某存储单元（Memory Location）的名称，该存储单元会存储特定类型的值。</p>
-<ol>
-<li><p>声明单个变量：var name type，例如：var age int</p>
-</li>
-<li><p>声明变量并初始化：var name type &#x3D; initialValue</p>
-</li>
-<li><p>类型推断：如果变量有初始值，那么 Go 能够自动推断具有初始值的变量的类型。因此，如果变量有初始值，就可以在变量声明中省略 type， 如 var age &#x3D; 16 指 age 类型为 int 型。</p>
-</li>
-<li><p>声明多个变量：var name1, name2 type &#x3D; initialValue1, initialValue2</p>
-</li>
-<li><p>在一个语句中声明不同类型的变量，如：</p>
-</li>
-</ol>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> (</span><br><span class="line">    age = <span class="number">19</span></span><br><span class="line">    name = “laowang”</span><br><span class="line">    adult = <span class="literal">true</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
-
-<ol start="6">
-<li>变量的简短声明语法：<code>:=</code> 操作符，例如：<code>age, name := 20, &quot;zhangsan&quot;</code>。简短声明要求 <code>:=</code> 操作符左边的 <strong> 所有变量都有初始值</strong>。</li>
-</ol>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;  </span><br><span class="line">    a, b := <span class="number">20</span>, <span class="number">30</span> <span class="comment">// 声明 a 和 b</span></span><br><span class="line">    fmt.Println(<span class="string">&quot;a is&quot;</span>, a, <span class="string">&quot;b is&quot;</span>, b)</span><br><span class="line">    a, b := <span class="number">40</span>, <span class="number">50</span> <span class="comment">// 错误，没有尚未声明的变量</span></span><br><span class="line">    a, c := <span class="number">40</span>, <span class="number">60</span> <span class="comment">// 正确，有新的尚未声明的变量</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<ol start="7">
-<li><p>变量也可以在运行时进行赋值，如 <code>a := math.Min(15, 20)</code></p>
-</li>
-<li><p>由于 Go 是强类型（Strongly Typed）语言，因此不允许某一类型的变量赋值为其他类型的值。</p>
-</li>
-</ol>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;  </span><br><span class="line">    age := <span class="number">29</span>      <span class="comment">// age 是 int 类型</span></span><br><span class="line">    age = <span class="string">&quot;naveen&quot;</span> <span class="comment">// 错误，尝试赋值一个字符串给 int 类型变量</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<hr>
-<h2 id="Go 语言学习笔记 -3：变量类型"><a href="#Go 语言学习笔记 -3：变量类型" class="headerlink" title="Go 语言学习笔记 -3：变量类型"></a>Go 语言学习笔记 -3：变量类型</h2><ol>
-<li>Go 语言支持的变量类型：</li>
-</ol>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">bool</span><br><span class="line">数字类型</span><br><span class="line">    int8, int16, int32, int64, int</span><br><span class="line">    uint8, uint16, uint32, uint64, uint</span><br><span class="line">    float32, float64</span><br><span class="line">    complex64, complex128 // 复数型</span><br><span class="line">    byte</span><br><span class="line">    rune</span><br><span class="line">string</span><br></pre></td></tr></table></figure>
-
-<ol start="2">
-<li>在 Printf 方法中，使用 <code>%T</code> 格式说明符（Format Specifier），可以打印出变量的类型。Go 的 <code>unsafe</code> 包提供了一个 <code>Sizeof</code> 函数，该函数接收变量并返回它的字节大小。如：</li>
-</ol>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line">fmt.Printf(<span class="string">&quot;type of age is %T, size of age is %d&quot;</span>, age, unsafe.Sizeof(age))</span><br></pre></td></tr></table></figure>
-
-<ol start="3">
-<li>复数类型：<code>complex64</code> 表示实部和虚部都是 <code>float32</code> 类型，<code>complex128</code> 表示实部和虚部都是 <code>float64</code> 类型。</li>
-</ol>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line">c1 := <span class="built_in">complex</span>(<span class="number">5</span>, <span class="number">7</span>) <span class="comment">// 通过内置函数声明复数变量 c1</span></span><br><span class="line">c2 := <span class="number">8</span> + <span class="number">27i</span> <span class="comment">// 通过简短声明声明复数变量 c2</span></span><br></pre></td></tr></table></figure>
-
-<ol start="4">
-<li><p>其它变量类型：<code>byte</code> 是 <code>uint8</code> 的别名， <code>rune</code> 是 <code>int32</code> 的别名。</p>
-</li>
-<li><p>Go 是强类型（Strongly Typed）语言， Go 没有自动类型提升或类型转换：</p>
-</li>
-</ol>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> i, j <span class="type">int</span>, float = <span class="number">5</span>, <span class="number">10.2</span></span><br><span class="line">diff := i - j <span class="comment">// 错误， int - float 不被允许</span></span><br><span class="line">diff := i - <span class="type">int</span>(j) <span class="comment">// 正确</span></span><br></pre></td></tr></table></figure>
-
-<hr>
-<h2 id="Go 语言学习笔记 -4：常量"><a href="#Go 语言学习笔记 -4：常量" class="headerlink" title="Go 语言学习笔记 -4：常量"></a>Go 语言学习笔记 -4：常量</h2><ol>
-<li><p>关键字：<code>const</code>，常量不能再重新赋值为其他的值。</p>
-</li>
-<li><p>常量的值会在 <strong> 编译的时候 </strong> 确定。因为函数调用发生在 <strong> 运行时</strong>，所以不能将函数的返回值赋值给常量。如：</p>
-</li>
-</ol>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> a := math.Sqrt(<span class="number">4</span>) <span class="comment">// 允许</span></span><br><span class="line"><span class="keyword">const</span> b := math.Sqrt(<span class="number">9</span>) <span class="comment">// 不允许，编译先于运行</span></span><br></pre></td></tr></table></figure>
-
-<ol start="3">
-<li><p>常量是可以没有类型的，如：<code>const name = &quot;zhangsan&quot;</code>；常量也可以是有类型的，如：<code>const name string = &quot;lisi&quot;</code>，即 name 是一个 string 类型的 <strong> 常量</strong>。</p>
-</li>
-<li><p>Go 的类型策略不允许将一种类型的变量赋值给另一种类型的变量。</p>
-</li>
-</ol>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;  </span><br><span class="line">    <span class="keyword">var</span> defaultName = <span class="string">&quot;Sam&quot;</span> <span class="comment">// 允许</span></span><br><span class="line">    <span class="keyword">type</span> myString <span class="type">string</span></span><br><span class="line">    <span class="keyword">var</span> customName myString = <span class="string">&quot;Sam&quot;</span> <span class="comment">// 允许</span></span><br><span class="line">    customName = defaultName <span class="comment">// 不允许，即使 myString 是 string 类型的别名</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<ol start="5">
-<li><strong>布尔常量</strong>：字符串常量的规则适用于布尔常量。</li>
-</ol>
-<p><code>var name = &quot;Sam&quot;</code> 无类型的 <strong> 常量 </strong> Sam 是如何赋值给<strong> 变量</strong> name 的？</p>
-<blockquote>
-<p>答案是 <strong> 无类型的常量有一个与它们相关联的默认类型，并且当且仅当一行代码需要时才提供它</strong>（常量可以赋值给 “合适的” 类型，而不需要类型转换）。在声明变量时，如果使用常量来赋值，变量会从常量的默认类型中获取类型。在这种情况下，常量 “Sam” 的默认类型是字符串，所以变量 name 的类型也是字符串。</p>
-</blockquote>
-]]></content>
-      <categories>
-        <category>学习笔记</category>
-        <category>Golang</category>
-      </categories>
-      <tags>
-        <tag>Go变量与常量</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Go 笔记之函数 &amp; 包 &amp; 判断 &amp; 循环</title>
     <url>/posts/230909120145.html</url>
-    <content><![CDATA[<blockquote>
-<p>学习链接：<a href="https://studygolang.com/subject/2">https://studygolang.com/subject/2</a>，感谢如此优秀的教程！</p>
-</blockquote>
-<h2 id="Go 语言学习笔记 -5：函数"><a href="#Go 语言学习笔记 -5：函数" class="headerlink" title="Go 语言学习笔记 -5：函数"></a>Go 语言学习笔记 -5：函数</h2><ol>
+    <content><![CDATA[<h2 id="Go 语言学习笔记 -5：函数"><a href="#Go 语言学习笔记 -5：函数" class="headerlink" title="Go 语言学习笔记 -5：函数"></a>Go 语言学习笔记 -5：函数</h2><ol>
 <li>函数声明语法：</li>
 </ol>
 <figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">functionname</span><span class="params">(parametername1 <span class="keyword">type</span>, parametername2 <span class="keyword">type</span>)</span></span> returntype &#123;  </span><br><span class="line">    <span class="comment">// 函数体（具体实现的功能）</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -771,6 +722,9 @@
 <ol start="5">
 <li>switch 和 case 的表达式不一定是常量。</li>
 </ol>
+<blockquote>
+<p>学习链接：<a href="https://studygolang.com/subject/2">https://studygolang.com/subject/2</a>，感谢如此优秀的教程！</p>
+</blockquote>
 ]]></content>
       <categories>
         <category>学习笔记</category>
@@ -783,12 +737,121 @@
       </tags>
   </entry>
   <entry>
-    <title>Go 笔记之可变参数函数与 Map 集合</title>
-    <url>/posts/230913161326.html</url>
-    <content><![CDATA[<blockquote>
+    <title>Go 笔记之变量与常量</title>
+    <url>/posts/230907162612.html</url>
+    <content><![CDATA[<h2 id="Go 语言学习笔记 -1：HelloWorld"><a href="#Go 语言学习笔记 -1：HelloWorld" class="headerlink" title="Go 语言学习笔记 -1：HelloWorld"></a>Go 语言学习笔记 -1：HelloWorld</h2><p>Go 语言是一种编译型语言，源代码都会编译成二进制机器码。</p>
+<p>所有 Go 源文件都应该放置在工作区里的 src 目录下。Linux 的工作区（Workspace）应该设置在 $HOME&#x2F;go，也可以通过设置 GOPATH 环境变量，用其他目录来作为工作区。</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">go</span></span><br><span class="line">  bin <span class="comment">// 编译生成的二进制文件存储位置</span></span><br><span class="line">    hello</span><br><span class="line">  src <span class="comment">// 所有 Go 源文件都应该放置在工作区里的 src 目录下</span></span><br><span class="line">    hello <span class="comment">// 为每个 project 新建一个文件夹</span></span><br><span class="line">      helloworld.<span class="keyword">go</span></span><br></pre></td></tr></table></figure>
+
+<p>第一个 Go 程序</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="string">&quot;fmt&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">  fmt.Println(<span class="string">&quot;Hello World!&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<span id="more"></span>
+
+<p>解析：</p>
+<ul>
+<li><p><code>package main</code> - 每一个 Go 文件都应该在开头进行 package name 的声明（译注：只有可执行程序的包名应当为 main）。包（Packages）用于代码的封装与重用，这里的包名称是 main。</p>
+</li>
+<li><p><code>import &quot;fmt&quot;</code> - 我们引入了 fmt 包，用于在 main 函数里面打印文本到标准输出。</p>
+</li>
+<li><p><code>func main()</code> - main 是一个特殊的函数。整个程序就是从 main 函数开始运行的。main 函数必须放置在 main 包中。{和} 分别表示 main 函数的开始和结束部分。</p>
+</li>
+<li><p><code>fmt.Println(&quot;Hello World&quot;)</code> - fmt 包中的 Println 函数用于把文本写入标准输出。</p>
+</li>
+</ul>
+<hr>
+<h2 id="Go 语言学习笔记 -2：变量"><a href="#Go 语言学习笔记 -2：变量" class="headerlink" title="Go 语言学习笔记 -2：变量"></a>Go 语言学习笔记 -2：变量 </h2><p><strong> 变量 </strong> 指定了某存储单元（Memory Location）的名称，该存储单元会存储特定类型的值。</p>
+<ol>
+<li><p>声明单个变量：var name type，例如：var age int</p>
+</li>
+<li><p>声明变量并初始化：var name type &#x3D; initialValue</p>
+</li>
+<li><p>类型推断：如果变量有初始值，那么 Go 能够自动推断具有初始值的变量的类型。因此，如果变量有初始值，就可以在变量声明中省略 type， 如 var age &#x3D; 16 指 age 类型为 int 型。</p>
+</li>
+<li><p>声明多个变量：var name1, name2 type &#x3D; initialValue1, initialValue2</p>
+</li>
+<li><p>在一个语句中声明不同类型的变量，如：</p>
+</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> (</span><br><span class="line">    age = <span class="number">19</span></span><br><span class="line">    name = “laowang”</span><br><span class="line">    adult = <span class="literal">true</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<ol start="6">
+<li>变量的简短声明语法：<code>:=</code> 操作符，例如：<code>age, name := 20, &quot;zhangsan&quot;</code>。简短声明要求 <code>:=</code> 操作符左边的 <strong> 所有变量都有初始值</strong>。</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;  </span><br><span class="line">    a, b := <span class="number">20</span>, <span class="number">30</span> <span class="comment">// 声明 a 和 b</span></span><br><span class="line">    fmt.Println(<span class="string">&quot;a is&quot;</span>, a, <span class="string">&quot;b is&quot;</span>, b)</span><br><span class="line">    a, b := <span class="number">40</span>, <span class="number">50</span> <span class="comment">// 错误，没有尚未声明的变量</span></span><br><span class="line">    a, c := <span class="number">40</span>, <span class="number">60</span> <span class="comment">// 正确，有新的尚未声明的变量</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="7">
+<li><p>变量也可以在运行时进行赋值，如 <code>a := math.Min(15, 20)</code></p>
+</li>
+<li><p>由于 Go 是强类型（Strongly Typed）语言，因此不允许某一类型的变量赋值为其他类型的值。</p>
+</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;  </span><br><span class="line">    age := <span class="number">29</span>      <span class="comment">// age 是 int 类型</span></span><br><span class="line">    age = <span class="string">&quot;naveen&quot;</span> <span class="comment">// 错误，尝试赋值一个字符串给 int 类型变量</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="Go 语言学习笔记 -3：变量类型"><a href="#Go 语言学习笔记 -3：变量类型" class="headerlink" title="Go 语言学习笔记 -3：变量类型"></a>Go 语言学习笔记 -3：变量类型</h2><ol>
+<li>Go 语言支持的变量类型：</li>
+</ol>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">bool</span><br><span class="line">数字类型</span><br><span class="line">    int8, int16, int32, int64, int</span><br><span class="line">    uint8, uint16, uint32, uint64, uint</span><br><span class="line">    float32, float64</span><br><span class="line">    complex64, complex128 // 复数型</span><br><span class="line">    byte</span><br><span class="line">    rune</span><br><span class="line">string</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>在 Printf 方法中，使用 <code>%T</code> 格式说明符（Format Specifier），可以打印出变量的类型。Go 的 <code>unsafe</code> 包提供了一个 <code>Sizeof</code> 函数，该函数接收变量并返回它的字节大小。如：</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line">fmt.Printf(<span class="string">&quot;type of age is %T, size of age is %d&quot;</span>, age, unsafe.Sizeof(age))</span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li>复数类型：<code>complex64</code> 表示实部和虚部都是 <code>float32</code> 类型，<code>complex128</code> 表示实部和虚部都是 <code>float64</code> 类型。</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line">c1 := <span class="built_in">complex</span>(<span class="number">5</span>, <span class="number">7</span>) <span class="comment">// 通过内置函数声明复数变量 c1</span></span><br><span class="line">c2 := <span class="number">8</span> + <span class="number">27i</span> <span class="comment">// 通过简短声明声明复数变量 c2</span></span><br></pre></td></tr></table></figure>
+
+<ol start="4">
+<li><p>其它变量类型：<code>byte</code> 是 <code>uint8</code> 的别名， <code>rune</code> 是 <code>int32</code> 的别名。</p>
+</li>
+<li><p>Go 是强类型（Strongly Typed）语言， Go 没有自动类型提升或类型转换：</p>
+</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> i, j <span class="type">int</span>, float = <span class="number">5</span>, <span class="number">10.2</span></span><br><span class="line">diff := i - j <span class="comment">// 错误， int - float 不被允许</span></span><br><span class="line">diff := i - <span class="type">int</span>(j) <span class="comment">// 正确</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="Go 语言学习笔记 -4：常量"><a href="#Go 语言学习笔记 -4：常量" class="headerlink" title="Go 语言学习笔记 -4：常量"></a>Go 语言学习笔记 -4：常量</h2><ol>
+<li><p>关键字：<code>const</code>，常量不能再重新赋值为其他的值。</p>
+</li>
+<li><p>常量的值会在 <strong> 编译的时候 </strong> 确定。因为函数调用发生在 <strong> 运行时</strong>，所以不能将函数的返回值赋值给常量。如：</p>
+</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> a := math.Sqrt(<span class="number">4</span>) <span class="comment">// 允许</span></span><br><span class="line"><span class="keyword">const</span> b := math.Sqrt(<span class="number">9</span>) <span class="comment">// 不允许，编译先于运行</span></span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li><p>常量是可以没有类型的，如：<code>const name = &quot;zhangsan&quot;</code>；常量也可以是有类型的，如：<code>const name string = &quot;lisi&quot;</code>，即 name 是一个 string 类型的 <strong> 常量</strong>。</p>
+</li>
+<li><p>Go 的类型策略不允许将一种类型的变量赋值给另一种类型的变量。</p>
+</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;  </span><br><span class="line">    <span class="keyword">var</span> defaultName = <span class="string">&quot;Sam&quot;</span> <span class="comment">// 允许</span></span><br><span class="line">    <span class="keyword">type</span> myString <span class="type">string</span></span><br><span class="line">    <span class="keyword">var</span> customName myString = <span class="string">&quot;Sam&quot;</span> <span class="comment">// 允许</span></span><br><span class="line">    customName = defaultName <span class="comment">// 不允许，即使 myString 是 string 类型的别名</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="5">
+<li><strong>布尔常量</strong>：字符串常量的规则适用于布尔常量。</li>
+</ol>
+<p><code>var name = &quot;Sam&quot;</code> 无类型的 <strong> 常量 </strong> Sam 是如何赋值给<strong> 变量</strong> name 的？</p>
+<blockquote>
+<p>答案是 <strong> 无类型的常量有一个与它们相关联的默认类型，并且当且仅当一行代码需要时才提供它</strong>（常量可以赋值给 “合适的” 类型，而不需要类型转换）。在声明变量时，如果使用常量来赋值，变量会从常量的默认类型中获取类型。在这种情况下，常量 “Sam” 的默认类型是字符串，所以变量 name 的类型也是字符串。</p>
+</blockquote>
+<blockquote>
 <p>学习链接：<a href="https://studygolang.com/subject/2">https://studygolang.com/subject/2</a>，感谢如此优秀的教程！</p>
 </blockquote>
-<h2 id="Go 语言学习笔记 -12：可变参数函数"><a href="#Go 语言学习笔记 -12：可变参数函数" class="headerlink" title="Go 语言学习笔记 -12：可变参数函数"></a>Go 语言学习笔记 -12：可变参数函数</h2><ol>
+]]></content>
+      <categories>
+        <category>学习笔记</category>
+        <category>Golang</category>
+      </categories>
+      <tags>
+        <tag>Go变量与常量</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Go 笔记之可变参数函数与 Map 集合</title>
+    <url>/posts/230913161326.html</url>
+    <content><![CDATA[<h2 id="Go 语言学习笔记 -12：可变参数函数"><a href="#Go 语言学习笔记 -12：可变参数函数" class="headerlink" title="Go 语言学习笔记 -12：可变参数函数"></a>Go 语言学习笔记 -12：可变参数函数</h2><ol>
 <li><p>可变参数函数是一种 <strong> 参数个数可变 </strong> 的函数。如果函数最后一个参数的类型被记作 <code>...T</code> ，这时函数可以接受任意个 <code>T</code> 类型的参数作为最后一个参数。<strong>只有 </strong> 函数的最后一个参数才允许是可变的。</p>
 </li>
 <li><p>可变参数函数的 <strong> 工作原理 </strong> 是把可变参数转换为一个新的 <strong> 切片</strong>。</p>
@@ -831,7 +894,9 @@
 <li><p>map 之间不能使用 <code>==</code> 操作符判断，<code>==</code> 只能用来检查 map 是否为 nil。</p>
 </li>
 </ol>
-<hr>
+<blockquote>
+<p>学习链接：<a href="https://studygolang.com/subject/2">https://studygolang.com/subject/2</a>，感谢如此优秀的教程！</p>
+</blockquote>
 ]]></content>
       <categories>
         <category>学习笔记</category>
@@ -845,10 +910,7 @@
   <entry>
     <title>Go 笔记之数组与切片</title>
     <url>/posts/230912152800.html</url>
-    <content><![CDATA[<blockquote>
-<p>学习链接：<a href="https://studygolang.com/subject/2">https://studygolang.com/subject/2</a>，感谢如此优秀的教程！</p>
-</blockquote>
-<h2 id="Go 语言学习笔记 -10：数组"><a href="#Go 语言学习笔记 -10：数组" class="headerlink" title="Go 语言学习笔记 -10：数组"></a>Go 语言学习笔记 -10：数组</h2><ol>
+    <content><![CDATA[<h2 id="Go 语言学习笔记 -10：数组"><a href="#Go 语言学习笔记 -10：数组" class="headerlink" title="Go 语言学习笔记 -10：数组"></a>Go 语言学习笔记 -10：数组</h2><ol>
 <li><p>数组是 <strong> 同一类型元素 </strong> 的集合，Go 语言中不允许混合不同类型的元素。</p>
 </li>
 <li><p>一个数组的表示形式为 <code>[n]T</code>。n 表示数组中元素的数量，T 代表每个元素的类型。如： <code>var arr [3]int</code>。</p>
@@ -967,7 +1029,9 @@
 </ol>
 <figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">countries</span><span class="params">()</span></span> []<span class="type">string</span> &#123;</span><br><span class="line">    countries := []<span class="type">string</span>&#123;<span class="string">&quot;USA&quot;</span>, <span class="string">&quot;Singapore&quot;</span>, <span class="string">&quot;Germany&quot;</span>, <span class="string">&quot;India&quot;</span>, <span class="string">&quot;Australia&quot;</span>&#125;</span><br><span class="line">    neededCountries := countries[:<span class="built_in">len</span>(countries)<span class="number">-2</span>]</span><br><span class="line">    countriesCpy := <span class="built_in">make</span>([]<span class="type">string</span>, <span class="built_in">len</span>(neededCountries))</span><br><span class="line">    <span class="built_in">copy</span>(countriesCpy, neededCountries) <span class="comment">//copies neededCountries to countriesCpy</span></span><br><span class="line">    <span class="keyword">return</span> countriesCpy</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    countriesNeeded := countries()</span><br><span class="line">    fmt.Println(countriesNeeded)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<hr>
+<blockquote>
+<p>学习链接：<a href="https://studygolang.com/subject/2">https://studygolang.com/subject/2</a>，感谢如此优秀的教程！</p>
+</blockquote>
 ]]></content>
       <categories>
         <category>学习笔记</category>
@@ -976,6 +1040,56 @@
       <tags>
         <tag>Go数组</tag>
         <tag>Go切片</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>二叉树的遍历基础</title>
+    <url>/posts/230905224335.html</url>
+    <content><![CDATA[<h2 id="二叉树的遍历"><a href="# 二叉树的遍历" class="headerlink" title="二叉树的遍历"></a>二叉树的遍历 </h2><p> 二叉树是一种非常重要的数据结构，很多其它数据结构都是基于二叉树的基础演变而来的。</p>
+<p>所谓遍历 Traversal 是指沿着某条搜索路线，依次对树中每个结点均做一次且仅做一次访问。</p>
+<p>对于二叉树，有深度遍历和广度遍历，深度遍历有前序、中序以及后序遍历三种方法，广度遍历即我们平常所说的层次遍历。因为树的定义本身就是递归定义，因此采用递归的方法去实现树的三种遍历不仅容易理解而且代码很简洁，而对于广度遍历来说，需要其他数据结构的支撑。</p>
+<p>四种遍历的主要思想是：</p>
+<ul>
+<li><p>前序遍历：根节点 -&gt; 左子树 -&gt; 右子树</p>
+</li>
+<li><p>中序遍历：左子树 -&gt; 根节点 -&gt; 右子树</p>
+</li>
+<li><p>后续遍历：左子树 -&gt; 右子树 -&gt; 根节点</p>
+</li>
+<li><p>层序遍历：依二叉树的深度从左到右（右到左）按层遍历</p>
+</li>
+</ul>
+<p>其中，前、中、后续指的是「根节点」的遍历顺序，例如前序遍历是先遍历根节点。</p>
+<span id="more"></span>
+
+<p>以下为一棵二叉树不同的遍历顺序以及实现方法（非递归实现 &#x2F; 递归实现）：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">    1</span><br><span class="line">   / \</span><br><span class="line">  2   3</span><br><span class="line"> / \   \</span><br><span class="line">4   5   6</span><br><span class="line"></span><br><span class="line">层次遍历顺序：[1 2 3 4 5 6] / 非递归实现：队列 + BFS</span><br><span class="line">前序遍历顺序：[1 2 4 5 3 6] / 非递归实现：栈，递归实现：DFS</span><br><span class="line">中序遍历顺序：[4 2 5 1 3 6] / 非递归实现：栈，递归实现：DFS</span><br><span class="line">后序遍历顺序：[4 5 2 6 3 1] / 非递归实现：栈，递归实现：DFS</span><br></pre></td></tr></table></figure>
+
+<p>层次遍历使用 BFS 实现，利用的就是 BFS 一层一层遍历的特性，而前序、中序、后序遍历利用了 DFS 实现。</p>
+<blockquote>
+<p>前序、中序、后序遍只是在对节点访问的顺序有一点不同，其它都相同。</p>
+</blockquote>
+<p>下面直接从 Leetcode 练习题，学习二叉树的不同遍历方法。</p>
+<h3 id="二叉树的层序遍历"><a href="# 二叉树的层序遍历" class="headerlink" title="二叉树的层序遍历"></a>二叉树的层序遍历</h3><blockquote>
+<p>题目链接：<a href="https://leetcode-cn.com/problems/average-of-levels-in-binary-tree/">637. 二叉树的层平均值</a></p>
+</blockquote>
+<p><strong>题目</strong>：给定一个非空二叉树，返回一个由每层节点平均值组成的数组。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">输入:</span><br><span class="line">    3</span><br><span class="line">   / \</span><br><span class="line">  9  20</span><br><span class="line">    /  \</span><br><span class="line">   15   7</span><br><span class="line">输出: [3, 14.5, 11]</span><br><span class="line">解释: 第 0 层的平均值是 3,  第 1 层是 14.5, 第 2 层是 11. 因此返回 [3, 14.5, 11].</span><br></pre></td></tr></table></figure>
+
+<p><strong>层序遍历</strong>：利用队列实现二叉树的层序遍历。</p>
+<p>python 双端队列实现二叉树的层序遍历：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">averageOfLevels</span>(<span class="params">self, root: TreeNode</span>) -&gt; <span class="type">List</span>[<span class="built_in">float</span>]:</span><br><span class="line">    <span class="keyword">if</span> root == <span class="literal">None</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line">    <span class="keyword">import</span> collections</span><br><span class="line">    queue = collections.deque()</span><br><span class="line">    queue.append(root)</span><br><span class="line">    res = []</span><br><span class="line">    <span class="keyword">while</span> queue:</span><br><span class="line">        size = <span class="built_in">len</span>(queue)</span><br><span class="line">        <span class="built_in">sum</span>, tmp_size = <span class="number">0</span>, size</span><br><span class="line">        <span class="keyword">while</span> size &gt; <span class="number">0</span>:</span><br><span class="line">            node = queue.popleft()</span><br><span class="line">            size -= <span class="number">1</span></span><br><span class="line">            <span class="built_in">sum</span> += node.val</span><br><span class="line">            <span class="keyword">if</span> node.left:</span><br><span class="line">                queue.append(node.left)</span><br><span class="line">            <span class="keyword">if</span> node.right:</span><br><span class="line">                queue.append(node.right)</span><br><span class="line">        res.append(<span class="built_in">sum</span> / tmp_size)</span><br><span class="line">    <span class="keyword">return</span> res</span><br></pre></td></tr></table></figure>
+
+<p>C 语言实现基于链表的队列，然后基于队列实现二叉树的层序遍历：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="comment">// Definition for a binary tree node.</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">TreeNode</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> val;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">TreeNode</span> *<span class="title">left</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">TreeNode</span> *<span class="title">right</span>;</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Define the structure for a node in the queue</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">Node</span> &#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">TreeNode</span> *<span class="title">data</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">Node</span> *<span class="title">next</span>;</span></span><br><span class="line">&#125; Node;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Define the structure for the queue</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">Queue</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> size;</span><br><span class="line">    Node *front;</span><br><span class="line">    Node *rear;</span><br><span class="line">&#125; Queue;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Function to create a new node</span></span><br><span class="line">Node *<span class="title function_">createNode</span><span class="params">(<span class="keyword">struct</span> TreeNode *data)</span> &#123;</span><br><span class="line">    Node *newNode = (Node *)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(Node));</span><br><span class="line">    newNode-&gt;data = data;</span><br><span class="line">    newNode-&gt;next = <span class="literal">NULL</span>;</span><br><span class="line">    <span class="keyword">return</span> newNode;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Function to create an empty queue</span></span><br><span class="line">Queue* <span class="title function_">createQueue</span><span class="params">()</span> &#123;</span><br><span class="line">    Queue *<span class="built_in">queue</span> = (Queue *)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(Queue));</span><br><span class="line">    <span class="built_in">queue</span>-&gt;front = <span class="literal">NULL</span>;</span><br><span class="line">    <span class="built_in">queue</span>-&gt;rear = <span class="literal">NULL</span>;</span><br><span class="line">    <span class="built_in">queue</span>-&gt;size = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">queue</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Function to check if the queue is empty</span></span><br><span class="line"><span class="type">bool</span> <span class="title function_">isEmpty</span><span class="params">(Queue *<span class="built_in">queue</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">queue</span>-&gt;size == <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Function to enqueue an element into the queue</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">enQueue</span><span class="params">(Queue *<span class="built_in">queue</span>, <span class="keyword">struct</span> TreeNode *data)</span> &#123;</span><br><span class="line">    Node *newNode = createNode(data);</span><br><span class="line">    <span class="keyword">if</span> (isEmpty(<span class="built_in">queue</span>)) &#123;</span><br><span class="line">        <span class="built_in">queue</span>-&gt;front = <span class="built_in">queue</span>-&gt;rear = newNode;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="built_in">queue</span>-&gt;rear-&gt;next = newNode;</span><br><span class="line">        <span class="built_in">queue</span>-&gt;rear = newNode;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">queue</span>-&gt;size += <span class="number">1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Function to dequeue an element from the queue</span></span><br><span class="line"><span class="keyword">struct</span> TreeNode *<span class="title function_">deQueue</span><span class="params">(Queue* <span class="built_in">queue</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (isEmpty(<span class="built_in">queue</span>)) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    Node *temp = <span class="built_in">queue</span>-&gt;front;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">TreeNode</span> *<span class="title">data</span> =</span> temp-&gt;data;</span><br><span class="line">    <span class="built_in">queue</span>-&gt;front = <span class="built_in">queue</span>-&gt;front-&gt;next;</span><br><span class="line">    <span class="built_in">queue</span>-&gt;size -= <span class="number">1</span>;</span><br><span class="line">    <span class="built_in">free</span>(temp);</span><br><span class="line">    <span class="keyword">return</span> data;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">double</span>* <span class="title function_">averageOfLevels</span><span class="params">(<span class="keyword">struct</span> TreeNode* root, <span class="type">int</span>* returnSize)</span>&#123;</span><br><span class="line">    <span class="type">double</span> *ans = (<span class="type">double</span> *)<span class="built_in">malloc</span>(<span class="number">10000</span> * <span class="keyword">sizeof</span>(<span class="type">double</span>));</span><br><span class="line">    Queue *<span class="built_in">queue</span> = createQueue();</span><br><span class="line">    enQueue(<span class="built_in">queue</span>, root);</span><br><span class="line">    *returnSize = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> (!isEmpty(<span class="built_in">queue</span>)) &#123;</span><br><span class="line">        <span class="type">int</span> size = <span class="built_in">queue</span>-&gt;size;</span><br><span class="line">        <span class="type">int</span> tmp_size = size;</span><br><span class="line">        <span class="type">double</span> sum = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">while</span> (size-- &gt; <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="class"><span class="keyword">struct</span> <span class="title">TreeNode</span> *<span class="title">node</span> =</span> deQueue(<span class="built_in">queue</span>);</span><br><span class="line">            sum += node-&gt;val;</span><br><span class="line">            <span class="keyword">if</span> (node-&gt;left) &#123;</span><br><span class="line">                enQueue(<span class="built_in">queue</span>, node-&gt;left);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (node-&gt;right) &#123;</span><br><span class="line">                enQueue(<span class="built_in">queue</span>, node-&gt;right);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        ans[(*returnSize)++] = sum / tmp_size;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> ans;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+]]></content>
+      <categories>
+        <category>数据结构</category>
+        <category>二叉树</category>
+      </categories>
+      <tags>
+        <tag>二叉树遍历</tag>
       </tags>
   </entry>
   <entry>
@@ -1060,7 +1174,9 @@
 <ul>
 <li>别再传递数组指针了，而是使用切片吧。上面的代码更加简洁，也更符合 Go 语言的习惯。</li>
 </ul>
-<hr>
+<blockquote>
+<p>学习链接：<a href="https://studygolang.com/subject/2">https://studygolang.com/subject/2</a>，感谢如此优秀的教程！</p>
+</blockquote>
 ]]></content>
       <categories>
         <category>学习笔记</category>
@@ -1072,63 +1188,13 @@
       </tags>
   </entry>
   <entry>
-    <title>二叉树的遍历基础</title>
-    <url>/posts/230905224335.html</url>
-    <content><![CDATA[<h2 id="二叉树的遍历"><a href="# 二叉树的遍历" class="headerlink" title="二叉树的遍历"></a>二叉树的遍历 </h2><p> 二叉树是一种非常重要的数据结构，很多其它数据结构都是基于二叉树的基础演变而来的。</p>
-<p>所谓遍历 Traversal 是指沿着某条搜索路线，依次对树中每个结点均做一次且仅做一次访问。</p>
-<p>对于二叉树，有深度遍历和广度遍历，深度遍历有前序、中序以及后序遍历三种方法，广度遍历即我们平常所说的层次遍历。因为树的定义本身就是递归定义，因此采用递归的方法去实现树的三种遍历不仅容易理解而且代码很简洁，而对于广度遍历来说，需要其他数据结构的支撑。</p>
-<p>四种遍历的主要思想是：</p>
-<ul>
-<li><p>前序遍历：根节点 -&gt; 左子树 -&gt; 右子树</p>
-</li>
-<li><p>中序遍历：左子树 -&gt; 根节点 -&gt; 右子树</p>
-</li>
-<li><p>后续遍历：左子树 -&gt; 右子树 -&gt; 根节点</p>
-</li>
-<li><p>层序遍历：依二叉树的深度从左到右（右到左）按层遍历</p>
-</li>
-</ul>
-<p>其中，前、中、后续指的是「根节点」的遍历顺序，例如前序遍历是先遍历根节点。</p>
-<span id="more"></span>
-
-<p>以下为一棵二叉树不同的遍历顺序以及实现方法（非递归实现 &#x2F; 递归实现）：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">    1</span><br><span class="line">   / \</span><br><span class="line">  2   3</span><br><span class="line"> / \   \</span><br><span class="line">4   5   6</span><br><span class="line"></span><br><span class="line">层次遍历顺序：[1 2 3 4 5 6] / 非递归实现：队列 + BFS</span><br><span class="line">前序遍历顺序：[1 2 4 5 3 6] / 非递归实现：栈，递归实现：DFS</span><br><span class="line">中序遍历顺序：[4 2 5 1 3 6] / 非递归实现：栈，递归实现：DFS</span><br><span class="line">后序遍历顺序：[4 5 2 6 3 1] / 非递归实现：栈，递归实现：DFS</span><br></pre></td></tr></table></figure>
-
-<p>层次遍历使用 BFS 实现，利用的就是 BFS 一层一层遍历的特性，而前序、中序、后序遍历利用了 DFS 实现。</p>
-<blockquote>
-<p>前序、中序、后序遍只是在对节点访问的顺序有一点不同，其它都相同。</p>
-</blockquote>
-<p>下面直接从 Leetcode 练习题，学习二叉树的不同遍历方法。</p>
-<h3 id="二叉树的层序遍历"><a href="# 二叉树的层序遍历" class="headerlink" title="二叉树的层序遍历"></a>二叉树的层序遍历</h3><blockquote>
-<p>题目链接：<a href="https://leetcode-cn.com/problems/average-of-levels-in-binary-tree/">637. 二叉树的层平均值</a></p>
-</blockquote>
-<p><strong>题目</strong>：给定一个非空二叉树，返回一个由每层节点平均值组成的数组。</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">输入:</span><br><span class="line">    3</span><br><span class="line">   / \</span><br><span class="line">  9  20</span><br><span class="line">    /  \</span><br><span class="line">   15   7</span><br><span class="line">输出: [3, 14.5, 11]</span><br><span class="line">解释: 第 0 层的平均值是 3,  第 1 层是 14.5, 第 2 层是 11. 因此返回 [3, 14.5, 11].</span><br></pre></td></tr></table></figure>
-
-<p><strong>层序遍历</strong>：利用队列实现二叉树的层序遍历。</p>
-<p>python 双端队列实现二叉树的层序遍历：</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">averageOfLevels</span>(<span class="params">self, root: TreeNode</span>) -&gt; <span class="type">List</span>[<span class="built_in">float</span>]:</span><br><span class="line">    <span class="keyword">if</span> root == <span class="literal">None</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line">    <span class="keyword">import</span> collections</span><br><span class="line">    queue = collections.deque()</span><br><span class="line">    queue.append(root)</span><br><span class="line">    res = []</span><br><span class="line">    <span class="keyword">while</span> queue:</span><br><span class="line">        size = <span class="built_in">len</span>(queue)</span><br><span class="line">        <span class="built_in">sum</span>, tmp_size = <span class="number">0</span>, size</span><br><span class="line">        <span class="keyword">while</span> size &gt; <span class="number">0</span>:</span><br><span class="line">            node = queue.popleft()</span><br><span class="line">            size -= <span class="number">1</span></span><br><span class="line">            <span class="built_in">sum</span> += node.val</span><br><span class="line">            <span class="keyword">if</span> node.left:</span><br><span class="line">                queue.append(node.left)</span><br><span class="line">            <span class="keyword">if</span> node.right:</span><br><span class="line">                queue.append(node.right)</span><br><span class="line">        res.append(<span class="built_in">sum</span> / tmp_size)</span><br><span class="line">    <span class="keyword">return</span> res</span><br></pre></td></tr></table></figure>
-
-<p>C 语言实现基于链表的队列，然后基于队列实现二叉树的层序遍历：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="comment">// Definition for a binary tree node.</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">TreeNode</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> val;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">TreeNode</span> *<span class="title">left</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">TreeNode</span> *<span class="title">right</span>;</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Define the structure for a node in the queue</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">Node</span> &#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">TreeNode</span> *<span class="title">data</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">Node</span> *<span class="title">next</span>;</span></span><br><span class="line">&#125; Node;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Define the structure for the queue</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">Queue</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> size;</span><br><span class="line">    Node *front;</span><br><span class="line">    Node *rear;</span><br><span class="line">&#125; Queue;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Function to create a new node</span></span><br><span class="line">Node *<span class="title function_">createNode</span><span class="params">(<span class="keyword">struct</span> TreeNode *data)</span> &#123;</span><br><span class="line">    Node *newNode = (Node *)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(Node));</span><br><span class="line">    newNode-&gt;data = data;</span><br><span class="line">    newNode-&gt;next = <span class="literal">NULL</span>;</span><br><span class="line">    <span class="keyword">return</span> newNode;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Function to create an empty queue</span></span><br><span class="line">Queue* <span class="title function_">createQueue</span><span class="params">()</span> &#123;</span><br><span class="line">    Queue *<span class="built_in">queue</span> = (Queue *)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(Queue));</span><br><span class="line">    <span class="built_in">queue</span>-&gt;front = <span class="literal">NULL</span>;</span><br><span class="line">    <span class="built_in">queue</span>-&gt;rear = <span class="literal">NULL</span>;</span><br><span class="line">    <span class="built_in">queue</span>-&gt;size = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">queue</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Function to check if the queue is empty</span></span><br><span class="line"><span class="type">bool</span> <span class="title function_">isEmpty</span><span class="params">(Queue *<span class="built_in">queue</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">queue</span>-&gt;size == <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Function to enqueue an element into the queue</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">enQueue</span><span class="params">(Queue *<span class="built_in">queue</span>, <span class="keyword">struct</span> TreeNode *data)</span> &#123;</span><br><span class="line">    Node *newNode = createNode(data);</span><br><span class="line">    <span class="keyword">if</span> (isEmpty(<span class="built_in">queue</span>)) &#123;</span><br><span class="line">        <span class="built_in">queue</span>-&gt;front = <span class="built_in">queue</span>-&gt;rear = newNode;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="built_in">queue</span>-&gt;rear-&gt;next = newNode;</span><br><span class="line">        <span class="built_in">queue</span>-&gt;rear = newNode;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">queue</span>-&gt;size += <span class="number">1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Function to dequeue an element from the queue</span></span><br><span class="line"><span class="keyword">struct</span> TreeNode *<span class="title function_">deQueue</span><span class="params">(Queue* <span class="built_in">queue</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (isEmpty(<span class="built_in">queue</span>)) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    Node *temp = <span class="built_in">queue</span>-&gt;front;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">TreeNode</span> *<span class="title">data</span> =</span> temp-&gt;data;</span><br><span class="line">    <span class="built_in">queue</span>-&gt;front = <span class="built_in">queue</span>-&gt;front-&gt;next;</span><br><span class="line">    <span class="built_in">queue</span>-&gt;size -= <span class="number">1</span>;</span><br><span class="line">    <span class="built_in">free</span>(temp);</span><br><span class="line">    <span class="keyword">return</span> data;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">double</span>* <span class="title function_">averageOfLevels</span><span class="params">(<span class="keyword">struct</span> TreeNode* root, <span class="type">int</span>* returnSize)</span>&#123;</span><br><span class="line">    <span class="type">double</span> *ans = (<span class="type">double</span> *)<span class="built_in">malloc</span>(<span class="number">10000</span> * <span class="keyword">sizeof</span>(<span class="type">double</span>));</span><br><span class="line">    Queue *<span class="built_in">queue</span> = createQueue();</span><br><span class="line">    enQueue(<span class="built_in">queue</span>, root);</span><br><span class="line">    *returnSize = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> (!isEmpty(<span class="built_in">queue</span>)) &#123;</span><br><span class="line">        <span class="type">int</span> size = <span class="built_in">queue</span>-&gt;size;</span><br><span class="line">        <span class="type">int</span> tmp_size = size;</span><br><span class="line">        <span class="type">double</span> sum = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">while</span> (size-- &gt; <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="class"><span class="keyword">struct</span> <span class="title">TreeNode</span> *<span class="title">node</span> =</span> deQueue(<span class="built_in">queue</span>);</span><br><span class="line">            sum += node-&gt;val;</span><br><span class="line">            <span class="keyword">if</span> (node-&gt;left) &#123;</span><br><span class="line">                enQueue(<span class="built_in">queue</span>, node-&gt;left);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (node-&gt;right) &#123;</span><br><span class="line">                enQueue(<span class="built_in">queue</span>, node-&gt;right);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        ans[(*returnSize)++] = sum / tmp_size;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> ans;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-]]></content>
-      <categories>
-        <category>数据结构</category>
-        <category>二叉树</category>
-      </categories>
-      <tags>
-        <tag>二叉树遍历</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>博客文章分类汇总</title>
     <url>/posts/230920160149.html</url>
     <content><![CDATA[<center><b>这篇文章是个人博客中系列文章的分类汇总。</b></center>
 
 <span id="more"></span>
 
-<h1 id="C 语言系列"><a href="#C 语言系列" class="headerlink" title="C 语言系列"></a>C 语言系列</h1><p><a href="https://pursue26.github.io/posts/230916171929.html">C 语言之 main 函数参数</a><br><a href="https://pursue26.github.io/posts/230913200729.html">C 语言之 const 关键字</a><br><a href="https://pursue26.github.io/posts/230918174223.html">C 语言之 typedef 自定义类型基础</a><br><a href="https://pursue26.github.io/posts/230920172849.html">C 语言之 typedef 实践</a><br><a href="https://pursue26.github.io/posts/230921094127.html">C 语言之锁与原子操作基础</a><br><a href="https://pursue26.github.io/posts/230911151334.html">C 语言之 pthread 多线程</a><br><a href="https://pursue26.github.io/posts/230918114841.html">C 语言之大小端知识</a></p>
+<h1 id="C 语言系列"><a href="#C 语言系列" class="headerlink" title="C 语言系列"></a>C 语言系列</h1><p><a href="https://pursue26.github.io/posts/230916171929.html">C 语言之 main 函数参数</a><br><a href="https://pursue26.github.io/posts/230922143003.html">C 语言之多维数组</a><br><a href="https://pursue26.github.io/posts/230913200729.html">C 语言之 const 关键字</a><br><a href="https://pursue26.github.io/posts/230918174223.html">C 语言之 typedef 自定义类型基础</a><br><a href="https://pursue26.github.io/posts/230920172849.html">C 语言之 typedef 实践</a><br><a href="https://pursue26.github.io/posts/230921094127.html">C 语言之锁与原子操作基础</a><br><a href="https://pursue26.github.io/posts/230911151334.html">C 语言之 pthread 多线程</a><br><a href="https://pursue26.github.io/posts/230918114841.html">C 语言之大小端知识</a></p>
 <h1 id="Golang 语言系列"><a href="#Golang 语言系列" class="headerlink" title="Golang 语言系列"></a>Golang 语言系列</h1><p><a href="https://pursue26.github.io/posts/230907162612.html">Go 笔记之变量与常量</a><br><a href="https://pursue26.github.io/posts/230909120145.html">Go 笔记之函数 &amp; 包 &amp; 判断 &amp; 循环</a><br><a href="https://pursue26.github.io/posts/230912152800.html">Go 笔记之数组与切片</a><br><a href="https://pursue26.github.io/posts/230913161326.html">Go 笔记之可变参数函数与 Map 集合</a><br><a href="https://pursue26.github.io/posts/230915155105.html">Go 笔记之字符串和指针</a></p>
 <h1 id="数据结构系列"><a href="# 数据结构系列" class="headerlink" title="数据结构系列"></a>数据结构系列 </h1><p><a href="https://pursue26.github.io/posts/230905224335.html"> 拓扑排序基础 </a><br><a href="https://pursue26.github.io/posts/230916094606.html"> 二叉树的遍历基础</a></p>
 <h1 id="Docker 系列"><a href="#Docker 系列" class="headerlink" title="Docker 系列"></a>Docker 系列</h1><p><a href="https://pursue26.github.io/posts/230909171809.html">Docker 学习笔记</a></p>
