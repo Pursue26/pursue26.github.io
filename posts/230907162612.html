@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha256-HtsXJanqjKTc8vVQjO4YMhiqFoXkfBsjBWcX91T1jr8=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pursue26.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.18.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="Go语言学习笔记-1：HelloWorldGo语言是一种编译型语言，源代码都会编译成二进制机器码。 所有 Go 源文件都应该放置在工作区里的 src 目录下。Linux 的工作区（Workspace）应该设置在 $HOME&#x2F;go，也可以通过设置 GOPATH 环境变量，用其他目录来作为工作区。 123456go  bin &#x2F;&#x2F; 编译生成的二进制文件存储位置    hello  src &#x2F;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Go 笔记之变量与常量">
+<meta property="og:url" content="https://pursue26.github.io/posts/230907162612.html">
+<meta property="og:site_name" content="aha&#39;s blog">
+<meta property="og:description" content="Go语言学习笔记-1：HelloWorldGo语言是一种编译型语言，源代码都会编译成二进制机器码。 所有 Go 源文件都应该放置在工作区里的 src 目录下。Linux 的工作区（Workspace）应该设置在 $HOME&#x2F;go，也可以通过设置 GOPATH 环境变量，用其他目录来作为工作区。 123456go  bin &#x2F;&#x2F; 编译生成的二进制文件存储位置    hello  src &#x2F;">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-09-07T08:26:12.000Z">
+<meta property="article:modified_time" content="2023-09-22T03:52:46.167Z">
+<meta property="article:author" content="aha">
+<meta property="article:tag" content="Go变量与常量">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://pursue26.github.io/posts/230907162612.html">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://pursue26.github.io/posts/230907162612.html","path":"posts/230907162612.html","title":"Go 笔记之变量与常量"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Go 笔记之变量与常量 | aha's blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">aha's blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Go%20%E8%AF%AD%E8%A8%80%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%20-1%EF%BC%9AHelloWorld"><span class="nav-number">1.</span> <span class="nav-text">Go 语言学习笔记 -1：HelloWorld</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Go%20%E8%AF%AD%E8%A8%80%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%20-2%EF%BC%9A%E5%8F%98%E9%87%8F"><span class="nav-number">2.</span> <span class="nav-text">Go 语言学习笔记 -2：变量 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Go%20%E8%AF%AD%E8%A8%80%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%20-3%EF%BC%9A%E5%8F%98%E9%87%8F%E7%B1%BB%E5%9E%8B"><span class="nav-number">3.</span> <span class="nav-text">Go 语言学习笔记 -3：变量类型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Go%20%E8%AF%AD%E8%A8%80%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%20-4%EF%BC%9A%E5%B8%B8%E9%87%8F"><span class="nav-number">4.</span> <span class="nav-text">Go 语言学习笔记 -4：常量</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">aha</p>
+  <div class="site-description" itemprop="description">经历一个过程然后成为更好的自己</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">20</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://pursue26.github.io/posts/230907162612.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="aha">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="aha's blog">
+      <meta itemprop="description" content="经历一个过程然后成为更好的自己">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Go 笔记之变量与常量 | aha's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Go 笔记之变量与常量
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+  
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2023-09-07 16:26:12" itemprop="dateCreated datePublished" datetime="2023-09-07T16:26:12+08:00">2023-09-07</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2023-09-22 11:52:46" itemprop="dateModified" datetime="2023-09-22T11:52:46+08:00">2023-09-22</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">学习笔记</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/Golang/" itemprop="url" rel="index"><span itemprop="name">Golang</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>2.7k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>5 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h2 id="Go 语言学习笔记 -1：HelloWorld"><a href="#Go 语言学习笔记 -1：HelloWorld" class="headerlink" title="Go 语言学习笔记 -1：HelloWorld"></a>Go 语言学习笔记 -1：HelloWorld</h2><p>Go 语言是一种编译型语言，源代码都会编译成二进制机器码。</p>
+<p>所有 Go 源文件都应该放置在工作区里的 src 目录下。Linux 的工作区（Workspace）应该设置在 $HOME&#x2F;go，也可以通过设置 GOPATH 环境变量，用其他目录来作为工作区。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">go</span></span><br><span class="line">  bin <span class="comment">// 编译生成的二进制文件存储位置</span></span><br><span class="line">    hello</span><br><span class="line">  src <span class="comment">// 所有 Go 源文件都应该放置在工作区里的 src 目录下</span></span><br><span class="line">    hello <span class="comment">// 为每个 project 新建一个文件夹</span></span><br><span class="line">      helloworld.<span class="keyword">go</span></span><br></pre></td></tr></table></figure>
+
+<p>第一个 Go 程序</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="string">&quot;fmt&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">  fmt.Println(<span class="string">&quot;Hello World!&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<span id="more"></span>
+
+<p>解析：</p>
+<ul>
+<li><p><code>package main</code> - 每一个 Go 文件都应该在开头进行 package name 的声明（译注：只有可执行程序的包名应当为 main）。包（Packages）用于代码的封装与重用，这里的包名称是 main。</p>
+</li>
+<li><p><code>import &quot;fmt&quot;</code> - 我们引入了 fmt 包，用于在 main 函数里面打印文本到标准输出。</p>
+</li>
+<li><p><code>func main()</code> - main 是一个特殊的函数。整个程序就是从 main 函数开始运行的。main 函数必须放置在 main 包中。{和} 分别表示 main 函数的开始和结束部分。</p>
+</li>
+<li><p><code>fmt.Println(&quot;Hello World&quot;)</code> - fmt 包中的 Println 函数用于把文本写入标准输出。</p>
+</li>
+</ul>
+<hr>
+<h2 id="Go 语言学习笔记 -2：变量"><a href="#Go 语言学习笔记 -2：变量" class="headerlink" title="Go 语言学习笔记 -2：变量"></a>Go 语言学习笔记 -2：变量 </h2><p><strong> 变量 </strong> 指定了某存储单元（Memory Location）的名称，该存储单元会存储特定类型的值。</p>
+<ol>
+<li><p>声明单个变量：var name type，例如：var age int</p>
+</li>
+<li><p>声明变量并初始化：var name type &#x3D; initialValue</p>
+</li>
+<li><p>类型推断：如果变量有初始值，那么 Go 能够自动推断具有初始值的变量的类型。因此，如果变量有初始值，就可以在变量声明中省略 type， 如 var age &#x3D; 16 指 age 类型为 int 型。</p>
+</li>
+<li><p>声明多个变量：var name1, name2 type &#x3D; initialValue1, initialValue2</p>
+</li>
+<li><p>在一个语句中声明不同类型的变量，如：</p>
+</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> (</span><br><span class="line">    age = <span class="number">19</span></span><br><span class="line">    name = “laowang”</span><br><span class="line">    adult = <span class="literal">true</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<ol start="6">
+<li>变量的简短声明语法：<code>:=</code> 操作符，例如：<code>age, name := 20, &quot;zhangsan&quot;</code>。简短声明要求 <code>:=</code> 操作符左边的 <strong> 所有变量都有初始值</strong>。</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;  </span><br><span class="line">    a, b := <span class="number">20</span>, <span class="number">30</span> <span class="comment">// 声明 a 和 b</span></span><br><span class="line">    fmt.Println(<span class="string">&quot;a is&quot;</span>, a, <span class="string">&quot;b is&quot;</span>, b)</span><br><span class="line">    a, b := <span class="number">40</span>, <span class="number">50</span> <span class="comment">// 错误，没有尚未声明的变量</span></span><br><span class="line">    a, c := <span class="number">40</span>, <span class="number">60</span> <span class="comment">// 正确，有新的尚未声明的变量</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="7">
+<li><p>变量也可以在运行时进行赋值，如 <code>a := math.Min(15, 20)</code></p>
+</li>
+<li><p>由于 Go 是强类型（Strongly Typed）语言，因此不允许某一类型的变量赋值为其他类型的值。</p>
+</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;  </span><br><span class="line">    age := <span class="number">29</span>      <span class="comment">// age 是 int 类型</span></span><br><span class="line">    age = <span class="string">&quot;naveen&quot;</span> <span class="comment">// 错误，尝试赋值一个字符串给 int 类型变量</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="Go 语言学习笔记 -3：变量类型"><a href="#Go 语言学习笔记 -3：变量类型" class="headerlink" title="Go 语言学习笔记 -3：变量类型"></a>Go 语言学习笔记 -3：变量类型</h2><ol>
+<li>Go 语言支持的变量类型：</li>
+</ol>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">bool</span><br><span class="line">数字类型</span><br><span class="line">    int8, int16, int32, int64, int</span><br><span class="line">    uint8, uint16, uint32, uint64, uint</span><br><span class="line">    float32, float64</span><br><span class="line">    complex64, complex128 // 复数型</span><br><span class="line">    byte</span><br><span class="line">    rune</span><br><span class="line">string</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>在 Printf 方法中，使用 <code>%T</code> 格式说明符（Format Specifier），可以打印出变量的类型。Go 的 <code>unsafe</code> 包提供了一个 <code>Sizeof</code> 函数，该函数接收变量并返回它的字节大小。如：</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fmt.Printf(<span class="string">&quot;type of age is %T, size of age is %d&quot;</span>, age, unsafe.Sizeof(age))</span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li>复数类型：<code>complex64</code> 表示实部和虚部都是 <code>float32</code> 类型，<code>complex128</code> 表示实部和虚部都是 <code>float64</code> 类型。</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">c1 := <span class="built_in">complex</span>(<span class="number">5</span>, <span class="number">7</span>) <span class="comment">// 通过内置函数声明复数变量 c1</span></span><br><span class="line">c2 := <span class="number">8</span> + <span class="number">27i</span> <span class="comment">// 通过简短声明声明复数变量 c2</span></span><br></pre></td></tr></table></figure>
+
+<ol start="4">
+<li><p>其它变量类型：<code>byte</code> 是 <code>uint8</code> 的别名， <code>rune</code> 是 <code>int32</code> 的别名。</p>
+</li>
+<li><p>Go 是强类型（Strongly Typed）语言， Go 没有自动类型提升或类型转换：</p>
+</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> i, j <span class="type">int</span>, float = <span class="number">5</span>, <span class="number">10.2</span></span><br><span class="line">diff := i - j <span class="comment">// 错误， int - float 不被允许</span></span><br><span class="line">diff := i - <span class="type">int</span>(j) <span class="comment">// 正确</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="Go 语言学习笔记 -4：常量"><a href="#Go 语言学习笔记 -4：常量" class="headerlink" title="Go 语言学习笔记 -4：常量"></a>Go 语言学习笔记 -4：常量</h2><ol>
+<li><p>关键字：<code>const</code>，常量不能再重新赋值为其他的值。</p>
+</li>
+<li><p>常量的值会在 <strong> 编译的时候 </strong> 确定。因为函数调用发生在 <strong> 运行时</strong>，所以不能将函数的返回值赋值给常量。如：</p>
+</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a := math.Sqrt(<span class="number">4</span>) <span class="comment">// 允许</span></span><br><span class="line"><span class="keyword">const</span> b := math.Sqrt(<span class="number">9</span>) <span class="comment">// 不允许，编译先于运行</span></span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li><p>常量是可以没有类型的，如：<code>const name = &quot;zhangsan&quot;</code>；常量也可以是有类型的，如：<code>const name string = &quot;lisi&quot;</code>，即 name 是一个 string 类型的 <strong> 常量</strong>。</p>
+</li>
+<li><p>Go 的类型策略不允许将一种类型的变量赋值给另一种类型的变量。</p>
+</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;  </span><br><span class="line">    <span class="keyword">var</span> defaultName = <span class="string">&quot;Sam&quot;</span> <span class="comment">// 允许</span></span><br><span class="line">    <span class="keyword">type</span> myString <span class="type">string</span></span><br><span class="line">    <span class="keyword">var</span> customName myString = <span class="string">&quot;Sam&quot;</span> <span class="comment">// 允许</span></span><br><span class="line">    customName = defaultName <span class="comment">// 不允许，即使 myString 是 string 类型的别名</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="5">
+<li><strong>布尔常量</strong>：字符串常量的规则适用于布尔常量。</li>
+</ol>
+<p><code>var name = &quot;Sam&quot;</code> 无类型的 <strong> 常量 </strong> Sam 是如何赋值给<strong> 变量</strong> name 的？</p>
+<blockquote>
+<p>答案是 <strong> 无类型的常量有一个与它们相关联的默认类型，并且当且仅当一行代码需要时才提供它</strong>（常量可以赋值给 “合适的” 类型，而不需要类型转换）。在声明变量时，如果使用常量来赋值，变量会从常量的默认类型中获取类型。在这种情况下，常量 “Sam” 的默认类型是字符串，所以变量 name 的类型也是字符串。</p>
+</blockquote>
+<blockquote>
+<p>学习链接：<a target="_blank" rel="noopener" href="https://studygolang.com/subject/2">https://studygolang.com/subject/2</a>，感谢如此优秀的教程！</p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Go%E5%8F%98%E9%87%8F%E4%B8%8E%E5%B8%B8%E9%87%8F/" rel="tag"># Go变量与常量</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/230905224335.html" rel="prev" title="二叉树的遍历基础">
+                  <i class="fa fa-angle-left"></i> 二叉树的遍历基础
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/230909120145.html" rel="next" title="Go 笔记之函数 & 包 & 判断 & 循环">
+                  Go 笔记之函数 & 包 & 判断 & 循环 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2023</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">aha</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">89k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">2:42</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+</div>
+  <div class="powered-by">
+    <!--由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动 -->
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script size="150" alpha="0.6" zIndex="-1" src="https://cdnjs.cloudflare.com/ajax/libs/ribbon.js/1.0.2/ribbon.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+
+</body>
+</html>

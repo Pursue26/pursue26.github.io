@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha256-HtsXJanqjKTc8vVQjO4YMhiqFoXkfBsjBWcX91T1jr8=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pursue26.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.18.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="多线程进程与线程进程：是一个具有一定独立功能的程序在一个数据集上的一次动态执行的过程，是操作系统进行资源分配和调度的一个独立单元，是应用程序运行的载体。进程一般由程序、数据集合和进程控制块三部分组成：  程序：描述进程的功能，控制进程的指令集（写论文的目的和手段）  数据集：程序在执行时所需要的数据和工作区（写论文的材料）  进程控制块：跟踪每个进程的状态，操作系统会为进程保留进程列表（写作者）">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C 语言之 pthread 多线程">
+<meta property="og:url" content="https://pursue26.github.io/posts/230911151334.html">
+<meta property="og:site_name" content="aha&#39;s blog">
+<meta property="og:description" content="多线程进程与线程进程：是一个具有一定独立功能的程序在一个数据集上的一次动态执行的过程，是操作系统进行资源分配和调度的一个独立单元，是应用程序运行的载体。进程一般由程序、数据集合和进程控制块三部分组成：  程序：描述进程的功能，控制进程的指令集（写论文的目的和手段）  数据集：程序在执行时所需要的数据和工作区（写论文的材料）  进程控制块：跟踪每个进程的状态，操作系统会为进程保留进程列表（写作者）">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-09-11T07:13:34.000Z">
+<meta property="article:modified_time" content="2023-09-22T05:56:53.436Z">
+<meta property="article:author" content="aha">
+<meta property="article:tag" content="多线程">
+<meta property="article:tag" content="进程与线程">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://pursue26.github.io/posts/230911151334.html">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://pursue26.github.io/posts/230911151334.html","path":"posts/230911151334.html","title":"C 语言之 pthread 多线程"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>C 语言之 pthread 多线程 | aha's blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">aha's blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%9A%E7%BA%BF%E7%A8%8B"><span class="nav-number">1.</span> <span class="nav-text">多线程 </span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%9B%E7%A8%8B%E4%B8%8E%E7%BA%BF%E7%A8%8B"><span class="nav-number">1.1.</span> <span class="nav-text"> 进程与线程 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8A%E4%B8%8B%E6%96%87%E5%88%87%E6%8D%A2"><span class="nav-number">1.2.</span> <span class="nav-text">上下文切换 </span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%97%B6%E9%97%B4%E7%89%87"><span class="nav-number">1.2.1.</span> <span class="nav-text"> 时间片 </span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%8A%E4%B8%8B%E6%96%87%E5%88%87%E6%8D%A2%20-1"><span class="nav-number">1.2.2.</span> <span class="nav-text">上下文切换 </span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%9A%E7%BA%BF%E7%A8%8B%E7%BC%96%E7%A8%8B"><span class="nav-number">1.3.</span> <span class="nav-text">多线程编程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#pthread%20%E5%A4%9A%E7%BA%BF%E7%A8%8B"><span class="nav-number">1.4.</span> <span class="nav-text">pthread 多线程</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E7%BA%BF%E7%A8%8B%E7%9B%B8%E5%85%B3"><span class="nav-number">1.4.1.</span> <span class="nav-text">创建线程相关 </span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#pthread-create"><span class="nav-number">1.4.1.1.</span> <span class="nav-text">pthread_create</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#pthread-self"><span class="nav-number">1.4.1.2.</span> <span class="nav-text">pthread_self</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#pthread-equal"><span class="nav-number">1.4.1.3.</span> <span class="nav-text">pthread_equal</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#pthread-detach"><span class="nav-number">1.4.1.4.</span> <span class="nav-text">pthread_detach</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BB%88%E6%AD%A2%E7%BA%BF%E7%A8%8B%E7%9B%B8%E5%85%B3"><span class="nav-number">1.4.2.</span> <span class="nav-text">终止线程相关 </span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#pthread-cancel"><span class="nav-number">1.4.2.1.</span> <span class="nav-text">pthread_cancel</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#pthread-exit"><span class="nav-number">1.4.2.2.</span> <span class="nav-text">pthread_exit</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%AD%89%E5%BE%85%E7%BA%BF%E7%A8%8B%E7%BB%93%E6%9D%9F"><span class="nav-number">1.4.3.</span> <span class="nav-text">等待线程结束 </span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#pthread-join"><span class="nav-number">1.4.3.1.</span> <span class="nav-text">pthread_join</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%A4%9A%E7%BA%BF%E7%A8%8B%E7%A4%BA%E4%BE%8B"><span class="nav-number">1.4.4.</span> <span class="nav-text">多线程示例</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%A4%9A%E7%BA%BF%E7%A8%8B%E5%90%8C%E6%AD%A5%E7%A4%BA%E4%BE%8B"><span class="nav-number">1.4.5.</span> <span class="nav-text">多线程同步示例 </span></a></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">aha</p>
+  <div class="site-description" itemprop="description">经历一个过程然后成为更好的自己</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">20</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://pursue26.github.io/posts/230911151334.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="aha">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="aha's blog">
+      <meta itemprop="description" content="经历一个过程然后成为更好的自己">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="C 语言之 pthread 多线程 | aha's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          C 语言之 pthread 多线程
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+  
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2023-09-11 15:13:34" itemprop="dateCreated datePublished" datetime="2023-09-11T15:13:34+08:00">2023-09-11</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2023-09-22 13:56:53" itemprop="dateModified" datetime="2023-09-22T13:56:53+08:00">2023-09-22</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">学习笔记</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/C%E8%AF%AD%E8%A8%80/" itemprop="url" rel="index"><span itemprop="name">C语言</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>11k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>19 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h2 id="多线程"><a href="# 多线程" class="headerlink" title="多线程"></a>多线程 </h2><h3 id="进程与线程"><a href="# 进程与线程" class="headerlink" title="进程与线程"></a> 进程与线程 </h3><p><strong> 进程</strong>：是一个具有一定独立功能的程序在一个数据集上的一次动态执行的过程，是操作系统进行资源分配和调度的一个独立单元，是应用程序运行的载体。进程一般由程序、数据集合和进程控制块三部分组成：</p>
+<ul>
+<li><p>程序：描述进程的功能，控制进程的指令集（写论文的目的和手段）</p>
+</li>
+<li><p>数据集：程序在执行时所需要的数据和工作区（写论文的材料）</p>
+</li>
+<li><p>进程控制块：跟踪每个进程的状态，操作系统会为进程保留进程列表（写作者）</p>
+</li>
+</ul>
+<p><strong>线程 </strong>：线程是程序执行中的一个单一的<strong> 顺序控制流程</strong>，是程序执行流的最小单元，是处理器调度和分派的基本单位。</p>
+<ul>
+<li><p>一个进程至少有一个线程，一个进程也可以有多个线程。（一个父亲可以有一个、多个孩子）</p>
+</li>
+<li><p>各个线程之间共享程序的内存空间，即所在进程的内存空间。（多个孩子共享一个家庭空间）</p>
+</li>
+<li><p>一个标准的线程由线程 ID、当前指令指针 PC、寄存器和堆栈组成。（每个孩子有其自身的成长轨迹）</p>
+</li>
+</ul>
+<span id="more"></span>
+
+<p><strong>进程与线程的区别</strong>：</p>
+<ul>
+<li><p>线程是程序执行的最小单位，而进程是操作系统分配资源的最小单位。</p>
+</li>
+<li><p>一个进程由一个或多个线程组成，线程是一个进程中代码的不同执行路线。</p>
+</li>
+<li><p>进程之间相互独立，但 <strong> 同一进程下的各个线程之间共享程序的内存空间 </strong>（代码段、数据集、堆等）以及一些<strong> 进程级的资源</strong>（如打开文件和信号等），某进程内的线程在其他进程中不可见。</p>
+</li>
+<li><p><strong>线程上下文切换比进程上下文切换要快得多</strong>。</p>
+</li>
+</ul>
+<h3 id="上下文切换"><a href="# 上下文切换" class="headerlink" title="上下文切换"></a>上下文切换 </h3><h4 id="时间片"><a href="# 时间片" class="headerlink" title="时间片"></a> 时间片 </h4><p> 多任务系统往往需要同时执行多道作业。作业数往往大于机器的 CPU 数，然而一颗 CPU 同时只能执行一项任务，如何让用户感觉这些任务正在同时进行呢? 操作系统的设计者巧妙地利用了 <strong> 时间片轮转的方式</strong>。</p>
+<p><strong>时间片是 CPU 分配给各个任务（线程）的时间</strong>。</p>
+<blockquote>
+<p>思考：单核 CPU 为何也支持多线程呢？</p>
+<p>虽然单核 CPU 只有一个物理处理单元，但它可以 <strong> 通过时间分片的方式支持多线程</strong>。在单核 CPU 中，操作系统通过时间片轮转算法将 CPU 时间划分为多个时间片段，每个时间片段分配给一个线程执行。当一个线程的时间片用完后，操作系统会暂停该线程的执行，并切换到下一个线程继续执行。这种切换是非常快速的，以至于我们感觉多个线程在同时执行。</p>
+<p>需要注意的是，在单核 CPU 上并发执行的多线程是通过时间片轮转调度实现的，每个线程在任意给定的时间点上 <strong> 只能有一个 </strong> 线程在执行。而在多核 CPU 上，可以实现真正的并行执行，每个核心可以同时执行一个线程，从而提高并发性能。</p>
+</blockquote>
+<h4 id="上下文切换 -1"><a href="# 上下文切换 -1" class="headerlink" title="上下文切换"></a>上下文切换 </h4><p><strong> 线程上下文 </strong>：是指某一时间点 CPU <strong> 寄存器和程序计数器的内容</strong>，CPU 通过时间片分配算法来循环执行任务（线程），因为时间片非常短，所以 CPU 通过不停地切换线程执行。</p>
+<p>换言之，单 CPU 这么频繁，多核 CPU 一定程度上可以减少上下文切换。</p>
+<p><strong>上下文切换 </strong>：CPU 切换前把当前任务的状态保存下来（以便下次切换回这个任务时可以再次加载这个任务的状态），然后加载下一任务的状态并执行。<strong> 任务的状态保存及再加载</strong>，这段过程就叫做上下文切换。</p>
+<h3 id="多线程编程"><a href="# 多线程编程" class="headerlink" title="多线程编程"></a>多线程编程</h3><ul>
+<li><p>多进程模式：启动多个进程，每个进程虽然只有一个线程，但是多个进程可以一块执行多个任务。</p>
+</li>
+<li><p><strong>多线程模式</strong>：启动一个进程，在一个进程内启动多个线程，多个线程一起执行多个任务。</p>
+</li>
+<li><p>多进程 + 多线程模式：启动多个进程，每个进程再启动多个线程，这样同时执行的任务就更多了。</p>
+</li>
+</ul>
+<p>其实创建线程之后，线程并不是始终保持一个状态的，其状态大概如下：</p>
+<ol>
+<li>New 创建</li>
+<li>Runnable 就绪，等待调度</li>
+<li>Running 运行</li>
+<li>Blocked 阻塞，阻塞可能在 Wait &#x2F; Locked &#x2F; Sleeping 阶段</li>
+<li>Dead 消亡</li>
+</ol>
+<p>线程有着不同的状态，也有不同的类型。大致可分为：</p>
+<ul>
+<li><p>主线程：主线程是程序启动时自动创建的线程，它负责执行程序的主要逻辑。主线程通常负责处理用户交互、调度其他线程的创建和管理等任务。</p>
+</li>
+<li><p>子线程：子线程是由主线程创建的额外线程，用于执行并发任务。子线程可以并行地执行任务，从而提高程序的效率和响应性。</p>
+</li>
+<li><p>守护线程（后台线程）：守护线程是一种特殊类型的线程，它在后台运行，<strong>不会阻止程序的退出</strong>。当所有的非守护线程都退出时，守护线程也会自动结束。守护线程通常用于执行一些后台任务，如日志记录、定时任务等。</p>
+</li>
+<li><p>前台线程：前台线程是与守护线程相对的概念，它是指 <strong> 会阻止程序退出的线程</strong>。当所有的前台线程都退出时，程序才会结束。</p>
+</li>
+</ul>
+<h3 id="pthread 多线程"><a href="#pthread 多线程" class="headerlink" title="pthread 多线程"></a>pthread 多线程</h3><p>POSIX 线程（Pthreads）是一套标准的线程 API，用于多线程编程。该库定义了一组 C 语言函数，允许程序员创建和管理多个线程，并提供同步和互斥机制，以确保线程之间的正确协调。</p>
+<p>Pthreads 库是 POSIX 标准的一部分，其全称是“Portable Operating System Interface”，旨在为 Unix-like 操作系统（如 Linux、FreeBSD、Mac OS X 等）提供一致的接口。由于该标准的广泛接受和实现，因此 Pthreads 库现在在许多不同的平台上都可用。</p>
+<p>Pthreads 库的一个优点是它允许程序员创建轻量级线程（LWP），这些线程比进程更轻量级，因此在创建和销毁它们时所需的开销较小。此外，由于它是标准的 POSIX 接口，因此 Pthreads 库可在不同的操作系统上重用，从而提高了代码的可移植性。</p>
+<p>pthread 库需要头文件：<code>pthread.h</code></p>
+<p>gcc 编译链接参数：<code>lpthread</code></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gcc ./demo.c -o demo -lpthread</span><br></pre></td></tr></table></figure>
+
+<h4 id="创建线程相关"><a href="# 创建线程相关" class="headerlink" title="创建线程相关"></a>创建线程相关 </h4><h5 id="pthread-create"><a href="#pthread-create" class="headerlink" title="pthread_create"></a>pthread_create</h5><p><code>pthread_create</code> 是一个用于创建线程的函数，它的原型如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">pthread_create</span><span class="params">(<span class="type">pthread_t</span> *thread, <span class="type">const</span> <span class="type">pthread_attr_t</span> *attr, <span class="type">void</span> *(*start_routine) (<span class="type">void</span> *), <span class="type">void</span> *arg)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// pthread_t 类型的原型定义</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">unsigned</span> <span class="type">long</span> <span class="type">int</span> <span class="type">pthread_t</span>;</span><br></pre></td></tr></table></figure>
+
+<p>该函数接收四个参数，分别是：</p>
+<ol>
+<li><p><code>thread</code>：一个指向线程标识符的指针，由函数创建并返回。</p>
+</li>
+<li><p><code>attr</code>：一个指向线程属性的指针，用于设置线程的属性。如果不需要设置属性，传入 <code>NULL</code> 即可。</p>
+</li>
+<li><p><code>start_routine</code>：线程执行的函数指针，该函数接受一个 <code>void *</code> 类型的参数，并返回一个 <code>void *</code> 类型的值。</p>
+</li>
+<li><p><code>arg</code>：传递给线程执行函数的参数，如果有多个参数，可以传递一个指向参数结构体的指针。</p>
+</li>
+</ol>
+<p>当调用 <code>pthread_create</code> 函数时，它会创建一个新的线程，并将其标识符存储在 <code>thread</code> 指针中。新线程的执行将从 <code>start_routine</code> 函数开始，<code>arg</code>参数将作为 <code>start_routine</code> 的参数传递给它。</p>
+<p>创建线程时，可以选择使用默认线程属性，也可以使用 <code>pthread_attr_t</code> 结构体来设置一些属性，例如线程的调度策略、栈大小、优先级等等。如果不需要设置属性，可以将 <code>attr</code> 参数设置为<code>NULL</code>。</p>
+<p><code>pthread_create</code>函数成功时返回 0，否则返回一个错误码。如果返回非零错误码，可以使用 <code>perror</code> 函数或 <code>strerror</code> 函数打印出错误信息。</p>
+<h5 id="pthread-self"><a href="#pthread-self" class="headerlink" title="pthread_self"></a>pthread_self</h5><p><code>pthread_self</code>函数返回调用它的线程的线程 ID：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">pthread_t</span> <span class="title function_">pthread_self</span><span class="params">(<span class="type">void</span>)</span>;</span><br></pre></td></tr></table></figure>
+
+<h5 id="pthread-equal"><a href="#pthread-equal" class="headerlink" title="pthread_equal"></a>pthread_equal</h5><p><code>pthread_equal</code>函数通过线程 ID 比较线程是否相等，如果两个线程相等，返回非 0 值，如果不相等，返回 0：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">pthread_equal</span><span class="params">(<span class="type">pthread_t</span> t1, <span class="type">pthread_t</span> t2)</span>;</span><br></pre></td></tr></table></figure>
+
+<h5 id="pthread-detach"><a href="#pthread-detach" class="headerlink" title="pthread_detach"></a>pthread_detach</h5><p><code>pthread_detach</code> 函数用于将指定的线程分离出去，所谓分离出去就是指 <strong> 主线程再不需要 </strong> 通过 <code>pthread_join</code> 等方式，等待该线程的结束并回收其线程控制块（TCB）的资源，<strong>被分离的线程结束后由操作系统负责其资源的回收</strong>。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">pthread_detach</span><span class="params">(<span class="type">pthread_t</span> thread)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>其中，<code>thread</code> 参数是要分离的线程的标识符，返回值为 0 表示成功，非 0 值表示出错。</p>
+<p>需要注意的是，如果一个线程被分离了，就不能再对它调用 <code>pthread_join</code> 函数，否则会出错。因此，在调用 <code>pthread_detach</code> 函数之前，必须确保不会再调用 <code>pthread_join</code> 函数。</p>
+<p>一般来说，主线程是要负责创建出来的子线程的资源回收工作的：</p>
+<ul>
+<li><p>如果主线程先于子线程退出，并且子线程没有设置为分离状态，那么子线程结束后其资源是无法得到回收的，会造成资源浪费和系统臃肿。</p>
+</li>
+<li><p>如果主线程先于子线程退出，但是子线程是分离状态，那么子线程退出的时候操作系统会自动回收其资源。</p>
+</li>
+</ul>
+<p>分离线程并不是分离了之后，就跟主线程没有一点关系了。主线程退出了，分离线程还是一样退出，只是分离线程的资源是由系统回收的。</p>
+<h4 id="终止线程相关"><a href="# 终止线程相关" class="headerlink" title="终止线程相关"></a>终止线程相关 </h4><p> 终止线程的三种方式：</p>
+<ol>
+<li><p>线程从启动例程返回，返回值就是线程的退出码；</p>
+</li>
+<li><p>线程可以被同一进程中的其他线程取消（通过<code>pthread_cancel()</code>）；</p>
+</li>
+<li><p>线程自身调用 <code>pthread_ exit()</code> 函数终止。</p>
+</li>
+</ol>
+<h5 id="pthread-cancel"><a href="#pthread-cancel" class="headerlink" title="pthread_cancel"></a>pthread_cancel</h5><p><code>pthread_cancel</code> 函数是一个用于取消 POSIX 线程的函数。该函数向目标线程发送一个取消请求，如果该线程允许取消，则会在处理该请求时终止该线程的执行。</p>
+<blockquote>
+<p>线程可以设置为允许取消（默认情况下）或者禁止取消。如果线程允许取消，它将在收到取消请求后 <strong> 尽快取消</strong>，并执行一些清理工作；如果线程禁止取消，它将继续运行，直到完成其任务或者显式地调用 <code>pthread_exit</code> 函数。</p>
+</blockquote>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">pthread_cancel</span><span class="params">(<span class="type">pthread_t</span> thread)</span>;</span><br></pre></td></tr></table></figure>
+
+<p><code>pthread_cancel</code> 函数有以下两种用法：</p>
+<ol>
+<li><p><code>int pthread_cancel(pthread_t thread);</code> 此用法向线程 ID 为 <code>thread</code> 的线程发送取消请求。如果请求成功发送，则返回 0。如果线程 ID 无效或请求无法发送，则返回一个非零错误码。</p>
+</li>
+<li><p><code>void pthread_testcancel(void);</code> 此用法可以在线程执行期间调用，用于测试是否有取消请求已经发送给该线程。如果是，则在线程执行期间发生取消动作，该线程的执行将立即停止。</p>
+</li>
+</ol>
+<p>需要注意的是，<code>pthread_cancel</code> 函数并不保证能够成功地取消目标线程的执行。当目标线程正在执行某些不可取消的操作（例如某些系统调用）时，取消请求可能会被暂时挂起，直到目标线程离开这些操作为止。另外，使用 <code>pthread_cancel</code> 函数需要注意线程同步问题，避免出现死锁等问题。</p>
+<p>总的来说，<code>pthread_cancel</code> 函数可以用于线程的优雅终止，但是需要谨慎使用，避免出现意外的问题。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;pthread.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span>* <span class="title function_">thread_func</span><span class="params">(<span class="type">void</span>* arg)</span> &#123;</span><br><span class="line">    <span class="keyword">while</span> (<span class="number">1</span>) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Thread is running...\n&quot;</span>);</span><br><span class="line">        sleep(<span class="number">1</span>);</span><br><span class="line">        <span class="comment">// 在循环中调用 pthread_testcancel 函数检查是否有取消请求</span></span><br><span class="line">        pthread_testcancel();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">pthread_t</span> thread_id;</span><br><span class="line">    <span class="comment">// 创建一个线程并启动它</span></span><br><span class="line">    pthread_create(&amp;thread_id, <span class="literal">NULL</span>, &amp;thread_func, <span class="literal">NULL</span>);</span><br><span class="line">    sleep(<span class="number">5</span>);</span><br><span class="line">    <span class="comment">// 在主线程中调用 pthread_cancel 函数向子线程发送取消请求</span></span><br><span class="line">    pthread_cancel(thread_id);</span><br><span class="line">    <span class="comment">// 等待子线程结束</span></span><br><span class="line">    pthread_join(thread_id, <span class="literal">NULL</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Thread has been canceled.\n&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">root@fw:~/w26/ccodes# ./demo</span><br><span class="line">Thread is running...</span><br><span class="line">Thread is running...</span><br><span class="line">Thread is running...</span><br><span class="line">Thread is running...</span><br><span class="line">Thread is running...</span><br><span class="line">Thread has been canceled.</span><br><span class="line">root@fw:~/w26/ccodes#</span><br></pre></td></tr></table></figure>
+
+<p>在上面的代码中，首先创建了一个子线程并启动它，在子线程的循环中不断输出信息，同时在循环中调用 <code>pthread_testcancel</code> 函数检查是否有取消请求。在主线程中等待 5 秒钟后，调用 <code>pthread_cancel</code> 函数向子线程发送取消请求，然后等待子线程结束并输出一条信息表示子线程已经被成功取消。</p>
+<p><strong>调用与不调用 <code>pthread_testcancel()</code> 的区别</strong>：</p>
+<ol>
+<li><p>调用 <code>pthread_testcancel</code> 函数可以让线程在循环或其他 <em> 可取消的操作中 </em> 主动检查是否有取消请求，并在检测到取消请求时 <em> 及时终止 </em> 线程的执行。这样可以增加线程的可靠性，<strong>确保线程在可以取消的时候及时响应取消请求</strong>。</p>
+</li>
+<li><p>如果不调用 <code>pthread_testcancel</code> 函数，线程可能会在某些不可取消的操作中被阻塞（例如在 <code>sleep</code> 等待时），无法及时响应取消请求，导致取消请求被暂时挂起。</p>
+</li>
+<li><p>因此，为了保证线程能够及时响应取消请求，通常建议在线程的循环或其他可取消的操作中调用 <code>pthread_testcancel</code> 函数，以便让线程在合适的时机进行取消。但是需要注意的是，在使用 <code>pthread_testcancel</code> 函数时，必须确保线程的同步操作是线程安全的，否则可能会导致程序出现不可预期的错误。</p>
+</li>
+<li><p>当然，在某些情况下，如果线程不会进入可取消的状态，或者线程在处理临界区时不能被取消，那么调用 <code>pthread_testcancel</code> 函数可能会导致线程被错误地取消。在这种情况下，可以通过设置线程的取消状态为 <code>PTHREAD_CANCEL_DISABLE</code> 来禁用取消操作，以避免意外的取消。</p>
+</li>
+</ol>
+<p>总之，调用 <code>pthread_testcancel</code> 函数可以让线程更加及时地、可靠地响应取消请求，从而增加程序的安全性和稳定性，但需要注意线程同步的问题，以避免出现错误。</p>
+<h5 id="pthread-exit"><a href="#pthread-exit" class="headerlink" title="pthread_exit"></a>pthread_exit</h5><p><code>pthread_exit()</code>是一个线程终止函数，它允许一个线程在它的 <strong> 任意位置退出</strong>。该函数接受一个参数，表示线程的返回值。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">pthread_exit</span><span class="params">(<span class="type">void</span> *retval)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>调用 <code>pthread_exit()</code> 函数会立即终止当前线程的执行，并将传递的参数作为线程的返回值。如果该线程被其他线程等待，那么该返回值可以被其他线程获取。</p>
+<blockquote>
+<p>注意：指针 <code>retval</code> 指向的内容不能为函数中局部变量，因为一旦线程函数终止，它们将不再存在。</p>
+</blockquote>
+<p><code>pthread_exit()</code>函数通常在以下情况下使用：</p>
+<ol>
+<li><p>在线程执行完任务后，主动结束自己的执行。</p>
+</li>
+<li><p>当线程执行出现错误时，使用该函数退出线程。</p>
+</li>
+<li><p>在主线程中调用 <code>pthread_exit()</code> 函数来结束整个程序的执行。</p>
+</li>
+</ol>
+<blockquote>
+<p>注意：如果在主线程中调用了<code>pthread_exit(NULL)</code>，则主线程退出，而不是退出进程，因此如果子线程存在，会继续执行。</p>
+<p>需要注意的是，当一个线程调用 <code>pthread_exit()</code> 函数后，该线程会 <strong> 立即终止，不会再执行任何其他操作 </strong>。因此，如果线程需要进行一些清理工作，比如释放内存、关闭文件等，就需要在调用<code>pthread_exit()</code> 函数之前完成这些操作。</p>
+</blockquote>
+<h4 id="等待线程结束"><a href="# 等待线程结束" class="headerlink" title="等待线程结束"></a>等待线程结束 </h4><h5 id="pthread-join"><a href="#pthread-join" class="headerlink" title="pthread_join"></a>pthread_join</h5><p><code>pthread_join</code> 函数用于 <strong> 等待一个指定线程结束，并回收其占用的资源</strong>。它的原型如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">pthread_join</span><span class="params">(<span class="type">pthread_t</span> thread, <span class="type">void</span> **retval)</span>;</span><br></pre></td></tr></table></figure>
+
+<ol>
+<li><p><code>thread</code>：要等待的线程的标识符，即线程创建时返回的 <code>pthread_t</code> 类型的值。该参数指定了需要等待的线程。</p>
+</li>
+<li><p><code>retval</code>：用于存储线程的返回值的指针。该参数是一个 <strong> 指向指针的指针，因为线程的返回值的类型可能是不确定的，可能是一个整型、浮点型或者指针等类型 </strong>。在<code>pthread_join</code> 函数返回时，线程的返回值将会被存储在 <code>retval</code> 所指向的内存空间中。</p>
+</li>
+</ol>
+<p>需要注意的是，<code>retval</code>参数是可选的，如果不需要获取线程的返回值，可以将其设置为 <code>NULL</code>。另外，如果线程没有返回值，或者<strong> 在线程函数中没有显式地调用 <code>pthread_exit</code> 函数退出线程 </strong>，那么<code>retval</code> 参数将被忽略。</p>
+<p>该函数会阻塞当前线程，直到指定的线程 <code>thread</code> 结束执行。具体来说，当我们调用 <code>pthread_join</code> 函数时，如果指定的线程 <code>thread</code> 还在运行中，当前线程就会被阻塞，等待该线程结束；如果线程 <code>thread</code> 已经结束了，那么 <code>pthread_join</code> 函数会立即返回，并将线程的返回值存储在 <code>retval</code> 中。此外，<code>pthread_join</code>函数会自动回收线程占用的资源，避免了资源泄露的问题。</p>
+<p>以下是一个简单的示例代码，用于演示如何使用 <code>pthread_join</code> 函数等待线程结束并获取其返回值：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;pthread.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span> *<span class="title function_">thread_func</span><span class="params">(<span class="type">void</span> *arg)</span> &#123;</span><br><span class="line">    <span class="type">int</span> *num = (<span class="type">int</span> *)arg;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Thread is running, parameter is %d\n&quot;</span>, *num);</span><br><span class="line">    <span class="type">int</span> *res = <span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(<span class="type">int</span>));</span><br><span class="line">    *res = (*num) * (*num);</span><br><span class="line">    pthread_exit((<span class="type">void</span> *)res);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">pthread_t</span> thread;</span><br><span class="line">    <span class="type">int</span> parameter = <span class="number">10</span>;</span><br><span class="line">    <span class="type">int</span> *result;</span><br><span class="line">    pthread_create(&amp;thread, <span class="literal">NULL</span>, thread_func, &amp;parameter);</span><br><span class="line">    pthread_join(thread, (<span class="type">void</span> **)&amp;result);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Thread returned: %d\n&quot;</span>, *result);</span><br><span class="line">    <span class="built_in">free</span>(result);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>需要注意的是，如果在线程函数中不调用 <code>pthread_exit</code> 函数退出线程，而是直接返回，那么该线程的返回值将是一个未定义的值，可能会导致程序出现不可预料的错误。因此，<strong>在编写多线程程序时，一定要记得在线程函数中调用 <code>pthread_exit</code> 函数退出线程</strong>。</p>
+<h4 id="多线程示例"><a href="# 多线程示例" class="headerlink" title="多线程示例"></a>多线程示例</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;pthread.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span> *<span class="title function_">my_thread_func</span><span class="params">(<span class="type">void</span> *pointer)</span> &#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">3</span>; ++i)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// sleep(1);</span></span><br><span class="line">        <span class="type">int</span> id = *(<span class="type">int</span> *)pointer;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;thread %d running, i=%d\r\n&quot;</span>, id, i);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">free</span>(pointer);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> <span class="type">const</span> *argv[])</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">pthread_t</span> threadId[<span class="number">5</span>];</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5</span>; ++i)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="type">int</span> *arg = <span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(*arg));</span><br><span class="line">        *arg = i;  <span class="comment">// 注意一</span></span><br><span class="line">        pthread_create(&amp;threadId[i], <span class="literal">NULL</span>, my_thread_func, (<span class="type">void</span> *)(arg));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5</span>; ++i)</span><br><span class="line">    &#123;</span><br><span class="line">        pthread_join(threadId[i], (<span class="type">void</span> **)(<span class="number">0</span>));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;main thread end\r\n&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>由于线程之间是异步执行的，因此在输出语句中的 <code>id</code> 值可能会和线程实际运行的顺序不一致，<strong>无法保证顺序执行</strong>。如果需要保证顺序执行，可以使用互斥锁来同步线程之间的执行顺序。</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">root@fw:~/w26/ccodes# ./demo</span><br><span class="line">thread 0 running, k=0</span><br><span class="line">thread 2 running, k=0</span><br><span class="line">thread 2 running, k=1</span><br><span class="line">thread 0 running, k=1</span><br><span class="line">thread 1 running, k=0</span><br><span class="line">thread 1 running, k=1</span><br><span class="line">thread 2 running, k=2</span><br><span class="line">thread 1 running, k=2</span><br><span class="line">thread 3 running, k=0</span><br><span class="line">thread 3 running, k=1</span><br><span class="line">thread 3 running, k=2</span><br><span class="line">thread 4 running, k=0</span><br><span class="line">thread 4 running, k=1</span><br><span class="line">thread 4 running, k=2</span><br><span class="line">thread 0 running, k=2</span><br><span class="line">main thread end</span><br><span class="line">root@fw:~/w26/ccodes#</span><br></pre></td></tr></table></figure>
+
+<p>对于注意一的解释：在 <code>main</code> 函数中循环创建 5 个线程时，每个线程的 <code>my_thread_func</code> 函数都被传递了指向 <code>i</code> 的指针，而 <code>i</code> 是一个 <em> 自动变量 </em>，其生命周期仅在循环内部。<strong> 由于线程的创建和调度是异步的</strong>，因此当线程实际运行时，<code>i</code> 可能已经被更新成另一个值，这会导致线程使用了错误的数据。</p>
+<p>使用 <code>malloc</code> 申请临时变量来保存自动变量 <code>i</code> 的值，每个线程函数都被传递了一个指向分配的临时变量的指针，该变量保存了正确的 <code>i</code> 值。在线程函数中，使用 <code>*(int *)pointer</code> 获取 <code>i</code> 的值，并在使用完后释放该临时变量的内存空间。</p>
+<blockquote>
+<p>何为自动变量？</p>
+</blockquote>
+<p>在 C 和 C++ 等编程语言中，当在函数或代码块内部声明一个变量时，该变量默认为自动变量。自动变量具有以下特点：</p>
+<ol>
+<li><p>作用域：自动变量的作用域仅限于声明它的代码块内部。这意味着在声明的代码块外部是无法访问到该变量的。</p>
+</li>
+<li><p>存储方式：自动变量通常存储在栈（stack）上。当进入声明变量的代码块时，该变量会在栈上分配存储空间，当代码块执行完毕时，变量会自动释放所占用的栈空间。</p>
+</li>
+<li><p>初始化：自动变量在声明时可以选择是否进行初始化。如果未初始化，则其值是不确定的。</p>
+</li>
+</ol>
+<p>自动变量适用于那些在局部范围内使用的临时数据和临时存储需求较小的变量。与全局变量和静态变量相比，自动变量具有更短的生命周期和更小的作用域，能够更有效地管理内存和避免命名冲突。</p>
+<h4 id="多线程同步示例"><a href="# 多线程同步示例" class="headerlink" title="多线程同步示例"></a>多线程同步示例 </h4><p> 保证线程内顺序执行，可以使用互斥锁来同步线程之间的执行顺序。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;pthread.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">pthread_mutex_t</span> mutex = PTHREAD_MUTEX_INITIALIZER;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> *<span class="title function_">my_thread_func</span><span class="params">(<span class="type">void</span> *pointer)</span> &#123;</span><br><span class="line">    pthread_mutex_lock(&amp;mutex);</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> k = <span class="number">0</span>; k &lt; <span class="number">3</span>; ++k)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// sleep(1);</span></span><br><span class="line">        <span class="type">int</span> i = *(<span class="type">int</span> *)(pointer);</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;thread %d running, k=%d\r\n&quot;</span>, i, k);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">free</span>(pointer);</span><br><span class="line">    pthread_mutex_unlock(&amp;mutex);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> <span class="type">const</span> *argv[])</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">pthread_t</span> threadId[<span class="number">5</span>];</span><br><span class="line"></span><br><span class="line">    pthread_mutex_init(&amp;mutex, <span class="literal">NULL</span>);</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5</span>; ++i)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="type">int</span> *arg = <span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(*arg));</span><br><span class="line">        *arg = i;  <span class="comment">// 注意一</span></span><br><span class="line">        pthread_create(&amp;threadId[i], <span class="literal">NULL</span>, my_thread_func, (<span class="type">void</span> *)(arg));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5</span>; ++i)</span><br><span class="line">    &#123;</span><br><span class="line">        pthread_join(threadId[i], (<span class="type">void</span> **)(<span class="number">0</span>));</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    pthread_mutex_destroy(&amp;mutex);</span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;main thread end\r\n&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">root@fw:~/w26/ccodes# ./demo</span><br><span class="line">thread 1 running, k=0</span><br><span class="line">thread 1 running, k=1</span><br><span class="line">thread 1 running, k=2</span><br><span class="line">thread 3 running, k=0</span><br><span class="line">thread 3 running, k=1</span><br><span class="line">thread 3 running, k=2</span><br><span class="line">thread 2 running, k=0</span><br><span class="line">thread 2 running, k=1</span><br><span class="line">thread 2 running, k=2</span><br><span class="line">thread 0 running, k=0</span><br><span class="line">thread 0 running, k=1</span><br><span class="line">thread 0 running, k=2</span><br><span class="line">thread 4 running, k=0</span><br><span class="line">thread 4 running, k=1</span><br><span class="line">thread 4 running, k=2</span><br><span class="line">main thread end</span><br><span class="line">root@fw:~/w26/ccodes#</span><br></pre></td></tr></table></figure>
+
+<p>在修改后的代码中，我们使用 <code>pthread_mutex_t</code> 类型定义了一个互斥锁，并在 <code>main</code> 函数中初始化了它。在 <code>my_thread_func</code> 函数中，我们在循环前加锁（某一个线程获取了锁），循环结束后解锁（该线程释放了锁，此时其它线程可以获取锁了），以保证线程的顺序执行（先获取到锁的线程，会执行完锁之间的内容，不再会出现上面未加锁的示例中，执行到一半，便去执行其它线程的内容）。最后在 <code>main</code> 函数结束前销毁互斥锁。</p>
+<hr>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%A4%9A%E7%BA%BF%E7%A8%8B/" rel="tag"># 多线程</a>
+              <a href="/tags/%E8%BF%9B%E7%A8%8B%E4%B8%8E%E7%BA%BF%E7%A8%8B/" rel="tag"># 进程与线程</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/230909171809.html" rel="prev" title="Docker 学习笔记">
+                  <i class="fa fa-angle-left"></i> Docker 学习笔记
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/230912152800.html" rel="next" title="Go 笔记之数组与切片">
+                  Go 笔记之数组与切片 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2023</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">aha</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">89k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">2:42</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+</div>
+  <div class="powered-by">
+    <!--由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动 -->
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script size="150" alpha="0.6" zIndex="-1" src="https://cdnjs.cloudflare.com/ajax/libs/ribbon.js/1.0.2/ribbon.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+
+</body>
+</html>

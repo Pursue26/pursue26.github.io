@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha256-HtsXJanqjKTc8vVQjO4YMhiqFoXkfBsjBWcX91T1jr8=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pursue26.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.18.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="宏定义 #define 和 const 关键字在 C 语言中有不同的用途：  #define 用于定义宏常量，它在编译前进行简单的文本替换，没有类型检查和作用域限制。宏常量的值可以是任意的表达式，包括函数调用和运算符操作，但容易导致代码的可读性和可维护性降低。  const 关键字用于定义常量变量，具有类型检查和作用域限制的特性。常量变量的值在定义后不能被修改，提高了代码的可读性和可维护性。常量变">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C 语言之 const 关键字">
+<meta property="og:url" content="https://pursue26.github.io/posts/230913200729.html">
+<meta property="og:site_name" content="aha&#39;s blog">
+<meta property="og:description" content="宏定义 #define 和 const 关键字在 C 语言中有不同的用途：  #define 用于定义宏常量，它在编译前进行简单的文本替换，没有类型检查和作用域限制。宏常量的值可以是任意的表达式，包括函数调用和运算符操作，但容易导致代码的可读性和可维护性降低。  const 关键字用于定义常量变量，具有类型检查和作用域限制的特性。常量变量的值在定义后不能被修改，提高了代码的可读性和可维护性。常量变">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-09-13T12:07:29.000Z">
+<meta property="article:modified_time" content="2023-09-20T04:34:31.965Z">
+<meta property="article:author" content="aha">
+<meta property="article:tag" content="const关键字">
+<meta property="article:tag" content="下限定">
+<meta property="article:tag" content="上限定">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://pursue26.github.io/posts/230913200729.html">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://pursue26.github.io/posts/230913200729.html","path":"posts/230913200729.html","title":"C 语言之 const 关键字"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>C 语言之 const 关键字 | aha's blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">aha's blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%AE%E9%A5%B0%E5%B8%B8%E9%87%8F%E5%8F%98%E9%87%8F%EF%BC%88Constant-Variables%EF%BC%89"><span class="nav-number">1.</span> <span class="nav-text">修饰常量变量（Constant Variables）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%AE%E9%A5%B0%E5%B8%B8%E9%87%8F%E5%AD%97%E7%AC%A6%E4%B8%B2"><span class="nav-number">2.</span> <span class="nav-text">修饰常量字符串</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8C%87%E9%92%88%E5%B8%B8%E9%87%8F%EF%BC%88Pointer-to-Constant%EF%BC%89"><span class="nav-number">3.</span> <span class="nav-text">指针常量（Pointer to Constant）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B8%B8%E9%87%8F%E6%8C%87%E9%92%88%E6%8C%87%E5%90%91%E5%8F%98%E9%87%8F%EF%BC%88Constant-Pointer-to-Variable%EF%BC%89"><span class="nav-number">4.</span> <span class="nav-text">常量指针指向变量（Constant Pointer to Variable）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B8%B8%E9%87%8F%E6%8C%87%E9%92%88%E6%8C%87%E5%90%91%E5%B8%B8%E9%87%8F%EF%BC%88Constant-Pointer-to-Constant%EF%BC%89"><span class="nav-number">5.</span> <span class="nav-text">常量指针指向常量（Constant Pointer to Constant）</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">aha</p>
+  <div class="site-description" itemprop="description">经历一个过程然后成为更好的自己</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">20</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://pursue26.github.io/posts/230913200729.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="aha">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="aha's blog">
+      <meta itemprop="description" content="经历一个过程然后成为更好的自己">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="C 语言之 const 关键字 | aha's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          C 语言之 const 关键字
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+  
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2023-09-13 20:07:29" itemprop="dateCreated datePublished" datetime="2023-09-13T20:07:29+08:00">2023-09-13</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2023-09-20 12:34:31" itemprop="dateModified" datetime="2023-09-20T12:34:31+08:00">2023-09-20</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">学习笔记</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/C%E8%AF%AD%E8%A8%80/" itemprop="url" rel="index"><span itemprop="name">C语言</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>5.7k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>10 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>宏定义 <code>#define</code> 和 <code>const</code> 关键字在 C 语言中有不同的用途：</p>
+<ol>
+<li><p><code>#define</code> 用于定义宏常量，它在编译前进行简单的文本替换，没有类型检查和作用域限制。宏常量的值可以是任意的表达式，包括函数调用和运算符操作，但容易导致代码的可读性和可维护性降低。</p>
+</li>
+<li><p><code>const</code> 关键字用于定义常量变量，具有类型检查和作用域限制的特性。常量变量的值在定义后不能被修改，提高了代码的可读性和可维护性。常量变量的作用域仅限于定义它的代码块内，其他代码块无法访问该常量。</p>
+</li>
+<li><p><code>const</code> 关键字还可以用于定义指向常量的指针、常量指针以及指向常量的常量指针。这些用法可以在编译阶段进行类型检查，避免了在运行时可能出现的错误。</p>
+</li>
+<li><p>编译器通常不会为 <em> 普通的</em> <code>const</code> 常量分配存储空间，而是将它们保存在符号表中，成为编译期间的常量。这样可以避免存储和读内存的操作，提高程序的执行效率。</p>
+</li>
+</ol>
+<p>综上所述，虽然 <code>#define</code> 可以用于定义常量，但 <code>const</code> 关键字更加推荐，因为它提供了类型检查和作用域限制，提高了代码的可读性和可维护性，同时能够进行编译期间的优化。</p>
+<span id="more"></span>
+
+<h2 id="修饰常量变量（Constant-Variables）"><a href="# 修饰常量变量（Constant-Variables）" class="headerlink" title="修饰常量变量（Constant Variables）"></a>修饰常量变量（Constant Variables）</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">const</span> <span class="type">int</span> var = <span class="number">100</span>;</span><br><span class="line"><span class="type">int</span> <span class="type">const</span> var = <span class="number">100</span>;</span><br></pre></td></tr></table></figure>
+
+<p>这两种写法是等价的，都表示变量 <code>n</code> 的值不能被修改了。需要注意的是，用 <code>const</code> 修饰变量时，一定要给变量初始化，否则后续就不能赋值了。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// C program to demonstrate that constant variables can not be modified</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">const</span> <span class="type">int</span> var = <span class="number">100</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Compilation error: assignment of read-only variable &#x27;var&#x27;</span></span><br><span class="line">    var = <span class="number">200</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="修饰常量字符串"><a href="# 修饰常量字符串" class="headerlink" title="修饰常量字符串"></a>修饰常量字符串</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">const</span> <span class="type">char</span> *str = <span class="string">&quot;Hello, World!&quot;</span>;</span><br></pre></td></tr></table></figure>
+
+<p><strong>字符指针指向的字符串是不能修改的 </strong>：在 C 语言中，字符串常量是以<strong> 只读方式 </strong> 存储的，编译器会将其 <strong> 存储在只读的数据段 </strong> 中。而使用 <code>const</code> 关键字修饰的指针变量，会告诉编译器不允许通过该指针修改指向的数据。</p>
+<p>如果没有 <code>const</code> 的修饰，我们可能会在后面有意无意的写 <code>str[0]=&#39;x&#39;</code> 这样的语句，这样会导致对只读内存区域的赋值，然后程序会立刻异常终止。但是，有了 <code>const</code>，这个错误就能在程序被编译的时候被检查出来，这就是 <code>const</code> 的好处，让逻辑错误在编译期被发现。</p>
+<h2 id="指针常量（Pointer-to-Constant）"><a href="# 指针常量（Pointer-to-Constant）" class="headerlink" title="指针常量（Pointer to Constant）"></a>指针常量（Pointer to Constant）</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">const</span> <span class="type">int</span>* ptr;</span><br><span class="line"><span class="type">int</span> <span class="type">const</span> *ptr;</span><br></pre></td></tr></table></figure>
+
+<p>这两种写法是等价的。指针常量可以更改指针 <code>ptr</code> 的地址，以指向任何其他同类型的变量，但不能更改指针 <code>ptr</code> 指向的对象的值。指针常量中的指针被存储在读写区域（read-write area），在本例中为堆栈，所指向的对象可能位于只读区域或读写区域。</p>
+<blockquote>
+<p>简言之：指针（的地址）可变；指针地址不变的前提下，其指向的内容不可变。</p>
+</blockquote>
+<p>变量 <code>i</code> 是变量：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// C program to demonstrate that the pointer to point to any other integer variable, </span></span><br><span class="line"><span class="comment">// but the value of the object (entity) pointed can not be changed</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> i = <span class="number">10</span>;</span><br><span class="line">    <span class="type">int</span> j = <span class="number">20</span>;</span><br><span class="line">    <span class="comment">/* ptr is pointer to constant */</span></span><br><span class="line">    <span class="type">const</span> <span class="type">int</span>* ptr = &amp;i;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;ptr: %d\n&quot;</span>, *ptr);</span><br><span class="line">    <span class="comment">/* error: object pointed cannot be modified using the pointer ptr */</span></span><br><span class="line">    <span class="comment">/* error: assignment of read-only location &#x27;*ptr&#x27; */</span></span><br><span class="line">    *ptr = <span class="number">100</span>;</span><br><span class="line"></span><br><span class="line">    ptr = &amp;j; <span class="comment">/* valid */</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;ptr: %d\n&quot;</span>, *ptr);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>变量 <code>i</code> 本身就是常量：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// C program to demonstrate that the pointer to point to any other integer variable, </span></span><br><span class="line"><span class="comment">// but the value of the object (entity) pointed can not be changed</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">/* i is stored in read only area*/</span></span><br><span class="line">    <span class="type">int</span> <span class="type">const</span> i = <span class="number">10</span>;</span><br><span class="line">    <span class="type">int</span> j = <span class="number">20</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* pointer to integer constant. Here i</span></span><br><span class="line"><span class="comment">    is of type &quot;const int&quot;, and &amp;i is of</span></span><br><span class="line"><span class="comment">    type &quot;const int *&quot;. And ptr is of type</span></span><br><span class="line"><span class="comment">    &quot;const int *&quot;, types are matching no issue */</span></span><br><span class="line">    <span class="type">int</span> <span class="type">const</span>* ptr = &amp;i;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;ptr: %d\n&quot;</span>, *ptr);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* error: assignment of read-only location &#x27;*ptr&#x27; */</span></span><br><span class="line">    *ptr = <span class="number">100</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* valid. We call it up qualification. In</span></span><br><span class="line"><span class="comment">    C/C++, the type of &quot;int *&quot; is allowed to up</span></span><br><span class="line"><span class="comment">    qualify to the type &quot;const int *&quot;. The type of</span></span><br><span class="line"><span class="comment">    &amp;j is &quot;int *&quot; and is implicitly up qualified by</span></span><br><span class="line"><span class="comment">    the compiler to &quot;const int *&quot; */</span></span><br><span class="line"></span><br><span class="line">    ptr = &amp;j;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;ptr: %d\n&quot;</span>, *ptr);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>在 C++ 中，不允许进行下限定（down qualification）操作，而在 C 中进行此操作可能会导致警告。下限定是指将已经限定了类型的变量赋值给没有限定类型的变量的情况。</p>
+<p>在 C++ 和 C 中，上限定（up qualification）是允许的，不会引发警告或错误。上限定是指将没有限定类型的变量赋值给已经限定了类型的变量的情况。这意味着可以将一个没有限定类型的变量赋值给一个已经限定了类型的变量，而编译器会自动进行类型转换。上限定操作可以用于提升变量的类型精度或实现类型转换。例如，将一个整数赋值给一个浮点数变量，编译器会自动将整数转换为浮点数类型。</p>
+</blockquote>
+<p>下限定操作示例：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// C program to demonstrate the down qualification</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> i = <span class="number">10</span>;</span><br><span class="line">    <span class="type">int</span> <span class="type">const</span> j = <span class="number">20</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* ptr is pointing an integer object */</span></span><br><span class="line">    <span class="type">int</span>* ptr = &amp;i;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;*ptr: %d\n&quot;</span>, *ptr);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* The below assignment is invalid in C++, results in</span></span><br><span class="line"><span class="comment">    error In C, the compiler *may* throw a warning, but</span></span><br><span class="line"><span class="comment">    casting is implicitly allowed */</span></span><br><span class="line">    ptr = &amp;j;  <span class="comment">/* warning: assignment discards ‘const’ qualifier from pointer target type [-Wdiscarded-qualifiers] */</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/* In C++, it is called &#x27;down qualification&#x27;. The type</span></span><br><span class="line"><span class="comment">    of expression &amp;j is &quot;const int *&quot; and the type of ptr</span></span><br><span class="line"><span class="comment">    is &quot;int *&quot;. The assignment &quot;ptr = &amp;j&quot; causes to</span></span><br><span class="line"><span class="comment">    implicitly remove const-ness from the expression &amp;j.</span></span><br><span class="line"><span class="comment">    C++ being more type restrictive, will not allow</span></span><br><span class="line"><span class="comment">    implicit down qualification. However, C++ allows</span></span><br><span class="line"><span class="comment">    implicit up qualification. The reason being, const</span></span><br><span class="line"><span class="comment">    qualified identifiers are bound to be placed in</span></span><br><span class="line"><span class="comment">    read-only memory (but not always). If C++ allows</span></span><br><span class="line"><span class="comment">    above kind of assignment (ptr = &amp;j), we can use &#x27;ptr&#x27;</span></span><br><span class="line"><span class="comment">    to modify value of j which is in read-only memory.</span></span><br><span class="line"><span class="comment">    The consequences are implementation dependent, the</span></span><br><span class="line"><span class="comment">    program may fail</span></span><br><span class="line"><span class="comment">    at runtime. So strict type checking helps clean code.</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;*ptr: %d\n&quot;</span>, *ptr);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="常量指针指向变量（Constant-Pointer-to-Variable）"><a href="# 常量指针指向变量（Constant-Pointer-to-Variable）" class="headerlink" title="常量指针指向变量（Constant Pointer to Variable）"></a>常量指针指向变量（Constant Pointer to Variable）</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span>* <span class="type">const</span> ptr;</span><br></pre></td></tr></table></figure>
+
+<p>上面的声明是一个指向整型变量的常量指针，这意味着我们可以改变该指针所指向的对象的值，但不能改变该指针指向另一个变量。</p>
+<blockquote>
+<p>简言之：指针（地址）是常量，不可变；指针指向的变量可变。</p>
+</blockquote>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// C program to demonstrate that the value of object pointed</span></span><br><span class="line"><span class="comment">// by pointer can be changed but the pointer can not point to another variable</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> i = <span class="number">10</span>;</span><br><span class="line">    <span class="type">int</span> j = <span class="number">20</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* constant pointer to integer */</span></span><br><span class="line">    <span class="type">int</span>* <span class="type">const</span> ptr = &amp;i;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;ptr: %d\n&quot;</span>, *ptr);</span><br><span class="line"></span><br><span class="line">    *ptr = <span class="number">100</span>; <span class="comment">/* valid */</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;ptr: %d\n&quot;</span>, *ptr);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* error: assignment of read-only variable &#x27;ptr&#x27; */</span></span><br><span class="line">    ptr = &amp;j;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="常量指针指向常量（Constant-Pointer-to-Constant）"><a href="# 常量指针指向常量（Constant-Pointer-to-Constant）" class="headerlink" title="常量指针指向常量（Constant Pointer to Constant）"></a>常量指针指向常量（Constant Pointer to Constant）</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">const</span> <span class="type">int</span>* <span class="type">const</span> ptr;</span><br></pre></td></tr></table></figure>
+
+<p>上面的声明是一个指向常量变量的常量指针，这意味着我们不能更改指针所指向的值，也不能将指针指向其他变量。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// C program to demonstrate that value pointed by the</span></span><br><span class="line"><span class="comment">// pointer can not be changed as well as we cannot point the</span></span><br><span class="line"><span class="comment">// pointer to other variables</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> i = <span class="number">10</span>;</span><br><span class="line">    <span class="type">int</span> j = <span class="number">20</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* constant pointer to constant integer */</span></span><br><span class="line">    <span class="type">const</span> <span class="type">int</span>* <span class="type">const</span> ptr = &amp;i;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;ptr: %d\n&quot;</span>, *ptr);</span><br><span class="line"></span><br><span class="line">    ptr = &amp;j; <span class="comment">/* error: assignment of read-only variable &#x27;ptr&#x27; */</span></span><br><span class="line">    *ptr = <span class="number">100</span>; <span class="comment">/* error: assignment of read-only location &#x27;*ptr&#x27; */</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Declaration</th>
+<th>Pointer Value Change</th>
+<th>Pointing Value Change</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Pointer to Variable</td>
+<td><code>int *ptr</code></td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Pointer to Constant</td>
+<td><code>const int *ptr</code></td>
+<td>No</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Pointer to Constant</td>
+<td><code>int const *ptr</code></td>
+<td>No</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Constant Pointer to Variable</td>
+<td><code>int* const ptr</code></td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Constant Pointer to Constant</td>
+<td><code>const int* const ptr</code></td>
+<td>No</td>
+<td>No</td>
+</tr>
+</tbody></table>
+<p>注：</p>
+<ol>
+<li><p>Pointer Value Change（指向的值的改变），如 <code>*ptr = 100</code></p>
+</li>
+<li><p>Pointing Value Change（指针的值的改变），如 <code>ptr = &amp;a</code></p>
+</li>
+<li><p>如果 <code>const</code> 在 <code>*</code> 的左边，那么 <code>const</code> 可以与类型互换位置，如 <code>const int *ptr</code> 等价于 <code>int const *ptr</code></p>
+</li>
+<li><p>被 <code>const</code> 修饰的变量，地址不可变还是值不可变，傻傻分不清？观察 <code>const</code> 靠近普通类型还是靠近指针类型：</p>
+<ul>
+<li>如果 <code>const</code> 靠近的是普通类型，那么常量变量的值不可变，指针地址可变，如 <code>const int *ptr</code>，<code>int const *ptr</code></li>
+<li>如果 <code>const</code> 靠近的是指针类型，那么指针指向的基本类型的值可变，指针地址不可变，如 <code>int* const ptr</code></li>
+</ul>
+</li>
+<li><p><strong>指针常量与常量指针记忆方法</strong>：只保留 <code>const</code> 和 <code>*</code>，从右往左读，如下：</p>
+<ul>
+<li><del>int</del> *<del>ptr</del>指针变量</li>
+<li>const <del>int</del> *<del>ptr</del>指针常量</li>
+<li><del>int</del> const *<del>ptr</del>指针常量</li>
+<li><del>int</del>* const <del>ptr</del>常量指针</li>
+<li>const <del>int</del>* const <del>ptr</del>常量指针指向常量变量</li>
+</ul>
+</li>
+</ol>
+<blockquote>
+<p>参考链接：<a target="_blank" rel="noopener" href="https://www.geeksforgeeks.org/const-qualifier-in-c/">https://www.geeksforgeeks.org/const-qualifier-in-c/</a></p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/const%E5%85%B3%E9%94%AE%E5%AD%97/" rel="tag"># const关键字</a>
+              <a href="/tags/%E4%B8%8B%E9%99%90%E5%AE%9A/" rel="tag"># 下限定</a>
+              <a href="/tags/%E4%B8%8A%E9%99%90%E5%AE%9A/" rel="tag"># 上限定</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/230913161326.html" rel="prev" title="Go 笔记之可变参数函数与 Map 集合">
+                  <i class="fa fa-angle-left"></i> Go 笔记之可变参数函数与 Map 集合
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/230915155105.html" rel="next" title="Go 笔记之字符串和指针">
+                  Go 笔记之字符串和指针 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2023</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">aha</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">89k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">2:42</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+</div>
+  <div class="powered-by">
+    <!--由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动 -->
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script size="150" alpha="0.6" zIndex="-1" src="https://cdnjs.cloudflare.com/ajax/libs/ribbon.js/1.0.2/ribbon.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+
+</body>
+</html>

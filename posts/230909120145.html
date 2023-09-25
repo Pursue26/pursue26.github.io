@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha256-HtsXJanqjKTc8vVQjO4YMhiqFoXkfBsjBWcX91T1jr8=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pursue26.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.18.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="Go语言学习笔记-5：函数 函数声明语法：  123func functionname(parametername1 type, parametername2 type) returntype &amp;#123;      &#x2F;&#x2F; 函数体（具体实现的功能）&amp;#125;   如果有连续若干个参数，它们的类型一致，那么我们无须一一罗列，只需在最后一个参数后添加该类型。  123func functionnam">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Go 笔记之函数 &amp; 包 &amp; 判断 &amp; 循环">
+<meta property="og:url" content="https://pursue26.github.io/posts/230909120145.html">
+<meta property="og:site_name" content="aha&#39;s blog">
+<meta property="og:description" content="Go语言学习笔记-5：函数 函数声明语法：  123func functionname(parametername1 type, parametername2 type) returntype &amp;#123;      &#x2F;&#x2F; 函数体（具体实现的功能）&amp;#125;   如果有连续若干个参数，它们的类型一致，那么我们无须一一罗列，只需在最后一个参数后添加该类型。  123func functionnam">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-09-09T04:01:45.000Z">
+<meta property="article:modified_time" content="2023-09-22T03:53:04.161Z">
+<meta property="article:author" content="aha">
+<meta property="article:tag" content="Go函数">
+<meta property="article:tag" content="Go判断">
+<meta property="article:tag" content="Go循环">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://pursue26.github.io/posts/230909120145.html">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://pursue26.github.io/posts/230909120145.html","path":"posts/230909120145.html","title":"Go 笔记之函数 & 包 & 判断 & 循环"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Go 笔记之函数 & 包 & 判断 & 循环 | aha's blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">aha's blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Go%20%E8%AF%AD%E8%A8%80%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%20-5%EF%BC%9A%E5%87%BD%E6%95%B0"><span class="nav-number">1.</span> <span class="nav-text">Go 语言学习笔记 -5：函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Go%20%E8%AF%AD%E8%A8%80%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%20-6%EF%BC%9A%E5%8C%85"><span class="nav-number">2.</span> <span class="nav-text">Go 语言学习笔记 -6：包</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Go%20%E8%AF%AD%E8%A8%80%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%20-7%EF%BC%9Aif-else"><span class="nav-number">3.</span> <span class="nav-text">Go 语言学习笔记 -7：if-else</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Go%20%E8%AF%AD%E8%A8%80%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%20-8%EF%BC%9A%E5%BE%AA%E7%8E%AF"><span class="nav-number">4.</span> <span class="nav-text">Go 语言学习笔记 -8：循环</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Go%20%E8%AF%AD%E8%A8%80%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%20-9%EF%BC%9Aswitch%20%E8%AF%AD%E5%8F%A5"><span class="nav-number">5.</span> <span class="nav-text">Go 语言学习笔记 -9：switch 语句</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">aha</p>
+  <div class="site-description" itemprop="description">经历一个过程然后成为更好的自己</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">20</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://pursue26.github.io/posts/230909120145.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="aha">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="aha's blog">
+      <meta itemprop="description" content="经历一个过程然后成为更好的自己">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Go 笔记之函数 & 包 & 判断 & 循环 | aha's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Go 笔记之函数 & 包 & 判断 & 循环
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+  
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2023-09-09 12:01:45" itemprop="dateCreated datePublished" datetime="2023-09-09T12:01:45+08:00">2023-09-09</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2023-09-22 11:53:04" itemprop="dateModified" datetime="2023-09-22T11:53:04+08:00">2023-09-22</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">学习笔记</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/Golang/" itemprop="url" rel="index"><span itemprop="name">Golang</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>3.2k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>6 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h2 id="Go 语言学习笔记 -5：函数"><a href="#Go 语言学习笔记 -5：函数" class="headerlink" title="Go 语言学习笔记 -5：函数"></a>Go 语言学习笔记 -5：函数</h2><ol>
+<li>函数声明语法：</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">functionname</span><span class="params">(parametername1 <span class="keyword">type</span>, parametername2 <span class="keyword">type</span>)</span></span> returntype &#123;  </span><br><span class="line">    <span class="comment">// 函数体（具体实现的功能）</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>如果有连续若干个参数，它们的类型一致，那么我们无须一一罗列，只需在最后一个参数后添加该类型。</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">functionname</span><span class="params">(parametername1, parametername2 <span class="keyword">type</span>)</span></span> returntype &#123;  </span><br><span class="line">    <span class="comment">// 函数体（具体实现的功能）</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li>Go 语言支持一个函数可以有 <strong> 多个返回值</strong>。</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">functionname</span><span class="params">(para1 type1, para2 type2)</span></span> (returntype1, returntype2, ...) &#123;</span><br><span class="line">    <span class="comment">// 函数体（具体实现的功能）</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<span id="more"></span>
+
+<ol start="4">
+<li><strong>命名返回值 </strong>：从函数中可以返回一个命名值。一旦命名了返回值，可以认为<strong> 这些值在函数第一行就被声明为变量了</strong>，在函数 return 时不必再跟随命名值。如<code>area, perimeter</code>：</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">rectProps</span><span class="params">(length, width <span class="type">float64</span>)</span></span> (area, perimeter <span class="type">float64</span>) &#123;  </span><br><span class="line">    area = length * width</span><br><span class="line">    perimeter = (length + width) * <span class="number">2</span></span><br><span class="line">    <span class="keyword">return</span> <span class="comment">// 不需要明确指定返回值，默认返回 area, perimeter 的值</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="5">
+<li><strong>空白符</strong>：<code>_</code> 在 Go 中被用作空白符，可以用作表示任何类型的任何值。</li>
+</ol>
+<p><code>area, _ := rectProps(10.8, 5.6) // 返回值周长被丢弃</code>。</p>
+<hr>
+<h2 id="Go 语言学习笔记 -6：包"><a href="#Go 语言学习笔记 -6：包" class="headerlink" title="Go 语言学习笔记 -6：包"></a>Go 语言学习笔记 -6：包</h2><ol>
+<li><p><code>package packagename</code> 指定了某一源文件属于一个包，它应该放在每一个源文件的第一行。</p>
+</li>
+<li><p><code>main</code> 包和自定义包目录结构（属于某一个包的源文件都应该放置于一个单独命名的文件夹里，且应该用包名命名文件夹名）：</p>
+</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">src</span><br><span class="line">    geometry  <span class="comment">// 自定义 main 包</span></span><br><span class="line">        geometry.<span class="keyword">go</span> <span class="comment">// main 函数</span></span><br><span class="line">        rectangle <span class="comment">// 自定义包，文件名为包名</span></span><br><span class="line">            rectprops.<span class="keyword">go</span> <span class="comment">// 属于 rectangle 包的源文件</span></span><br><span class="line">bin</span><br><span class="line">    <span class="comment">// 通过执行 go build geometry/geometry.go 编译得到 </span></span><br><span class="line">    geometry (Linux)</span><br><span class="line">    geometry.exe (Windows)</span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li><p>导入自定义包：<code>import packagepath</code>，必须指定自定义包 <code>packagename</code> 相对于工作区 <code>src</code> 文件夹的相对路径，如：<code>import &quot;geometry/rectangle&quot;</code>。</p>
+</li>
+<li><p>导出名字：在 Go 中，任何 <strong> 以大写字母开头的变量或者函数都是被导出的名字，其它包只能访问被导出的函数和变量</strong>（即，如果想在包外访问一个函数，它应该首首字母大写）。</p>
+</li>
+<li><p><code>init</code> 函数：所有包都可以包含一个 <code>init</code> 函数，<code>init</code> 函数不应该有任何返回值类型和参数。</p>
+</li>
+</ol>
+<ul>
+<li><p>包的初始化顺序：1）首先初始化 <strong> 被导入的 </strong> 包；2）然后初始化 <strong> 包级别（package level）的变量 </strong>；3）紧接着<strong> 调用 <code>init</code> 函数</strong>，按照编译器解析它们的顺序进行调用。</p>
+</li>
+<li><p>如果一个包导入了另一个包，会先初始化 <strong> 被导入的 </strong> 包。</p>
+</li>
+<li><p>尽管一个包可能会被导入多次，但是它们只会被初始化一次。</p>
+</li>
+</ul>
+<ol start="6">
+<li>空白标识符导入包中的使用：导入了包，却不在代码中使用它，这在 Go 中是非法的，会抛出 <code>xxx.go:6: imported and not used: packagename_yyy</code>。</li>
+</ol>
+<ul>
+<li><p>为了避免这种程序错误，通常会在函数外调用其中的一个函数，并将返回值赋给 <code>_</code> 变量，把这一操作称为 <code> 错误屏蔽器</code>。</p>
+</li>
+<li><p>同时，有时我们并不想使用导入的包中的任一函数或变量，只是为了 <strong> 确保它进行初始化</strong>，这种情况可以使用空白标识符 <code>_</code>，如 <code>import _ &quot;geometry/rectangle&quot;</code>。这样在不调用包中的函数或变量时，也不会报错。</p>
+</li>
+</ul>
+<hr>
+<h2 id="Go 语言学习笔记 -7：if-else"><a href="#Go 语言学习笔记 -7：if-else" class="headerlink" title="Go 语言学习笔记 -7：if-else"></a>Go 语言学习笔记 -7：if-else</h2><ol>
+<li>即使 <code>if</code> 状态下仅有一条语句，也必须加 <code>&#123; &#125;</code></li>
+</ol>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> condition &#123;</span><br><span class="line"></span><br><span class="line">&#125; <span class="keyword">else</span> <span class="keyword">if</span> condition &#123;</span><br><span class="line"></span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li><code>if</code> 还有另外一种形式，它包含一个 <code>statement</code> 可选语句部分，该组件在条件判断之前运行，语法为：<code>if statement; condition &#123;  &#125;</code>，其中 <code>statement</code> 的作用域仅在 <code>if-else</code> 范围内。</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123; <span class="comment">// num 的范围仅限于 if else 代码块</span></span><br><span class="line">  <span class="keyword">if</span> num:= <span class="number">10</span>; num % <span class="number">2</span> == <span class="number">0</span> &#123;</span><br><span class="line">    fmt.Println(num, <span class="string">&quot;is even.&quot;</span>)</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    fmt.Println(num, <span class="string">&quot;is odd.&quot;</span>)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li><strong>一个注意点</strong>：<code>else</code> 必须键入在 <code>&#125;</code> 后面，不能另取一行键入，因为 Go 语言默认在每条语句结束时插入一个分号，但 <code>if else</code> 是一个整体。</li>
+</ol>
+<h2 id="Go 语言学习笔记 -8：循环"><a href="#Go 语言学习笔记 -8：循环" class="headerlink" title="Go 语言学习笔记 -8：循环"></a>Go 语言学习笔记 -8：循环</h2><ol>
+<li>Go 语言中唯一的循环语句是 <code>for</code>，没有 <code>while</code> 和 <code>do while</code> 循环。</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> initialisation; condition; post &#123;  </span><br><span class="line">    <span class="comment">// 循环体</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>for</code> 循环的三个组成部分，即初始化，条件和 post 都是可选的（可有可无），如：<code>for ;i &lt;= 10; &#123;...&#125;</code>、<code>for &#123;...&#125;</code> 或 <code>for i &lt;= 10 &#123;... i += 2&#125;</code>，即 <code>;</code> 也是可以省略的。</li>
+</ul>
+<ol start="2">
+<li><code>break</code> 为跳出循环，<code>continue</code> 为不执行后续语句，进入下一次循环。</li>
+</ol>
+<hr>
+<h2 id="Go 语言学习笔记 -9：switch 语句"><a href="#Go 语言学习笔记 -9：switch 语句" class="headerlink" title="Go 语言学习笔记 -9：switch 语句"></a>Go 语言学习笔记 -9：switch 语句</h2><ol>
+<li><code>switch</code>是一个条件语句，它可以被认为是替代多个 <code>if else</code> 子句的常用方式，<code>case</code> 不允许出现重复项。</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    finger := <span class="number">4</span></span><br><span class="line">    <span class="keyword">switch</span> finger &#123;</span><br><span class="line">        <span class="keyword">case</span> <span class="number">1</span>:</span><br><span class="line">            fmt.Println(<span class="string">&quot;Thumb&quot;</span>)</span><br><span class="line">        <span class="keyword">case</span> <span class="number">2</span>:</span><br><span class="line">            fmt.Println(<span class="string">&quot;Index&quot;</span>)</span><br><span class="line">        <span class="keyword">case</span> <span class="number">3</span>:</span><br><span class="line">            fmt.Println(<span class="string">&quot;Middle&quot;</span>)</span><br><span class="line">        <span class="keyword">case</span> <span class="number">4</span>, <span class="number">5</span>: <span class="comment">// 一个选项多个表达式</span></span><br><span class="line">            fmt.Println(<span class="string">&quot;Ring or Pinky&quot;</span>)</span><br><span class="line">        <span class="keyword">default</span>: <span class="comment">// 默认情况</span></span><br><span class="line">            fmt.Println(<span class="string">&quot;incorrect finger number&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li><p><strong>先声明变量再使用</strong>：<code>switch varname := xxx; varname &#123;...&#125;</code>，此时的 <code>varname</code> 变量的作用域仅限于当前 <code>switch</code> 内。</p>
+</li>
+<li><p><strong>无表达式的 <code>switch</code><strong>：在 switch 语句中，表达式是可选的，可以被省略。如果省略表达式，则表示这个 switch 语句 </strong> 等同于 switch true</strong>，并且 <strong> 每个 case 表达式都被认定为有效，相应的代码块也会被执行</strong>。</p>
+</li>
+<li><p><strong>fallthrough</strong>：fallthrough 语句可以在已经执行完成的 case 之后，把控制权转移到下一个 case 的执行代码中，而不会跳出 switch。</p>
+</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span>  <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">switch</span> num := <span class="number">3</span>; &#123;</span><br><span class="line">        <span class="keyword">case</span> num == <span class="number">3</span>:</span><br><span class="line">            fmt.Println(<span class="string">&quot;==&quot;</span>)</span><br><span class="line">            <span class="keyword">fallthrough</span></span><br><span class="line">        <span class="keyword">case</span> num &lt; <span class="number">10</span>:</span><br><span class="line">            fmt.Println(<span class="string">&quot;yes&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="5">
+<li>switch 和 case 的表达式不一定是常量。</li>
+</ol>
+<blockquote>
+<p>学习链接：<a target="_blank" rel="noopener" href="https://studygolang.com/subject/2">https://studygolang.com/subject/2</a>，感谢如此优秀的教程！</p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Go%E5%87%BD%E6%95%B0/" rel="tag"># Go函数</a>
+              <a href="/tags/Go%E5%88%A4%E6%96%AD/" rel="tag"># Go判断</a>
+              <a href="/tags/Go%E5%BE%AA%E7%8E%AF/" rel="tag"># Go循环</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/230907162612.html" rel="prev" title="Go 笔记之变量与常量">
+                  <i class="fa fa-angle-left"></i> Go 笔记之变量与常量
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/230909171809.html" rel="next" title="Docker 学习笔记">
+                  Docker 学习笔记 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2023</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">aha</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">89k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">2:42</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+</div>
+  <div class="powered-by">
+    <!--由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动 -->
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script size="150" alpha="0.6" zIndex="-1" src="https://cdnjs.cloudflare.com/ajax/libs/ribbon.js/1.0.2/ribbon.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+
+</body>
+</html>

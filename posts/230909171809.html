@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha256-HtsXJanqjKTc8vVQjO4YMhiqFoXkfBsjBWcX91T1jr8=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pursue26.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.18.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="1. 什么是Docker？Docker是一个开源的容器化平台，用于构建、打包和部署应用程序。它允许开发人员将应用程序和它们的依赖项打包成一个轻量级、可移植的容器，然后在任何支持Docker的环境中运行。 1.1 Docker的核心概念在深入学习Docker之前，了解以下几个核心概念是很重要的：  容器（Container）：一个独立运行的沙箱（sandboxed）应用程序实例，包含应用程序及其所有">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Docker 学习笔记">
+<meta property="og:url" content="https://pursue26.github.io/posts/230909171809.html">
+<meta property="og:site_name" content="aha&#39;s blog">
+<meta property="og:description" content="1. 什么是Docker？Docker是一个开源的容器化平台，用于构建、打包和部署应用程序。它允许开发人员将应用程序和它们的依赖项打包成一个轻量级、可移植的容器，然后在任何支持Docker的环境中运行。 1.1 Docker的核心概念在深入学习Docker之前，了解以下几个核心概念是很重要的：  容器（Container）：一个独立运行的沙箱（sandboxed）应用程序实例，包含应用程序及其所有">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-09-09T09:18:09.000Z">
+<meta property="article:modified_time" content="2023-09-20T04:35:08.617Z">
+<meta property="article:author" content="aha">
+<meta property="article:tag" content="Docker">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://pursue26.github.io/posts/230909171809.html">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://pursue26.github.io/posts/230909171809.html","path":"posts/230909171809.html","title":"Docker 学习笔记"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Docker 学习笔记 | aha's blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">aha's blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%20%E4%BB%80%E4%B9%88%E6%98%AF%20Docker%EF%BC%9F"><span class="nav-number">1.</span> <span class="nav-text">1. 什么是 Docker？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-Docker%20%E7%9A%84%E6%A0%B8%E5%BF%83%E6%A6%82%E5%BF%B5"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 Docker 的核心概念 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-Dcoker-registry"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 Dcoker registry</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-Docker%20%E7%9A%84%E5%AE%89%E8%A3%85%E5%92%8C%E9%85%8D%E7%BD%AE"><span class="nav-number">2.</span> <span class="nav-text">2. Docker 的安装和配置 </span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%20%E5%AE%89%E8%A3%85%20Docker"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 安装 Docker</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-%20%E9%85%8D%E7%BD%AE%20Docker"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 配置 Docker</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%20%E4%BD%BF%E7%94%A8%20Docker"><span class="nav-number">3.</span> <span class="nav-text">3. 使用 Docker</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-%20%E8%BF%90%E8%A1%8C%E5%AE%B9%E5%99%A8"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 运行容器 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-%20%E6%9E%84%E5%BB%BA%E8%87%AA%E5%AE%9A%E4%B9%89%E9%95%9C%E5%83%8F"><span class="nav-number">3.2.</span> <span class="nav-text">3.2 构建自定义镜像 </span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-Docker-Volumes%20%E4%B8%8E%20Mount"><span class="nav-number">4.</span> <span class="nav-text">4. Docker Volumes 与 Mount</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-%20%E5%88%9B%E5%BB%BA%20-Volume"><span class="nav-number">4.1.</span> <span class="nav-text">4.1 创建 Volume</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-%20%E5%AE%B9%E5%99%A8%E4%B8%AD%E4%BD%BF%E7%94%A8%20-Volume"><span class="nav-number">4.2.</span> <span class="nav-text">4.2 容器中使用 Volume</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#4-2-1-v%20%E5%8F%82%E6%95%B0%E5%8D%B7%E6%8C%82%E8%BD%BD"><span class="nav-number">4.2.1.</span> <span class="nav-text">4.2.1 -v 参数卷挂载</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-2-2-%E2%80%93mount%20%E5%8F%82%E6%95%B0%E5%8D%B7%E6%8C%82%E8%BD%BD"><span class="nav-number">4.2.2.</span> <span class="nav-text">4.2.2 –mount 参数卷挂载 </span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-%20%E6%8C%82%E8%BD%BD%E4%B8%BB%E6%9C%BA%E7%9B%AE%E5%BD%95%E4%BD%9C%E4%B8%BA%20-Volume"><span class="nav-number">4.3.</span> <span class="nav-text">4.3 挂载主机目录作为 Volume</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-4-%20%E6%9F%A5%E7%9C%8B%20-Volume"><span class="nav-number">4.4.</span> <span class="nav-text">4.4 查看 Volume</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-5-%20%E5%88%A0%E9%99%A4%20-Volume"><span class="nav-number">4.5.</span> <span class="nav-text">4.5 删除 Volume</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-6-Volume-Mounts-Vs-Bind-Mounts"><span class="nav-number">4.6.</span> <span class="nav-text">4.6 Volume Mounts Vs Bind Mounts</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#4-6-1-Volume-Mounts%20%E7%9A%84%E7%89%B9%E6%80%A7"><span class="nav-number">4.6.1.</span> <span class="nav-text">4.6.1 Volume Mounts 的特性 </span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-6-2-Bind-Mounts%20%E7%9A%84%E7%89%B9%E6%80%A7"><span class="nav-number">4.6.2.</span> <span class="nav-text">4.6.2 Bind Mounts 的特性 </span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-6-3-%20%E9%80%89%E6%8B%A9%E4%BD%BF%E7%94%A8%E5%8D%B7%E6%8C%82%E8%BD%BD%E8%BF%98%E6%98%AF%E7%BB%91%E5%AE%9A%E6%8C%82%E8%BD%BD"><span class="nav-number">4.6.3.</span> <span class="nav-text">4.6.3 选择使用卷挂载还是绑定挂载</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-Container-networking"><span class="nav-number">5.</span> <span class="nav-text">5. Container networking</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#5-1-%20%E5%AE%B9%E5%99%A8%E7%BD%91%E7%BB%9C%E7%89%B9%E6%80%A7"><span class="nav-number">5.1.</span> <span class="nav-text">5.1 容器网络特性 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-2-%20%E5%AE%B9%E5%99%A8%E7%BD%91%E7%BB%9C%E5%AE%9E%E8%B7%B5%E5%91%BD%E4%BB%A4"><span class="nav-number">5.2.</span> <span class="nav-text">5.2 容器网络实践命令 </span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#5-2-1-%20%E5%88%9B%E5%BB%BA%E8%87%AA%E5%AE%9A%E4%B9%89%E5%AE%B9%E5%99%A8%E7%BD%91%E7%BB%9C"><span class="nav-number">5.2.1.</span> <span class="nav-text">5.2.1 创建自定义容器网络</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-2-2-%20%E8%BF%90%E8%A1%8C%E5%AE%B9%E5%99%A8%E5%B9%B6%E8%BF%9E%E6%8E%A5%E5%88%B0%E7%BD%91%E7%BB%9C"><span class="nav-number">5.2.2.</span> <span class="nav-text">5.2.2 运行容器并连接到网络 </span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-2-3-%20%E6%9F%A5%E7%9C%8B%E5%AE%B9%E5%99%A8%E7%BD%91%E7%BB%9C%E4%BF%A1%E6%81%AF"><span class="nav-number">5.2.3.</span> <span class="nav-text">5.2.3 查看容器网络信息 </span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-2-4-%20%E5%AE%B9%E5%99%A8%E9%97%B4%E9%80%9A%E4%BF%A1"><span class="nav-number">5.2.4.</span> <span class="nav-text">5.2.4 容器间通信 </span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-2-5-%20%E7%AB%AF%E5%8F%A3%E6%98%A0%E5%B0%84"><span class="nav-number">5.2.5.</span> <span class="nav-text">5.2.5 端口映射 </span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-Docker-Compose"><span class="nav-number">6.</span> <span class="nav-text">6. Docker Compose</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">aha</p>
+  <div class="site-description" itemprop="description">经历一个过程然后成为更好的自己</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">20</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">30</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://pursue26.github.io/posts/230909171809.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="aha">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="aha's blog">
+      <meta itemprop="description" content="经历一个过程然后成为更好的自己">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Docker 学习笔记 | aha's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Docker 学习笔记
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+  
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2023-09-09 17:18:09" itemprop="dateCreated datePublished" datetime="2023-09-09T17:18:09+08:00">2023-09-09</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2023-09-20 12:35:08" itemprop="dateModified" datetime="2023-09-20T12:35:08+08:00">2023-09-20</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">学习笔记</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/Docker/" itemprop="url" rel="index"><span itemprop="name">Docker</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>11k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>20 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h2 id="1- 什么是 Docker？"><a href="#1- 什么是 Docker？" class="headerlink" title="1. 什么是 Docker？"></a>1. 什么是 Docker？</h2><p>Docker 是一个开源的容器化平台，用于构建、打包和部署应用程序。它允许开发人员将应用程序和它们的依赖项打包成一个轻量级、可移植的容器，然后在任何支持 Docker 的环境中运行。</p>
+<h3 id="1-1-Docker 的核心概念"><a href="#1-1-Docker 的核心概念" class="headerlink" title="1.1 Docker 的核心概念"></a>1.1 Docker 的核心概念 </h3><p> 在深入学习 Docker 之前，了解以下几个核心概念是很重要的：</p>
+<ul>
+<li><p><strong>容器（Container）</strong>：一个 <strong> 独立 </strong> 运行的沙箱（sandboxed）应用程序实例，包含应用程序及其所有依赖项。容器是 Docker 的基本构建块，有以下特点：</p>
+<ul>
+<li><p>利用 <a target="_blank" rel="noopener" href="https://medium.com/@saschagrunert/demystifying-containers-part-i-kernel-space-2c53d6979504">kernel namespaces and cgroups</a> 实现隔离 &#x2F; 独立。</p>
+</li>
+<li><p>是一个可运行的镜像的实例，可以使用 DockerAPI 或 CLI 创建、开始、停止、移动、删除一个容器。</p>
+</li>
+<li><p>可以运行在本地机器上、虚拟机上或者部署在云上。</p>
+</li>
+<li><p>可移植的（能运行在任何操作系统上）。</p>
+</li>
+<li><p>与其它容器隔离并运行自己的软件、二进制文件和配置。</p>
+</li>
+</ul>
+</li>
+<li><p><strong>镜像（Image）</strong>：一个只读的模板，用于创建容器。镜像包含了运行应用程序所需的一切，例如代码、运行时环境、库和依赖项。</p>
+</li>
+<li><p><strong>仓库（Repository）</strong>：用于存储和组织 Docker 镜像的地方。可以将仓库看作是镜像的集合。</p>
+</li>
+<li><p><strong>Dockerfile</strong>：一个文本文件，包含了一系列命令和指令，用于从头开始构建 Docker 镜像。</p>
+</li>
+</ul>
+<span id="more"></span>
+
+<h3 id="1-2-Dcoker-registry"><a href="#1-2-Dcoker-registry" class="headerlink" title="1.2 Dcoker registry"></a>1.2 Dcoker registry</h3><p>Docker Registry 是用于 <strong> 存储、管理和分发 Docker 镜像的中央仓库</strong>。它允许用户将自己创建的镜像上传到仓库，或者从仓库中拉取他人创建的镜像。在 Docker 中，默认使用 Docker 官方的公共注册服务器，称为 Docker Hub。此外，还可以在本地或私有云环境中搭建自己的 Docker Registry。</p>
+<p>以下是 Docker Registry 的一些重要概念：</p>
+<ol>
+<li><p>镜像（Image）：Docker 镜像是一个包含了应用程序、运行时环境、库和依赖的只读模板。镜像是构建和运行容器的基础。在 Docker Registry 中，镜像被存储和管理。</p>
+</li>
+<li><p>仓库（Repository）：仓库是包含多个镜像的集合。仓库可以用于组织和管理镜像。每个镜像都有一个唯一的标签（tag），用于标识不同版本或变体的镜像。</p>
+</li>
+<li><p>注册服务器（Registry Server）：注册服务器是存储和分发镜像的服务器。Docker Hub 是 Docker 官方提供的公共注册服务器。除了 Docker Hub，还可以搭建私有的注册服务器，例如 Docker 官方提供的开源项目 Docker Registry 或第三方的解决方案。</p>
+</li>
+<li><p>仓库名称（Repository Name）：仓库名称用于唯一标识一个仓库。它由用户名（如果是私有仓库还包括域名）、斜杠和仓库名称组成，例如 <code>username/repository</code> 或<code>domain.com/username/repository</code>。</p>
+</li>
+<li><p>标签（Tag）：标签用于标识仓库中的镜像的不同版本或变体。通过标签，可以区分不同的镜像，并拉取特定的版本。</p>
+</li>
+</ol>
+<p>常见的 Docker Registry 操作包括：</p>
+<ul>
+<li><p>拉取镜像（Pull Image）：从注册服务器上拉取镜像到本地，以供使用或进一步构建容器。</p>
+</li>
+<li><p>推送镜像（Push Image）：将本地创建的镜像推送到注册服务器，以便其他人可以访问和使用。</p>
+</li>
+<li><p>搜索镜像（Search Image）：在注册服务器上搜索和浏览可用的镜像，以找到感兴趣的镜像。</p>
+</li>
+<li><p>删除镜像（Delete Image）：从注册服务器上删除不再需要的镜像，释放存储空间。</p>
+</li>
+</ul>
+<p>使用 Docker Registry，你可以方便地共享和分发镜像，构建自己的镜像仓库，并进行版本控制和管理。无论是使用公共注册服务器还是搭建私有的注册服务器，Docker Registry 都是 Docker 生态系统中重要的组成部分之一。</p>
+<blockquote>
+<p>什么叫分发镜像？<br>分发镜像是指将 Docker 镜像从一个地方复制到另一个地方，以便其他用户可以访问和使用该镜像。</p>
+<p>分发镜像的过程一般包括以下步骤：1）Dockerfile 构建镜像；2）打标签；3）推送到 Registry；4）拉取镜像。</p>
+<p>分发镜像的好处包括：1）共享性；2）可移植性；3）版本控制：使用标签来管理镜像的不同版本，可以轻松回退到先前的版本或升级到新的版本。</p>
+</blockquote>
+<h2 id="2-Docker 的安装和配置"><a href="#2-Docker 的安装和配置" class="headerlink" title="2. Docker 的安装和配置"></a>2. Docker 的安装和配置 </h2><h3 id="2-1- 安装 Docker"><a href="#2-1- 安装 Docker" class="headerlink" title="2.1 安装 Docker"></a>2.1 安装 Docker</h3><p> 首先，需要安装 Docker 引擎。以下是在常见操作系统上安装 Docker 的步骤：</p>
+<p><strong>Ubuntu</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">sudo apt-get update</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">sudo apt-get install docker.io</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>Windows</strong></p>
+<ol>
+<li>前往 <a target="_blank" rel="noopener" href="https://www.docker.com/products/docker-desktop">Docker 官方网站</a> 下载 Docker Desktop。</li>
+<li>双击安装包并按照指示完成安装。可能需要更新 WSL，<strong>需要把 Windows 的更新计划打开</strong>，否则可能无法更新 WSL。</li>
+</ol>
+<h3 id="2-2- 配置 Docker"><a href="#2-2- 配置 Docker" class="headerlink" title="2.2 配置 Docker"></a>2.2 配置 Docker</h3><p>安装完成后，你可能需要进行一些配置。例如，你可以设置 Docker 镜像加速器以加快下载速度。以下是一个示例：</p>
+<ol>
+<li>打开 Docker 配置文件：</li>
+</ol>
+<ul>
+<li><strong>Ubuntu</strong>：<code>/etc/docker/daemon.json</code></li>
+<li><strong>MacOS</strong> &#x2F; <strong>Windows</strong>：Docker Desktop 应用程序 &gt; Preferences &gt; Docker Engine</li>
+</ul>
+<ol start="2">
+<li>如果文件不存在，创建它。然后，将以下内容添加到配置文件中：</li>
+</ol>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;registry-mirrors&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="string">&quot;https://your-mirror.example.com&quot;</span><span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;insecure-registries&quot;</span><span class="punctuation">:</span><span class="punctuation">[</span><span class="punctuation">]</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li>保存配置文件并重启 Docker 服务：</li>
+</ol>
+<ul>
+<li><strong>Ubuntu</strong>：<ul>
+<li><code>sudo systemctl daemon-reload</code></li>
+<li><code>sudo systemctl restart docker</code></li>
+</ul>
+</li>
+<li><strong>MacOS</strong> &#x2F; <strong>Windows</strong>：在 Docker Desktop 应用程序中点击重启按钮。</li>
+</ul>
+<h2 id="3- 使用 Docker"><a href="#3- 使用 Docker" class="headerlink" title="3. 使用 Docker"></a>3. 使用 Docker</h2><h3 id="3-1- 运行容器"><a href="#3-1- 运行容器" class="headerlink" title="3.1 运行容器"></a>3.1 运行容器 </h3><p> 要运行一个容器，首先需要一个 Docker 镜像。可以从 Docker 仓库中获取现有的镜像，或者自己创建一个。以下是一个运行基于 Ubuntu 的容器的示例：</p>
+<ol>
+<li>拉取 Ubuntu 镜像：</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">docker pull ubuntu</span></span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>运行容器：</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">docker run -it ubuntu /bin/bash</span></span><br></pre></td></tr></table></figure>
+
+<p>这将以交互式终端的方式在 Ubuntu 容器中运行一个 bash shell。你可以在容器中执行任意命令。</p>
+<ol start="3">
+<li>退出容器：</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash"><span class="built_in">exit</span></span></span><br></pre></td></tr></table></figure>
+
+<h3 id="3-2- 构建自定义镜像"><a href="#3-2- 构建自定义镜像" class="headerlink" title="3.2 构建自定义镜像"></a>3.2 构建自定义镜像 </h3><p> 使用 Dockerfile 可以构建自定义的 Docker 镜像。以下是一个简单的示例：</p>
+<ol>
+<li><p>创建一个新目录，例如 <code>myapp</code>，并在其中创建一个名为<code>Dockerfile</code> 的文件。</p>
+</li>
+<li><p>在 <code>Dockerfile</code> 中添加以下内容：</p>
+</li>
+</ol>
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 使用较小的基础镜像</span></span><br><span class="line"><span class="keyword">FROM</span> python:<span class="number">3.9</span>-slim</span><br><span class="line"></span><br><span class="line"><span class="comment"># 维护者信息</span></span><br><span class="line"><span class="keyword">LABEL</span><span class="language-bash"> maintainer=<span class="string">&quot;Your Name &lt;your.email@example.com&gt;&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 安装 Vim 编辑器</span></span><br><span class="line"><span class="keyword">RUN</span><span class="language-bash"> apt-get update &amp;&amp; \</span></span><br><span class="line"><span class="language-bash">    apt-get install -y vim &amp;&amp; \</span></span><br><span class="line"><span class="language-bash">    apt-get clean &amp;&amp; \</span></span><br><span class="line"><span class="language-bash">    <span class="built_in">rm</span> -rf /var/lib/apt/lists/*</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 安装所需的软件包, 将多个 RUN 指令合并为一个（减小 image 的体积）</span></span><br><span class="line"><span class="keyword">RUN</span><span class="language-bash"> pip install --no-cache-dir --upgrade pip setuptools wheel &amp;&amp; \</span></span><br><span class="line"><span class="language-bash">    pip install --no-cache-dir \</span></span><br><span class="line"><span class="language-bash">    langchain==0.0.162 \</span></span><br><span class="line"><span class="language-bash">    openai \</span></span><br><span class="line"><span class="language-bash">    fastapi \</span></span><br><span class="line"><span class="language-bash"></span></span><br><span class="line"><span class="comment"># 设置工作目录</span></span><br><span class="line"><span class="keyword">WORKDIR</span><span class="language-bash"> /app</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 将本地项目文件复制到容器中</span></span><br><span class="line"><span class="keyword">COPY</span><span class="language-bash"> ./ /app</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 设置环境变量</span></span><br><span class="line"><span class="keyword">ENV</span> ENV_VARIABLE_NAME=value</span><br><span class="line"></span><br><span class="line"><span class="comment"># 运行命令</span></span><br><span class="line"><span class="keyword">CMD</span><span class="language-bash"> [<span class="string">&quot;python&quot;</span>, <span class="string">&quot;/app/src/main.py&quot;</span>, <span class="string">&quot;--extra-arg&quot;</span>, <span class="string">&quot;value&quot;</span>]</span></span><br></pre></td></tr></table></figure>
+
+<p>以上示例使用了 python 作为基础镜像，并在容器中安装了一些软件包，设置了工作目录，复制了本地文件，并设置了环境变量和默认运行命令。</p>
+<ol start="3">
+<li>在 <code>Dockerfile</code> 所在的目录中打开终端，并构建镜像：</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">docker build -t aigc/plugins:v1.0.0 .</span></span><br></pre></td></tr></table></figure>
+
+<p>这将使用 <code>Dockerfile</code> 创建一个名为 <code>aigc/plugins</code> 的镜像，版本号为<code>v1.0.0</code>。</p>
+<ol start="4">
+<li>运行容器：</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">docker run --restart=always -d --name aigc_plugins -p 8385:8385 \</span></span><br><span class="line"><span class="language-bash">    -v /home/aigc/mount/plugins/data/store:/app/store \</span></span><br><span class="line"><span class="language-bash">    -v /home/aigc/mount/plugins/data/cfg:/app/cfg aigc/plugins:v1.0.0 python /app/src/main.py \</span></span><br><span class="line"><span class="language-bash">    --ip 0.0.0.0 --port 8385 --url http://0.0.0.0:8383/v1/completions</span></span><br></pre></td></tr></table></figure>
+
+<p>现在你可以在自定义镜像的容器中运行你的应用程序。</p>
+<ol start="5">
+<li>进入容器：</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">docker <span class="built_in">exec</span> -it aigc_plugins bash</span></span><br></pre></td></tr></table></figure>
+
+<ol start="6">
+<li>删除容器：</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">docker <span class="built_in">rm</span> -f aigc_plugins</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">docker <span class="built_in">rm</span> -f &lt;container-id&gt;</span></span><br></pre></td></tr></table></figure>
+
+<ol start="7">
+<li>查看容器运行的日志，并保存到文件中：</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">docker logs -f aigc_plugins | <span class="built_in">tee</span> -a aigc_plugins_logs.txt</span></span><br></pre></td></tr></table></figure>
+
+<ol start="8">
+<li>打包保存镜像：</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">docker save -o aigc_plugins.tar aigc/plugins:v1.0.0</span></span><br></pre></td></tr></table></figure>
+
+<ol start="9">
+<li>加载本地镜像包：</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">docker load -i aigc_plugins.tar</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="4-Docker-Volumes 与 Mount"><a href="#4-Docker-Volumes 与 Mount" class="headerlink" title="4. Docker Volumes 与 Mount"></a>4. Docker Volumes 与 Mount</h2><p>Docker Volumes（卷）是 Docker 中用于 <strong> 持久化数据 </strong> 的一种机制，它允许将主机上的目录或文件与容器内的路径进行映射，从而实现数据在容器和主机之间的共享和持久化存储。</p>
+<h3 id="4-1- 创建 -Volume"><a href="#4-1- 创建 -Volume" class="headerlink" title="4.1 创建 Volume"></a>4.1 创建 Volume</h3><p>使用 <code>docker volume create</code> 命令可以创建一个新的 Volume。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">docker volume create my-volume</span></span><br></pre></td></tr></table></figure>
+
+<p>上述命令将创建一个名为 <code>my-volume</code> 的新 Volume。Docker 会在宿主机的默认 Volume 存储位置上创建一个目录，用于保存 Volume 的数据。</p>
+<blockquote>
+<p>Where is Docker storing my data when I use a volume?</p>
+</blockquote>
+<p>使用 <code>docker volume inspect</code> 命令查看 Volume 存储位置。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">docker volume inspect my-volume</span></span><br></pre></td></tr></table></figure>
+
+<p>接着，你将看到如下信息：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">[</span></span><br><span class="line">    <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;CreatedAt&quot;</span><span class="punctuation">:</span> <span class="string">&quot;2021-06-01T16:18:36Z&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;Driver&quot;</span><span class="punctuation">:</span> <span class="string">&quot;local&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;Labels&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span><span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;Mountpoint&quot;</span><span class="punctuation">:</span> <span class="string">&quot;/var/lib/docker/volumes/my-volume/_data&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;Name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;my-volume&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;Options&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span><span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;Scope&quot;</span><span class="punctuation">:</span> <span class="string">&quot;local&quot;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">]</span></span><br></pre></td></tr></table></figure>
+
+
+<blockquote>
+<p>Mountpoint 是数据在磁盘上的实际位置。请注意，在大多数机器上，您需要具有根访问权限才能从主机访问此目录。但是，这就是它所在的位置。</p>
+</blockquote>
+<h3 id="4-2- 容器中使用 -Volume"><a href="#4-2- 容器中使用 -Volume" class="headerlink" title="4.2 容器中使用 Volume"></a>4.2 容器中使用 Volume</h3><p>在运行容器时，可以使用 <code>-v</code> 或 <code>--mount</code> 参数将 Volume 挂载到容器内的路径上。</p>
+<h4 id="4-2-1-v 参数卷挂载"><a href="#4-2-1-v 参数卷挂载" class="headerlink" title="4.2.1 -v 参数卷挂载"></a>4.2.1 -v 参数卷挂载</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">docker run -d -v my-volume:/path/in/container my-image</span></span><br></pre></td></tr></table></figure>
+
+<p>上述命令将创建一个基于 <code>my-image</code> 镜像的容器，并将名为 <code>my-volume</code> 的 Volume 挂载到容器内的 <code>/path/in/container</code> 路径上。</p>
+<h4 id="4-2-2-–mount 参数卷挂载"><a href="#4-2-2-–mount 参数卷挂载" class="headerlink" title="4.2.2 –mount 参数卷挂载"></a>4.2.2 –mount 参数卷挂载 </h4><p> 使用 <code>--mount</code> 参数可以更细粒度地配置容器中的 Volume 挂载。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">docker run -d --mount <span class="built_in">type</span>=volume,<span class="built_in">source</span>=my-volume,target=/path/in/container my-image</span></span><br></pre></td></tr></table></figure>
+
+<p>在上述命令中，我们使用了 <code>--mount</code> 参数来指定挂载的类型和配置。<code>type=volume</code> 表示挂载类型为 Volume，<code>source=my-volume</code> 指定了要挂载的 Volume 的名称为 <code>my-volume</code>，<code>target=/path/in/container</code> 指定了挂载到容器内的路径为 <code>/path/in/container</code>。</p>
+<p>除了指定挂载类型、Volume 名称和路径外，<code>--mount</code> 参数还可以接受其他选项，例如读写权限、文件系统类型等。下面是一个更详细的示例：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">docker run -d --mount <span class="built_in">type</span>=volume,<span class="built_in">source</span>=my-volume,target=/path/in/container,ro,volume-opt=option=value my-image</span></span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中，我们添加了一些额外的选项。<code>ro</code> 表示将 Volume 挂载为只读（read-only），<code>volume-opt=option=value</code> 表示指定了额外的 Volume 选项。你可以根据需要使用适当的选项来满足挂载的要求。</p>
+<p>使用 <code>--mount</code> 参数进行 Volume 挂载可以提供更多的灵活性和配置选项，例如指定挂载类型、读写权限、Volume 选项等。这使得我们能够更好地控制容器与 Volume 之间的数据交互。</p>
+<h3 id="4-3- 挂载主机目录作为 -Volume"><a href="#4-3- 挂载主机目录作为 -Volume" class="headerlink" title="4.3 挂载主机目录作为 Volume"></a>4.3 挂载主机目录作为 Volume</h3><p>除了使用命名 Volume，还可以直接将主机上的目录或文件挂载为 Volume，即 <strong> 绑定挂载（Bind mounts）</strong>。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">docker run -d -v /path/on/host:/path/in/container my-image</span></span><br></pre></td></tr></table></figure>
+
+<p>上述命令将主机上的 <code>/path/on/host</code> 目录挂载到容器内的 <code>/path/in/container</code> 路径上。</p>
+<blockquote>
+<p>绑定挂载（Bind mounts）允许将主机文件系统上的特定路径直接挂载到容器内的路径上。<br>卷挂载（Volume mounts）通过使用 Docker 卷 (Volume) 将容器内的路径与主机上的路径进行关联。</p>
+</blockquote>
+<h3 id="4-4- 查看 -Volume"><a href="#4-4- 查看 -Volume" class="headerlink" title="4.4 查看 Volume"></a>4.4 查看 Volume</h3><p>使用 <code>docker volume ls</code> 命令可以列出所有已创建的 Volumes。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">docker volume <span class="built_in">ls</span></span></span><br></pre></td></tr></table></figure>
+
+<p>上述命令将显示所有已创建的 Volumes 的列表，包括它们的名称和所在的路径。</p>
+<h3 id="4-5- 删除 -Volume"><a href="#4-5- 删除 -Volume" class="headerlink" title="4.5 删除 Volume"></a>4.5 删除 Volume</h3><p>要删除一个不再需要的 Volume，可以使用 <code>docker volume rm</code> 命令。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">docker volume <span class="built_in">rm</span> my-volume</span></span><br></pre></td></tr></table></figure>
+
+<p>上述命令将删除名为 <code>my-volume</code> 的 Volume。请注意，只有在没有任何容器使用该 Volume 时，才能成功删除。</p>
+<h3 id="4-6-Volume-Mounts-Vs-Bind-Mounts"><a href="#4-6-Volume-Mounts-Vs-Bind-Mounts" class="headerlink" title="4.6 Volume Mounts Vs Bind Mounts"></a>4.6 Volume Mounts Vs Bind Mounts</h3><h4 id="4-6-1-Volume-Mounts 的特性"><a href="#4-6-1-Volume-Mounts 的特性" class="headerlink" title="4.6.1 Volume Mounts 的特性"></a>4.6.1 Volume Mounts 的特性 </h4><p> 卷挂载通过使用 Docker 卷 (Volume) 将容器内的路径与主机上的路径进行关联。Docker 卷是一种特殊的目录，用于存储容器中的数据。卷挂载具有以下特点：</p>
+<ul>
+<li><p><strong>主机位置</strong>：Docker 选择卷的主机位置，通常在宿主机上的特定目录中。</p>
+</li>
+<li><p><strong>数据持久化</strong>：Volume 提供了一种持久化存储数据的方式。即使容器被删除或重新创建，Volume 中的数据仍然保持不变。</p>
+</li>
+<li><p><strong>容器间数据共享</strong>：多个容器可以共享同一个 Volume，使得它们可以轻松地共享数据。</p>
+</li>
+<li><p><strong>与主机文件系统交互</strong>：通过将主机上的目录挂载为 Volume，容器可以访问主机的文件系统，方便与容器之外的环境交互。</p>
+</li>
+<li><p><strong>备份和迁移</strong>：使用 Volumes 可以方便地备份和迁移容器的数据，通过备份或迁移 Volume，可以快速复制或迁移整个容器的数据。</p>
+</li>
+<li><p><strong>卷驱动程序支持</strong>：卷挂载支持使用不同的卷驱动程序，例如本地主机文件系统、网络存储或其他存储后端。</p>
+</li>
+</ul>
+<h4 id="4-6-2-Bind-Mounts 的特性"><a href="#4-6-2-Bind-Mounts 的特性" class="headerlink" title="4.6.2 Bind Mounts 的特性"></a>4.6.2 Bind Mounts 的特性 </h4><p> 绑定挂载允许将主机文件系统上的特定路径直接挂载到容器内的路径上。绑定挂载具有以下特点：</p>
+<ul>
+<li><p><strong>主机位置</strong>：您可以自行选择要挂载的主机路径，它可以是任何主机上的目录或文件。</p>
+</li>
+<li><p><strong>与主机文件系统实时同步</strong>：容器中的更改会实时反映在绑定挂载的主机路径上，反之亦然。</p>
+</li>
+<li><p><strong>灵活性</strong>：绑定挂载允许容器与宿主机之间进行更紧密的交互，方便开发人员对文件进行编辑、调试或测试。</p>
+</li>
+<li><p><strong>支持权限和访问控制</strong>：绑定挂载可以继承主机文件系统的权限设置，以控制容器对文件的读写权限。</p>
+</li>
+</ul>
+<h4 id="4-6-3- 选择使用卷挂载还是绑定挂载"><a href="#4-6-3- 选择使用卷挂载还是绑定挂载" class="headerlink" title="4.6.3 选择使用卷挂载还是绑定挂载"></a>4.6.3 选择使用卷挂载还是绑定挂载</h4><table>
+<thead>
+<tr>
+<th></th>
+<th>命名卷 (Named Volumes)</th>
+<th>绑定挂载 (Bind Mounts)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>主机位置</td>
+<td>由 Docker 选择</td>
+<td>由您决定</td>
+</tr>
+<tr>
+<td>挂载示例 (使用 <code>--mount</code>)</td>
+<td><code>type=volume,src=my-volume,target=/usr/local/data</code></td>
+<td><code>type=bind,src=/path/to/data,target=/usr/local/data</code></td>
+</tr>
+<tr>
+<td>容器内容填充新卷</td>
+<td>是</td>
+<td>否</td>
+</tr>
+<tr>
+<td>支持卷驱动程序</td>
+<td>是</td>
+<td>否</td>
+</tr>
+</tbody></table>
+<p>在选择使用卷挂载还是绑定挂载时，可以根据具体需求和场景来进行决策：</p>
+<ul>
+<li><p>如果需要数据持久性、跨容器共享和卷驱动程序支持，则应选择卷挂载。</p>
+</li>
+<li><p>如果需要与主机文件系统实时同步、灵活的文件访问和交互，则应选择绑定挂载。</p>
+</li>
+</ul>
+<p>在实际应用中，根据不同的需求，卷挂载和绑定挂载可以结合使用，以满足容器与主机之间数据共享和交互的需求。</p>
+<blockquote>
+<p>容器内容填充新卷是指在使用卷挂载（Volume Mounts）时，如果目标卷是新创建的并且为空（即没有初始数据），<strong>容器启动时会将容器内的内容填充到新创建的卷中</strong>。</p>
+<p>这意味着，如果使用一个新的、空的卷挂载到容器内的路径上，并且容器内的路径中有预先存在的数据，那么在容器启动时，这些数据会被复制到新的卷中，以便卷中具有与容器内部相同的初始数据。这样可以确保在容器重新创建或迁移时，新创建的卷具有与原始容器相同的初始状态。</p>
+</blockquote>
+<h2 id="5-Container-networking"><a href="#5-Container-networking" class="headerlink" title="5. Container networking"></a>5. Container networking</h2><blockquote>
+<p>请记住，默认情况下，容器是独立运行的，对同一台机器上的其他进程或容器一无所知。那么，如何让一个容器与另一个容器通信呢？答案是网络（network）。如果将两个容器放在同一个网络上，它们就可以相互通信。</p>
+</blockquote>
+<h3 id="5-1- 容器网络特性"><a href="#5-1- 容器网络特性" class="headerlink" title="5.1 容器网络特性"></a>5.1 容器网络特性 </h3><p> 容器网络是 Docker 中一个重要的概念，它允许 <strong> 在容器之间建立网络连接和通信</strong>。通过容器网络，可以实现容器间的数据传输、服务发现和跨主机的容器通信等功能。以下是容器网络的一些关键点和特性：</p>
+<ul>
+<li><p>** 网络命名空间 (Network Namespace)**：每个容器都有自己独立的网络命名空间，使得容器可以拥有自己的网络栈，包括网络接口、IP 地址和路由表等。这样可以实现容器之间的网络隔离，避免网络冲突和干扰。</p>
+</li>
+<li><p><strong>虚拟以太网桥 (Virtual Ethernet Bridge)<strong>：Docker 使用虚拟以太网桥来连接容器和宿主机的网络。每个宿主机上的 Docker 守护进程会创建一个名为 docker0 的桥接接口，</strong>通过该接口与容器的网络命名空间相连</strong>。</p>
+</li>
+<li><p>** 网络驱动程序 (Network Drivers)**：Docker 提供了多种网络驱动程序，用于实现不同的网络功能和配置选项。默认情况下，Docker 使用桥接网络驱动程序 (Bridge Network Driver)，但还支持其他驱动程序，如 Overlay、Host、Macvlan 等，以满足不同的网络需求。</p>
+</li>
+<li><p><strong>容器间通信 </strong>：容器可以通过使用网络连接和端口来实现相互通信。<strong> 可以使用容器的 IP 地址、端口号或容器名称来访问其他容器上的服务</strong>。容器网络还支持多个容器共享同一个网络端口的负载均衡和服务发现功能。</p>
+</li>
+<li><p><strong>跨主机容器通信</strong>：通过使用网络驱动程序中的 Overlay 网络模式，可以在多个主机上创建一个虚拟网络，使得不同主机上的容器可以直接通信。这为构建分布式应用和容器编排平台（如 Docker Swarm 和 Kubernetes）提供了基础。</p>
+</li>
+<li><p><strong>外部网络访问</strong>：容器可以通过端口映射 (Port Mapping) 的方式将容器内部的服务暴露给外部网络。通过将容器的特定端口映射到宿主机上的端口，可以使得外部网络能够访问容器中的应用程序或服务。</p>
+</li>
+</ul>
+<p>容器网络是 Docker 中实现容器间通信和与外部网络交互的重要机制。通过灵活配置和管理容器网络，可以构建具有高可用性、可伸缩性和弹性的容器化应用程序。</p>
+<h3 id="5-2- 容器网络实践命令"><a href="#5-2- 容器网络实践命令" class="headerlink" title="5.2 容器网络实践命令"></a>5.2 容器网络实践命令 </h3><h4 id="5-2-1- 创建自定义容器网络"><a href="#5-2-1- 创建自定义容器网络" class="headerlink" title="5.2.1 创建自定义容器网络"></a>5.2.1 创建自定义容器网络</h4><p> 使用 <code>docker network create</code> 命令可以创建自定义的 Docker 网络。例如，创建一个名为 <code>my-network</code> 的自定义网络：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">docker network create my-network</span></span><br></pre></td></tr></table></figure>
+
+<p>这将在 Docker 中创建一个新的网络，供容器使用。</p>
+<h4 id="5-2-2- 运行容器并连接到网络"><a href="#5-2-2- 运行容器并连接到网络" class="headerlink" title="5.2.2 运行容器并连接到网络"></a>5.2.2 运行容器并连接到网络 </h4><p> 在创建容器时，可以使用 <code>--network</code> 参数将容器连接到指定的网络。例如，将一个容器连接到 <code>my-network</code> 网络：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">docker run --network my-network my-image</span></span><br></pre></td></tr></table></figure>
+
+<p>这将在启动容器时将其连接到 <code>my-network</code> 网络，使得容器可以与该网络中的其他容器进行通信。</p>
+<h4 id="5-2-3- 查看容器网络信息"><a href="#5-2-3- 查看容器网络信息" class="headerlink" title="5.2.3 查看容器网络信息"></a>5.2.3 查看容器网络信息 </h4><p> 使用 <code>docker network inspect</code> 命令可以查看特定网络的详细信息。例如，查看名为 <code>my-network</code> 的网络信息：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">docker network inspect my-network</span></span><br></pre></td></tr></table></figure>
+
+<p> 这将显示与 <code>my-network</code> 相关的网络配置和容器列表等信息。</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">[</span></span><br><span class="line">    <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;Name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;my-network&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;Id&quot;</span><span class="punctuation">:</span> <span class="string">&quot;000f5e28bfcafa18622593e04dba1bc70c1bc9480a055c0a0bb2b8ec13039138&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;Created&quot;</span><span class="punctuation">:</span> <span class="string">&quot;2023-06-01T22:51:27.366486209-04:00&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;Scope&quot;</span><span class="punctuation">:</span> <span class="string">&quot;local&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;Driver&quot;</span><span class="punctuation">:</span> <span class="string">&quot;bridge&quot;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;EnableIPv6&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">false</span></span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;IPAM&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">            <span class="attr">&quot;Driver&quot;</span><span class="punctuation">:</span> <span class="string">&quot;default&quot;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;Options&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span><span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">            <span class="attr">&quot;Config&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">                <span class="punctuation">&#123;</span></span><br><span class="line">                    <span class="attr">&quot;Subnet&quot;</span><span class="punctuation">:</span> <span class="string">&quot;172.18.0.0/16&quot;</span><span class="punctuation">,</span></span><br><span class="line">                    <span class="attr">&quot;Gateway&quot;</span><span class="punctuation">:</span> <span class="string">&quot;172.18.0.1&quot;</span></span><br><span class="line">                <span class="punctuation">&#125;</span></span><br><span class="line">            <span class="punctuation">]</span></span><br><span class="line">        <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;Internal&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">false</span></span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;Attachable&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">false</span></span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;Ingress&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">false</span></span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;ConfigFrom&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">            <span class="attr">&quot;Network&quot;</span><span class="punctuation">:</span> <span class="string">&quot;&quot;</span></span><br><span class="line">        <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;ConfigOnly&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">false</span></span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;Containers&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span><span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;Options&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span><span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;Labels&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span><span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">]</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="5-2-4- 容器间通信"><a href="#5-2-4- 容器间通信" class="headerlink" title="5.2.4 容器间通信"></a>5.2.4 容器间通信 </h4><p> 容器可以通过使用容器名称或 IP 地址进行互相通信。例如，通过容器名称进行通信：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">docker run --name container1 --network my-network my-image</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">docker run --name container2 --network my-network my-image</span></span><br></pre></td></tr></table></figure>
+
+<p>在上述示例中，<code>container1</code> 和 <code>container2</code> 这两个容器可以通过彼此的名称进行通信。例如，通过 <code>ping</code> 命令测试容器之间的连通性：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">docker <span class="built_in">exec</span> container1 ping container2</span></span><br></pre></td></tr></table></figure>
+
+<p>在上述示例中，<code>container1</code> 容器使用 <code>ping container2</code> 的命令来 ping <code>container2</code> 容器。由于容器名称在容器网络中被解析为相应容器的 IP 地址，因此可以直接使用容器名称来实现容器间的通信。</p>
+<blockquote>
+<p>通过使用容器名称进行通信，可以减少对容器 IP 地址的依赖，提高容器间通信的灵活性。注意，容器名称必须在同一网络中才能相互解析，因此需要将容器都连接到同一个网络中。</p>
+</blockquote>
+<h4 id="5-2-5- 端口映射"><a href="#5-2-5- 端口映射" class="headerlink" title="5.2.5 端口映射"></a>5.2.5 端口映射 </h4><p> 使用 <code>-p</code> 参数可以将容器内的端口映射到宿主机上，以使得外部网络可以访问容器中的服务。例如，将容器的 8080 端口映射到宿主机的 80 端口：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">docker run -p 80:8080 my-image</span></span><br></pre></td></tr></table></figure>
+
+<p>这将使得宿主机上的 80 端口转发到容器内的 8080 端口，从而允许外部网络通过宿主机的 80 端口访问容器中的服务。</p>
+<p>以上是一些与容器网络相关的实践命令和示例。通过灵活运用这些命令，可以有效管理和配置容器网络，实现容器间的通信和与外部网络的交互。</p>
+<h2 id="6-Docker-Compose"><a href="#6-Docker-Compose" class="headerlink" title="6. Docker Compose"></a>6. Docker Compose</h2><p>Docker Compose 是一个用于定义和运行 <strong> 多个容器 </strong> 的工具。它使用一个 <code>docker-compose.yml</code> 文件来配置应用程序的服务、网络和卷。以下是一个示例：</p>
+<ol>
+<li>创建一个名为 <code>docker-compose.yml</code> 的文件，并在其中定义服务：</li>
+</ol>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">version:</span> <span class="string">&quot;3.9&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="attr">services:</span></span><br><span class="line">  <span class="attr">plugins:</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">aigc/plugins:v1.0.0</span></span><br><span class="line">    <span class="attr">container_name:</span> <span class="string">aigc_plugins</span></span><br><span class="line">    <span class="attr">restart:</span> <span class="string">always</span></span><br><span class="line">    <span class="attr">networks:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">my_network</span></span><br><span class="line">    <span class="attr">command:</span> <span class="string">python</span> <span class="string">/app/src/main.py</span> </span><br><span class="line">        <span class="string">--ip</span> <span class="number">0.0</span><span class="number">.0</span><span class="number">.0</span> </span><br><span class="line">        <span class="string">--port</span> <span class="number">8385</span> </span><br><span class="line">        <span class="string">--url</span> <span class="string">http://0.0.0.0:8383/v1/completions</span></span><br><span class="line">    <span class="attr">ports:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="number">8385</span><span class="string">:8385</span></span><br><span class="line">    <span class="attr">volumes:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">/home/aigc/mount/plugins/data/store:/app/store</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">/home/aigc/mount/plugins/data/cfg:/app/cfg</span></span><br><span class="line">    <span class="attr">deploy:</span></span><br><span class="line">      <span class="attr">replicas:</span> <span class="number">3</span></span><br><span class="line">      <span class="attr">resources:</span></span><br><span class="line">        <span class="attr">limits:</span></span><br><span class="line">          <span class="attr">cpus:</span> <span class="string">&quot;0.5&quot;</span></span><br><span class="line">          <span class="attr">memory:</span> <span class="string">1024M</span></span><br><span class="line"></span><br><span class="line"><span class="attr">networks:</span></span><br><span class="line">  <span class="attr">my_network:</span></span><br><span class="line">    <span class="attr">name:</span> <span class="string">plugins_net</span></span><br><span class="line">    <span class="attr">driver:</span> <span class="string">bridge</span></span><br></pre></td></tr></table></figure>
+
+<p>以上示例定义了一个名为 <code>plugins</code> 的服务，使用当前目录中的 <code>Dockerfile</code> 构建镜像。它将主机的 <code>8385</code> 端口映射到容器的 <code>8385</code> 端口，并将本地的 <code>./</code> 目录挂载到容器的 <code>/app</code> 目录，还设置了一个环境变量。</p>
+<ol start="2">
+<li>在包含 <code>docker-compose.yml</code> 文件的目录中打开终端，并运行服务：</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">docker-compose up</span></span><br></pre></td></tr></table></figure>
+
+<p>Docker Compose 将自动构建镜像并运行服务。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Docker/" rel="tag"># Docker</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/230909120145.html" rel="prev" title="Go 笔记之函数 & 包 & 判断 & 循环">
+                  <i class="fa fa-angle-left"></i> Go 笔记之函数 & 包 & 判断 & 循环
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/230911151334.html" rel="next" title="C 语言之 pthread 多线程">
+                  C 语言之 pthread 多线程 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2023</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">aha</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">89k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">2:42</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+</div>
+  <div class="powered-by">
+    <!--由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动 -->
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script size="150" alpha="0.6" zIndex="-1" src="https://cdnjs.cloudflare.com/ajax/libs/ribbon.js/1.0.2/ribbon.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+
+</body>
+</html>
