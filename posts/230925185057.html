@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha256-HtsXJanqjKTc8vVQjO4YMhiqFoXkfBsjBWcX91T1jr8=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pursue26.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.18.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="什么是字典树字典树，是一种以空间换时间的数据结构，又称Trie树、前缀树，是一种树形结构（字典树是一种数据结构），典型应用是统计、排序、和保存大量字符串（但不仅限于字符串）。所以经常被搜索引擎系统用于文本词频统计。它的优点是：利用字符串的公共前缀来减少查询时间，最大限度地减少无谓的字符串比较，查询效率比哈希树高。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="数据结构之字典树">
+<meta property="og:url" content="https://pursue26.github.io/posts/230925185057.html">
+<meta property="og:site_name" content="aha&#39;s blog">
+<meta property="og:description" content="什么是字典树字典树，是一种以空间换时间的数据结构，又称Trie树、前缀树，是一种树形结构（字典树是一种数据结构），典型应用是统计、排序、和保存大量字符串（但不仅限于字符串）。所以经常被搜索引擎系统用于文本词频统计。它的优点是：利用字符串的公共前缀来减少查询时间，最大限度地减少无谓的字符串比较，查询效率比哈希树高。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pursue26.github.io/images/data-structure/trie-demo.png">
+<meta property="article:published_time" content="2023-09-25T10:50:57.000Z">
+<meta property="article:modified_time" content="2023-09-26T09:03:43.686Z">
+<meta property="article:author" content="aha">
+<meta property="article:tag" content="字典树">
+<meta property="article:tag" content="Trie">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pursue26.github.io/images/data-structure/trie-demo.png">
+
+
+<link rel="canonical" href="https://pursue26.github.io/posts/230925185057.html">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://pursue26.github.io/posts/230925185057.html","path":"posts/230925185057.html","title":"数据结构之字典树"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>数据结构之字典树 | aha's blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">aha's blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E5%AD%97%E5%85%B8%E6%A0%91"><span class="nav-number">1.</span> <span class="nav-text">什么是字典树 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%97%E5%85%B8%E6%A0%91%E7%9A%84%E6%80%A7%E8%B4%A8"><span class="nav-number">2.</span> <span class="nav-text">字典树的性质 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%BE%E8%AE%A1%E5%AE%9E%E7%8E%B0%E5%AD%97%E5%85%B8%E6%A0%91"><span class="nav-number">3.</span> <span class="nav-text">设计实现字典树 </span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9A%E4%B9%89%E5%AD%97%E5%85%B8%E6%A0%91%E7%B1%BB"><span class="nav-number">3.1.</span> <span class="nav-text">定义字典树类 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AD%97%E5%85%B8%E6%A0%91%E5%88%9B%E5%BB%BA%EF%BC%88%E5%88%9D%E5%A7%8B%E5%8C%96%EF%BC%89"><span class="nav-number">3.2.</span> <span class="nav-text">字典树创建（初始化）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AD%97%E5%85%B8%E6%A0%91%E6%8F%92%E5%85%A5%E5%AD%97%E7%AC%A6%E4%B8%B2"><span class="nav-number">3.3.</span> <span class="nav-text">字典树插入字符串 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AD%97%E5%85%B8%E6%A0%91%E6%9F%A5%E8%AF%A2%E5%AD%97%E7%AC%A6%E4%B8%B2"><span class="nav-number">3.4.</span> <span class="nav-text">字典树查询字符串 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AD%97%E5%85%B8%E6%A0%91%E5%89%8D%E7%BC%80%E6%9F%A5%E8%AF%A2"><span class="nav-number">3.5.</span> <span class="nav-text">字典树前缀查询 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AD%97%E5%85%B8%E6%A0%91%E9%87%8A%E6%94%BE"><span class="nav-number">3.6.</span> <span class="nav-text">字典树释放 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%8C%E6%95%B4%E5%AD%97%E5%85%B8%E6%A0%91%E4%BB%A3%E7%A0%81"><span class="nav-number">3.7.</span> <span class="nav-text">完整字典树代码 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%8D%E6%9D%82%E5%BA%A6"><span class="nav-number">3.8.</span> <span class="nav-text">复杂度 </span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E6%A0%B9%E8%8A%82%E7%82%B9%E4%B8%8D%E5%8C%85%E5%90%AB%E4%BB%BB%E4%BD%95%E5%AD%97%E7%AC%A6"><span class="nav-number">4.</span> <span class="nav-text">为什么根节点不包含任何字符 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E5%AD%97%E5%85%B8%E6%A0%91%E7%A9%BA%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6%E7%9B%B8%E5%AF%B9%E8%BE%83%E9%AB%98"><span class="nav-number">5.</span> <span class="nav-text">为什么字典树空间复杂度相对较高 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%93%88%E5%B8%8C%E8%A1%A8%E5%AE%9E%E7%8E%B0%E7%9A%84%E5%AD%97%E5%85%B8%E6%A0%91"><span class="nav-number">6.</span> <span class="nav-text">哈希表实现的字典树 </span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">aha</p>
+  <div class="site-description" itemprop="description">经历一个过程然后成为更好的自己</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">21</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">32</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://pursue26.github.io/posts/230925185057.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="aha">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="aha's blog">
+      <meta itemprop="description" content="经历一个过程然后成为更好的自己">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="数据结构之字典树 | aha's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          数据结构之字典树
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+  
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2023-09-25 18:50:57" itemprop="dateCreated datePublished" datetime="2023-09-25T18:50:57+08:00">2023-09-25</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2023-09-26 17:03:43" itemprop="dateModified" datetime="2023-09-26T17:03:43+08:00">2023-09-26</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" itemprop="url" rel="index"><span itemprop="name">数据结构</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/%E5%AD%97%E5%85%B8%E6%A0%91/" itemprop="url" rel="index"><span itemprop="name">字典树</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>10k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>18 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h2 id="什么是字典树"><a href="# 什么是字典树" class="headerlink" title="什么是字典树"></a>什么是字典树 </h2><p> 字典树，是一种 <strong> 以空间换时间 </strong> 的数据结构，又称 Trie 树、前缀树，是一种树形结构（字典树是一种数据结构），典型应用是统计、排序、和保存大量字符串（但不仅限于字符串）。所以经常被搜索引擎系统用于文本词频统计。它的优点是：利用字符串的公共前缀来减少查询时间，最大限度地减少无谓的字符串比较，查询效率比哈希树高。</p>
+<span id="more"></span>
+
+<p><img src="/images/data-structure/trie-demo.png" alt="字典树示意图"></p>
+<blockquote>
+<p>可能大部分情况你很难直观或者有接触的体验，可能对前缀这个玩意没啥概念，可能做题遇到前缀问题也是暴力匹配蒙混过关，<strong>如果字符串比较少使用哈希表等结构可能也能蒙混过关，但如果字符串比较长、相同前缀较多，那么使用字典树可以大大减少内存的使用和效率 </strong>。<br> 一个字典树的应用场景：在 Google 搜索框输入部分单词下面会有一些神关联的搜索内容，你有时候都很神奇是怎么做到的，这其实就是字典树的一个思想。</p>
+</blockquote>
+<h2 id="字典树的性质"><a href="# 字典树的性质" class="headerlink" title="字典树的性质"></a>字典树的性质 </h2><p> 字典树是一种高效的数据结构，用于存储和快速检索字符串集合。它具有以下性质：</p>
+<ol>
+<li>字典树的 <strong> 根节点不包含任何字符</strong>，每个节点都代表一个字符，从根节点到叶节点的路径组成一个字符串。</li>
+<li>每个节点可以包含 <strong> 多个子节点</strong>，每个子节点代表一个字符，节点之间的连接表示字符之间的关系。</li>
+<li>每个节点的子节点通过不同的字符来标识，不同节点之间的路径上的字符不会重复。</li>
+<li>字典树中的每个节点都可以 <strong> 存储一个附加值</strong>，用于表示该节点所代表的字符串的一些信息。</li>
+<li>字典树可以 <strong> 高效地插入和查找字符串</strong>。插入操作将一个字符串的字符逐个添加到字典树中，查找操作根据给定的前缀或完整字符串，在字典树中检索相应的字符串。</li>
+<li>字典树可以用于 <strong> 前缀匹配</strong>，例如，可以快速找到所有具有相同前缀的字符串。</li>
+<li>字典树的 <strong> 空间复杂度相对较高</strong>，因为它需要为每个字符创建一个节点，但它可以通过压缩节点来减少空间占用。</li>
+</ol>
+<h2 id="设计实现字典树"><a href="# 设计实现字典树" class="headerlink" title="设计实现字典树"></a>设计实现字典树 </h2><p> 上面已经介绍了什么是字典树，那么我们开始设计一个字典树吧！</p>
+<p>对于字典树，可能不同的场景或者需求设计上有一些细致的区别，但整体来说一般的字典树有创建、插入、查询（指定字符串）、查询（指定前缀）操作。</p>
+<p>以 <a target="_blank" rel="noopener" href="https://leetcode.cn/problems/implement-trie-prefix-tree/">LeetCode 实现字典树 </a> 为例，实现字符集是 26 个英文小写字母的字典树的创建、插入、查询操作。</p>
+<ul>
+<li><code>trieCreate()</code> 初始化字典树对象。</li>
+<li><code>void trieInsert(Trie *obj, char *word)</code> 向字典树中插入字符串<code>word</code>。</li>
+<li><code>bool trieSearch(Trie *obj, char *word)</code> 搜索字符串 <code>word</code> 是否在字典树中。</li>
+<li><code>bool trieStartsWith(Trie *obj, char *prefix)</code> 搜索字符串的前缀 <code>prefix</code> 是否在字典树中。</li>
+</ul>
+<h3 id="定义字典树类"><a href="# 定义字典树类" class="headerlink" title="定义字典树类"></a>定义字典树类 </h3><p> 字典树中的每一个节点，都是一个 <code>Trie</code> 类，而这个节点标识的字符可以是字符集中的任意一个字符。简单地，可以使用一个 <code>Trie</code> 类型数组（长度为字符集大小）来标识所有子节点。同时，为了表示该节点是否是某一个字符串的结束字符，可以添加一个布尔类型的结束标记 <code>isEnd</code>。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> NUMS (26)</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">Trie</span> &#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">Trie</span> *<span class="title">children</span>[<span class="title">NUMS</span>];</span>  <span class="comment">// 子节点指针数组，用于存储子节点的指针</span></span><br><span class="line">    <span class="type">bool</span> isEnd;  <span class="comment">// 表示当前节点是否为一个单词的结束节点</span></span><br><span class="line">    <span class="type">char</span> padding[<span class="number">7</span>];  <span class="comment">// 用于字节对齐的占位</span></span><br><span class="line">&#125; Trie;</span><br></pre></td></tr></table></figure>
+
+<h3 id="字典树创建（初始化）"><a href="# 字典树创建（初始化）" class="headerlink" title="字典树创建（初始化）"></a>字典树创建（初始化）</h3><p>字典树有一个根节点，且字典树的根节点不包含任何字符。所以，我们需要初始化一个 <code>Trie</code> 类，并置空所有的子节点地址，以表示根节点不包含任何字符。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">Trie* <span class="title function_">trieCreate</span><span class="params">()</span> &#123;</span><br><span class="line">    Trie *node = (Trie *)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(Trie));</span><br><span class="line">    <span class="keyword">if</span> (node == <span class="literal">NULL</span>) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;failed to create a trie node\r\n&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// printf(&quot;sizeof(Trie) = %d\n&quot;, sizeof(Trie));  // x64, 216</span></span><br><span class="line">    <span class="built_in">memset</span>(node-&gt;children, <span class="number">0</span>, <span class="keyword">sizeof</span>(Trie));</span><br><span class="line">    node-&gt;isEnd = <span class="literal">false</span>;</span><br><span class="line">    <span class="keyword">return</span> node;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>通过调用 <code>trieCreate()</code> 函数创建了节点 <code>node</code>，它不包含任何字符。</p>
+<h3 id="字典树插入字符串"><a href="# 字典树插入字符串" class="headerlink" title="字典树插入字符串"></a>字典树插入字符串 </h3><p> 插入字符串的过程是逐个字符地搜索并检查它们是否存在于字典树中。如果某个字符不存在，则需要在上一个字符对应的节点上创建一个新的子节点，并将该节点指向新的字符（新的节点）。这样，就能够正确地构建出整个字符串在字典树中的路径。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">trieInsert</span><span class="params">(Trie *obj, <span class="type">char</span> *word)</span> &#123;</span><br><span class="line">    Trie* curr = obj;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; word[i] != <span class="string">&#x27;\0&#x27;</span>; i++) &#123;</span><br><span class="line">        <span class="type">int</span> index = word[i] - <span class="string">&#x27;a&#x27;</span>;</span><br><span class="line">        <span class="keyword">if</span> (curr-&gt;children[index] == <span class="literal">NULL</span>) &#123;</span><br><span class="line">            Trie* child = trieCreate();</span><br><span class="line">            <span class="keyword">if</span> (child == <span class="literal">NULL</span>) &#123;</span><br><span class="line">                <span class="built_in">printf</span>(<span class="string">&quot;failed to create a new trie\r\n&quot;</span>);</span><br><span class="line">                <span class="keyword">return</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            curr-&gt;children[index] = child;</span><br><span class="line">            curr-&gt;children[index]-&gt;isEnd = <span class="literal">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 将当前节点更新为新节点</span></span><br><span class="line">        curr = curr-&gt;children[index];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 将最后一个字符所在的节点标记为字符串的结尾</span></span><br><span class="line">    curr-&gt;isEnd = <span class="literal">true</span>;</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>从根节点开始遍历字符串的每一个字符，然后根据字符计算出在子节点数组中的索引位置：</p>
+<ul>
+<li>如果该位置为空，则创建一个新的节点，并将该位置指向新节点；</li>
+<li>然后，<strong>将当前节点更新为新节点</strong>，继续下一个字符的判断；</li>
+<li>最后，将最后一个字符所在的节点标记为字符串的结尾，表示该字符串已经插入到字典树中。</li>
+</ul>
+<h3 id="字典树查询字符串"><a href="# 字典树查询字符串" class="headerlink" title="字典树查询字符串"></a>字典树查询字符串 </h3><p> 查询字符串的过程是在字典树已经建立好的情况下进行的。类似于插入过程，也是逐个字符地搜索并检查它们是否存在于字典树中（但不需要创建新的子节点）。如果在查询的过程中发现某个节点为空（未被初始化），则说明该字符串在字典树中不存在。如果成功遍历到最后一个字符所对应的节点，并且该节点标记为结束字符，则表明该字符串在字典树中存在；反之，如果最后一个字符对应的节点不是结束字符，则表明该字符串在字典树中不存在。所以 <strong> 在查询过程中，我们需要注意判断节点是否为空以及最后一个字符对应节点的结束字符标记</strong>。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">bool</span> <span class="title function_">trieSearch</span><span class="params">(Trie *obj, <span class="type">char</span> *word)</span> &#123;</span><br><span class="line">    Trie* curr = obj;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; word[i] != <span class="string">&#x27;\0&#x27;</span>; i++) &#123;</span><br><span class="line">        <span class="type">int</span> index = word[i] - <span class="string">&#x27;a&#x27;</span>;</span><br><span class="line">        <span class="keyword">if</span> (curr-&gt;children[index] == <span class="literal">NULL</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        curr = curr-&gt;children[index];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> curr-&gt;isEnd;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>从根节点开始遍历字符串的每一个字符：</p>
+<ul>
+<li>首先，根据字符计算出在子节点数组中的索引位置：<ul>
+<li>如果对应位置的子节点为空，则表示字典树中没有该字符串；</li>
+<li>如果对应位置的子节点非空，则将当前节点更新为新节点，继续后续字符的判断</li>
+</ul>
+</li>
+<li>最后，根据结束字符的状态，返回字符串是否存在。</li>
+</ul>
+<h3 id="字典树前缀查询"><a href="# 字典树前缀查询" class="headerlink" title="字典树前缀查询"></a>字典树前缀查询 </h3><p> 前缀查询的过程也是在字典树已经建立好的情况下进行的。与查询字符串的过程类似，我们仍然是逐个字符地搜索并检查它们是否存在于字典树中。不同之处在于，前缀查询不需要判断前缀字符串的最后一个字符是否是结束字符，只要能成功遍历到最后一个字符，就可以确认该前缀字符串存在于字典树中。</p>
+<blockquote>
+<p>因为字典树的特点是每个节点都存储了字符集中的每个字符的子节点，所以只要前缀字符串中的每个字符都在字典树中存在对应的子节点，就可以确定该前缀字符串存在于字典树中。</p>
+</blockquote>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">bool</span> <span class="title function_">trieStartsWith</span><span class="params">(Trie *obj, <span class="type">char</span> *prefix)</span> &#123;</span><br><span class="line">    Trie* curr = obj;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; prefix[i] != <span class="string">&#x27;\0&#x27;</span>; i++) &#123;</span><br><span class="line">        <span class="type">int</span> index = prefix[i] - <span class="string">&#x27;a&#x27;</span>;</span><br><span class="line">        <span class="keyword">if</span> (curr-&gt;children[index] == <span class="literal">NULL</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        curr = curr-&gt;children[index];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="字典树释放"><a href="# 字典树释放" class="headerlink" title="字典树释放"></a>字典树释放 </h3><p> 字典树释放的过程需要释放 <strong> 每个 </strong> 节点的 <strong> 所有子节点 </strong> 的空间。如果某个节点的子节点不为空，则需要继续深入该子节点，释放它的子节点的空间，直到最底层的叶子节点。然后再回溯到上一层节点，继续释放它的其他子节点，直到所有节点的空间都被释放完毕。所以字典树的释放过程是一个递归地释放每个节点的所有子节点的过程。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">trieFree</span><span class="params">(Trie *obj)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (obj == <span class="literal">NULL</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; NUMS; i++) &#123;</span><br><span class="line">        <span class="keyword">if</span> (obj-&gt;children[i]) &#123;</span><br><span class="line">            trieFree(obj-&gt;children[i]);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">free</span>(obj);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="完整字典树代码"><a href="# 完整字典树代码" class="headerlink" title="完整字典树代码"></a>完整字典树代码 </h3><p> 上面的代码汇总在一起就是完整的字典树的最基础的版本了。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdbool.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> NUMS (26)</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">Trie</span> &#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">Trie</span> *<span class="title">children</span>[<span class="title">NUMS</span>];</span>  <span class="comment">// 子节点指针数组，用于存储子节点的指针</span></span><br><span class="line">    <span class="type">bool</span> isEnd;  <span class="comment">// 表示当前节点是否为一个单词的结束节点</span></span><br><span class="line">    <span class="type">char</span> padding[<span class="number">7</span>];  <span class="comment">// 用于字节对齐的占位</span></span><br><span class="line">&#125; Trie;</span><br><span class="line"></span><br><span class="line">Trie* <span class="title function_">trieCreate</span><span class="params">()</span> &#123;</span><br><span class="line">    Trie *node = (Trie *)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(Trie));</span><br><span class="line">    <span class="keyword">if</span> (node == <span class="literal">NULL</span>) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;failed to create a trie node\r\n&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// printf(&quot;sizeof(Trie) = %d\n&quot;, sizeof(Trie));  // x64, 216</span></span><br><span class="line">    <span class="built_in">memset</span>(node-&gt;children, <span class="number">0</span>, <span class="keyword">sizeof</span>(Trie));</span><br><span class="line">    node-&gt;isEnd = <span class="literal">false</span>;</span><br><span class="line">    <span class="keyword">return</span> node;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">trieInsert</span><span class="params">(Trie *obj, <span class="type">char</span> *word)</span> &#123;</span><br><span class="line">    Trie* curr = obj;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; word[i] != <span class="string">&#x27;\0&#x27;</span>; i++) &#123;</span><br><span class="line">        <span class="type">int</span> index = word[i] - <span class="string">&#x27;a&#x27;</span>;</span><br><span class="line">        <span class="keyword">if</span> (curr-&gt;children[index] == <span class="literal">NULL</span>) &#123;</span><br><span class="line">            Trie* child = trieCreate();</span><br><span class="line">            <span class="keyword">if</span> (child == <span class="literal">NULL</span>) &#123;</span><br><span class="line">                <span class="built_in">printf</span>(<span class="string">&quot;failed to create a new trie\r\n&quot;</span>);</span><br><span class="line">                <span class="keyword">return</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            curr-&gt;children[index] = child;</span><br><span class="line">            curr-&gt;children[index]-&gt;isEnd = <span class="literal">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        curr = curr-&gt;children[index];</span><br><span class="line">    &#125;</span><br><span class="line">    curr-&gt;isEnd = <span class="literal">true</span>;</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">bool</span> <span class="title function_">trieSearch</span><span class="params">(Trie *obj, <span class="type">char</span> *word)</span> &#123;</span><br><span class="line">    Trie* curr = obj;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; word[i] != <span class="string">&#x27;\0&#x27;</span>; i++) &#123;</span><br><span class="line">        <span class="type">int</span> index = word[i] - <span class="string">&#x27;a&#x27;</span>;</span><br><span class="line">        <span class="keyword">if</span> (curr-&gt;children[index] == <span class="literal">NULL</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        curr = curr-&gt;children[index];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> curr-&gt;isEnd;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">bool</span> <span class="title function_">trieStartsWith</span><span class="params">(Trie *obj, <span class="type">char</span> *prefix)</span> &#123;</span><br><span class="line">    Trie* curr = obj;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; prefix[i] != <span class="string">&#x27;\0&#x27;</span>; i++) &#123;</span><br><span class="line">        <span class="type">int</span> index = prefix[i] - <span class="string">&#x27;a&#x27;</span>;</span><br><span class="line">        <span class="keyword">if</span> (curr-&gt;children[index] == <span class="literal">NULL</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        curr = curr-&gt;children[index];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">trieFree</span><span class="params">(Trie *obj)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (obj == <span class="literal">NULL</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; NUMS; i++) &#123;</span><br><span class="line">        <span class="keyword">if</span> (obj-&gt;children[i]) &#123;</span><br><span class="line">            trieFree(obj-&gt;children[i]);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">free</span>(obj);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span> &#123;</span><br><span class="line">    Trie *root = trieCreate();</span><br><span class="line"></span><br><span class="line">    trieInsert(root, <span class="string">&quot;apple&quot;</span>);</span><br><span class="line">    trieInsert(root, <span class="string">&quot;banana&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Search apple: %s\n&quot;</span>, trieSearch(root, <span class="string">&quot;apple&quot;</span>) ? <span class="string">&quot;Found&quot;</span> : <span class="string">&quot;Not Found&quot;</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Search banana: %s\n&quot;</span>, trieSearch(root, <span class="string">&quot;banana&quot;</span>) ? <span class="string">&quot;Found&quot;</span> : <span class="string">&quot;Not Found&quot;</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Search car: %s\n&quot;</span>, trieSearch(root, <span class="string">&quot;car&quot;</span>) ? <span class="string">&quot;Found&quot;</span> : <span class="string">&quot;Not Found&quot;</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Search prefix bana: %s\n&quot;</span>, trieStartsWith(root, <span class="string">&quot;bana&quot;</span>) ? <span class="string">&quot;Found&quot;</span> : <span class="string">&quot;Not Found&quot;</span>);</span><br><span class="line"> </span><br><span class="line">    trieFree(root);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="复杂度"><a href="# 复杂度" class="headerlink" title="复杂度"></a>复杂度 </h3><p> 时间复杂度：初始化为 $O(1)$，其余操作为 $O(|S|)$，其中 $|S|$ 是每次插入或查询的字符串的长度。</p>
+<p>空间复杂度：$O(|T| \times \Sigma)$，其中 $|T|$ 为所有插入字符串的长度之和，$\Sigma$ 为字符集的大小。</p>
+<h2 id="为什么根节点不包含任何字符"><a href="# 为什么根节点不包含任何字符" class="headerlink" title="为什么根节点不包含任何字符"></a>为什么根节点不包含任何字符 </h2><p> 字典树的根节点不包含任何字符是为了保持数据结构的一致性和简洁性。每个节点代表一个字符，根节点是整个字典树的起始点，它并不代表具体的字符。</p>
+<ul>
+<li>如果根节点包含一个字符，那么在插入和搜索操作时就需要额外的处理逻辑。例如，在搜索一个字符串时，需要先判断根节点的字符是否匹配，然后再进入下一层的子节点进行匹配。这样的处理逻辑会增加代码的复杂性。</li>
+<li>而将根节点作为一个特殊的节点，不包含任何字符，可以简化操作。在搜索一个字符串时，直接从根节点开始匹配 <strong> 下一层的子节点</strong>（<code>node-&gt;children[x]</code>）即可，不需要额外的判断逻辑。这样的设计使得字典树的实现更加简单和统一。</li>
+</ul>
+<h2 id="为什么字典树空间复杂度相对较高"><a href="# 为什么字典树空间复杂度相对较高" class="headerlink" title="为什么字典树空间复杂度相对较高"></a>为什么字典树空间复杂度相对较高 </h2><p> 字典树是一种以空间换时间的数据结构（空间复杂度相对较高）。这是因为 <strong> 它需要存储每个节点的子节点指针 </strong>，具体来说，字典树的空间复杂度与字典树中存储的字符串数量和字符串的平均长度相关。<strong> 每个节点都需要存储一个指向下一个字符节点的指针</strong>，而每个字符串的字符数量会决定树的深度。因此，当字典树中包含大量的字符串或者字符串的平均长度较长时，字典树的空间复杂度就相对较高。</p>
+<h2 id="哈希表实现的字典树"><a href="# 哈希表实现的字典树" class="headerlink" title="哈希表实现的字典树"></a>哈希表实现的字典树 </h2><p> 字典树基础班很容易，但很可能会出现一些延伸。</p>
+<p>对于上面是 26 个字符的，我们很容易用 ASCII 找到对应索引，如果字符可能性比较多，用数组可能浪费的空间比较大，那我们也可以用哈希表实现字典树。使用哈希表替代数组，其实逻辑是一样的，只需要判断时候用哈希表判断是否存在对应的 key 即可。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdbool.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;uthash/src/uthash.h&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">    +-----------------------+</span></span><br><span class="line"><span class="comment">    |         Trie          |</span></span><br><span class="line"><span class="comment">    +-----------------------+</span></span><br><span class="line"><span class="comment">    |   ch                  |</span></span><br><span class="line"><span class="comment">    |   isEnd               |      +-----------------------+</span></span><br><span class="line"><span class="comment">    |   children            | ---&gt; |         Trie          |</span></span><br><span class="line"><span class="comment">    |   hh                  |      +-----------------------+</span></span><br><span class="line"><span class="comment">    +-----------------------+</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">Trie</span> &#123;</span></span><br><span class="line">    <span class="type">char</span> ch;</span><br><span class="line">    <span class="type">bool</span> isEnd;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">Trie</span> *<span class="title">children</span>;</span></span><br><span class="line">    UT_hash_handle hh;</span><br><span class="line">&#125; Trie;</span><br><span class="line"></span><br><span class="line">Trie* <span class="title function_">trieCreate</span><span class="params">()</span> &#123;</span><br><span class="line">    Trie *node = (Trie *)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(Trie));</span><br><span class="line">    <span class="keyword">if</span> (node == <span class="literal">NULL</span>) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;failed to create a trie node\r\n&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    node-&gt;ch = <span class="string">&#x27;\0&#x27;</span>;</span><br><span class="line">    node-&gt;isEnd = <span class="literal">false</span>;</span><br><span class="line">    node-&gt;children = <span class="literal">NULL</span>;</span><br><span class="line">    <span class="keyword">return</span> node;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">trieInsert</span><span class="params">(Trie *root, <span class="type">char</span> *word)</span> &#123;</span><br><span class="line">    Trie *curr = root;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; word[i] != <span class="string">&#x27;\0&#x27;</span>; i++) &#123;</span><br><span class="line">        Trie *child = <span class="literal">NULL</span>;</span><br><span class="line">        HASH_FIND(hh, curr-&gt;children, &amp;word[i], <span class="keyword">sizeof</span>(<span class="type">char</span>), child);</span><br><span class="line">        <span class="keyword">if</span> (child == <span class="literal">NULL</span>) &#123;</span><br><span class="line">            child = trieCreate();</span><br><span class="line">            child-&gt;ch = word[i];</span><br><span class="line">            HASH_ADD(hh, curr-&gt;children, ch, <span class="keyword">sizeof</span>(<span class="type">char</span>), child);</span><br><span class="line">        &#125;</span><br><span class="line">        curr = child;</span><br><span class="line">    &#125;</span><br><span class="line">    curr-&gt;isEnd = <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">bool</span> <span class="title function_">trieSearch</span><span class="params">(Trie *root, <span class="type">char</span> *word)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (root == <span class="literal">NULL</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    Trie *curr = root;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; word[i] != <span class="string">&#x27;\0&#x27;</span>; i++) &#123;</span><br><span class="line">        Trie *child = <span class="literal">NULL</span>;</span><br><span class="line">        HASH_FIND(hh, curr-&gt;children, &amp;word[i], <span class="keyword">sizeof</span>(<span class="type">char</span>), child);</span><br><span class="line">        <span class="keyword">if</span> (child == <span class="literal">NULL</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        curr = child;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> curr-&gt;isEnd;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">bool</span> <span class="title function_">trieStartsWith</span><span class="params">(Trie *root, <span class="type">char</span> *prefix)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (root == <span class="literal">NULL</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    Trie *curr = root;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; prefix[i] != <span class="string">&#x27;\0&#x27;</span>; i++) &#123;</span><br><span class="line">        Trie *child = <span class="literal">NULL</span>;</span><br><span class="line">        HASH_FIND(hh, curr-&gt;children, &amp;prefix[i], <span class="keyword">sizeof</span>(<span class="type">char</span>), child);</span><br><span class="line">        <span class="keyword">if</span> (child == <span class="literal">NULL</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        curr = child;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">trieFree</span><span class="params">(Trie *root)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (root == <span class="literal">NULL</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    Trie *curr, *tmp;</span><br><span class="line">    HASH_ITER(hh, root-&gt;children, curr, tmp) &#123;</span><br><span class="line">        trieFree(curr-&gt;children);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">free</span>(root);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span> &#123;</span><br><span class="line">    Trie *root = trieCreate();</span><br><span class="line"></span><br><span class="line">    trieInsert(root, <span class="string">&quot;apple&quot;</span>);</span><br><span class="line">    trieInsert(root, <span class="string">&quot;+861**01[]&#x27;;/&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Search apple: %s\n&quot;</span>, trieSearch(root, <span class="string">&quot;apple&quot;</span>) ? <span class="string">&quot;Found&quot;</span> : <span class="string">&quot;Not Found&quot;</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Search +861**01[]&#x27;;/: %s\n&quot;</span>, trieSearch(root, <span class="string">&quot;+861**01[]&#x27;;/&quot;</span>) ? <span class="string">&quot;Found&quot;</span> : <span class="string">&quot;Not Found&quot;</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Search car: %s\n&quot;</span>, trieSearch(root, <span class="string">&quot;car&quot;</span>) ? <span class="string">&quot;Found&quot;</span> : <span class="string">&quot;Not Found&quot;</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Search prefix app: %s\n&quot;</span>, trieStartsWith(root, <span class="string">&quot;app&quot;</span>) ? <span class="string">&quot;Found&quot;</span> : <span class="string">&quot;Not Found&quot;</span>);</span><br><span class="line">    </span><br><span class="line">    trieFree(root);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>下面为程序运行的结果。可以看到，使用哈希表实现字典树，可以处理的字符种类不再是仅限于英文字母。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Search apple: Found</span><br><span class="line">Search +861**01[]&#x27;;/: Found</span><br><span class="line">Search car: Not Found</span><br><span class="line">Search prefix app: Found</span><br></pre></td></tr></table></figure>
+
+<p>关于 <code>HASH_FIND</code>、<code>HASH_ADD</code> 和 <code>HASH_ITER</code> 的使用可以看 <a target="_blank" rel="noopener" href="https://troydhanson.github.io/uthash/userguide.html#_general_macros"> 这里</a>。</p>
+<blockquote>
+<p>参考连接：<a target="_blank" rel="noopener" href="https://segmentfault.com/a/1190000040801084">https://segmentfault.com/a/1190000040801084</a></p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%AD%97%E5%85%B8%E6%A0%91/" rel="tag"># 字典树</a>
+              <a href="/tags/Trie/" rel="tag"># Trie</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/230924172528.html" rel="prev" title="操作系统之 chapter2 启动 & 中断 & 异常 & 系统调用">
+                  <i class="fa fa-angle-left"></i> 操作系统之 chapter2 启动 & 中断 & 异常 & 系统调用
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2023</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">aha</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">100k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">3:01</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+</div>
+  <div class="powered-by">
+    <!--由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动 -->
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script size="150" alpha="0.6" zIndex="-1" src="https://cdnjs.cloudflare.com/ajax/libs/ribbon.js/1.0.2/ribbon.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+
+</body>
+</html>
