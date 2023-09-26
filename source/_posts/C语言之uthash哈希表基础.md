@@ -46,13 +46,15 @@ HashItem *hashTbl = NULL;    /* important! initialize to NULL */
 
 ### 添加
 
-- `HASH_ADD_INT`：表示添加的键值为整型；
+- `HASH_ADD_INT`：表示添加的键值为整型，参数为 `(head, keyfield_name, item_ptr)`；
 
-- `HASH_ADD_STR`：表示添加的键值为字符串类型；
+- `HASH_ADD_STR`：表示添加的键值为字符串类型，参数为 `(head, keyfield_name, item_ptr)`；
 
-- `HASH_ADD_PTR`：表示添加的键值为指针类型；
+- `HASH_ADD_PTR`：表示添加的键值为指针类型，参数为 `(head, keyfield_name, item_ptr)`；
 
-- `HASH_ADD`：表示添加的键值可以是任意类型。
+- `HASH_ADD`：表示添加的键值可以是任意类型，参数为 `(hh_name, head, keyfield_name, key_len, item_ptr)`。
+
+这些常见的宏的参数可以看[这里](https://troydhanson.github.io/uthash/userguide.html#_convenience_macros)，一般性的宏（如`HASH_ADD`）的参数可以看[这里](https://troydhanson.github.io/uthash/userguide.html#_general_macros)。
 
 ```c
 void add_user(int user_id, char *name) {
@@ -251,6 +253,7 @@ int *twoSum(int* nums, int numsSize, int target, int* returnSize){
 2. 然后，将数组中的键-值对（索引对应的值-索引）依次添加到哈希表中，并使用操作符 `&` 获取指向哈希指针的指针；
 3. 最后，经过查找后，不再使用哈希表，这时通过释放接口，将哈希表中的所有哈希结点迭代地删除并释放对应的内存空间。
 
+如果哈希表的键值不是整形，而是字符类型呢，应该怎么使用呢？可以参考[这里](https://pursue26.github.io/posts/230925185057.html#%20哈希表实现的字典树)的一个例子。
 
 > 源码地址：https://github.com/troydhanson/uthash
 
