@@ -1,59 +1,59 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <title>每日博客跳转中...</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
+</head>
 <body onload="dogo();">
-<script>
-function dogo(){
-    var urls=[
-        "https://pursue26.github.io/posts/summary.html",
-        "https://pursue26.github.io/posts/230925185057.html",
-        "https://pursue26.github.io/posts/230922172626.html",
-        "https://pursue26.github.io/posts/230916094606.html",
-        "https://pursue26.github.io/posts/230905224335.html",
-        "https://pursue26.github.io/posts/230924172528.html",
-        "https://pursue26.github.io/posts/230921190726.html",
-        "https://pursue26.github.io/posts/230918174223.html",
-        "https://pursue26.github.io/about/index.html",
-        "https://pursue26.github.io/posts/230922143003.html",
-        "https://pursue26.github.io/posts/230921094127.html",
-        "https://pursue26.github.io/posts/230916171929.html",
-        "https://pursue26.github.io/posts/230920172849.html",
-        "https://pursue26.github.io/posts/230911151334.html",
-        "https://pursue26.github.io/posts/230915155105.html",
-        "https://pursue26.github.io/posts/230912152800.html",
-        "https://pursue26.github.io/posts/230913161326.html",
-        "https://pursue26.github.io/posts/230909120145.html",
-        "https://pursue26.github.io/posts/230907162612.html",
-        "https://pursue26.github.io/posts/230909171809.html",
-        "https://pursue26.github.io/posts/230913200729.html",
-        "https://pursue26.github.io/posts/230918114841.html",
-        "https://pursue26.github.io/tags/index.html",
-        "https://pursue26.github.io/categories/index.html",
-        ];
+    <script>
+    function dogo(){
+        var urls=[
+                "https://pursue26.github.io/posts/summary.html",
+                "https://pursue26.github.io/posts/230925185057.html",
+                "https://pursue26.github.io/posts/230922172626.html",
+                "https://pursue26.github.io/posts/230916094606.html",
+                "https://pursue26.github.io/posts/230905224335.html",
+                "https://pursue26.github.io/posts/230924172528.html",
+                "https://pursue26.github.io/posts/230921190726.html",
+                "https://pursue26.github.io/posts/230918174223.html",
+                "https://pursue26.github.io/about/index.html",
+                "https://pursue26.github.io/posts/230922143003.html",
+                "https://pursue26.github.io/posts/230921094127.html",
+                "https://pursue26.github.io/posts/230916171929.html",
+                "https://pursue26.github.io/posts/230920172849.html",
+                "https://pursue26.github.io/posts/230911151334.html",
+                "https://pursue26.github.io/posts/230915155105.html",
+                "https://pursue26.github.io/posts/230912152800.html",
+                "https://pursue26.github.io/posts/230913161326.html",
+                "https://pursue26.github.io/posts/230909120145.html",
+                "https://pursue26.github.io/posts/230907162612.html",
+                "https://pursue26.github.io/posts/230909171809.html",
+                "https://pursue26.github.io/posts/230913200729.html",
+                "https://pursue26.github.io/posts/230918114841.html",
+                "https://pursue26.github.io/tags/index.html",
+                "https://pursue26.github.io/categories/index.html",
+                ];
 
-    var filteredUrls = urls.filter(function(url) {
-        return url.includes('/posts/') && !url.includes('/posts/summary.html');
-    });
+        var filteredUrls = urls.filter(function(url) {
+            return url.includes('/posts/') && !url.includes('/posts/summary.html');
+        });
 
-    var currentDate = new Date();
-    var year = currentDate.getFullYear();
-    var month = currentDate.getMonth() + 1; // 月份从 0 开始，需要加 1
-    var day = currentDate.getDate();
-    // var seconds = currentDate.getSeconds();
-    var formattedDate = `${year}-${month}-${day}`;
+        var currentDate = new Date();
+        var currentYear = currentDate.getFullYear();
+        var currentMonth = currentDate.getMonth() + 1;
+        var currentDay = currentDate.getDate();
 
-    var savedDate = JSON.parse(localStorage.getItem('savedHexoDate'));
-    var savedN = JSON.parse(localStorage.getItem('savedHexoN'));
+        // var seconds = currentDate.getSeconds();
+        var formattedDate = `${currentYear}-${currentMonth}-${currentDay}`;
+        
+        var hash = CryptoJS.SHA256(formattedDate).toString();
+        var random = parseInt(hash.slice(0, 8), 16) / 0xffffffff;
 
-    var n = 0;
-    if(savedDate && savedDate === formattedDate) {
-        n = savedN;
-    } else {
-        n = Math.floor(Math.random() * filteredUrls.length);
-        localStorage.setItem('savedHexoDate', JSON.stringify(formattedDate));
-        localStorage.setItem('savedHexoN', JSON.stringify(n));
+        var n = Math.floor(random * filteredUrls.length);
+
+        // console.log(n);
+        location.href = filteredUrls[n % filteredUrls.length];
     }
-
-    // console.log(n);
-    location.href = filteredUrls[n % filteredUrls.length];
-}
-</script>
+    </script>
 </body>
-    
+</html>
