@@ -1112,70 +1112,6 @@
       </tags>
   </entry>
   <entry>
-    <title>操作系统之 chapter1 概述</title>
-    <url>/posts/230921190726.html</url>
-    <content><![CDATA[<p>这篇文章主要介绍操作系统的定义、架构层次、界面和内核、内部组成和特征等内容。</p>
-<span id="more"></span>
-
-<h1 id="概述"><a href="# 概述" class="headerlink" title="概述"></a>概述 </h1><h2 id="操作系统定义"><a href="# 操作系统定义" class="headerlink" title="操作系统定义"></a> 操作系统定义 </h2><p><strong> 用户角度</strong>：操作系统是一个控制软件。</p>
-<ul>
-<li>管理应用软件：可以限制不同的应用程序占用不同的资源</li>
-<li>为应用程序提供服务：I&#x2F;O 服务，声卡、网卡的访问服务</li>
-<li>杀死应用程序</li>
-<li>资源管理：CPU、内存、外设资源</li>
-<li>管理外设，分配资源</li>
-</ul>
-<p><strong>程序角度</strong>：操作系统是资源管理器。</p>
-<ul>
-<li>管理外设</li>
-<li>抽象<ul>
-<li>CPU 抽象成进程</li>
-<li>磁盘抽象成文件</li>
-<li>内存抽象成地址空间</li>
-</ul>
-</li>
-</ul>
-<h2 id="操作系统的架构层次"><a href="# 操作系统的架构层次" class="headerlink" title="操作系统的架构层次"></a>操作系统的架构层次 </h2><p> 硬件之上、应用软件之下（为应用软件提供服务支持）。</p>
-<h2 id="操作系统的界面和内核"><a href="# 操作系统的界面和内核" class="headerlink" title="操作系统的界面和内核"></a>操作系统的界面和内核</h2><p>Linux、Windows、Android 的界面属于外壳（shell），而不是内核（kernel）。kernel 是操作系统的研究重点，在 shell 之下。</p>
-<h2 id="操作系统内部组成"><a href="# 操作系统内部组成" class="headerlink" title="操作系统内部组成"></a>操作系统内部组成 </h2><p> 操作系统（kernel）内部组件包括：</p>
-<ul>
-<li>CPU 调度器</li>
-<li>物理内存管理</li>
-<li>虚拟内存管理</li>
-<li>文件系统管理</li>
-<li>中断处理与 I&#x2F;O 设备驱动</li>
-</ul>
-<h2 id="操作系统特征："><a href="# 操作系统特征：" class="headerlink" title="操作系统特征："></a>操作系统特征：</h2><ul>
-<li>并发<ul>
-<li>计算机系统中同时存在多个运行的程序，需要 OS 管理和调度。</li>
-</ul>
-</li>
-<li>共享<ul>
-<li>“同时”访问或互斥共享。</li>
-</ul>
-</li>
-<li>虚拟<ul>
-<li>利用多道程序设计技术，让每一个用户都觉得有一个计算机专门为他服务。</li>
-</ul>
-</li>
-<li>异步<ul>
-<li>每个程序的执行不是一贯到底，而是走走停停 &amp; 交替执行，向前推进速度不可预知；</li>
-<li>只要运行环境相同，OS 保证程序运行结果相同。</li>
-</ul>
-</li>
-</ul>
-<blockquote>
-<p>「并发」在一段时间内可以有多个程序运行，而「并行」是在一个时间点上可以有多个程序运行，并行需要多核 CPU 支持。</p>
-</blockquote>
-]]></content>
-      <categories>
-        <category>操作系统</category>
-      </categories>
-      <tags>
-        <tag>操作系统</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Go 笔记之数组与切片</title>
     <url>/posts/230912152800.html</url>
     <content><![CDATA[<h2 id="Go 语言学习笔记 -10：数组"><a href="#Go 语言学习笔记 -10：数组" class="headerlink" title="Go 语言学习笔记 -10：数组"></a>Go 语言学习笔记 -10：数组</h2><ol>
@@ -1323,6 +1259,70 @@
 <h1 id="Docker 系列"><a href="#Docker 系列" class="headerlink" title="Docker 系列"></a>Docker 系列</h1><p><a href="https://pursue26.github.io/posts/230909171809.html">Docker 学习笔记</a></p>
 <h1 id="操作系统系列"><a href="# 操作系统系列" class="headerlink" title="操作系统系列"></a>操作系统系列 </h1><h2 id="操作系统课程学习（清华大学 - 陈渝老师）"><a href="# 操作系统课程学习（清华大学 - 陈渝老师）" class="headerlink" title="操作系统课程学习（清华大学 - 陈渝老师）"></a> 操作系统课程学习（清华大学 - 陈渝老师）</h2><p><a href="https://pursue26.github.io/posts/230921190726.html">操作系统之 chapter1 概述 </a><br><a href="https://pursue26.github.io/posts/230924172528.html"> 操作系统之 chapter2 启动 &amp; 中断 &amp; 异常 &amp; 系统调用</a></p>
 ]]></content>
+  </entry>
+  <entry>
+    <title>操作系统之 chapter1 概述</title>
+    <url>/posts/230921190726.html</url>
+    <content><![CDATA[<p>这篇文章主要介绍操作系统的定义、架构层次、界面和内核、内部组成和特征等内容。</p>
+<span id="more"></span>
+
+<h1 id="概述"><a href="# 概述" class="headerlink" title="概述"></a>概述 </h1><h2 id="操作系统定义"><a href="# 操作系统定义" class="headerlink" title="操作系统定义"></a> 操作系统定义 </h2><p><strong> 用户角度</strong>：操作系统是一个控制软件。</p>
+<ul>
+<li>管理应用软件：可以限制不同的应用程序占用不同的资源</li>
+<li>为应用程序提供服务：I&#x2F;O 服务，声卡、网卡的访问服务</li>
+<li>杀死应用程序</li>
+<li>资源管理：CPU、内存、外设资源</li>
+<li>管理外设，分配资源</li>
+</ul>
+<p><strong>程序角度</strong>：操作系统是资源管理器。</p>
+<ul>
+<li>管理外设</li>
+<li>抽象<ul>
+<li>CPU 抽象成进程</li>
+<li>磁盘抽象成文件</li>
+<li>内存抽象成地址空间</li>
+</ul>
+</li>
+</ul>
+<h2 id="操作系统的架构层次"><a href="# 操作系统的架构层次" class="headerlink" title="操作系统的架构层次"></a>操作系统的架构层次 </h2><p> 硬件之上、应用软件之下（为应用软件提供服务支持）。</p>
+<h2 id="操作系统的界面和内核"><a href="# 操作系统的界面和内核" class="headerlink" title="操作系统的界面和内核"></a>操作系统的界面和内核</h2><p>Linux、Windows、Android 的界面属于外壳（shell），而不是内核（kernel）。kernel 是操作系统的研究重点，在 shell 之下。</p>
+<h2 id="操作系统内部组成"><a href="# 操作系统内部组成" class="headerlink" title="操作系统内部组成"></a>操作系统内部组成 </h2><p> 操作系统（kernel）内部组件包括：</p>
+<ul>
+<li>CPU 调度器</li>
+<li>物理内存管理</li>
+<li>虚拟内存管理</li>
+<li>文件系统管理</li>
+<li>中断处理与 I&#x2F;O 设备驱动</li>
+</ul>
+<h2 id="操作系统特征："><a href="# 操作系统特征：" class="headerlink" title="操作系统特征："></a>操作系统特征：</h2><ul>
+<li>并发<ul>
+<li>计算机系统中同时存在多个运行的程序，需要 OS 管理和调度。</li>
+</ul>
+</li>
+<li>共享<ul>
+<li>“同时”访问或互斥共享。</li>
+</ul>
+</li>
+<li>虚拟<ul>
+<li>利用多道程序设计技术，让每一个用户都觉得有一个计算机专门为他服务。</li>
+</ul>
+</li>
+<li>异步<ul>
+<li>每个程序的执行不是一贯到底，而是走走停停 &amp; 交替执行，向前推进速度不可预知；</li>
+<li>只要运行环境相同，OS 保证程序运行结果相同。</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>「并发」在一段时间内可以有多个程序运行，而「并行」是在一个时间点上可以有多个程序运行，并行需要多核 CPU 支持。</p>
+</blockquote>
+]]></content>
+      <categories>
+        <category>操作系统</category>
+      </categories>
+      <tags>
+        <tag>操作系统</tag>
+      </tags>
   </entry>
   <entry>
     <title>操作系统之 chapter2 启动 &amp; 中断 &amp; 异常 &amp; 系统调用</title>
