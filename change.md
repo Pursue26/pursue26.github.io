@@ -2,43 +2,44 @@
 1. node_modules\hexo-generator-random\random.html
 
 ```js
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <title>每日博客跳转中...</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
+</head>
 <body onload="dogo();">
-<script>
-function dogo(){
-    var urls=[
-    {% for post in posts %}
-    "{{ post.permalink | uriencode }}",
-    {% endfor %}
-    ];
+    <script>
+    function dogo(){
+        var urls=[
+        {% for post in posts %}
+        "{{ post.permalink | uriencode }}",
+        {% endfor %}
+        ];
 
-    var filteredUrls = urls.filter(function(url) {
-        return url.includes('/posts/') && !url.includes('/posts/summary.html');
-    });
+        var filteredUrls = urls.filter(function(url) {
+            return url.includes('/posts/') && !url.includes('/posts/summary.html');
+        });
 
-    var currentDate = new Date();
-    var year = currentDate.getFullYear();
-    var month = currentDate.getMonth() + 1; // 月份从 0 开始，需要加 1
-    var day = currentDate.getDate();
-    // var seconds = currentDate.getSeconds();
-    var formattedDate = `${year}-${month}-${day}`;
+        var currentDate = new Date();
+        var currentYear = currentDate.getFullYear();
+        var currentMonth = currentDate.getMonth() + 1;
+        var currentDay = currentDate.getDate();
 
-    var savedDate = JSON.parse(localStorage.getItem('savedHexoDate'));
-    var savedN = JSON.parse(localStorage.getItem('savedHexoN'));
+        // var seconds = currentDate.getSeconds();
+        var formattedDate = `${currentYear}-${currentMonth}-${currentDay}`;
+        
+        var hash = CryptoJS.SHA256(formattedDate).toString();
+        var random = parseInt(hash.slice(0, 8), 16) / 0xffffffff;
 
-    var n = 0;
-    if(savedDate && savedDate === formattedDate) {
-        n = savedN;
-    } else {
-        n = Math.floor(Math.random() * filteredUrls.length);
-        localStorage.setItem('savedHexoDate', JSON.stringify(formattedDate));
-        localStorage.setItem('savedHexoN', JSON.stringify(n));
+        var n = Math.floor(random * filteredUrls.length);
+
+        // console.log(n);
+        location.href = filteredUrls[n % filteredUrls.length];
     }
-
-    // console.log(n);
-    location.href = urls[n % filteredUrls.length];
-}
-</script>
+    </script>
 </body>
+</html>
 ```
 
 2. node_modules\hexo-generator-index\lib\generator.js
