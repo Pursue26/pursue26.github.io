@@ -172,74 +172,104 @@
       </tags>
   </entry>
   <entry>
-    <title>C 语言之 typedef 实践</title>
-    <url>/posts/230920172849.html</url>
-    <content><![CDATA[<p>在 <a href="https://pursue26.github.io/posts/230918174223.html">C 语言之 typedef 自定义类型基础</a> 中介绍了 <code>typedef</code> 的使用，下面介绍一些 <code>typedef</code> 的实践。</p>
+    <title>C 语言之 uthash 哈希表基础</title>
+    <url>/posts/230922172626.html</url>
+    <content><![CDATA[<p>由于 C 语言本身不存在哈希，但当需要使用哈希表的时候，自己构建又会异常复杂。因此，我们可以调用开源的第三方库 <code>uthash.h</code>，<strong>这只是一个头文件</strong>。我们需要做的就是将头文件通过 <code>#include &quot;uthash.h&quot;</code> 引入到自己的项目中。由于 <code>uthash</code> 仅是头文件，因此没有可链接的库代码。</p>
 <span id="more"></span>
 
-<h2 id="两大陷阱"><a href="# 两大陷阱" class="headerlink" title="两大陷阱"></a>两大陷阱 </h2><h3 id="不是简单的字符串替换"><a href="# 不是简单的字符串替换" class="headerlink" title="不是简单的字符串替换"></a> 不是简单的字符串替换</h3><p><code>typedef</code> 是定义了一种类型的新别名，不同于宏，它不是简单的字符串替换。</p>
-<p>当 <code>const</code> 与 <code>typedef</code> 相结合时，如定义：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="type">char</span>* PSTR;</span><br><span class="line"><span class="type">int</span> <span class="title function_">mystrcmp</span><span class="params">(<span class="type">const</span> PSTR, <span class="type">const</span> PSTR)</span>;</span><br></pre></td></tr></table></figure>
-
-<p><code>const PSTR</code> 实际上相当于指针常量 <code>const char*</code> 吗？</p>
-<p>不是的，它实际上相当于 <code>char* const</code>。这是因为 <code>const</code> 给予了整个指针本身以常量性，也就是形成了常量指针。简单来说，记住当 <code>const</code> 和 <code>typedef</code> 一起出现时，<code>typedef</code> 不会是简单的字符串替换就行。</p>
-<h3 id="与其它存储类关键字不共存"><a href="# 与其它存储类关键字不共存" class="headerlink" title="与其它存储类关键字不共存"></a>与其它存储类关键字不共存 </h3><p><code>typedef</code> 在语法上是一个<strong> 存储类关键字</strong>，虽然它并不真正影响对象的存储特性，但变量只能被一种储类的关键字修饰。</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="type">static</span> <span class="type">int</span> SINT_t;</span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">auto</span> <span class="type">int</span> AINT_t;</span><br><span class="line"><span class="keyword">extern</span> <span class="keyword">typedef</span> <span class="type">int</span> INT_t;</span><br></pre></td></tr></table></figure>
-
-<p>上述代码中，有两个存储类关键字，会编译将失败，报错 error: multiple storage classes in declaration specifiers</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="type">int</span> INT_t;</span><br><span class="line"><span class="type">static</span> INT_t a = <span class="number">10</span>;</span><br></pre></td></tr></table></figure>
-
-<p>这种写法是合法的。</p>
-<blockquote>
-<p>其它存储类关键字有 <code>auto</code>、<code>extern</code>、<code>mutable</code>、<code>static</code>、<code>register</code> 等。</p>
-</blockquote>
-<h2 id="typedef、const 与 define 结合"><a href="#typedef、const 与 define 结合" class="headerlink" title="typedef、const 与 define 结合"></a>typedef、const 与 define 结合 </h2><p> 示例 1：通常讲，<code>typedef</code> 要比 <code>define</code> 要好，<strong>特别是在有指针的场合</strong>。</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> pStr2 char*</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">char</span>* pStr1;</span><br><span class="line"></span><br><span class="line">pStr1 s1, s2;  </span><br><span class="line">pStr2 s3, s4;</span><br></pre></td></tr></table></figure>
-
-<p>在上述的变量定义中，<code>s1</code>、<code>s2</code>、<code>s3</code>都被定义为 <code>char *</code>，而<code>s4</code> 则定义成了 <code>char</code>，不是我们所预期的指针变量，根本原因就在于<code>define</code> 只是简单的字符串替换而 <code>typedef</code> 则是为一个类型起新名字。</p>
-<p>示例 2：当 <code>const</code> 和<code>typedef</code>一起出现时，<code>typedef</code>不会是简单的字符串替换。</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="type">char</span>* pStr;</span><br><span class="line"><span class="type">char</span> s[<span class="number">4</span>] = <span class="string">&quot;abc&quot;</span>;</span><br><span class="line"><span class="type">const</span> <span class="type">char</span> *p1 = s;</span><br><span class="line"><span class="type">const</span> pStr p2 = s; <span class="comment">// 实际为 char* const p2 = s;</span></span><br><span class="line"></span><br><span class="line">p1++;  <span class="comment">// 指针常量的指针可变</span></span><br><span class="line">p2++;  <span class="comment">// 编译报错, 常量指针的指针不可变</span></span><br><span class="line">*p1 = <span class="string">&#x27;m&#x27;</span>;  <span class="comment">// 编译报错, 指针常量的值不可变</span></span><br><span class="line"></span><br><span class="line">s[<span class="number">0</span>] = <span class="string">&#x27;d&#x27;</span>;</span><br><span class="line">s[<span class="number">1</span>] = <span class="string">&#x27;e&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="built_in">printf</span>(<span class="string">&quot;s = %s, %c\r\n&quot;</span>, s, *p1, *p2);  <span class="comment">//dec, e, d</span></span><br><span class="line">*p2 = <span class="string">&#x27;m&#x27;</span>;</span><br><span class="line"><span class="built_in">printf</span>(<span class="string">&quot;s = %s, %c\r\n&quot;</span>, s, *p1, *p2);  <span class="comment">//mec, e, m</span></span><br></pre></td></tr></table></figure>
-
-<p>示例中，</p>
+<h2 id="uthash 简介"><a href="#uthash 简介" class="headerlink" title="uthash 简介"></a>uthash 简介 </h2><p> 使用 <code>uthash</code> 添加、查找和删除通常是常数时间的操作，此哈希库的目标是简约、高效。它大约有 1000 行 C 代码，它会 <em> 自动内联</em>，因为它是作为宏实现的。</p>
+<p><code>uthash</code> 还包括三个额外的头文件，主要提供链表、动态数组和动态字符串。</p>
 <ul>
-<li><code>const char *p1</code>是限定数据类型为 <code>char *</code> 的指针变量可变，指针变量指向的对象不可变，所以 <code>p1++</code> 正确；</li>
-<li><code>p2++</code>出错了，这个问题再一次提醒我们：<code>typedef</code>和 <code>define</code> 不同，它不是简单的文本替换；</li>
-<li><code>const pStr p2</code>并不等于 <code>const char *p2</code>，<code>const pStr p2</code> 和<code>const long x</code>本质上没有区别，都是对变量进行只读限制，只不过此处变量 <code>p2</code> 的数据类型是我们自己定义的，而不是系统固有类型。因此，<code>const pStr p2</code>的含义是：限定数据类型为 <code>char *</code> 的指针变量 <code>p2</code> 为只读，因此 <code>p2++</code> 错误。</li>
+<li><code>utlist.h</code> 为 C 结构提供了链接列表宏。</li>
+<li><code>utarray.h</code> 使用宏实现动态数组。</li>
+<li><code>utstring.h</code> 实现基本的动态字符串。</li>
 </ul>
-<h2 id="抑制劣质代码"><a href="# 抑制劣质代码" class="headerlink" title="抑制劣质代码"></a>抑制劣质代码 </h2><p> 人们常常使用 <code>typedef</code> 来编写更美观和可读的代码。所谓美观，意指 <code>typedef</code> 能隐藏笨拙的语法构造以及平台相关的数据类型，从而增强可移植性以及未来的可维护性。在编程中使用 <code>typedef</code> 目的一般有两个，一个是给变量一个易记且意义明确的新名字，另一个是简化一些比较复杂的类型声明。</p>
-<h3 id="定义易于记忆的类型名"><a href="# 定义易于记忆的类型名" class="headerlink" title="定义易于记忆的类型名"></a>定义易于记忆的类型名</h3><p><code>typedef</code> 使用最多的地方是创建易于记忆的类型名，用它来归档程序员的意图。类型出现在所声明的变量名字中，位于 <code>typedef</code> 关键字右边。例如：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="type">int</span> size;</span><br></pre></td></tr></table></figure>
-
-<p>此声明定义了一个 <code>int</code> 的同义字，名字为 <code>size</code>。注意 <code>typedef</code> 并不创建新的类型，它仅仅为现有类型添加一个同义字。因此，你可以在任何需要 <code>int</code> 的上下文中使用 <code>size</code>：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">measure</span><span class="params">(size *pSize)</span>;</span><br><span class="line">size <span class="built_in">array</span>[<span class="number">4</span>];</span><br><span class="line">size len = file.getlength();</span><br></pre></td></tr></table></figure>
-
-<p><code>typedef</code> 还可以掩饰复合类型，如指针和数组。例如，你不用像下面这样重复定义有 81 个字符元素的数组：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">char</span> line[<span class="number">81</span>];</span><br><span class="line"><span class="type">char</span> text[<span class="number">81</span>];</span><br></pre></td></tr></table></figure>
-
-<p>定义一个 <code>typedef</code>，每当要用到相同类型和大小的数组时，可以这样：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="type">char</span> Line[<span class="number">81</span>];</span><br><span class="line">Line text, secondline;</span><br><span class="line">getline(text);</span><br></pre></td></tr></table></figure>
-
-<p>同样，也可以像下面这样隐藏指针语法：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="type">const</span> <span class="type">char</span> *<span class="type">pstr_t</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">mystrcmp</span><span class="params">(<span class="type">pstr_t</span>, <span class="type">pstr_t</span>)</span>;</span><br></pre></td></tr></table></figure>
-
-<p><strong>记住</strong>，不管什么时候，只要为指针声明 <code>typedef</code>，都要在最终的 <code>typedef</code> 名称中加一个 <code>const</code>，比如：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="type">const</span> <span class="type">char</span> *<span class="type">cpstr_t</span>;  <span class="comment">// 指针常量, 使得该指针可变, 而指针指向的对象不可变（只读）</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">char</span>* <span class="type">const</span> <span class="type">cpstr_t</span>;  <span class="comment">// 常量指针, 使得该指针不可变（只读）, 但指针指向的对象可变的</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="简化代码"><a href="# 简化代码" class="headerlink" title="简化代码"></a>简化代码 </h3><p> 上面讨论的 <code>typedef</code> 行为有点像 <code>define</code> 宏，用其实际类型替代同义字。不同点是 <code>typedef</code> 在编译时被解释，因此可以让编译器来应付超越预处理器能力的文本替换。例如：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="title function_">int</span> <span class="params">(*PF)</span> <span class="params">(<span class="type">const</span> <span class="type">char</span> *, <span class="type">const</span> <span class="type">char</span> *)</span>;</span><br></pre></td></tr></table></figure>
-
-<p>这个声明引入了 <code>PF</code> 类型作为函数指针的同义字，该函数有两个 <code>const char *</code> 类型的参数以及一个 <code>int</code> 类型的返回值。如果要使用下列形式的函数声明，那么上述这个 <code>typedef</code> 是不可或缺的：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">PF <span class="title function_">Register</span><span class="params">(PF pf)</span>;</span><br></pre></td></tr></table></figure>
-
-<p><code>Register()</code> 的参数是一个 <code>PF</code> 类型的回调函数，返回某个函数的地址，其署名与先前注册的名字相同。下面我展示一下如果不用 <code>typedef</code>，我们是如何实现这个声明的：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> (*Register (<span class="type">int</span> (*pf)(<span class="type">const</span> <span class="type">char</span> *, <span class="type">const</span> <span class="type">char</span> *))) (<span class="type">const</span> <span class="type">char</span> *, <span class="type">const</span> <span class="type">char</span> *); </span><br></pre></td></tr></table></figure>
-
-<p>很少有程序员理解它是什么意思，更不用说这种费解的代码所带来的出错风险了。显然，这里使用 <code>typedef</code> 不是一种特权，而是一种必需。</p>
-<p>持怀疑态度的人可能会问：“OK，还会有人写这样的代码吗？”，快速浏览一下揭示 <code>signal()</code> 函数的头文件 <code>&lt;csinal&gt;</code>，有一个同样接口的函数：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="comment">// signal 原型</span></span><br><span class="line"><span class="type">void</span> (*signal(<span class="type">int</span> sig, <span class="type">void</span> (*func)(<span class="type">int</span>)))(<span class="type">int</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// typedef 优化后</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="title function_">void</span> <span class="params">(*pFun)</span><span class="params">(<span class="type">int</span>)</span>;</span><br><span class="line">pFun <span class="title function_">signal</span><span class="params">(<span class="type">int</span> sig, pFun func)</span>;</span><br></pre></td></tr></table></figure>
-
 <blockquote>
-<p>参考链接：<a href="https://www.cnblogs.com/a-s-m/p/10995722.html">https://www.cnblogs.com/a-s-m/p/10995722.html</a></p>
+<p>内联是一种编译器优化，它将「函数调用」替换为「函数体的代码」。这样可以避免函数调用时所需的开销，从而提高性能。</p>
+</blockquote>
+<h2 id="uthash 的使用"><a href="#uthash 的使用" class="headerlink" title="uthash 的使用"></a>uthash 的使用 </h2><h3 id="初始化"><a href="# 初始化" class="headerlink" title="初始化"></a> 初始化 </h3><p> 这里我们将 <code>id</code> 作为一个索引值，也就是键 key，将 <code>name</code> 作为值 value，它可以是任意复杂结构。</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;uthash.h&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> id;                    <span class="comment">/* key */</span></span><br><span class="line">    <span class="type">char</span> name[<span class="number">10</span>];</span><br><span class="line">    UT_hash_handle hh;         <span class="comment">/* makes this structure hashable */</span></span><br><span class="line">&#125; HashItem;</span><br><span class="line"></span><br><span class="line">HashItem *hashTbl = <span class="literal">NULL</span>;    <span class="comment">/* important! initialize to NULL */</span></span><br></pre></td></tr></table></figure>
+
+<p>注意：结构中一定要包含 <code>UT_hash_handle hh</code>（<code>hh</code>不需要初始化）。它可以命名为任何名称，但是一般都命名为 <code>hh</code>。</p>
+<h3 id="添加"><a href="# 添加" class="headerlink" title="添加"></a>添加</h3><ul>
+<li><p><code>HASH_ADD_INT</code>：表示添加的键值为整型，参数为 <code>(head, keyfield_name, item_ptr)</code>；</p>
+</li>
+<li><p><code>HASH_ADD_STR</code>：表示添加的键值为字符串类型，参数为 <code>(head, keyfield_name, item_ptr)</code>；</p>
+</li>
+<li><p><code>HASH_ADD_PTR</code>：表示添加的键值为指针类型，参数为 <code>(head, keyfield_name, item_ptr)</code>；</p>
+</li>
+<li><p><code>HASH_ADD</code>：表示添加的键值可以是任意类型，参数为 <code>(hh_name, head, keyfield_name, key_len, item_ptr)</code>。</p>
+</li>
+</ul>
+<p>这些常见的宏的参数可以看 <a href="https://troydhanson.github.io/uthash/userguide.html#_convenience_macros"> 这里 </a>，一般性的宏（如<code>HASH_ADD</code>）的参数可以看<a href="https://troydhanson.github.io/uthash/userguide.html#_general_macros"> 这里</a>。</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">add_user</span><span class="params">(<span class="type">int</span> user_id, <span class="type">char</span> *name)</span> &#123;</span><br><span class="line">    HashItem *hashNode = <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 添加前先进行重复性检查，因为当把两个相同 key 值的结构体添加到哈希表中时会报错 */</span></span><br><span class="line">    HASH_FIND_INT(hashTbl, &amp;user_id, hashNode);  <span class="comment">/* id already in the hash? */</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 只有在哈希中不存在 ID 的情况下，才创建该项目并将其添加；否则，只修改已经存在的结构 */</span></span><br><span class="line">    <span class="keyword">if</span> (hashNode == <span class="literal">NULL</span>) &#123;</span><br><span class="line">      hashNode = (HashItem *)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(HashItem));</span><br><span class="line">      hashNode-&gt;id = user_id;</span><br><span class="line">      HASH_ADD_INT(hashTbl, id, hashNode);  <span class="comment">/* id: name of key field */</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">strcpy</span>(hashNode-&gt;name, name);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在 <code>HASH_ADD_INT</code> 函数中，</p>
+<ul>
+<li>第一个参数 <code>hashTbl</code> 是哈希表；</li>
+<li>第二个参数 <code>id</code> 是键字段的名称；</li>
+<li>第三个参数 <code>hashNode</code> 是指向要添加的结构的指针。</li>
+</ul>
+<h3 id="将指向哈希指针的指针传递给函数（重要）"><a href="# 将指向哈希指针的指针传递给函数（重要）" class="headerlink" title="将指向哈希指针的指针传递给函数（重要）"></a>将指向哈希指针的指针传递给函数（重要）</h3><p>在上面的例子中 <code>hashTbl</code> 是一个全局变量，但是如果调用者想将哈希指针传递给函数 <code>add_user</code> 怎么办？乍一看，您似乎可以简单地将 <code>hashTbl</code> 作为参数传递，但这行不通。</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="comment">/* bad */</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">add_user</span><span class="params">(HashItem *obj, <span class="type">int</span> user_id, <span class="type">char</span> *name)</span> &#123;</span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">  HASH_ADD_INT(obj, id, hashNode);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>正确地，你需要 <strong> 传递一个指向哈希指针的指针</strong>（a pointer to the hash pointer）。</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="comment">/* good */</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">add_user</span><span class="params">(HashItem **obj, <span class="type">int</span> user_id, <span class="type">char</span> *name)</span> &#123;</span><br><span class="line">  ...</span><br><span class="line">  HASH_ADD_INT(*obj, id, hashNode);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>必须处理「指向哈希指针的指针」的原因很简单：散列宏会修改它（换句话说，它们修改指针地址本身，而不仅仅是它指向的内容）</strong>。</p>
+<p>The reason it’s necessary to deal with a pointer to the hash pointer is simple: the hash macros modify it (in other words, they modify the <em>pointer itself</em> not just what it points to).</p>
+<blockquote>
+<p>假设哈希表 <code>hashTbl</code> 的指针（地址）是 <code>0x7fffd69b9a10</code>，那么通过运算符 <code>&amp;</code> 可以得到存放该地址的地址，假如为 <code>0x8defd69b9a26</code>，那么后续散列宏修改了哈希指针后，我们还可以通过地址 <code>0x8defd69b9a26</code> 指向的内容（哈希表的地址）来获取最新的哈希表地址。</p>
+</blockquote>
+<h3 id="查找"><a href="# 查找" class="headerlink" title="查找"></a>查找</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line">HashItem *<span class="title function_">find_user</span><span class="params">(<span class="type">int</span> user_id)</span> &#123;</span><br><span class="line">    HashItem *hashNode = <span class="literal">NULL</span>;</span><br><span class="line">    HASH_FIND_INT(hashTbl, &amp;user_id, hashNode);  <span class="comment">/* hashNode: output pointer */</span></span><br><span class="line">    <span class="keyword">return</span> hashNode;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在 <code>HASH_FIND_INT</code> 函数中，</p>
+<ul>
+<li>第一个参数 <code>hashTbl</code> 是哈希表；</li>
+<li>第二个参数是 <code>user_id</code> 的地址（一定要传递地址）；</li>
+<li>第三个参数 <code>hashNode</code> 是输出变量。</li>
+</ul>
+<p>当可以在哈希表中找到相应键值时，返回给定键的结构到 <code>hashNode</code>，当找不到时返回 <code>NULL</code> 到 <code>hashNode</code>。也就是说可以通过判断返回值是否为 <code>NULL</code> 来判断查找的键值是否存在于哈希表中。</p>
+<h3 id="替换"><a href="# 替换" class="headerlink" title="替换"></a>替换</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">replace_user</span><span class="params">(HashItem *obj, HashItem *newHashNode)</span> &#123;</span><br><span class="line">    HashItem *oldHashNode = find_user(newHashNode-&gt;id);</span><br><span class="line">    <span class="keyword">if</span> (oldHashNode) &#123;</span><br><span class="line">        HASH_REPLACE_INT(hashTbl, id, newHashNode, oldHashNode);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>HASH_REPLACE</code> 宏等效于 <code>HASH_ADD</code> 宏，<code>HASH_REPLACE</code> 会尝试查找和删除项目，如果找到并删除了一个项目，它将返回该项目的指针作为输出参数。</p>
+<h3 id="删除"><a href="# 删除" class="headerlink" title="删除"></a>删除</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">delete_user</span><span class="params">(HashItem *hashNode)</span> &#123;</span><br><span class="line">    HASH_DEL(hashTbl, hashNode);  <span class="comment">/* user: pointer to delete */</span></span><br><span class="line">    <span class="built_in">free</span>(hashNode);             <span class="comment">/* optional; it&#x27;s up to you */</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol>
+<li><p>要从哈希表中删除结构，必须具有指向它的指针（如果只有键值，应该先执行 <code>HASH_FIND</code> 以获取结构的指针）。</p>
+</li>
+<li><p>这里 <code>hashTbl</code> 是哈希表，<code>hashNode</code> 是指向我们要从哈希表中删除的结构的指针。删除结构只是将其从哈希表中删除，并非 <code>free</code>，何时释放结构的选择完全取决于自己，<code>uthash</code> 永远不会释放您的结构。</p>
+</li>
+</ol>
+<h3 id="迭代删除"><a href="# 迭代删除" class="headerlink" title="迭代删除"></a>迭代删除 </h3><p> 上面的「删除」只能从哈希表中删除指定的一个结构，如果想将所有结构从哈希表中删除，可以使用迭代删除操作。</p>
+<p><code>HASH_ITER</code> 宏是一个删除安全的迭代构造，它扩展为一个简单的 <code>for</code> 循环。</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">delete_all</span><span class="params">()</span> &#123;</span><br><span class="line">    HashItem *curr = <span class="literal">NULL</span>, *tmp = <span class="literal">NULL</span>;</span><br><span class="line">    HASH_ITER(hh, hashTbl, curr, tmp) &#123;</span><br><span class="line">        HASH_DEL(hashTbl, curr);  <span class="comment">/* delete; users advances to next */</span></span><br><span class="line">        <span class="built_in">free</span>(curr);               <span class="comment">/* optional- if you want to free  */</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="一次性删除"><a href="# 一次性删除" class="headerlink" title="一次性删除"></a>一次性删除 </h4><p> 如果你只想删除所有的结构（哈希结点），而不释放它们的内存空间或进行任何逐个元素的清理操作，你可以使用单个操作更高效地完成这个任务。</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">HASH_CLEAR(hh, hashTbl);</span><br></pre></td></tr></table></figure>
+
+<p>之后，列表头（这里是 <code>hashTbl</code>）将被设置为 <code>NULL</code>。</p>
+<blockquote>
+<p>在 uthash 中，ut 是 unordered tables，即无序表。</p>
+<p>上面全大写的宏，为了方便，有些也被我叫成了函数。</p>
+<p>上面的代码，未做充分的指针为空判断，实际使用指针前，要先进行不为空判断。</p>
+</blockquote>
+<h2 id="uthash 的实践"><a href="#uthash 的实践" class="headerlink" title="uthash 的实践"></a>uthash 的实践 </h2><p> 以 <a href="https://leetcode.cn/problems/two-sum/">LeetCode 两数之和 </a> 为例，介绍 <code>uthash.h</code> 哈希表的使用。</p>
+<p>题目大意：从一个数组中找出两个索引不同的数，使得它们的和等于目标值，并返回这两个数。</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;uthash.h&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> key;</span><br><span class="line">    <span class="type">int</span> val;</span><br><span class="line">    UT_hash_handle hh;</span><br><span class="line">&#125; HashItem;</span><br><span class="line"></span><br><span class="line">HashItem *<span class="title function_">hashFindItem</span><span class="params">(HashItem **obj, <span class="type">int</span> key)</span> &#123;</span><br><span class="line">    HashItem *pEntry = <span class="literal">NULL</span>;</span><br><span class="line">    HASH_FIND_INT(*obj, &amp;key, pEntry);</span><br><span class="line">    <span class="keyword">return</span> pEntry;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">hashAddItem</span><span class="params">(HashItem **obj, <span class="type">int</span> key, <span class="type">int</span> val)</span> &#123;</span><br><span class="line">    HashItem *pEntry = hashFindItem(obj, key);</span><br><span class="line">    <span class="keyword">if</span> (pEntry == <span class="literal">NULL</span>) &#123;</span><br><span class="line">        pEntry = (HashItem *)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(HashItem));</span><br><span class="line">        pEntry-&gt;key = key;</span><br><span class="line">        HASH_ADD_INT(*obj, key, pEntry);</span><br><span class="line">    &#125;</span><br><span class="line">    pEntry-&gt;val = val;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">hashFree</span><span class="params">(HashItem **obj)</span> &#123;</span><br><span class="line">    HashItem *curr = <span class="literal">NULL</span>, *tmp = <span class="literal">NULL</span>;</span><br><span class="line">    HASH_ITER(hh, *obj, curr, tmp) &#123;</span><br><span class="line">        HASH_DEL(*obj, curr);  </span><br><span class="line">        <span class="built_in">free</span>(curr);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> *<span class="title function_">twoSum</span><span class="params">(<span class="type">int</span>* nums, <span class="type">int</span> numsSize, <span class="type">int</span> target, <span class="type">int</span>* returnSize)</span>&#123;</span><br><span class="line">    HashItem *hashTbl = <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; numsSize; ++i) &#123;</span><br><span class="line">        <span class="comment">// 重要：传入的是指向哈希指针的指针</span></span><br><span class="line">        HashItem *hashNode = hashFindItem(&amp;hashTbl, nums[i]);</span><br><span class="line">        <span class="keyword">if</span> (hashNode == <span class="literal">NULL</span>) &#123;</span><br><span class="line">            hashAddItem(&amp;hashTbl, nums[i], i);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; numsSize; ++i) &#123;</span><br><span class="line">        HashItem *hashNode = hashFindItem(&amp;hashTbl, target - nums[i]);</span><br><span class="line">        <span class="keyword">if</span> (hashNode &amp;&amp; hashNode-&gt;val != i) &#123;</span><br><span class="line">            *returnSize = <span class="number">2</span>;</span><br><span class="line">            <span class="type">int</span> *ans = (<span class="type">int</span> *)<span class="built_in">malloc</span>((*returnSize) * <span class="keyword">sizeof</span>(<span class="type">int</span>));</span><br><span class="line">            ans[<span class="number">0</span>] = i, ans[<span class="number">1</span>] = hashNode-&gt;val;</span><br><span class="line">            <span class="keyword">return</span> ans;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    *returnSize = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上面代码中，我们定义了哈希表的查找、添加、释放接口，接口中的第一个参数均为指向哈希表指针的指针（二级指针），这是必须的。</p>
+<ol>
+<li>首先，在进行哈希操作前，先定义了一个哈希表 <code>hashTbl</code>，他是一个 <code>HashItem</code> 类型的指针；</li>
+<li>然后，将数组中的键 - 值对（索引对应的值 - 索引）依次添加到哈希表中，并使用操作符 <code>&amp;</code> 获取指向哈希指针的指针；</li>
+<li>最后，经过查找后，不再使用哈希表，这时通过释放接口，将哈希表中的所有哈希结点迭代地删除并释放对应的内存空间。</li>
+</ol>
+<p>如果哈希表的键值不是整形，而是字符类型呢，应该怎么使用呢？可以参考 <a href="https://pursue26.github.io/posts/230925185057.html#%20%E5%93%88%E5%B8%8C%E8%A1%A8%E5%AE%9E%E7%8E%B0%E7%9A%84%E5%AD%97%E5%85%B8%E6%A0%91"> 这里 </a> 的一个例子。</p>
+<blockquote>
+<p>源码地址：<a href="https://github.com/troydhanson/uthash">https://github.com/troydhanson/uthash</a></p>
+</blockquote>
+<blockquote>
+<p>英文原版用户指导：<a href="https://troydhanson.github.io/uthash/userguide.html">https://troydhanson.github.io/uthash/userguide.html</a></p>
 </blockquote>
 ]]></content>
       <categories>
@@ -247,7 +277,7 @@
         <category>C语言</category>
       </categories>
       <tags>
-        <tag>自定义类型</tag>
+        <tag>哈希表</tag>
       </tags>
   </entry>
   <entry>
@@ -367,104 +397,74 @@
       </tags>
   </entry>
   <entry>
-    <title>C 语言之 uthash 哈希表基础</title>
-    <url>/posts/230922172626.html</url>
-    <content><![CDATA[<p>由于 C 语言本身不存在哈希，但当需要使用哈希表的时候，自己构建又会异常复杂。因此，我们可以调用开源的第三方库 <code>uthash.h</code>，<strong>这只是一个头文件</strong>。我们需要做的就是将头文件通过 <code>#include &quot;uthash.h&quot;</code> 引入到自己的项目中。由于 <code>uthash</code> 仅是头文件，因此没有可链接的库代码。</p>
+    <title>C 语言之 typedef 实践</title>
+    <url>/posts/230920172849.html</url>
+    <content><![CDATA[<p>在 <a href="https://pursue26.github.io/posts/230918174223.html">C 语言之 typedef 自定义类型基础</a> 中介绍了 <code>typedef</code> 的使用，下面介绍一些 <code>typedef</code> 的实践。</p>
 <span id="more"></span>
 
-<h2 id="uthash 简介"><a href="#uthash 简介" class="headerlink" title="uthash 简介"></a>uthash 简介 </h2><p> 使用 <code>uthash</code> 添加、查找和删除通常是常数时间的操作，此哈希库的目标是简约、高效。它大约有 1000 行 C 代码，它会 <em> 自动内联</em>，因为它是作为宏实现的。</p>
-<p><code>uthash</code> 还包括三个额外的头文件，主要提供链表、动态数组和动态字符串。</p>
+<h2 id="两大陷阱"><a href="# 两大陷阱" class="headerlink" title="两大陷阱"></a>两大陷阱 </h2><h3 id="不是简单的字符串替换"><a href="# 不是简单的字符串替换" class="headerlink" title="不是简单的字符串替换"></a> 不是简单的字符串替换</h3><p><code>typedef</code> 是定义了一种类型的新别名，不同于宏，它不是简单的字符串替换。</p>
+<p>当 <code>const</code> 与 <code>typedef</code> 相结合时，如定义：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="type">char</span>* PSTR;</span><br><span class="line"><span class="type">int</span> <span class="title function_">mystrcmp</span><span class="params">(<span class="type">const</span> PSTR, <span class="type">const</span> PSTR)</span>;</span><br></pre></td></tr></table></figure>
+
+<p><code>const PSTR</code> 实际上相当于指针常量 <code>const char*</code> 吗？</p>
+<p>不是的，它实际上相当于 <code>char* const</code>。这是因为 <code>const</code> 给予了整个指针本身以常量性，也就是形成了常量指针。简单来说，记住当 <code>const</code> 和 <code>typedef</code> 一起出现时，<code>typedef</code> 不会是简单的字符串替换就行。</p>
+<h3 id="与其它存储类关键字不共存"><a href="# 与其它存储类关键字不共存" class="headerlink" title="与其它存储类关键字不共存"></a>与其它存储类关键字不共存 </h3><p><code>typedef</code> 在语法上是一个<strong> 存储类关键字</strong>，虽然它并不真正影响对象的存储特性，但变量只能被一种储类的关键字修饰。</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="type">static</span> <span class="type">int</span> SINT_t;</span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">auto</span> <span class="type">int</span> AINT_t;</span><br><span class="line"><span class="keyword">extern</span> <span class="keyword">typedef</span> <span class="type">int</span> INT_t;</span><br></pre></td></tr></table></figure>
+
+<p>上述代码中，有两个存储类关键字，会编译将失败，报错 error: multiple storage classes in declaration specifiers</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="type">int</span> INT_t;</span><br><span class="line"><span class="type">static</span> INT_t a = <span class="number">10</span>;</span><br></pre></td></tr></table></figure>
+
+<p>这种写法是合法的。</p>
+<blockquote>
+<p>其它存储类关键字有 <code>auto</code>、<code>extern</code>、<code>mutable</code>、<code>static</code>、<code>register</code> 等。</p>
+</blockquote>
+<h2 id="typedef、const 与 define 结合"><a href="#typedef、const 与 define 结合" class="headerlink" title="typedef、const 与 define 结合"></a>typedef、const 与 define 结合 </h2><p> 示例 1：通常讲，<code>typedef</code> 要比 <code>define</code> 要好，<strong>特别是在有指针的场合</strong>。</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> pStr2 char*</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">char</span>* pStr1;</span><br><span class="line"></span><br><span class="line">pStr1 s1, s2;  </span><br><span class="line">pStr2 s3, s4;</span><br></pre></td></tr></table></figure>
+
+<p>在上述的变量定义中，<code>s1</code>、<code>s2</code>、<code>s3</code>都被定义为 <code>char *</code>，而<code>s4</code> 则定义成了 <code>char</code>，不是我们所预期的指针变量，根本原因就在于<code>define</code> 只是简单的字符串替换而 <code>typedef</code> 则是为一个类型起新名字。</p>
+<p>示例 2：当 <code>const</code> 和<code>typedef</code>一起出现时，<code>typedef</code>不会是简单的字符串替换。</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="type">char</span>* pStr;</span><br><span class="line"><span class="type">char</span> s[<span class="number">4</span>] = <span class="string">&quot;abc&quot;</span>;</span><br><span class="line"><span class="type">const</span> <span class="type">char</span> *p1 = s;</span><br><span class="line"><span class="type">const</span> pStr p2 = s; <span class="comment">// 实际为 char* const p2 = s;</span></span><br><span class="line"></span><br><span class="line">p1++;  <span class="comment">// 指针常量的指针可变</span></span><br><span class="line">p2++;  <span class="comment">// 编译报错, 常量指针的指针不可变</span></span><br><span class="line">*p1 = <span class="string">&#x27;m&#x27;</span>;  <span class="comment">// 编译报错, 指针常量的值不可变</span></span><br><span class="line"></span><br><span class="line">s[<span class="number">0</span>] = <span class="string">&#x27;d&#x27;</span>;</span><br><span class="line">s[<span class="number">1</span>] = <span class="string">&#x27;e&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="built_in">printf</span>(<span class="string">&quot;s = %s, %c\r\n&quot;</span>, s, *p1, *p2);  <span class="comment">//dec, e, d</span></span><br><span class="line">*p2 = <span class="string">&#x27;m&#x27;</span>;</span><br><span class="line"><span class="built_in">printf</span>(<span class="string">&quot;s = %s, %c\r\n&quot;</span>, s, *p1, *p2);  <span class="comment">//mec, e, m</span></span><br></pre></td></tr></table></figure>
+
+<p>示例中，</p>
 <ul>
-<li><code>utlist.h</code> 为 C 结构提供了链接列表宏。</li>
-<li><code>utarray.h</code> 使用宏实现动态数组。</li>
-<li><code>utstring.h</code> 实现基本的动态字符串。</li>
+<li><code>const char *p1</code>是限定数据类型为 <code>char *</code> 的指针变量可变，指针变量指向的对象不可变，所以 <code>p1++</code> 正确；</li>
+<li><code>p2++</code>出错了，这个问题再一次提醒我们：<code>typedef</code>和 <code>define</code> 不同，它不是简单的文本替换；</li>
+<li><code>const pStr p2</code>并不等于 <code>const char *p2</code>，<code>const pStr p2</code> 和<code>const long x</code>本质上没有区别，都是对变量进行只读限制，只不过此处变量 <code>p2</code> 的数据类型是我们自己定义的，而不是系统固有类型。因此，<code>const pStr p2</code>的含义是：限定数据类型为 <code>char *</code> 的指针变量 <code>p2</code> 为只读，因此 <code>p2++</code> 错误。</li>
 </ul>
+<h2 id="抑制劣质代码"><a href="# 抑制劣质代码" class="headerlink" title="抑制劣质代码"></a>抑制劣质代码 </h2><p> 人们常常使用 <code>typedef</code> 来编写更美观和可读的代码。所谓美观，意指 <code>typedef</code> 能隐藏笨拙的语法构造以及平台相关的数据类型，从而增强可移植性以及未来的可维护性。在编程中使用 <code>typedef</code> 目的一般有两个，一个是给变量一个易记且意义明确的新名字，另一个是简化一些比较复杂的类型声明。</p>
+<h3 id="定义易于记忆的类型名"><a href="# 定义易于记忆的类型名" class="headerlink" title="定义易于记忆的类型名"></a>定义易于记忆的类型名</h3><p><code>typedef</code> 使用最多的地方是创建易于记忆的类型名，用它来归档程序员的意图。类型出现在所声明的变量名字中，位于 <code>typedef</code> 关键字右边。例如：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="type">int</span> size;</span><br></pre></td></tr></table></figure>
+
+<p>此声明定义了一个 <code>int</code> 的同义字，名字为 <code>size</code>。注意 <code>typedef</code> 并不创建新的类型，它仅仅为现有类型添加一个同义字。因此，你可以在任何需要 <code>int</code> 的上下文中使用 <code>size</code>：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">measure</span><span class="params">(size *pSize)</span>;</span><br><span class="line">size <span class="built_in">array</span>[<span class="number">4</span>];</span><br><span class="line">size len = file.getlength();</span><br></pre></td></tr></table></figure>
+
+<p><code>typedef</code> 还可以掩饰复合类型，如指针和数组。例如，你不用像下面这样重复定义有 81 个字符元素的数组：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">char</span> line[<span class="number">81</span>];</span><br><span class="line"><span class="type">char</span> text[<span class="number">81</span>];</span><br></pre></td></tr></table></figure>
+
+<p>定义一个 <code>typedef</code>，每当要用到相同类型和大小的数组时，可以这样：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="type">char</span> Line[<span class="number">81</span>];</span><br><span class="line">Line text, secondline;</span><br><span class="line">getline(text);</span><br></pre></td></tr></table></figure>
+
+<p>同样，也可以像下面这样隐藏指针语法：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="type">const</span> <span class="type">char</span> *<span class="type">pstr_t</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">mystrcmp</span><span class="params">(<span class="type">pstr_t</span>, <span class="type">pstr_t</span>)</span>;</span><br></pre></td></tr></table></figure>
+
+<p><strong>记住</strong>，不管什么时候，只要为指针声明 <code>typedef</code>，都要在最终的 <code>typedef</code> 名称中加一个 <code>const</code>，比如：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="type">const</span> <span class="type">char</span> *<span class="type">cpstr_t</span>;  <span class="comment">// 指针常量, 使得该指针可变, 而指针指向的对象不可变（只读）</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">char</span>* <span class="type">const</span> <span class="type">cpstr_t</span>;  <span class="comment">// 常量指针, 使得该指针不可变（只读）, 但指针指向的对象可变的</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="简化代码"><a href="# 简化代码" class="headerlink" title="简化代码"></a>简化代码 </h3><p> 上面讨论的 <code>typedef</code> 行为有点像 <code>define</code> 宏，用其实际类型替代同义字。不同点是 <code>typedef</code> 在编译时被解释，因此可以让编译器来应付超越预处理器能力的文本替换。例如：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="title function_">int</span> <span class="params">(*PF)</span> <span class="params">(<span class="type">const</span> <span class="type">char</span> *, <span class="type">const</span> <span class="type">char</span> *)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>这个声明引入了 <code>PF</code> 类型作为函数指针的同义字，该函数有两个 <code>const char *</code> 类型的参数以及一个 <code>int</code> 类型的返回值。如果要使用下列形式的函数声明，那么上述这个 <code>typedef</code> 是不可或缺的：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">PF <span class="title function_">Register</span><span class="params">(PF pf)</span>;</span><br></pre></td></tr></table></figure>
+
+<p><code>Register()</code> 的参数是一个 <code>PF</code> 类型的回调函数，返回某个函数的地址，其署名与先前注册的名字相同。下面我展示一下如果不用 <code>typedef</code>，我们是如何实现这个声明的：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> (*Register (<span class="type">int</span> (*pf)(<span class="type">const</span> <span class="type">char</span> *, <span class="type">const</span> <span class="type">char</span> *))) (<span class="type">const</span> <span class="type">char</span> *, <span class="type">const</span> <span class="type">char</span> *); </span><br></pre></td></tr></table></figure>
+
+<p>很少有程序员理解它是什么意思，更不用说这种费解的代码所带来的出错风险了。显然，这里使用 <code>typedef</code> 不是一种特权，而是一种必需。</p>
+<p>持怀疑态度的人可能会问：“OK，还会有人写这样的代码吗？”，快速浏览一下揭示 <code>signal()</code> 函数的头文件 <code>&lt;csinal&gt;</code>，有一个同样接口的函数：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="comment">// signal 原型</span></span><br><span class="line"><span class="type">void</span> (*signal(<span class="type">int</span> sig, <span class="type">void</span> (*func)(<span class="type">int</span>)))(<span class="type">int</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// typedef 优化后</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="title function_">void</span> <span class="params">(*pFun)</span><span class="params">(<span class="type">int</span>)</span>;</span><br><span class="line">pFun <span class="title function_">signal</span><span class="params">(<span class="type">int</span> sig, pFun func)</span>;</span><br></pre></td></tr></table></figure>
+
 <blockquote>
-<p>内联是一种编译器优化，它将「函数调用」替换为「函数体的代码」。这样可以避免函数调用时所需的开销，从而提高性能。</p>
-</blockquote>
-<h2 id="uthash 的使用"><a href="#uthash 的使用" class="headerlink" title="uthash 的使用"></a>uthash 的使用 </h2><h3 id="初始化"><a href="# 初始化" class="headerlink" title="初始化"></a> 初始化 </h3><p> 这里我们将 <code>id</code> 作为一个索引值，也就是键 key，将 <code>name</code> 作为值 value，它可以是任意复杂结构。</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;uthash.h&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> id;                    <span class="comment">/* key */</span></span><br><span class="line">    <span class="type">char</span> name[<span class="number">10</span>];</span><br><span class="line">    UT_hash_handle hh;         <span class="comment">/* makes this structure hashable */</span></span><br><span class="line">&#125; HashItem;</span><br><span class="line"></span><br><span class="line">HashItem *hashTbl = <span class="literal">NULL</span>;    <span class="comment">/* important! initialize to NULL */</span></span><br></pre></td></tr></table></figure>
-
-<p>注意：结构中一定要包含 <code>UT_hash_handle hh</code>（<code>hh</code>不需要初始化）。它可以命名为任何名称，但是一般都命名为 <code>hh</code>。</p>
-<h3 id="添加"><a href="# 添加" class="headerlink" title="添加"></a>添加</h3><ul>
-<li><p><code>HASH_ADD_INT</code>：表示添加的键值为整型，参数为 <code>(head, keyfield_name, item_ptr)</code>；</p>
-</li>
-<li><p><code>HASH_ADD_STR</code>：表示添加的键值为字符串类型，参数为 <code>(head, keyfield_name, item_ptr)</code>；</p>
-</li>
-<li><p><code>HASH_ADD_PTR</code>：表示添加的键值为指针类型，参数为 <code>(head, keyfield_name, item_ptr)</code>；</p>
-</li>
-<li><p><code>HASH_ADD</code>：表示添加的键值可以是任意类型，参数为 <code>(hh_name, head, keyfield_name, key_len, item_ptr)</code>。</p>
-</li>
-</ul>
-<p>这些常见的宏的参数可以看 <a href="https://troydhanson.github.io/uthash/userguide.html#_convenience_macros"> 这里 </a>，一般性的宏（如<code>HASH_ADD</code>）的参数可以看<a href="https://troydhanson.github.io/uthash/userguide.html#_general_macros"> 这里</a>。</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">add_user</span><span class="params">(<span class="type">int</span> user_id, <span class="type">char</span> *name)</span> &#123;</span><br><span class="line">    HashItem *hashNode = <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 添加前先进行重复性检查，因为当把两个相同 key 值的结构体添加到哈希表中时会报错 */</span></span><br><span class="line">    HASH_FIND_INT(hashTbl, &amp;user_id, hashNode);  <span class="comment">/* id already in the hash? */</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 只有在哈希中不存在 ID 的情况下，才创建该项目并将其添加；否则，只修改已经存在的结构 */</span></span><br><span class="line">    <span class="keyword">if</span> (hashNode == <span class="literal">NULL</span>) &#123;</span><br><span class="line">      hashNode = (HashItem *)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(HashItem));</span><br><span class="line">      hashNode-&gt;id = user_id;</span><br><span class="line">      HASH_ADD_INT(hashTbl, id, hashNode);  <span class="comment">/* id: name of key field */</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">strcpy</span>(hashNode-&gt;name, name);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>在 <code>HASH_ADD_INT</code> 函数中，</p>
-<ul>
-<li>第一个参数 <code>hashTbl</code> 是哈希表；</li>
-<li>第二个参数 <code>id</code> 是键字段的名称；</li>
-<li>第三个参数 <code>hashNode</code> 是指向要添加的结构的指针。</li>
-</ul>
-<h3 id="将指向哈希指针的指针传递给函数（重要）"><a href="# 将指向哈希指针的指针传递给函数（重要）" class="headerlink" title="将指向哈希指针的指针传递给函数（重要）"></a>将指向哈希指针的指针传递给函数（重要）</h3><p>在上面的例子中 <code>hashTbl</code> 是一个全局变量，但是如果调用者想将哈希指针传递给函数 <code>add_user</code> 怎么办？乍一看，您似乎可以简单地将 <code>hashTbl</code> 作为参数传递，但这行不通。</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="comment">/* bad */</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">add_user</span><span class="params">(HashItem *obj, <span class="type">int</span> user_id, <span class="type">char</span> *name)</span> &#123;</span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">  HASH_ADD_INT(obj, id, hashNode);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>正确地，你需要 <strong> 传递一个指向哈希指针的指针</strong>（a pointer to the hash pointer）。</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="comment">/* good */</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">add_user</span><span class="params">(HashItem **obj, <span class="type">int</span> user_id, <span class="type">char</span> *name)</span> &#123;</span><br><span class="line">  ...</span><br><span class="line">  HASH_ADD_INT(*obj, id, hashNode);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><strong>必须处理「指向哈希指针的指针」的原因很简单：散列宏会修改它（换句话说，它们修改指针地址本身，而不仅仅是它指向的内容）</strong>。</p>
-<p>The reason it’s necessary to deal with a pointer to the hash pointer is simple: the hash macros modify it (in other words, they modify the <em>pointer itself</em> not just what it points to).</p>
-<blockquote>
-<p>假设哈希表 <code>hashTbl</code> 的指针（地址）是 <code>0x7fffd69b9a10</code>，那么通过运算符 <code>&amp;</code> 可以得到存放该地址的地址，假如为 <code>0x8defd69b9a26</code>，那么后续散列宏修改了哈希指针后，我们还可以通过地址 <code>0x8defd69b9a26</code> 指向的内容（哈希表的地址）来获取最新的哈希表地址。</p>
-</blockquote>
-<h3 id="查找"><a href="# 查找" class="headerlink" title="查找"></a>查找</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line">HashItem *<span class="title function_">find_user</span><span class="params">(<span class="type">int</span> user_id)</span> &#123;</span><br><span class="line">    HashItem *hashNode = <span class="literal">NULL</span>;</span><br><span class="line">    HASH_FIND_INT(hashTbl, &amp;user_id, hashNode);  <span class="comment">/* hashNode: output pointer */</span></span><br><span class="line">    <span class="keyword">return</span> hashNode;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>在 <code>HASH_FIND_INT</code> 函数中，</p>
-<ul>
-<li>第一个参数 <code>hashTbl</code> 是哈希表；</li>
-<li>第二个参数是 <code>user_id</code> 的地址（一定要传递地址）；</li>
-<li>第三个参数 <code>hashNode</code> 是输出变量。</li>
-</ul>
-<p>当可以在哈希表中找到相应键值时，返回给定键的结构到 <code>hashNode</code>，当找不到时返回 <code>NULL</code> 到 <code>hashNode</code>。也就是说可以通过判断返回值是否为 <code>NULL</code> 来判断查找的键值是否存在于哈希表中。</p>
-<h3 id="替换"><a href="# 替换" class="headerlink" title="替换"></a>替换</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">replace_user</span><span class="params">(HashItem *obj, HashItem *newHashNode)</span> &#123;</span><br><span class="line">    HashItem *oldHashNode = find_user(newHashNode-&gt;id);</span><br><span class="line">    <span class="keyword">if</span> (oldHashNode) &#123;</span><br><span class="line">        HASH_REPLACE_INT(hashTbl, id, newHashNode, oldHashNode);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><code>HASH_REPLACE</code> 宏等效于 <code>HASH_ADD</code> 宏，<code>HASH_REPLACE</code> 会尝试查找和删除项目，如果找到并删除了一个项目，它将返回该项目的指针作为输出参数。</p>
-<h3 id="删除"><a href="# 删除" class="headerlink" title="删除"></a>删除</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">delete_user</span><span class="params">(HashItem *hashNode)</span> &#123;</span><br><span class="line">    HASH_DEL(hashTbl, hashNode);  <span class="comment">/* user: pointer to delete */</span></span><br><span class="line">    <span class="built_in">free</span>(hashNode);             <span class="comment">/* optional; it&#x27;s up to you */</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<ol>
-<li><p>要从哈希表中删除结构，必须具有指向它的指针（如果只有键值，应该先执行 <code>HASH_FIND</code> 以获取结构的指针）。</p>
-</li>
-<li><p>这里 <code>hashTbl</code> 是哈希表，<code>hashNode</code> 是指向我们要从哈希表中删除的结构的指针。删除结构只是将其从哈希表中删除，并非 <code>free</code>，何时释放结构的选择完全取决于自己，<code>uthash</code> 永远不会释放您的结构。</p>
-</li>
-</ol>
-<h3 id="迭代删除"><a href="# 迭代删除" class="headerlink" title="迭代删除"></a>迭代删除 </h3><p> 上面的「删除」只能从哈希表中删除指定的一个结构，如果想将所有结构从哈希表中删除，可以使用迭代删除操作。</p>
-<p><code>HASH_ITER</code> 宏是一个删除安全的迭代构造，它扩展为一个简单的 <code>for</code> 循环。</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">delete_all</span><span class="params">()</span> &#123;</span><br><span class="line">    HashItem *curr = <span class="literal">NULL</span>, *tmp = <span class="literal">NULL</span>;</span><br><span class="line">    HASH_ITER(hh, hashTbl, curr, tmp) &#123;</span><br><span class="line">        HASH_DEL(hashTbl, curr);  <span class="comment">/* delete; users advances to next */</span></span><br><span class="line">        <span class="built_in">free</span>(curr);               <span class="comment">/* optional- if you want to free  */</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h4 id="一次性删除"><a href="# 一次性删除" class="headerlink" title="一次性删除"></a>一次性删除 </h4><p> 如果你只想删除所有的结构（哈希结点），而不释放它们的内存空间或进行任何逐个元素的清理操作，你可以使用单个操作更高效地完成这个任务。</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">HASH_CLEAR(hh, hashTbl);</span><br></pre></td></tr></table></figure>
-
-<p>之后，列表头（这里是 <code>hashTbl</code>）将被设置为 <code>NULL</code>。</p>
-<blockquote>
-<p>在 uthash 中，ut 是 unordered tables，即无序表。</p>
-<p>上面全大写的宏，为了方便，有些也被我叫成了函数。</p>
-<p>上面的代码，未做充分的指针为空判断，实际使用指针前，要先进行不为空判断。</p>
-</blockquote>
-<h2 id="uthash 的实践"><a href="#uthash 的实践" class="headerlink" title="uthash 的实践"></a>uthash 的实践 </h2><p> 以 <a href="https://leetcode.cn/problems/two-sum/">LeetCode 两数之和 </a> 为例，介绍 <code>uthash.h</code> 哈希表的使用。</p>
-<p>题目大意：从一个数组中找出两个索引不同的数，使得它们的和等于目标值，并返回这两个数。</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;uthash.h&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> key;</span><br><span class="line">    <span class="type">int</span> val;</span><br><span class="line">    UT_hash_handle hh;</span><br><span class="line">&#125; HashItem;</span><br><span class="line"></span><br><span class="line">HashItem *<span class="title function_">hashFindItem</span><span class="params">(HashItem **obj, <span class="type">int</span> key)</span> &#123;</span><br><span class="line">    HashItem *pEntry = <span class="literal">NULL</span>;</span><br><span class="line">    HASH_FIND_INT(*obj, &amp;key, pEntry);</span><br><span class="line">    <span class="keyword">return</span> pEntry;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">hashAddItem</span><span class="params">(HashItem **obj, <span class="type">int</span> key, <span class="type">int</span> val)</span> &#123;</span><br><span class="line">    HashItem *pEntry = hashFindItem(obj, key);</span><br><span class="line">    <span class="keyword">if</span> (pEntry == <span class="literal">NULL</span>) &#123;</span><br><span class="line">        pEntry = (HashItem *)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(HashItem));</span><br><span class="line">        pEntry-&gt;key = key;</span><br><span class="line">        HASH_ADD_INT(*obj, key, pEntry);</span><br><span class="line">    &#125;</span><br><span class="line">    pEntry-&gt;val = val;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">hashFree</span><span class="params">(HashItem **obj)</span> &#123;</span><br><span class="line">    HashItem *curr = <span class="literal">NULL</span>, *tmp = <span class="literal">NULL</span>;</span><br><span class="line">    HASH_ITER(hh, *obj, curr, tmp) &#123;</span><br><span class="line">        HASH_DEL(*obj, curr);  </span><br><span class="line">        <span class="built_in">free</span>(curr);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> *<span class="title function_">twoSum</span><span class="params">(<span class="type">int</span>* nums, <span class="type">int</span> numsSize, <span class="type">int</span> target, <span class="type">int</span>* returnSize)</span>&#123;</span><br><span class="line">    HashItem *hashTbl = <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; numsSize; ++i) &#123;</span><br><span class="line">        <span class="comment">// 重要：传入的是指向哈希指针的指针</span></span><br><span class="line">        HashItem *hashNode = hashFindItem(&amp;hashTbl, nums[i]);</span><br><span class="line">        <span class="keyword">if</span> (hashNode == <span class="literal">NULL</span>) &#123;</span><br><span class="line">            hashAddItem(&amp;hashTbl, nums[i], i);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; numsSize; ++i) &#123;</span><br><span class="line">        HashItem *hashNode = hashFindItem(&amp;hashTbl, target - nums[i]);</span><br><span class="line">        <span class="keyword">if</span> (hashNode &amp;&amp; hashNode-&gt;val != i) &#123;</span><br><span class="line">            *returnSize = <span class="number">2</span>;</span><br><span class="line">            <span class="type">int</span> *ans = (<span class="type">int</span> *)<span class="built_in">malloc</span>((*returnSize) * <span class="keyword">sizeof</span>(<span class="type">int</span>));</span><br><span class="line">            ans[<span class="number">0</span>] = i, ans[<span class="number">1</span>] = hashNode-&gt;val;</span><br><span class="line">            <span class="keyword">return</span> ans;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    *returnSize = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>上面代码中，我们定义了哈希表的查找、添加、释放接口，接口中的第一个参数均为指向哈希表指针的指针（二级指针），这是必须的。</p>
-<ol>
-<li>首先，在进行哈希操作前，先定义了一个哈希表 <code>hashTbl</code>，他是一个 <code>HashItem</code> 类型的指针；</li>
-<li>然后，将数组中的键 - 值对（索引对应的值 - 索引）依次添加到哈希表中，并使用操作符 <code>&amp;</code> 获取指向哈希指针的指针；</li>
-<li>最后，经过查找后，不再使用哈希表，这时通过释放接口，将哈希表中的所有哈希结点迭代地删除并释放对应的内存空间。</li>
-</ol>
-<p>如果哈希表的键值不是整形，而是字符类型呢，应该怎么使用呢？可以参考 <a href="https://pursue26.github.io/posts/230925185057.html#%20%E5%93%88%E5%B8%8C%E8%A1%A8%E5%AE%9E%E7%8E%B0%E7%9A%84%E5%AD%97%E5%85%B8%E6%A0%91"> 这里 </a> 的一个例子。</p>
-<blockquote>
-<p>源码地址：<a href="https://github.com/troydhanson/uthash">https://github.com/troydhanson/uthash</a></p>
-</blockquote>
-<blockquote>
-<p>英文原版用户指导：<a href="https://troydhanson.github.io/uthash/userguide.html">https://troydhanson.github.io/uthash/userguide.html</a></p>
+<p>参考链接：<a href="https://www.cnblogs.com/a-s-m/p/10995722.html">https://www.cnblogs.com/a-s-m/p/10995722.html</a></p>
 </blockquote>
 ]]></content>
       <categories>
@@ -472,7 +472,7 @@
         <category>C语言</category>
       </categories>
       <tags>
-        <tag>哈希表</tag>
+        <tag>自定义类型</tag>
       </tags>
   </entry>
   <entry>
@@ -539,83 +539,6 @@
       <tags>
         <tag>多维数组</tag>
         <tag>数组排序</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>C 语言之大小端知识</title>
-    <url>/posts/230918114841.html</url>
-    <content><![CDATA[<h2 id="字节序"><a href="# 字节序" class="headerlink" title="字节序"></a>字节序 </h2><h3 id="主机字节序"><a href="# 主机字节序" class="headerlink" title="主机字节序"></a> 主机字节序 </h3><p> 在计算机中，数据在内存中的存储是以 byte 为单位的。字节序是由于 CPU 对大于一个字节的变量，在内存中的存放顺序不同而产生的。</p>
-<p>不同的计算机体系结构使用不同的字节序，对于大于一个字节的变量表示，有如下两种方式：</p>
-<ul>
-<li><p>小端模式（Listen Endian, LE）：高位字节存储在高位地址，而低位字节存储在低位地址，与大端模式相反。</p>
-</li>
-<li><p>大端模式（Big Endian, BE）：高位字节存储在低位地址，而低位字节存储在高位地址。</p>
-</li>
-</ul>
-<span id="more"></span>
-
-<p><img src="/images/le-be-endian.png" alt="大小端模式"></p>
-<p>在小端字节序主机系统中进行字节序转换时，需要将低地址的字节和高地址的字节进行交换即可得到大端字节序。</p>
-<h3 id="网络字节序"><a href="# 网络字节序" class="headerlink" title="网络字节序"></a>网络字节序 </h3><p> 不同的机器主机字节序不相同，与 CPU 设计有关，数据的顺序是由 CPU 决定的，而与操作系统无关。我们把某个给定系统所用的字节序称为主机字节序（host byte order）。比如 x86 系列 CPU 都是 little-endian 的字节序。</p>
-<p>网络字节序是 TCP&#x2F;IP 中规定好的一种数据表示格式，它与具体的 CPU 类型、操作系统等无关，从而可以保证数据在不同主机之间传输时能够被正确解释。网络字节序采用 big-endian 排序方式。</p>
-<p>由于这个原因，为了确保数据在不同主机之间传输时能够被正确解释，需要在不同字节序之间进行转换，所以在网络通信中，一般需要将数据转换为网络字节序进行传输。</p>
-<h2 id="主机字节序类型判断"><a href="# 主机字节序类型判断" class="headerlink" title="主机字节序类型判断"></a>主机字节序类型判断 </h2><p> 可以使用共用体（union）来判断当前 CPU 平台是大端字节序还是小端字节序。这是因为共用体的特点是：使用长度最大的数据类型作为共用体的大小。</p>
-<ul>
-<li><p>建立一个联合类型 <code>BYTE_ORDER_UN</code>，用于测试字节序，可以通过成员 <code>byte</code> 来访问 <code>value</code> 变量的高字节和低字节。</p>
-</li>
-<li><p>声明一个 <code>BYTE_ORDER_UN</code> 类型的变量 <code>unByteOrder</code>，将值 <code>0xabcd</code> 赋给成员变量 <code>value</code>。由于在类型 <code>BYTE_ORDER_UN</code> 中，<code>value</code> 和 <code>byte</code> 成员 <strong> 共享一块内存</strong>，所以可以通过 <code>byte</code> 的不同成员来访问 <code>value</code> 的高字节和低字节。</p>
-</li>
-</ul>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">union</span> <span class="title">byte_order</span> &#123;</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">short</span> <span class="type">int</span> value;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">char</span> byte[<span class="keyword">sizeof</span>(<span class="type">unsigned</span> <span class="type">short</span> <span class="type">int</span>)];</span><br><span class="line">&#125; BYTE_ORDER_UN;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span> &#123;</span><br><span class="line">    BYTE_ORDER_UN unByteOrder;</span><br><span class="line">    unByteOrder.value = <span class="number">0xabcd</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> ((unByteOrder.byte[<span class="number">0</span>] ==<span class="number">0xcd</span>) &amp;&amp; (unByteOrder.byte[<span class="number">1</span>] ==<span class="number">0xab</span>)) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Listen endian byte order, byte[0]: 0x%x, byte[1]: 0x%x\n&quot;</span>, \</span><br><span class="line">        unByteOrder.byte[<span class="number">0</span>], unByteOrder.byte[<span class="number">1</span>]);</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span>((unByteOrder.byte[<span class="number">0</span>] ==<span class="number">0xab</span>) &amp;&amp; (unByteOrder.byte[<span class="number">1</span>] ==<span class="number">0xcd</span>)) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Big endian byte order, byte[0]: 0x%x, byte[1]: 0x%x\n&quot;</span>, \</span><br><span class="line">        unByteOrder.byte[<span class="number">0</span>], unByteOrder.byte[<span class="number">1</span>]);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>主机系统为小端字节序的测试结果：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">$ gcc byteOrder.c -o byteOrder</span><br><span class="line">$ ./byteOrder</span><br><span class="line">Listen endian byte order, byte[0]: 0xcd, byte[1]: 0xab</span><br></pre></td></tr></table></figure>
-
-<h2 id="主机字节序到网络字节序转换"><a href="# 主机字节序到网络字节序转换" class="headerlink" title="主机字节序到网络字节序转换"></a>主机字节序到网络字节序转换 </h2><p> 字节交换的作用是生成一个网络字节序的变量，<strong>其字节的顺序与主机类型和操作系统无关</strong>。进行网络字节序转换的时候，只要转换一次就可以了，不要进行多次的转换。如果进行多次字节序的转换，最后生成的网络字节序的值可能是错误的。例如：</p>
-<ul>
-<li><p>对于主机为小端字节序的系统，进行两次字节序转换的过程如下图所示，经过两次转换，最终的值与最初的主机字节序相同。</p>
-</li>
-<li><p>对于主机为大端字节序的系统，无论进行多少次字节序的转换，最终的值与最初的主机字节序相同。</p>
-</li>
-</ul>
-<p><img src="/images/htos-conversion.png" alt="小端系统中的变量多次字节序转换"></p>
-<p>下面的例子是对 16 位数值和 32 位数值进行字节序转换，每种类型的数值进行两次转换，最后打印结果。</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;arpa/inet.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> BITS16 16</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> BITS32 32</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">union</span> <span class="title">two_bytes_order</span> &#123;</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">short</span> <span class="type">int</span> value;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">char</span> byte[<span class="keyword">sizeof</span>(<span class="type">unsigned</span> <span class="type">short</span>)];</span><br><span class="line">&#125; TWO_BYTES_ORDER_UN;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">union</span> <span class="title">four_bytes_order</span> &#123;</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> <span class="type">int</span> value;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">char</span> byte[<span class="keyword">sizeof</span>(<span class="type">unsigned</span> <span class="type">long</span> <span class="type">int</span>)];</span><br><span class="line">&#125; FOUR_BYTES_ORDER_UN;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">showValue</span><span class="params">(<span class="type">void</span> *begin, <span class="type">int</span> flag)</span> &#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; ((flag) / <span class="number">8</span>); i++) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%x (%p) &quot;</span>, *((<span class="type">unsigned</span> <span class="type">char</span> *)begin + i), (<span class="type">unsigned</span> <span class="type">char</span> *)begin + i);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\n&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span> &#123;</span><br><span class="line">    TWO_BYTES_ORDER_UN v16_orig, v16_turn1, v16_turn2;</span><br><span class="line">    FOUR_BYTES_ORDER_UN v32_orig, v32_turn1, v32_turn2;</span><br><span class="line"></span><br><span class="line">    v16_orig.value = <span class="number">0xabcd</span>;</span><br><span class="line">    v16_turn1.value = htons(v16_orig.value);</span><br><span class="line">    v16_turn2.value = htons(v16_turn1.value);</span><br><span class="line"></span><br><span class="line">    v32_orig.value = <span class="number">0x12345678</span>;</span><br><span class="line">    v32_turn1.value = htonl(v32_orig.value);</span><br><span class="line">    v32_turn2.value = htonl(v32_turn1.value);</span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;16 host to network byte order change:\n&quot;</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\torig:    &quot;</span>);</span><br><span class="line">    showValue(v16_orig.byte, BITS16);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\t1 times: &quot;</span>);</span><br><span class="line">    showValue(v16_turn1.byte, BITS16);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\t2 times: &quot;</span>);</span><br><span class="line">    showValue(v16_turn2.byte, BITS16);</span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;32 host to network byte order change:\n&quot;</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\torig:    &quot;</span>);</span><br><span class="line">    showValue(v32_orig.byte, BITS32);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\t1 times: &quot;</span>);</span><br><span class="line">    showValue(v32_turn1.byte, BITS32);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\t2 times: &quot;</span>);</span><br><span class="line">    showValue(v32_turn2.byte, BITS32);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>小端模式到网络字节序转换的测试结果：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">$ gcc byteOrder2.c -o byteOrder2</span><br><span class="line">$ ./byteOrder2</span><br><span class="line">16 host to network byte order change:</span><br><span class="line">        orig:    cd (0x7ffcd6ad66de) ab (0x7ffcd6ad66df)</span><br><span class="line">        1 times: ab (0x7ffcd6ad66dc) cd (0x7ffcd6ad66dd)</span><br><span class="line">        2 times: cd (0x7ffcd6ad66da) ab (0x7ffcd6ad66db)</span><br><span class="line">32 host to network byte order change:</span><br><span class="line">        orig:    78 (0x7ffcd6ad66d0) 56 (0x7ffcd6ad66d1) 34 (0x7ffcd6ad66d2) 12 (0x7ffcd6ad66d3)</span><br><span class="line">        1 times: 12 (0x7ffcd6ad66c8) 34 (0x7ffcd6ad66c9) 56 (0x7ffcd6ad66ca) 78 (0x7ffcd6ad66cb)</span><br><span class="line">        2 times: 78 (0x7ffcd6ad66c0) 56 (0x7ffcd6ad66c1) 34 (0x7ffcd6ad66c2) 12 (0x7ffcd6ad66c3)</span><br></pre></td></tr></table></figure>
-
-<p>16 位变量 0xabcd 在内存中的表示方式为 cd 在前，ab 在后；进行一次字节序转换后变为 ab 在前，cd 在后。在进行第一次转换后字节序发生了变化，而进行第二次字节序转换后与原始的排列方式一致。</p>
-<h2 id="大小端的转换"><a href="# 大小端的转换" class="headerlink" title="大小端的转换"></a>大小端的转换 </h2><p> 上面的代码中 <code>htons</code> 和 <code>htonl</code>，分别给出了主机字节序到网络字节序的 <code>short</code> 和 <code>long</code> 类型的转换接口，那么这个接口是如何实现大小端转换的呢？</p>
-<p><strong>通过位运算的方式来实现大小端的转换</strong>：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">unsigned</span> <span class="type">int</span> <span class="title function_">little_endian_to_big_endian_4bytes</span><span class="params">(<span class="type">unsigned</span> <span class="type">int</span> value)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> ((value &amp; <span class="number">0x000000ff</span>) &lt;&lt; <span class="number">24</span>) | </span><br><span class="line">           ((value &amp; <span class="number">0x0000ff00</span>) &lt;&lt; <span class="number">8</span>)  | </span><br><span class="line">           ((value &amp; <span class="number">0x00ff0000</span>) &gt;&gt; <span class="number">8</span>)  | </span><br><span class="line">           ((value &amp; <span class="number">0xff000000</span>) &gt;&gt; <span class="number">24</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">unsigned</span> <span class="type">short</span> <span class="title function_">little_endian_to_big_endian_2bytes</span><span class="params">(<span class="type">unsigned</span> <span class="type">short</span> value)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> ((value &amp; <span class="number">0x00ff</span>) &lt;&lt; <span class="number">8</span>) | ((value &amp; <span class="number">0xff00</span>) &gt;&gt; <span class="number">8</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span> &#123;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> little_value4 = <span class="number">0x12345678</span>;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">short</span> little_value2 = <span class="number">0xabcd</span>;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> big_value4 = little_endian_to_big_endian_4bytes(little_value4);</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">short</span> big_value2 = little_endian_to_big_endian_2bytes(little_value2);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;LE2 value: 0x%04x\n&quot;</span>, little_value2);  <span class="comment">// LE2 value: 0xabcd</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;BE2 value: 0x%04x\n&quot;</span>, big_value2);  <span class="comment">// BE2 value: 0xcdab</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;LE4 value: 0x%08x\n&quot;</span>, little_value4);  <span class="comment">// LE4 value: 0x12345678</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;BE4 value: 0x%08x\n&quot;</span>, big_value4);  <span class="comment">// BE4 value: 0x78563412</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="多变量存储在连续内存中的字节序转换"><a href="# 多变量存储在连续内存中的字节序转换" class="headerlink" title="多变量存储在连续内存中的字节序转换"></a>多变量存储在连续内存中的字节序转换 </h2><p> 示例 1：一个 2 字节变量存储在连续的内存中，与一个 4 字节变量存储在连续的内容中，从小端主机字节序转换为大端网络字节序后的结果一样吗？一样的！</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;arpa/inet.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">four_bytes_order</span> &#123;</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">short</span> <span class="type">int</span> val1;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">short</span> <span class="type">int</span> val2;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> <span class="type">int</span> val3;</span><br><span class="line">&#125; FOUR_BYTES_ORDER_S;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> BITS16 16</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> BITS32 32</span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">showValue</span><span class="params">(<span class="type">void</span> *begin, <span class="type">int</span> flag)</span> &#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; ((flag) / <span class="number">8</span>); i++) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%x (%p) &quot;</span>, *((<span class="type">unsigned</span> <span class="type">char</span> *)begin + i), (<span class="type">unsigned</span> <span class="type">char</span> *)begin + i);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\n&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span> &#123;</span><br><span class="line">    FOUR_BYTES_ORDER_S sOrig, sTurn;</span><br><span class="line">    </span><br><span class="line">    sOrig.val1 = <span class="number">0x1234</span>;</span><br><span class="line">    sOrig.val2 = <span class="number">0x5678</span>;</span><br><span class="line">    sTurn.val1 = htons(sOrig.val1);</span><br><span class="line">    sTurn.val2 = htons(sOrig.val2);</span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;16 + 16 host to network byte order change:\n&quot;</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\thost:    &quot;</span>);</span><br><span class="line">    showValue(&amp;sOrig.val1, BITS32);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\tnetwork: &quot;</span>);</span><br><span class="line">    showValue(&amp;sTurn.val1, BITS32);</span><br><span class="line"></span><br><span class="line">    sOrig.val3 = <span class="number">0x12345678</span>;</span><br><span class="line">    sTurn.val3 = htonl(sOrig.val3);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;32 host to network byte order change:\n&quot;</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\thost:    &quot;</span>);</span><br><span class="line">    showValue(&amp;sOrig.val3, BITS32);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\tnetwork: &quot;</span>);</span><br><span class="line">    showValue(&amp;sTurn.val3, BITS32);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>对于上述连续内存的两个 2 字节变量和一个 4 字节变量，转换成的网络字节序都是 <code>0x12345678</code>：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">$ gcc byteOrder2.c -o byteOrder3</span><br><span class="line">$ ./byteOrder3</span><br><span class="line">16 + 16 host to network byte order change:</span><br><span class="line">        host:    34 (0x7fffd69b9a10) 12 (0x7fffd69b9a11) 78 (0x7fffd69b9a12) 56 (0x7fffd69b9a13)</span><br><span class="line">        network: 12 (0x7fffd69b9a00) 34 (0x7fffd69b9a01) 56 (0x7fffd69b9a02) 78 (0x7fffd69b9a03)</span><br><span class="line">32 host to network byte order change:</span><br><span class="line">        host:    78 (0x7fffd69b9a18) 56 (0x7fffd69b9a19) 34 (0x7fffd69b9a1a) 12 (0x7fffd69b9a1b)</span><br><span class="line">        network: 12 (0x7fffd69b9a08) 34 (0x7fffd69b9a09) 56 (0x7fffd69b9a0a) 78 (0x7fffd69b9a0b)</span><br></pre></td></tr></table></figure>
-
-<p>示例 2：一个变量 <code>0x12345678abcd9876</code>，分别以 <code>short + long + short</code> 和 <code>long + long</code> 变量存储在一个连续内容中，那么两种存储的小端主机字节序和大端网络字节序在内存中的存储的值顺序一致吗？一致的！</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">val_le = 0x12345678abcd9876</span><br><span class="line"></span><br><span class="line">short + long + short</span><br><span class="line">    a = 0x1234</span><br><span class="line">    b = 0x5678abcd</span><br><span class="line">    c = 0x9876</span><br><span class="line"></span><br><span class="line">分别给出其主机序和网络序：</span><br><span class="line">    内存低地址 -----------------------&gt; 内存高地址 </span><br><span class="line">    小端主机序：34 12 | cd ab 78 56 | 76 98</span><br><span class="line">    大端网络序：12 34 | 56 78 ab cd | 98 76</span><br><span class="line"></span><br><span class="line">long + long</span><br><span class="line">    d = 0x12345678</span><br><span class="line">    e = 0xabcd9876</span><br><span class="line"></span><br><span class="line"> 分别给出其主机序和网络序：</span><br><span class="line">    内存低地址 -----------------------&gt; 内存高地址</span><br><span class="line">    主机序：78 56 34 12 | 76 98 cd ab</span><br><span class="line">    网络序：12 34 56 78 | ab cd 98 76</span><br></pre></td></tr></table></figure>
-
-<p>可以看出, 两种组合变量的主机序到网络序转换后的结果是一致的！</p>
-<blockquote>
-<p>参考：</p>
-<ol>
-<li><a href="https://blog.51cto.com/u_15249901/4893764">https://blog.51cto.com/u_15249901/4893764</a></li>
-<li><a href="https://blog.csdn.net/Jmilk/article/details/106898871">https://blog.csdn.net/Jmilk/article/details/106898871</a></li>
-</ol>
-</blockquote>
-]]></content>
-      <categories>
-        <category>学习笔记</category>
-        <category>C语言</category>
-      </categories>
-      <tags>
-        <tag>大小端</tag>
-        <tag>字节序</tag>
-        <tag>网络字节序</tag>
       </tags>
   </entry>
   <entry>
@@ -846,6 +769,83 @@
       </tags>
   </entry>
   <entry>
+    <title>C 语言之大小端知识</title>
+    <url>/posts/230918114841.html</url>
+    <content><![CDATA[<h2 id="字节序"><a href="# 字节序" class="headerlink" title="字节序"></a>字节序 </h2><h3 id="主机字节序"><a href="# 主机字节序" class="headerlink" title="主机字节序"></a> 主机字节序 </h3><p> 在计算机中，数据在内存中的存储是以 byte 为单位的。字节序是由于 CPU 对大于一个字节的变量，在内存中的存放顺序不同而产生的。</p>
+<p>不同的计算机体系结构使用不同的字节序，对于大于一个字节的变量表示，有如下两种方式：</p>
+<ul>
+<li><p>小端模式（Listen Endian, LE）：高位字节存储在高位地址，而低位字节存储在低位地址，与大端模式相反。</p>
+</li>
+<li><p>大端模式（Big Endian, BE）：高位字节存储在低位地址，而低位字节存储在高位地址。</p>
+</li>
+</ul>
+<span id="more"></span>
+
+<p><img src="/images/le-be-endian.png" alt="大小端模式"></p>
+<p>在小端字节序主机系统中进行字节序转换时，需要将低地址的字节和高地址的字节进行交换即可得到大端字节序。</p>
+<h3 id="网络字节序"><a href="# 网络字节序" class="headerlink" title="网络字节序"></a>网络字节序 </h3><p> 不同的机器主机字节序不相同，与 CPU 设计有关，数据的顺序是由 CPU 决定的，而与操作系统无关。我们把某个给定系统所用的字节序称为主机字节序（host byte order）。比如 x86 系列 CPU 都是 little-endian 的字节序。</p>
+<p>网络字节序是 TCP&#x2F;IP 中规定好的一种数据表示格式，它与具体的 CPU 类型、操作系统等无关，从而可以保证数据在不同主机之间传输时能够被正确解释。网络字节序采用 big-endian 排序方式。</p>
+<p>由于这个原因，为了确保数据在不同主机之间传输时能够被正确解释，需要在不同字节序之间进行转换，所以在网络通信中，一般需要将数据转换为网络字节序进行传输。</p>
+<h2 id="主机字节序类型判断"><a href="# 主机字节序类型判断" class="headerlink" title="主机字节序类型判断"></a>主机字节序类型判断 </h2><p> 可以使用共用体（union）来判断当前 CPU 平台是大端字节序还是小端字节序。这是因为共用体的特点是：使用长度最大的数据类型作为共用体的大小。</p>
+<ul>
+<li><p>建立一个联合类型 <code>BYTE_ORDER_UN</code>，用于测试字节序，可以通过成员 <code>byte</code> 来访问 <code>value</code> 变量的高字节和低字节。</p>
+</li>
+<li><p>声明一个 <code>BYTE_ORDER_UN</code> 类型的变量 <code>unByteOrder</code>，将值 <code>0xabcd</code> 赋给成员变量 <code>value</code>。由于在类型 <code>BYTE_ORDER_UN</code> 中，<code>value</code> 和 <code>byte</code> 成员 <strong> 共享一块内存</strong>，所以可以通过 <code>byte</code> 的不同成员来访问 <code>value</code> 的高字节和低字节。</p>
+</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">union</span> <span class="title">byte_order</span> &#123;</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">short</span> <span class="type">int</span> value;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">char</span> byte[<span class="keyword">sizeof</span>(<span class="type">unsigned</span> <span class="type">short</span> <span class="type">int</span>)];</span><br><span class="line">&#125; BYTE_ORDER_UN;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span> &#123;</span><br><span class="line">    BYTE_ORDER_UN unByteOrder;</span><br><span class="line">    unByteOrder.value = <span class="number">0xabcd</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> ((unByteOrder.byte[<span class="number">0</span>] ==<span class="number">0xcd</span>) &amp;&amp; (unByteOrder.byte[<span class="number">1</span>] ==<span class="number">0xab</span>)) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Listen endian byte order, byte[0]: 0x%x, byte[1]: 0x%x\n&quot;</span>, \</span><br><span class="line">        unByteOrder.byte[<span class="number">0</span>], unByteOrder.byte[<span class="number">1</span>]);</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span>((unByteOrder.byte[<span class="number">0</span>] ==<span class="number">0xab</span>) &amp;&amp; (unByteOrder.byte[<span class="number">1</span>] ==<span class="number">0xcd</span>)) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Big endian byte order, byte[0]: 0x%x, byte[1]: 0x%x\n&quot;</span>, \</span><br><span class="line">        unByteOrder.byte[<span class="number">0</span>], unByteOrder.byte[<span class="number">1</span>]);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>主机系统为小端字节序的测试结果：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">$ gcc byteOrder.c -o byteOrder</span><br><span class="line">$ ./byteOrder</span><br><span class="line">Listen endian byte order, byte[0]: 0xcd, byte[1]: 0xab</span><br></pre></td></tr></table></figure>
+
+<h2 id="主机字节序到网络字节序转换"><a href="# 主机字节序到网络字节序转换" class="headerlink" title="主机字节序到网络字节序转换"></a>主机字节序到网络字节序转换 </h2><p> 字节交换的作用是生成一个网络字节序的变量，<strong>其字节的顺序与主机类型和操作系统无关</strong>。进行网络字节序转换的时候，只要转换一次就可以了，不要进行多次的转换。如果进行多次字节序的转换，最后生成的网络字节序的值可能是错误的。例如：</p>
+<ul>
+<li><p>对于主机为小端字节序的系统，进行两次字节序转换的过程如下图所示，经过两次转换，最终的值与最初的主机字节序相同。</p>
+</li>
+<li><p>对于主机为大端字节序的系统，无论进行多少次字节序的转换，最终的值与最初的主机字节序相同。</p>
+</li>
+</ul>
+<p><img src="/images/htos-conversion.png" alt="小端系统中的变量多次字节序转换"></p>
+<p>下面的例子是对 16 位数值和 32 位数值进行字节序转换，每种类型的数值进行两次转换，最后打印结果。</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;arpa/inet.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> BITS16 16</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> BITS32 32</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">union</span> <span class="title">two_bytes_order</span> &#123;</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">short</span> <span class="type">int</span> value;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">char</span> byte[<span class="keyword">sizeof</span>(<span class="type">unsigned</span> <span class="type">short</span>)];</span><br><span class="line">&#125; TWO_BYTES_ORDER_UN;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">union</span> <span class="title">four_bytes_order</span> &#123;</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> <span class="type">int</span> value;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">char</span> byte[<span class="keyword">sizeof</span>(<span class="type">unsigned</span> <span class="type">long</span> <span class="type">int</span>)];</span><br><span class="line">&#125; FOUR_BYTES_ORDER_UN;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">showValue</span><span class="params">(<span class="type">void</span> *begin, <span class="type">int</span> flag)</span> &#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; ((flag) / <span class="number">8</span>); i++) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%x (%p) &quot;</span>, *((<span class="type">unsigned</span> <span class="type">char</span> *)begin + i), (<span class="type">unsigned</span> <span class="type">char</span> *)begin + i);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\n&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span> &#123;</span><br><span class="line">    TWO_BYTES_ORDER_UN v16_orig, v16_turn1, v16_turn2;</span><br><span class="line">    FOUR_BYTES_ORDER_UN v32_orig, v32_turn1, v32_turn2;</span><br><span class="line"></span><br><span class="line">    v16_orig.value = <span class="number">0xabcd</span>;</span><br><span class="line">    v16_turn1.value = htons(v16_orig.value);</span><br><span class="line">    v16_turn2.value = htons(v16_turn1.value);</span><br><span class="line"></span><br><span class="line">    v32_orig.value = <span class="number">0x12345678</span>;</span><br><span class="line">    v32_turn1.value = htonl(v32_orig.value);</span><br><span class="line">    v32_turn2.value = htonl(v32_turn1.value);</span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;16 host to network byte order change:\n&quot;</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\torig:    &quot;</span>);</span><br><span class="line">    showValue(v16_orig.byte, BITS16);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\t1 times: &quot;</span>);</span><br><span class="line">    showValue(v16_turn1.byte, BITS16);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\t2 times: &quot;</span>);</span><br><span class="line">    showValue(v16_turn2.byte, BITS16);</span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;32 host to network byte order change:\n&quot;</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\torig:    &quot;</span>);</span><br><span class="line">    showValue(v32_orig.byte, BITS32);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\t1 times: &quot;</span>);</span><br><span class="line">    showValue(v32_turn1.byte, BITS32);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\t2 times: &quot;</span>);</span><br><span class="line">    showValue(v32_turn2.byte, BITS32);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>小端模式到网络字节序转换的测试结果：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">$ gcc byteOrder2.c -o byteOrder2</span><br><span class="line">$ ./byteOrder2</span><br><span class="line">16 host to network byte order change:</span><br><span class="line">        orig:    cd (0x7ffcd6ad66de) ab (0x7ffcd6ad66df)</span><br><span class="line">        1 times: ab (0x7ffcd6ad66dc) cd (0x7ffcd6ad66dd)</span><br><span class="line">        2 times: cd (0x7ffcd6ad66da) ab (0x7ffcd6ad66db)</span><br><span class="line">32 host to network byte order change:</span><br><span class="line">        orig:    78 (0x7ffcd6ad66d0) 56 (0x7ffcd6ad66d1) 34 (0x7ffcd6ad66d2) 12 (0x7ffcd6ad66d3)</span><br><span class="line">        1 times: 12 (0x7ffcd6ad66c8) 34 (0x7ffcd6ad66c9) 56 (0x7ffcd6ad66ca) 78 (0x7ffcd6ad66cb)</span><br><span class="line">        2 times: 78 (0x7ffcd6ad66c0) 56 (0x7ffcd6ad66c1) 34 (0x7ffcd6ad66c2) 12 (0x7ffcd6ad66c3)</span><br></pre></td></tr></table></figure>
+
+<p>16 位变量 0xabcd 在内存中的表示方式为 cd 在前，ab 在后；进行一次字节序转换后变为 ab 在前，cd 在后。在进行第一次转换后字节序发生了变化，而进行第二次字节序转换后与原始的排列方式一致。</p>
+<h2 id="大小端的转换"><a href="# 大小端的转换" class="headerlink" title="大小端的转换"></a>大小端的转换 </h2><p> 上面的代码中 <code>htons</code> 和 <code>htonl</code>，分别给出了主机字节序到网络字节序的 <code>short</code> 和 <code>long</code> 类型的转换接口，那么这个接口是如何实现大小端转换的呢？</p>
+<p><strong>通过位运算的方式来实现大小端的转换</strong>：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">unsigned</span> <span class="type">int</span> <span class="title function_">little_endian_to_big_endian_4bytes</span><span class="params">(<span class="type">unsigned</span> <span class="type">int</span> value)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> ((value &amp; <span class="number">0x000000ff</span>) &lt;&lt; <span class="number">24</span>) | </span><br><span class="line">           ((value &amp; <span class="number">0x0000ff00</span>) &lt;&lt; <span class="number">8</span>)  | </span><br><span class="line">           ((value &amp; <span class="number">0x00ff0000</span>) &gt;&gt; <span class="number">8</span>)  | </span><br><span class="line">           ((value &amp; <span class="number">0xff000000</span>) &gt;&gt; <span class="number">24</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">unsigned</span> <span class="type">short</span> <span class="title function_">little_endian_to_big_endian_2bytes</span><span class="params">(<span class="type">unsigned</span> <span class="type">short</span> value)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> ((value &amp; <span class="number">0x00ff</span>) &lt;&lt; <span class="number">8</span>) | ((value &amp; <span class="number">0xff00</span>) &gt;&gt; <span class="number">8</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span> &#123;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> little_value4 = <span class="number">0x12345678</span>;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">short</span> little_value2 = <span class="number">0xabcd</span>;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> big_value4 = little_endian_to_big_endian_4bytes(little_value4);</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">short</span> big_value2 = little_endian_to_big_endian_2bytes(little_value2);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;LE2 value: 0x%04x\n&quot;</span>, little_value2);  <span class="comment">// LE2 value: 0xabcd</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;BE2 value: 0x%04x\n&quot;</span>, big_value2);  <span class="comment">// BE2 value: 0xcdab</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;LE4 value: 0x%08x\n&quot;</span>, little_value4);  <span class="comment">// LE4 value: 0x12345678</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;BE4 value: 0x%08x\n&quot;</span>, big_value4);  <span class="comment">// BE4 value: 0x78563412</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="多变量存储在连续内存中的字节序转换"><a href="# 多变量存储在连续内存中的字节序转换" class="headerlink" title="多变量存储在连续内存中的字节序转换"></a>多变量存储在连续内存中的字节序转换 </h2><p> 示例 1：一个 2 字节变量存储在连续的内存中，与一个 4 字节变量存储在连续的内容中，从小端主机字节序转换为大端网络字节序后的结果一样吗？一样的！</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;arpa/inet.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">four_bytes_order</span> &#123;</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">short</span> <span class="type">int</span> val1;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">short</span> <span class="type">int</span> val2;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> <span class="type">int</span> val3;</span><br><span class="line">&#125; FOUR_BYTES_ORDER_S;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> BITS16 16</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> BITS32 32</span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">showValue</span><span class="params">(<span class="type">void</span> *begin, <span class="type">int</span> flag)</span> &#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; ((flag) / <span class="number">8</span>); i++) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%x (%p) &quot;</span>, *((<span class="type">unsigned</span> <span class="type">char</span> *)begin + i), (<span class="type">unsigned</span> <span class="type">char</span> *)begin + i);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\n&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span> &#123;</span><br><span class="line">    FOUR_BYTES_ORDER_S sOrig, sTurn;</span><br><span class="line">    </span><br><span class="line">    sOrig.val1 = <span class="number">0x1234</span>;</span><br><span class="line">    sOrig.val2 = <span class="number">0x5678</span>;</span><br><span class="line">    sTurn.val1 = htons(sOrig.val1);</span><br><span class="line">    sTurn.val2 = htons(sOrig.val2);</span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;16 + 16 host to network byte order change:\n&quot;</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\thost:    &quot;</span>);</span><br><span class="line">    showValue(&amp;sOrig.val1, BITS32);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\tnetwork: &quot;</span>);</span><br><span class="line">    showValue(&amp;sTurn.val1, BITS32);</span><br><span class="line"></span><br><span class="line">    sOrig.val3 = <span class="number">0x12345678</span>;</span><br><span class="line">    sTurn.val3 = htonl(sOrig.val3);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;32 host to network byte order change:\n&quot;</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\thost:    &quot;</span>);</span><br><span class="line">    showValue(&amp;sOrig.val3, BITS32);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\tnetwork: &quot;</span>);</span><br><span class="line">    showValue(&amp;sTurn.val3, BITS32);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>对于上述连续内存的两个 2 字节变量和一个 4 字节变量，转换成的网络字节序都是 <code>0x12345678</code>：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">$ gcc byteOrder2.c -o byteOrder3</span><br><span class="line">$ ./byteOrder3</span><br><span class="line">16 + 16 host to network byte order change:</span><br><span class="line">        host:    34 (0x7fffd69b9a10) 12 (0x7fffd69b9a11) 78 (0x7fffd69b9a12) 56 (0x7fffd69b9a13)</span><br><span class="line">        network: 12 (0x7fffd69b9a00) 34 (0x7fffd69b9a01) 56 (0x7fffd69b9a02) 78 (0x7fffd69b9a03)</span><br><span class="line">32 host to network byte order change:</span><br><span class="line">        host:    78 (0x7fffd69b9a18) 56 (0x7fffd69b9a19) 34 (0x7fffd69b9a1a) 12 (0x7fffd69b9a1b)</span><br><span class="line">        network: 12 (0x7fffd69b9a08) 34 (0x7fffd69b9a09) 56 (0x7fffd69b9a0a) 78 (0x7fffd69b9a0b)</span><br></pre></td></tr></table></figure>
+
+<p>示例 2：一个变量 <code>0x12345678abcd9876</code>，分别以 <code>short + long + short</code> 和 <code>long + long</code> 变量存储在一个连续内容中，那么两种存储的小端主机字节序和大端网络字节序在内存中的存储的值顺序一致吗？一致的！</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">val_le = 0x12345678abcd9876</span><br><span class="line"></span><br><span class="line">short + long + short</span><br><span class="line">    a = 0x1234</span><br><span class="line">    b = 0x5678abcd</span><br><span class="line">    c = 0x9876</span><br><span class="line"></span><br><span class="line">分别给出其主机序和网络序：</span><br><span class="line">    内存低地址 -----------------------&gt; 内存高地址 </span><br><span class="line">    小端主机序：34 12 | cd ab 78 56 | 76 98</span><br><span class="line">    大端网络序：12 34 | 56 78 ab cd | 98 76</span><br><span class="line"></span><br><span class="line">long + long</span><br><span class="line">    d = 0x12345678</span><br><span class="line">    e = 0xabcd9876</span><br><span class="line"></span><br><span class="line"> 分别给出其主机序和网络序：</span><br><span class="line">    内存低地址 -----------------------&gt; 内存高地址</span><br><span class="line">    主机序：78 56 34 12 | 76 98 cd ab</span><br><span class="line">    网络序：12 34 56 78 | ab cd 98 76</span><br></pre></td></tr></table></figure>
+
+<p>可以看出, 两种组合变量的主机序到网络序转换后的结果是一致的！</p>
+<blockquote>
+<p>参考：</p>
+<ol>
+<li><a href="https://blog.51cto.com/u_15249901/4893764">https://blog.51cto.com/u_15249901/4893764</a></li>
+<li><a href="https://blog.csdn.net/Jmilk/article/details/106898871">https://blog.csdn.net/Jmilk/article/details/106898871</a></li>
+</ol>
+</blockquote>
+]]></content>
+      <categories>
+        <category>学习笔记</category>
+        <category>C语言</category>
+      </categories>
+      <tags>
+        <tag>大小端</tag>
+        <tag>字节序</tag>
+        <tag>网络字节序</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Go 笔记之变量与常量</title>
     <url>/posts/230907162612.html</url>
     <content><![CDATA[<h2 id="Go 语言学习笔记 -1：HelloWorld"><a href="#Go 语言学习笔记 -1：HelloWorld" class="headerlink" title="Go 语言学习笔记 -1：HelloWorld"></a>Go 语言学习笔记 -1：HelloWorld</h2><p>Go 语言是一种编译型语言，源代码都会编译成二进制机器码。</p>
@@ -1017,6 +1017,20 @@
       </tags>
   </entry>
   <entry>
+    <title>博客文章分类汇总</title>
+    <url>/posts/summary.html</url>
+    <content><![CDATA[<center><b>这篇文章是个人博客中系列文章的分类汇总。</b></center>
+
+<span id="more"></span>
+
+<h1 id="C 语言系列"><a href="#C 语言系列" class="headerlink" title="C 语言系列"></a>C 语言系列</h1><p><a href="https://pursue26.github.io/posts/230916171929.html">C 语言之 main 函数参数</a><br><a href="https://pursue26.github.io/posts/230922143003.html">C 语言之多维数组</a><br><a href="https://pursue26.github.io/posts/230913200729.html">C 语言之 const 关键字</a><br><a href="https://pursue26.github.io/posts/230918174223.html">C 语言之 typedef 自定义类型基础</a><br><a href="https://pursue26.github.io/posts/230920172849.html">C 语言之 typedef 实践</a><br><a href="https://pursue26.github.io/posts/230922172626.html">C 语言之 uthash 哈希表基础</a><br><a href="https://pursue26.github.io/posts/230921094127.html">C 语言之锁与原子操作基础</a><br><a href="https://pursue26.github.io/posts/230911151334.html">C 语言之 pthread 多线程</a><br><a href="https://pursue26.github.io/posts/230918114841.html">C 语言之大小端知识</a></p>
+<h1 id="Golang 语言系列"><a href="#Golang 语言系列" class="headerlink" title="Golang 语言系列"></a>Golang 语言系列</h1><p><a href="https://pursue26.github.io/posts/230907162612.html">Go 笔记之变量与常量</a><br><a href="https://pursue26.github.io/posts/230909120145.html">Go 笔记之函数 &amp; 包 &amp; 判断 &amp; 循环</a><br><a href="https://pursue26.github.io/posts/230912152800.html">Go 笔记之数组与切片</a><br><a href="https://pursue26.github.io/posts/230913161326.html">Go 笔记之可变参数函数与 Map 集合</a><br><a href="https://pursue26.github.io/posts/230915155105.html">Go 笔记之字符串和指针</a></p>
+<h1 id="数据结构系列"><a href="# 数据结构系列" class="headerlink" title="数据结构系列"></a>数据结构系列 </h1><p><a href="https://pursue26.github.io/posts/231007174854.html"> 数据结构之链表（数组实现）</a><br><a href="https://pursue26.github.io/posts/230916094606.html">数据结构之二叉树的遍历 </a><br><a href="https://pursue26.github.io/posts/230905224335.html"> 数据结构之拓扑排序 </a><br><a href="https://pursue26.github.io/posts/230925185057.html"> 数据结构之 Trie 字典树</a></p>
+<h1 id="Docker 系列"><a href="#Docker 系列" class="headerlink" title="Docker 系列"></a>Docker 系列</h1><p><a href="https://pursue26.github.io/posts/230909171809.html">Docker 学习笔记</a></p>
+<h1 id="操作系统系列"><a href="# 操作系统系列" class="headerlink" title="操作系统系列"></a>操作系统系列 </h1><h2 id="操作系统课程学习（清华大学 - 陈渝老师）"><a href="# 操作系统课程学习（清华大学 - 陈渝老师）" class="headerlink" title="操作系统课程学习（清华大学 - 陈渝老师）"></a> 操作系统课程学习（清华大学 - 陈渝老师）</h2><p><a href="https://pursue26.github.io/posts/230921190726.html">操作系统之 chapter1 概述 </a><br><a href="https://pursue26.github.io/posts/230924172528.html"> 操作系统之 chapter2 启动 &amp; 中断 &amp; 异常 &amp; 系统调用</a></p>
+]]></content>
+  </entry>
+  <entry>
     <title>Go 笔记之字符串和指针</title>
     <url>/posts/230915155105.html</url>
     <content><![CDATA[<h2 id="Go 语言学习笔记 -14：字符串"><a href="#Go 语言学习笔记 -14：字符串" class="headerlink" title="Go 语言学习笔记 -14：字符串"></a>Go 语言学习笔记 -14：字符串</h2><ol>
@@ -1109,219 +1123,6 @@
       <tags>
         <tag>Go字符串</tag>
         <tag>Go指针</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Go 笔记之数组与切片</title>
-    <url>/posts/230912152800.html</url>
-    <content><![CDATA[<h2 id="Go 语言学习笔记 -10：数组"><a href="#Go 语言学习笔记 -10：数组" class="headerlink" title="Go 语言学习笔记 -10：数组"></a>Go 语言学习笔记 -10：数组</h2><ol>
-<li><p>数组是 <strong> 同一类型元素 </strong> 的集合，Go 语言中不允许混合不同类型的元素。</p>
-</li>
-<li><p>一个数组的表示形式为 <code>[n]T</code>。n 表示数组中元素的数量，T 代表每个元素的类型。如： <code>var arr [3]int</code>。</p>
-</li>
-<li><p>数组简略声明：<code>arr := [3]int&#123;12, 78, 50&#125;</code>，在简略声明中，可对部分元素赋值：<code>arr := [3]int&#123;12&#125;</code>，剩下的元素自动赋值为 0 。</p>
-</li>
-<li><p>可以忽略声明数组的长度，并用 <code>...</code> 代替，让编译器为你自动计算长度：<code>arr := [...]int&#123;12, 21&#125;</code>。</p>
-</li>
-<li><p><strong>数组是值类型，不是引用类型 </strong>：这意味着当数组赋值给一个新的变量时，该变量会得到一个原始数组的副本。<strong> 如果对新变量进行更改，则不会影响原始数组</strong>。注：对切片的修改会影响原始数组。</p>
-</li>
-</ol>
-<span id="more"></span>
-
-<ol start="6">
-<li><strong>当数组作为参数传递给函数时，它们是按值传递，而原始数组保持不变（原始数组不会因为函数调用而改变）</strong>。</li>
-</ol>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">changeLocal</span><span class="params">(num [5]<span class="type">int</span>)</span></span> &#123;</span><br><span class="line">    num[<span class="number">0</span>] = <span class="number">55</span></span><br><span class="line">    fmt.Println(<span class="string">&quot;inside function &quot;</span>, num)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    num := [...]<span class="type">int</span>&#123;<span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span>, <span class="number">8</span>&#125;</span><br><span class="line">    fmt.Println(<span class="string">&quot;before passing to function &quot;</span>, num)</span><br><span class="line">    changeLocal(num) <span class="comment">// num is passed by value</span></span><br><span class="line">    fmt.Println(<span class="string">&quot;after passing to function &quot;</span>, num)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// before passing to function  [5 6 7 8 8]</span></span><br><span class="line"><span class="comment">// inside function  [55 6 7 8 8]</span></span><br><span class="line"><span class="comment">// after passing to function  [5 6 7 8 8]</span></span><br></pre></td></tr></table></figure>
-
-<ol start="7">
-<li><p>数组的长度：<code>len(arr)</code>。</p>
-</li>
-<li><p>数组的迭代 for 循环：</p>
-</li>
-</ol>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">for</span> i := <span class="number">0</span>; i &lt; <span class="built_in">len</span>(arr); i++ &#123;</span><br><span class="line">    fmt.Println(<span class="string">&quot;%d-th element of arr is %.2f\n&quot;</span>, i, arr[i])</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<ol start="9">
-<li>数组的迭代：Go 提供了一种更好、更简洁的方法，通过 <strong> 使用 for 循环的 <code>range</code> 方法来遍历数组</strong>。<code>range</code> 返回索引和该索引处的值。</li>
-</ol>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">for</span> i, v := <span class="keyword">range</span> arr &#123;</span><br><span class="line">  fmt.Println(<span class="string">&quot;%d-th element of arr is %.2f\n&quot;</span>, i, v)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<ol start="10">
-<li>多维数组：1）简略声明；2）先声明二维数组变量，再根据索引来对数组添加值。</li>
-</ol>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line">arr := [<span class="number">3</span>][<span class="number">2</span>]<span class="type">string</span>&#123; <span class="comment">// 简略声明</span></span><br><span class="line">      &#123;<span class="string">&quot;lion&quot;</span>, <span class="string">&quot;tiger&quot;</span>&#125;,</span><br><span class="line">      &#123;<span class="string">&quot;cat&quot;</span>, <span class="string">&quot;dog&quot;</span>&#125;,</span><br><span class="line">      &#123;<span class="string">&quot;pigeon&quot;</span>, <span class="string">&quot;peacock&quot;</span>&#125;, <span class="comment">// this comma is necessary. The compiler will complain if you omit this comma</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> _, v1 := <span class="keyword">range</span> arr &#123; <span class="comment">// 打印二维数组</span></span><br><span class="line">    <span class="keyword">for</span> _, v2 := <span class="keyword">range</span> v1 &#123;</span><br><span class="line">        fmt.Printf(<span class="string">&quot;%s &quot;</span>, v2)</span><br><span class="line">    &#125;</span><br><span class="line">    fmt.Printf(<span class="string">&quot;\n&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<ol start="11">
-<li>数组的缺陷：长度固定，不可能增加数组的长度。</li>
-</ol>
-<hr>
-<h2 id="Go 语言学习笔记 -11：切片"><a href="#Go 语言学习笔记 -11：切片" class="headerlink" title="Go 语言学习笔记 -11：切片"></a>Go 语言学习笔记 -11：切片</h2><ol>
-<li><p>切片是 <strong> 由数组建立 </strong> 的一种方便、灵活且功能强大的包装（Wrapper）。<strong>切片本身不拥有任何数据 </strong>。它们只是对现有数组的<strong> 引用</strong>。</p>
-</li>
-<li><p>创建一个切片 A ：带有 <code>T</code> 类型元素的切片由 <code>[]T</code> 表示。语法：<code>a[start:end]</code> 创建一个从 a 数组索引 start 开始到 end - 1 结束的切片。</p>
-</li>
-</ol>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line">arr := [<span class="number">5</span>]<span class="type">int</span>&#123;<span class="number">76</span>, <span class="number">77</span>, <span class="number">78</span>, <span class="number">79</span>, <span class="number">80</span>&#125;</span><br><span class="line"><span class="keyword">var</span> b []<span class="type">int</span> = a[<span class="number">1</span>:<span class="number">4</span>] <span class="comment">// 数组切片</span></span><br></pre></td></tr></table></figure>
-
-<ol start="3">
-<li>创建一个切片 B ：创建一个数组，并返回一个存储在 c 中的 <strong> 切片引用</strong>。注意：<code>[]</code> 内无内容。</li>
-</ol>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line">c := []<span class="type">int</span>&#123;<span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span>&#125; <span class="comment">// creates and array and returns a slice reference</span></span><br></pre></td></tr></table></figure>
-
-<ol start="4">
-<li><p><strong>对切片的修改会影响原始数组</strong>。</p>
-</li>
-<li><p>当多个切片共用相同的底层数组时，每个切片所做的更改将反映在数组中。</p>
-</li>
-<li><p><strong>切片的长度和容量</strong>：切片的长度是切片中的元素数。切片的容量是从创建切片索引开始（到数组末尾）的底层数组中的元素数。</p>
-</li>
-</ol>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    fruitarray := [...]<span class="type">string</span>&#123;<span class="string">&quot;a&quot;</span>, <span class="string">&quot;b&quot;</span>, <span class="string">&quot;c&quot;</span>, <span class="string">&quot;d&quot;</span>&#125;</span><br><span class="line">    fruitslice := fruitarray[<span class="number">1</span>:<span class="number">3</span>]</span><br><span class="line">    fmt.Println(<span class="string">&quot;length of slice: %d, capacity: %d&quot;</span>, <span class="built_in">len</span>(fruitslice), <span class="built_in">cap</span>(fruitslice)) <span class="comment">// 2, 3</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<ol start="7">
-<li>切片可以重置其容量：<code>slicename[:cap(slicename)]</code>。</li>
-</ol>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    fruitarray := [...]<span class="type">string</span>&#123;<span class="string">&quot;a&quot;</span>, <span class="string">&quot;b&quot;</span>, <span class="string">&quot;c&quot;</span>, <span class="string">&quot;d&quot;</span>&#125;</span><br><span class="line">    fruitslice := fruitarray[<span class="number">1</span>:<span class="number">3</span>]</span><br><span class="line">    fmt.Println(<span class="string">&quot;length of slice: %d, capacity: %d&quot;</span>, <span class="built_in">len</span>(fruitslice), <span class="built_in">cap</span>(fruitslice)) <span class="comment">// 2, 3. print: [b, c]</span></span><br><span class="line">    fruitslice = fruitslice[:<span class="built_in">cap</span>(fruitslice)] <span class="comment">// re-slicing furitslice till its capacity. print: [b, c, d]</span></span><br><span class="line">    fmt.Println(<span class="string">&quot;After re-slicing length is&quot;</span>, <span class="built_in">len</span>(fruitslice), <span class="string">&quot;and capacity is&quot;</span>, <span class="built_in">cap</span>(fruitslice)) <span class="comment">// 3, 3</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<ol start="8">
-<li><p><strong>使用 <code>make</code> 创建一个切片</strong>：<code>func make ([]T, len, cap)</code> 通过传递类型、长度和容量来创建切片。其中，容量是可选参数，默认值为切片长度。**<code>make</code> 函数创建一个数组，并返回引用该数组的切片 **。如 <code>arrslice := make([]float64, 5, 5)</code>。</p>
-</li>
-<li><p>切片是动态的，可以使用 <code>append</code> 将新元素追加到切片上。<code>append</code> 函数定义为：<code>func append(slice []T, x ...T) []T</code>，其中 <code>x...T</code> 表示该函数接收 T 类型的参数 x 的个数是可变的，如：<code>arrslice = append(arrslice, 5.6, 7.3)</code>。</p>
-</li>
-</ol>
-<blockquote>
-<p><code>append</code> 函数会返回一个新的切片，其中包含了原始切片和追加的元素：</p>
-<ol>
-<li>如果原始切片的容量足够，<code>append</code> 函数会在原始切片的基础上进行追加；</li>
-<li>如果原始切片的容量不够，<code>append</code> 函数会创建一个新的底层数组，并将原始切片中的元素和追加的元素复制到新的底层数组中。</li>
-</ol>
-<p>因此，append 函数返回的切片可能指向一个新的底层数组，而不是原始切片所指向的底层数组。</p>
-</blockquote>
-<ol start="10">
-<li><p>数组是固定的，但 <strong> 切片具有动态长度 </strong>：切片是由一个指向数组的指针、长度和容量组成的数据结构。当我们向切片中追加元素时，如果切片的长度小于容量，新元素会直接添加到切片的末尾，切片的长度会增加。但是，如果追加元素后切片的长度超过了容量，Go 语言会创建一个新的更大的底层数组，将原来的元素复制到新的数组中，并将新元素添加到新数组的末尾。然后，切片会指向这个新数组（<strong> 相比于旧切片，引用类型的地址改变了</strong>），并且容量会成为原来的两倍（并不是每次执行 <code>append</code> 时容量都会变成旧切片的两倍，只有当长度超过容量时，才会扩充一倍容量）。这样，切片就具有了动态长度的特性。</p>
-</li>
-<li><p>切片类型的零值为 <code>nil</code>：一个 <code>nil</code> 切片的长度和容量为 0，可以使用 <code>append</code> 函数将值追加到 <code>nil</code> 切片。</p>
-</li>
-</ol>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> names []<span class="type">string</span> <span class="comment">// zero value of a slice is nil</span></span><br><span class="line"><span class="keyword">if</span> names == <span class="literal">nil</span> &#123;</span><br><span class="line">    fmt.Println(<span class="string">&quot;slice is nil going to append&quot;</span>)</span><br><span class="line">    names = <span class="built_in">append</span>(names, <span class="string">&quot;John&quot;</span>, <span class="string">&quot;Sebastian&quot;</span>, <span class="string">&quot;Vinay&quot;</span>)</span><br><span class="line">    fmt.Println(<span class="string">&quot;names contents:&quot;</span>, names)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<ol start="12">
-<li><p><code>...</code> 可将一个切片添加到另一个切片中：<code>append(slice1, slice2...)</code>。</p>
-</li>
-<li><p>切片的函数传递：切片在内部可由一个结构体类型表示，即：</p>
-</li>
-</ol>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">type</span> slice <span class="keyword">struct</span> &#123;</span><br><span class="line">    Length         <span class="type">int</span></span><br><span class="line">    Capacity       <span class="type">int</span></span><br><span class="line">    ZerothElement  *<span class="type">byte</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li><p>切片本身包含了长度、容量和指向底层数组首个元素的指针。当切片作为参数传递给函数时，虽然是通过值传递，但是切片内部的指针变量（这里的<code>byte</code>）仍然指向相同的底层数组。因此，当函数内部修改底层数组的值时，这些修改在函数外部是可见的。</p>
-</li>
-<li><p>然而，如果函数内部修改了切片的长度或容量，将会创建一个新的切片，而不会影响原始切片。这是因为切片的长度和容量是切片结构体的字段，而非底层数组的属性。因此，修改切片的长度或容量会创建一个新的切片结构体，其中的指针变量仍然指向原始的底层数组，但是新的切片具有不同的长度和容量。</p>
-</li>
-<li><p>因此，可以说当切片传递给函数时，函数内部对底层数组的修改，在函数外部是可见的，但是对切片的长度和容量的修改是不可见的。</p>
-</li>
-</ul>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">modifySlice</span><span class="params">(s []<span class="type">int</span>)</span></span> &#123;</span><br><span class="line">    s[<span class="number">0</span>] = <span class="number">100</span> <span class="comment">// 修改底层数组的值</span></span><br><span class="line">    s = <span class="built_in">append</span>(s, <span class="number">200</span>) <span class="comment">// 创建新的切片，不影响原始切片</span></span><br><span class="line">    fmt.Println(<span class="string">&quot;Inside modifySlice:&quot;</span>, s)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    numbers := []<span class="type">int</span>&#123;<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>&#125;</span><br><span class="line">    fmt.Println(<span class="string">&quot;Before modifySlice:&quot;</span>, numbers)</span><br><span class="line">    modifySlice(numbers)</span><br><span class="line">    fmt.Println(<span class="string">&quot;After modifySlice:&quot;</span>, numbers)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Before modifySlice: [1 2 3 4 5]</span></span><br><span class="line"><span class="comment">// Inside modifySlice: [100 2 3 4 5 200]</span></span><br><span class="line"><span class="comment">// After modifySlice: [100 2 3 4 5]  // 函数内部对底层数组的修改在函数外部是可见的</span></span><br></pre></td></tr></table></figure>
-
-<ol start="14">
-<li><strong>多维切片</strong>：类似于多维数组，但每行索引对应的元素数量可以不等于其它行。</li>
-</ol>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line">pls := [][]<span class="type">string</span> &#123;</span><br><span class="line">      &#123;<span class="string">&quot;C&quot;</span>, <span class="string">&quot;C++&quot;</span>&#125;,</span><br><span class="line">      &#123;<span class="string">&quot;JavaScript&quot;</span>&#125;,</span><br><span class="line">      &#123;<span class="string">&quot;Go&quot;</span>, <span class="string">&quot;Rust&quot;</span>&#125;,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<ol start="15">
-<li>内存优化：切片持有对底层数组的引用，只要切片在内存中，数组就不能被垃圾回收。一种回收数组的方法时使用 <code>copy</code> 函数 <code>func copy(dst, src[]T) int</code> 来生成一个切片的副本，这样就可以使用新的切片，原始数组也可以被垃圾回收。注：返回的 int 类型的值为 dst 的长度。</li>
-</ol>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">countries</span><span class="params">()</span></span> []<span class="type">string</span> &#123;</span><br><span class="line">    countries := []<span class="type">string</span>&#123;<span class="string">&quot;USA&quot;</span>, <span class="string">&quot;Singapore&quot;</span>, <span class="string">&quot;Germany&quot;</span>, <span class="string">&quot;India&quot;</span>, <span class="string">&quot;Australia&quot;</span>&#125;</span><br><span class="line">    neededCountries := countries[:<span class="built_in">len</span>(countries)<span class="number">-2</span>]</span><br><span class="line">    countriesCpy := <span class="built_in">make</span>([]<span class="type">string</span>, <span class="built_in">len</span>(neededCountries))</span><br><span class="line">    <span class="built_in">copy</span>(countriesCpy, neededCountries) <span class="comment">//copies neededCountries to countriesCpy</span></span><br><span class="line">    <span class="keyword">return</span> countriesCpy</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    countriesNeeded := countries()</span><br><span class="line">    fmt.Println(countriesNeeded)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>学习链接：<a href="https://studygolang.com/subject/2">https://studygolang.com/subject/2</a>，感谢如此优秀的教程！</p>
-</blockquote>
-]]></content>
-      <categories>
-        <category>学习笔记</category>
-        <category>Golang</category>
-      </categories>
-      <tags>
-        <tag>Go数组</tag>
-        <tag>Go切片</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>博客文章分类汇总</title>
-    <url>/posts/summary.html</url>
-    <content><![CDATA[<center><b>这篇文章是个人博客中系列文章的分类汇总。</b></center>
-
-<span id="more"></span>
-
-<h1 id="C 语言系列"><a href="#C 语言系列" class="headerlink" title="C 语言系列"></a>C 语言系列</h1><p><a href="https://pursue26.github.io/posts/230916171929.html">C 语言之 main 函数参数</a><br><a href="https://pursue26.github.io/posts/230922143003.html">C 语言之多维数组</a><br><a href="https://pursue26.github.io/posts/230913200729.html">C 语言之 const 关键字</a><br><a href="https://pursue26.github.io/posts/230918174223.html">C 语言之 typedef 自定义类型基础</a><br><a href="https://pursue26.github.io/posts/230920172849.html">C 语言之 typedef 实践</a><br><a href="https://pursue26.github.io/posts/230922172626.html">C 语言之 uthash 哈希表基础</a><br><a href="https://pursue26.github.io/posts/230921094127.html">C 语言之锁与原子操作基础</a><br><a href="https://pursue26.github.io/posts/230911151334.html">C 语言之 pthread 多线程</a><br><a href="https://pursue26.github.io/posts/230918114841.html">C 语言之大小端知识</a></p>
-<h1 id="Golang 语言系列"><a href="#Golang 语言系列" class="headerlink" title="Golang 语言系列"></a>Golang 语言系列</h1><p><a href="https://pursue26.github.io/posts/230907162612.html">Go 笔记之变量与常量</a><br><a href="https://pursue26.github.io/posts/230909120145.html">Go 笔记之函数 &amp; 包 &amp; 判断 &amp; 循环</a><br><a href="https://pursue26.github.io/posts/230912152800.html">Go 笔记之数组与切片</a><br><a href="https://pursue26.github.io/posts/230913161326.html">Go 笔记之可变参数函数与 Map 集合</a><br><a href="https://pursue26.github.io/posts/230915155105.html">Go 笔记之字符串和指针</a></p>
-<h1 id="数据结构系列"><a href="# 数据结构系列" class="headerlink" title="数据结构系列"></a>数据结构系列 </h1><p><a href="https://pursue26.github.io/posts/230916094606.html"> 数据结构之二叉树的遍历 </a><br><a href="https://pursue26.github.io/posts/230905224335.html"> 数据结构之拓扑排序 </a><br><a href="https://pursue26.github.io/posts/230925185057.html"> 数据结构之 Trie 字典树</a></p>
-<h1 id="Docker 系列"><a href="#Docker 系列" class="headerlink" title="Docker 系列"></a>Docker 系列</h1><p><a href="https://pursue26.github.io/posts/230909171809.html">Docker 学习笔记</a></p>
-<h1 id="操作系统系列"><a href="# 操作系统系列" class="headerlink" title="操作系统系列"></a>操作系统系列 </h1><h2 id="操作系统课程学习（清华大学 - 陈渝老师）"><a href="# 操作系统课程学习（清华大学 - 陈渝老师）" class="headerlink" title="操作系统课程学习（清华大学 - 陈渝老师）"></a> 操作系统课程学习（清华大学 - 陈渝老师）</h2><p><a href="https://pursue26.github.io/posts/230921190726.html">操作系统之 chapter1 概述 </a><br><a href="https://pursue26.github.io/posts/230924172528.html"> 操作系统之 chapter2 启动 &amp; 中断 &amp; 异常 &amp; 系统调用</a></p>
-]]></content>
-  </entry>
-  <entry>
-    <title>操作系统之 chapter1 概述</title>
-    <url>/posts/230921190726.html</url>
-    <content><![CDATA[<p>这篇文章主要介绍操作系统的定义、架构层次、界面和内核、内部组成和特征等内容。</p>
-<span id="more"></span>
-
-<h1 id="概述"><a href="# 概述" class="headerlink" title="概述"></a>概述 </h1><h2 id="操作系统定义"><a href="# 操作系统定义" class="headerlink" title="操作系统定义"></a> 操作系统定义 </h2><p><strong> 用户角度</strong>：操作系统是一个控制软件。</p>
-<ul>
-<li>管理应用软件：可以限制不同的应用程序占用不同的资源</li>
-<li>为应用程序提供服务：I&#x2F;O 服务，声卡、网卡的访问服务</li>
-<li>杀死应用程序</li>
-<li>资源管理：CPU、内存、外设资源</li>
-<li>管理外设，分配资源</li>
-</ul>
-<p><strong>程序角度</strong>：操作系统是资源管理器。</p>
-<ul>
-<li>管理外设</li>
-<li>抽象<ul>
-<li>CPU 抽象成进程</li>
-<li>磁盘抽象成文件</li>
-<li>内存抽象成地址空间</li>
-</ul>
-</li>
-</ul>
-<h2 id="操作系统的架构层次"><a href="# 操作系统的架构层次" class="headerlink" title="操作系统的架构层次"></a>操作系统的架构层次 </h2><p> 硬件之上、应用软件之下（为应用软件提供服务支持）。</p>
-<h2 id="操作系统的界面和内核"><a href="# 操作系统的界面和内核" class="headerlink" title="操作系统的界面和内核"></a>操作系统的界面和内核</h2><p>Linux、Windows、Android 的界面属于外壳（shell），而不是内核（kernel）。kernel 是操作系统的研究重点，在 shell 之下。</p>
-<h2 id="操作系统内部组成"><a href="# 操作系统内部组成" class="headerlink" title="操作系统内部组成"></a>操作系统内部组成 </h2><p> 操作系统（kernel）内部组件包括：</p>
-<ul>
-<li>CPU 调度器</li>
-<li>物理内存管理</li>
-<li>虚拟内存管理</li>
-<li>文件系统管理</li>
-<li>中断处理与 I&#x2F;O 设备驱动</li>
-</ul>
-<h2 id="操作系统特征："><a href="# 操作系统特征：" class="headerlink" title="操作系统特征："></a>操作系统特征：</h2><ul>
-<li>并发<ul>
-<li>计算机系统中同时存在多个运行的程序，需要 OS 管理和调度。</li>
-</ul>
-</li>
-<li>共享<ul>
-<li>“同时”访问或互斥共享。</li>
-</ul>
-</li>
-<li>虚拟<ul>
-<li>利用多道程序设计技术，让每一个用户都觉得有一个计算机专门为他服务。</li>
-</ul>
-</li>
-<li>异步<ul>
-<li>每个程序的执行不是一贯到底，而是走走停停 &amp; 交替执行，向前推进速度不可预知；</li>
-<li>只要运行环境相同，OS 保证程序运行结果相同。</li>
-</ul>
-</li>
-</ul>
-<blockquote>
-<p>「并发」在一段时间内可以有多个程序运行，而「并行」是在一个时间点上可以有多个程序运行，并行需要多核 CPU 支持。</p>
-</blockquote>
-]]></content>
-      <categories>
-        <category>操作系统</category>
-      </categories>
-      <tags>
-        <tag>操作系统</tag>
       </tags>
   </entry>
   <entry>
@@ -1526,6 +1327,70 @@
       </tags>
   </entry>
   <entry>
+    <title>操作系统之 chapter1 概述</title>
+    <url>/posts/230921190726.html</url>
+    <content><![CDATA[<p>这篇文章主要介绍操作系统的定义、架构层次、界面和内核、内部组成和特征等内容。</p>
+<span id="more"></span>
+
+<h1 id="概述"><a href="# 概述" class="headerlink" title="概述"></a>概述 </h1><h2 id="操作系统定义"><a href="# 操作系统定义" class="headerlink" title="操作系统定义"></a> 操作系统定义 </h2><p><strong> 用户角度</strong>：操作系统是一个控制软件。</p>
+<ul>
+<li>管理应用软件：可以限制不同的应用程序占用不同的资源</li>
+<li>为应用程序提供服务：I&#x2F;O 服务，声卡、网卡的访问服务</li>
+<li>杀死应用程序</li>
+<li>资源管理：CPU、内存、外设资源</li>
+<li>管理外设，分配资源</li>
+</ul>
+<p><strong>程序角度</strong>：操作系统是资源管理器。</p>
+<ul>
+<li>管理外设</li>
+<li>抽象<ul>
+<li>CPU 抽象成进程</li>
+<li>磁盘抽象成文件</li>
+<li>内存抽象成地址空间</li>
+</ul>
+</li>
+</ul>
+<h2 id="操作系统的架构层次"><a href="# 操作系统的架构层次" class="headerlink" title="操作系统的架构层次"></a>操作系统的架构层次 </h2><p> 硬件之上、应用软件之下（为应用软件提供服务支持）。</p>
+<h2 id="操作系统的界面和内核"><a href="# 操作系统的界面和内核" class="headerlink" title="操作系统的界面和内核"></a>操作系统的界面和内核</h2><p>Linux、Windows、Android 的界面属于外壳（shell），而不是内核（kernel）。kernel 是操作系统的研究重点，在 shell 之下。</p>
+<h2 id="操作系统内部组成"><a href="# 操作系统内部组成" class="headerlink" title="操作系统内部组成"></a>操作系统内部组成 </h2><p> 操作系统（kernel）内部组件包括：</p>
+<ul>
+<li>CPU 调度器</li>
+<li>物理内存管理</li>
+<li>虚拟内存管理</li>
+<li>文件系统管理</li>
+<li>中断处理与 I&#x2F;O 设备驱动</li>
+</ul>
+<h2 id="操作系统特征："><a href="# 操作系统特征：" class="headerlink" title="操作系统特征："></a>操作系统特征：</h2><ul>
+<li>并发<ul>
+<li>计算机系统中同时存在多个运行的程序，需要 OS 管理和调度。</li>
+</ul>
+</li>
+<li>共享<ul>
+<li>“同时”访问或互斥共享。</li>
+</ul>
+</li>
+<li>虚拟<ul>
+<li>利用多道程序设计技术，让每一个用户都觉得有一个计算机专门为他服务。</li>
+</ul>
+</li>
+<li>异步<ul>
+<li>每个程序的执行不是一贯到底，而是走走停停 &amp; 交替执行，向前推进速度不可预知；</li>
+<li>只要运行环境相同，OS 保证程序运行结果相同。</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>「并发」在一段时间内可以有多个程序运行，而「并行」是在一个时间点上可以有多个程序运行，并行需要多核 CPU 支持。</p>
+</blockquote>
+]]></content>
+      <categories>
+        <category>操作系统</category>
+      </categories>
+      <tags>
+        <tag>操作系统</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>数据结构之二叉树的遍历</title>
     <url>/posts/230905224335.html</url>
     <content><![CDATA[<h2 id="二叉树的遍历"><a href="# 二叉树的遍历" class="headerlink" title="二叉树的遍历"></a>二叉树的遍历 </h2><p> 二叉树是一种非常重要的数据结构，很多其它数据结构都是基于二叉树的基础演变而来的。</p>
@@ -1573,6 +1438,71 @@
       </categories>
       <tags>
         <tag>二叉树遍历</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>数据结构之链表（数组实现）</title>
+    <url>/posts/231007174854.html</url>
+    <content><![CDATA[<p>线性表是一组 <strong> 按线性顺序排列的、具有相同特征的数据元素的有限序列</strong>，其中的数据元素之间存在一对一的关系，即除了第一个和最后一个数据元素之外，其它数据元素都是首尾相接的（这句话只适用大部分线性表，而不是全部，如循环链表把最后一个数据元素的尾指针指向了首位结点）。线性表可以用于表示一串有序的数据，例如数组、链表、栈和队列等都是线性表的实现方式。</p>
+<p>线性表中的「单链表」的实现，包括单链表的顺序存储（数组实现）和单链表的链式存储。这篇文章主要介绍单链表的顺序存储（数组实现）。</p>
+<span id="more"></span>
+
+<h2 id="数组和链表的特点"><a href="# 数组和链表的特点" class="headerlink" title="数组和链表的特点"></a>数组和链表的特点 </h2><p> 首先介绍一下数组和链表的特点。</p>
+<p>数组：创建数组时会在内存空间中划分出一块连续的内存，然后数据进入时会将数据按顺序存储在这块连续的内存中。因为数组在存储数据时是按顺序存储的，存储数据的内存也是连续的。所以，<strong>数组的特点就是寻址读取数据容易，插入和删除比较困难 &#x2F; 费时</strong>。</p>
+<p>链表：链表不同于数组，不会先划分出一块连续的内存，链表中的数据并不是连续的，链表在存储数据的内存中有两块区域，一块区域用来存储数据，一块区域用来记录下一个数据保存在哪里。虽然链表是线性表，但是并不会按线性的顺序存储数据。所以，<strong>链表在插入和删除时比较容易，在读取数据时比较麻烦</strong>。</p>
+<blockquote>
+<p>这里的容易，即意味着时间复杂度低；麻烦，即意味着时间复杂度高。</p>
+</blockquote>
+<h2 id="链表的顺序存储（数组实现）"><a href="# 链表的顺序存储（数组实现）" class="headerlink" title="链表的顺序存储（数组实现）"></a>链表的顺序存储（数组实现）</h2><p>链表的 API 主要包括：</p>
+<ul>
+<li>创建并初始化链表</li>
+<li>查找链表中的元素</li>
+<li>向链表中插入元素</li>
+<li>删除链表中的元素</li>
+<li>获取链表的长度</li>
+</ul>
+<h3 id="链表结构定义"><a href="# 链表结构定义" class="headerlink" title="链表结构定义"></a>链表结构定义</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> MAX_SIZE (100)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 定义链表结构</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> data[MAX_SIZE];  <span class="comment">// 存储元素的数组</span></span><br><span class="line">    <span class="type">int</span> length;  <span class="comment">// 链表的长度</span></span><br><span class="line">&#125; ArrayList;</span><br></pre></td></tr></table></figure>
+
+<p>这段代码定义了一个名为 <code>ArrayList</code> 的结构体，用来表示一个数组实现的链表。</p>
+<p>该结构体包含两个成员变量：</p>
+<ol>
+<li><code>int data[MAX_SIZE]</code>：一个整型数组，用来存储链表中的元素。</li>
+<li><code>int length</code>：一个整型变量，表示链表的长度。</li>
+</ol>
+<p>通过使用这个结构体，我们可以创建一个顺序存储结构的链表，其中元素按照顺序存储在数组中，并且可以通过索引来访问和修改链表中的元素。</p>
+<h3 id="创建并初始化链表"><a href="# 创建并初始化链表" class="headerlink" title="创建并初始化链表"></a>创建并初始化链表 </h3><p> 使用动态申请内存空间的方式创建并初始化一个链表。</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">ArrayList *<span class="title function_">initArrayList</span><span class="params">()</span> &#123;</span><br><span class="line">    ArrayList *<span class="built_in">list</span> = (ArrayList *)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(ArrayList));</span><br><span class="line">    <span class="built_in">memset</span>(<span class="built_in">list</span>-&gt;data, <span class="number">0</span>, MAX_SIZE * <span class="keyword">sizeof</span>(<span class="type">int</span>));</span><br><span class="line">    <span class="built_in">list</span>-&gt;length = <span class="number">0</span>;</span><br><span class="line">    <span class="comment">// printf(&quot;ArrayList size is %d bytes, data size is %d bytes.\n&quot;, sizeof(list), sizeof(list-&gt;data));</span></span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">list</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="查找链表中的元素"><a href="# 查找链表中的元素" class="headerlink" title="查找链表中的元素"></a>查找链表中的元素 </h3><p> 在链表中查找目标元素第一次出现时的索引，不存在则返回 -1。</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">findArrayList</span><span class="params">(ArrayList *<span class="built_in">list</span>, <span class="type">int</span> target)</span> &#123;</span><br><span class="line">    <span class="comment">/* 查找成功的平均比较次数为(n+1)/2 */</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="built_in">list</span>-&gt;length; i++) &#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="built_in">list</span>-&gt;data[i] == target) &#123;</span><br><span class="line">            <span class="keyword">return</span> i;  <span class="comment">// 返回元素在链表中的索引</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">-1</span>;  <span class="comment">// 没有找到元素</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>为什么查找成功的平均比较次数为 $\frac {n+1}{2}$ 呢？</p>
+</blockquote>
+<p>假设链表的长度为 $n$，若元素在链表中存在，在最坏情况下，需要比较 $n$ 次才能找到元素；在最好情况下，只需要比较 $1$ 次就能找到元素。因此，平均比较次数为 $\frac {n+1}{2}$。</p>
+<h3 id="向链表中插入元素"><a href="# 向链表中插入元素" class="headerlink" title="向链表中插入元素"></a>向链表中插入元素 </h3><p> 向链表中指定的索引位置插入一个元素，可以在有效数据的最前面和最后面插入元素。</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">insertArrayList</span><span class="params">(ArrayList *<span class="built_in">list</span>, <span class="type">int</span> index, <span class="type">int</span> element)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">list</span>-&gt;length == MAX_SIZE) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;List is full! Unable to insert element.\n&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (index &lt; <span class="number">0</span> || index &gt; <span class="built_in">list</span>-&gt;length) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Invalid index! Unable to insert element.\n&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="built_in">list</span>-&gt;length - <span class="number">1</span>; i &gt;= index; i--) &#123;</span><br><span class="line">        <span class="built_in">list</span>-&gt;data[i + <span class="number">1</span>] = <span class="built_in">list</span>-&gt;data[i];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">list</span>-&gt;data[index] = element;</span><br><span class="line">    <span class="built_in">list</span>-&gt;length++;  <span class="comment">// 更新链表的长度</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="删除链表中的元素"><a href="# 删除链表中的元素" class="headerlink" title="删除链表中的元素"></a>删除链表中的元素 </h3><p> 删除链表中指定索引位置的元素。</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">deleteArrayList</span><span class="params">(ArrayList *<span class="built_in">list</span>, <span class="type">int</span> index)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">list</span>-&gt;length == <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;List is empty! Unable to delete element.\n&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (index &lt; <span class="number">0</span> || index &gt;= <span class="built_in">list</span>-&gt;length) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Invalid index! Unable to delete element.\n&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = index; i &lt; <span class="built_in">list</span>-&gt;length - <span class="number">1</span>; i++) &#123;</span><br><span class="line">        <span class="built_in">list</span>-&gt;data[i] = <span class="built_in">list</span>-&gt;data[i + <span class="number">1</span>];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">list</span>-&gt;length--;  <span class="comment">// 更新链表的长度</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="获取链表的长度"><a href="# 获取链表的长度" class="headerlink" title="获取链表的长度"></a>获取链表的长度 </h3><p> 获取链表中有效数据元素的长度。</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">getArrayListLength</span><span class="params">(ArrayList *<span class="built_in">list</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">list</span>-&gt;length;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="释放链表空间"><a href="# 释放链表空间" class="headerlink" title="释放链表空间"></a>释放链表空间</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">freeArrayList</span><span class="params">(ArrayList *<span class="built_in">list</span>)</span> &#123;</span><br><span class="line">    <span class="built_in">free</span>(<span class="built_in">list</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="链表的数组实现完整代码"><a href="# 链表的数组实现完整代码" class="headerlink" title="链表的数组实现完整代码"></a>链表的数组实现完整代码</h2><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;string.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> MAX_SIZE (100)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 定义链表结构</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> data[MAX_SIZE];  <span class="comment">// 存储元素的数组</span></span><br><span class="line">    <span class="type">int</span> length;  <span class="comment">// 链表的长度</span></span><br><span class="line">&#125; ArrayList;</span><br><span class="line"></span><br><span class="line">ArrayList *<span class="title function_">initArrayList</span><span class="params">()</span> &#123;</span><br><span class="line">    ArrayList *<span class="built_in">list</span> = (ArrayList *)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(ArrayList));</span><br><span class="line">    <span class="built_in">memset</span>(<span class="built_in">list</span>-&gt;data, <span class="number">0</span>, MAX_SIZE * <span class="keyword">sizeof</span>(<span class="type">int</span>));</span><br><span class="line">    <span class="built_in">list</span>-&gt;length = <span class="number">0</span>;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;ArrayList size is %d bytes, data size is %d bytes.\n&quot;</span>, <span class="keyword">sizeof</span>(<span class="built_in">list</span>), <span class="keyword">sizeof</span>(<span class="built_in">list</span>-&gt;data));</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">list</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">findArrayList</span><span class="params">(ArrayList *<span class="built_in">list</span>, <span class="type">int</span> target)</span> &#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="built_in">list</span>-&gt;length; i++) &#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="built_in">list</span>-&gt;data[i] == target) &#123;</span><br><span class="line">            <span class="keyword">return</span> i;  <span class="comment">// 返回元素在链表中的索引</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">-1</span>;  <span class="comment">// 没有找到元素</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">insertArrayList</span><span class="params">(ArrayList *<span class="built_in">list</span>, <span class="type">int</span> index, <span class="type">int</span> element)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">list</span>-&gt;length == MAX_SIZE) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;List is full! Unable to insert element.\n&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (index &lt; <span class="number">0</span> || index &gt; <span class="built_in">list</span>-&gt;length) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Invalid index! Unable to insert element.\n&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="built_in">list</span>-&gt;length - <span class="number">1</span>; i &gt;= index; i--) &#123;</span><br><span class="line">        <span class="built_in">list</span>-&gt;data[i + <span class="number">1</span>] = <span class="built_in">list</span>-&gt;data[i];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">list</span>-&gt;data[index] = element;</span><br><span class="line">    <span class="built_in">list</span>-&gt;length++;  <span class="comment">// 更新链表的长度</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">deleteArrayList</span><span class="params">(ArrayList *<span class="built_in">list</span>, <span class="type">int</span> index)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">list</span>-&gt;length == <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;List is empty! Unable to delete element.\n&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (index &lt; <span class="number">0</span> || index &gt;= <span class="built_in">list</span>-&gt;length) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Invalid index! Unable to delete element.\n&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = index; i &lt; <span class="built_in">list</span>-&gt;length - <span class="number">1</span>; i++) &#123;</span><br><span class="line">        <span class="built_in">list</span>-&gt;data[i] = <span class="built_in">list</span>-&gt;data[i + <span class="number">1</span>];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">list</span>-&gt;length--;  <span class="comment">// 更新链表的长度</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">getArrayListLength</span><span class="params">(ArrayList *<span class="built_in">list</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">list</span>-&gt;length;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">printArrayList</span><span class="params">(ArrayList *<span class="built_in">list</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="built_in">list</span>-&gt;length; i++) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%d &quot;</span>, <span class="built_in">list</span>-&gt;data[i]);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\n&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">freeArrayList</span><span class="params">(ArrayList *<span class="built_in">list</span>)</span> &#123;</span><br><span class="line">    <span class="built_in">free</span>(<span class="built_in">list</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    ArrayList *<span class="built_in">list</span> = initArrayList();</span><br><span class="line"></span><br><span class="line">    insertArrayList(<span class="built_in">list</span>, <span class="number">0</span>, <span class="number">10</span>);</span><br><span class="line">    insertArrayList(<span class="built_in">list</span>, <span class="number">1</span>, <span class="number">20</span>);</span><br><span class="line">    insertArrayList(<span class="built_in">list</span>, <span class="number">2</span>, <span class="number">30</span>);</span><br><span class="line">    printArrayList(<span class="built_in">list</span>);</span><br><span class="line"></span><br><span class="line">    insertArrayList(<span class="built_in">list</span>, <span class="number">2</span>, <span class="number">40</span>);</span><br><span class="line">    insertArrayList(<span class="built_in">list</span>, <span class="number">0</span>, <span class="number">15</span>);</span><br><span class="line">    printArrayList(<span class="built_in">list</span>);</span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Length of list: %d\n&quot;</span>, getArrayListLength(<span class="built_in">list</span>));</span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> index = findArrayList(<span class="built_in">list</span>, <span class="number">20</span>);</span><br><span class="line">    <span class="keyword">if</span> (index != <span class="number">-1</span>) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Element 20 is found at index %d\n&quot;</span>, index);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Element 20 is not found\n&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    deleteArrayList(<span class="built_in">list</span>, <span class="number">1</span>);</span><br><span class="line">    printArrayList(<span class="built_in">list</span>);</span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Length of list: %d\n&quot;</span>, getArrayListLength(<span class="built_in">list</span>));</span><br><span class="line"></span><br><span class="line">    freeArrayList(<span class="built_in">list</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>程序的输出结果为：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">ArrayList size is 8 bytes, data size is 400 bytes.</span><br><span class="line">10 20 30</span><br><span class="line">15 10 20 40 30</span><br><span class="line">Length of list: 5</span><br><span class="line">Element 20 is found at index 2</span><br><span class="line">15 20 40 30</span><br><span class="line">Length of list: 4</span><br></pre></td></tr></table></figure>
+
+]]></content>
+      <categories>
+        <category>数据结构</category>
+        <category>链表</category>
+      </categories>
+      <tags>
+        <tag>链表</tag>
       </tags>
   </entry>
   <entry>
@@ -1676,6 +1606,141 @@
       </categories>
       <tags>
         <tag>拓扑排序</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Go 笔记之数组与切片</title>
+    <url>/posts/230912152800.html</url>
+    <content><![CDATA[<h2 id="Go 语言学习笔记 -10：数组"><a href="#Go 语言学习笔记 -10：数组" class="headerlink" title="Go 语言学习笔记 -10：数组"></a>Go 语言学习笔记 -10：数组</h2><ol>
+<li><p>数组是 <strong> 同一类型元素 </strong> 的集合，Go 语言中不允许混合不同类型的元素。</p>
+</li>
+<li><p>一个数组的表示形式为 <code>[n]T</code>。n 表示数组中元素的数量，T 代表每个元素的类型。如： <code>var arr [3]int</code>。</p>
+</li>
+<li><p>数组简略声明：<code>arr := [3]int&#123;12, 78, 50&#125;</code>，在简略声明中，可对部分元素赋值：<code>arr := [3]int&#123;12&#125;</code>，剩下的元素自动赋值为 0 。</p>
+</li>
+<li><p>可以忽略声明数组的长度，并用 <code>...</code> 代替，让编译器为你自动计算长度：<code>arr := [...]int&#123;12, 21&#125;</code>。</p>
+</li>
+<li><p><strong>数组是值类型，不是引用类型 </strong>：这意味着当数组赋值给一个新的变量时，该变量会得到一个原始数组的副本。<strong> 如果对新变量进行更改，则不会影响原始数组</strong>。注：对切片的修改会影响原始数组。</p>
+</li>
+</ol>
+<span id="more"></span>
+
+<ol start="6">
+<li><strong>当数组作为参数传递给函数时，它们是按值传递，而原始数组保持不变（原始数组不会因为函数调用而改变）</strong>。</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">changeLocal</span><span class="params">(num [5]<span class="type">int</span>)</span></span> &#123;</span><br><span class="line">    num[<span class="number">0</span>] = <span class="number">55</span></span><br><span class="line">    fmt.Println(<span class="string">&quot;inside function &quot;</span>, num)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    num := [...]<span class="type">int</span>&#123;<span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span>, <span class="number">8</span>&#125;</span><br><span class="line">    fmt.Println(<span class="string">&quot;before passing to function &quot;</span>, num)</span><br><span class="line">    changeLocal(num) <span class="comment">// num is passed by value</span></span><br><span class="line">    fmt.Println(<span class="string">&quot;after passing to function &quot;</span>, num)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// before passing to function  [5 6 7 8 8]</span></span><br><span class="line"><span class="comment">// inside function  [55 6 7 8 8]</span></span><br><span class="line"><span class="comment">// after passing to function  [5 6 7 8 8]</span></span><br></pre></td></tr></table></figure>
+
+<ol start="7">
+<li><p>数组的长度：<code>len(arr)</code>。</p>
+</li>
+<li><p>数组的迭代 for 循环：</p>
+</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">for</span> i := <span class="number">0</span>; i &lt; <span class="built_in">len</span>(arr); i++ &#123;</span><br><span class="line">    fmt.Println(<span class="string">&quot;%d-th element of arr is %.2f\n&quot;</span>, i, arr[i])</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="9">
+<li>数组的迭代：Go 提供了一种更好、更简洁的方法，通过 <strong> 使用 for 循环的 <code>range</code> 方法来遍历数组</strong>。<code>range</code> 返回索引和该索引处的值。</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">for</span> i, v := <span class="keyword">range</span> arr &#123;</span><br><span class="line">  fmt.Println(<span class="string">&quot;%d-th element of arr is %.2f\n&quot;</span>, i, v)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="10">
+<li>多维数组：1）简略声明；2）先声明二维数组变量，再根据索引来对数组添加值。</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line">arr := [<span class="number">3</span>][<span class="number">2</span>]<span class="type">string</span>&#123; <span class="comment">// 简略声明</span></span><br><span class="line">      &#123;<span class="string">&quot;lion&quot;</span>, <span class="string">&quot;tiger&quot;</span>&#125;,</span><br><span class="line">      &#123;<span class="string">&quot;cat&quot;</span>, <span class="string">&quot;dog&quot;</span>&#125;,</span><br><span class="line">      &#123;<span class="string">&quot;pigeon&quot;</span>, <span class="string">&quot;peacock&quot;</span>&#125;, <span class="comment">// this comma is necessary. The compiler will complain if you omit this comma</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> _, v1 := <span class="keyword">range</span> arr &#123; <span class="comment">// 打印二维数组</span></span><br><span class="line">    <span class="keyword">for</span> _, v2 := <span class="keyword">range</span> v1 &#123;</span><br><span class="line">        fmt.Printf(<span class="string">&quot;%s &quot;</span>, v2)</span><br><span class="line">    &#125;</span><br><span class="line">    fmt.Printf(<span class="string">&quot;\n&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="11">
+<li>数组的缺陷：长度固定，不可能增加数组的长度。</li>
+</ol>
+<hr>
+<h2 id="Go 语言学习笔记 -11：切片"><a href="#Go 语言学习笔记 -11：切片" class="headerlink" title="Go 语言学习笔记 -11：切片"></a>Go 语言学习笔记 -11：切片</h2><ol>
+<li><p>切片是 <strong> 由数组建立 </strong> 的一种方便、灵活且功能强大的包装（Wrapper）。<strong>切片本身不拥有任何数据 </strong>。它们只是对现有数组的<strong> 引用</strong>。</p>
+</li>
+<li><p>创建一个切片 A ：带有 <code>T</code> 类型元素的切片由 <code>[]T</code> 表示。语法：<code>a[start:end]</code> 创建一个从 a 数组索引 start 开始到 end - 1 结束的切片。</p>
+</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line">arr := [<span class="number">5</span>]<span class="type">int</span>&#123;<span class="number">76</span>, <span class="number">77</span>, <span class="number">78</span>, <span class="number">79</span>, <span class="number">80</span>&#125;</span><br><span class="line"><span class="keyword">var</span> b []<span class="type">int</span> = a[<span class="number">1</span>:<span class="number">4</span>] <span class="comment">// 数组切片</span></span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li>创建一个切片 B ：创建一个数组，并返回一个存储在 c 中的 <strong> 切片引用</strong>。注意：<code>[]</code> 内无内容。</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line">c := []<span class="type">int</span>&#123;<span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span>&#125; <span class="comment">// creates and array and returns a slice reference</span></span><br></pre></td></tr></table></figure>
+
+<ol start="4">
+<li><p><strong>对切片的修改会影响原始数组</strong>。</p>
+</li>
+<li><p>当多个切片共用相同的底层数组时，每个切片所做的更改将反映在数组中。</p>
+</li>
+<li><p><strong>切片的长度和容量</strong>：切片的长度是切片中的元素数。切片的容量是从创建切片索引开始（到数组末尾）的底层数组中的元素数。</p>
+</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    fruitarray := [...]<span class="type">string</span>&#123;<span class="string">&quot;a&quot;</span>, <span class="string">&quot;b&quot;</span>, <span class="string">&quot;c&quot;</span>, <span class="string">&quot;d&quot;</span>&#125;</span><br><span class="line">    fruitslice := fruitarray[<span class="number">1</span>:<span class="number">3</span>]</span><br><span class="line">    fmt.Println(<span class="string">&quot;length of slice: %d, capacity: %d&quot;</span>, <span class="built_in">len</span>(fruitslice), <span class="built_in">cap</span>(fruitslice)) <span class="comment">// 2, 3</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="7">
+<li>切片可以重置其容量：<code>slicename[:cap(slicename)]</code>。</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    fruitarray := [...]<span class="type">string</span>&#123;<span class="string">&quot;a&quot;</span>, <span class="string">&quot;b&quot;</span>, <span class="string">&quot;c&quot;</span>, <span class="string">&quot;d&quot;</span>&#125;</span><br><span class="line">    fruitslice := fruitarray[<span class="number">1</span>:<span class="number">3</span>]</span><br><span class="line">    fmt.Println(<span class="string">&quot;length of slice: %d, capacity: %d&quot;</span>, <span class="built_in">len</span>(fruitslice), <span class="built_in">cap</span>(fruitslice)) <span class="comment">// 2, 3. print: [b, c]</span></span><br><span class="line">    fruitslice = fruitslice[:<span class="built_in">cap</span>(fruitslice)] <span class="comment">// re-slicing furitslice till its capacity. print: [b, c, d]</span></span><br><span class="line">    fmt.Println(<span class="string">&quot;After re-slicing length is&quot;</span>, <span class="built_in">len</span>(fruitslice), <span class="string">&quot;and capacity is&quot;</span>, <span class="built_in">cap</span>(fruitslice)) <span class="comment">// 3, 3</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="8">
+<li><p><strong>使用 <code>make</code> 创建一个切片</strong>：<code>func make ([]T, len, cap)</code> 通过传递类型、长度和容量来创建切片。其中，容量是可选参数，默认值为切片长度。**<code>make</code> 函数创建一个数组，并返回引用该数组的切片 **。如 <code>arrslice := make([]float64, 5, 5)</code>。</p>
+</li>
+<li><p>切片是动态的，可以使用 <code>append</code> 将新元素追加到切片上。<code>append</code> 函数定义为：<code>func append(slice []T, x ...T) []T</code>，其中 <code>x...T</code> 表示该函数接收 T 类型的参数 x 的个数是可变的，如：<code>arrslice = append(arrslice, 5.6, 7.3)</code>。</p>
+</li>
+</ol>
+<blockquote>
+<p><code>append</code> 函数会返回一个新的切片，其中包含了原始切片和追加的元素：</p>
+<ol>
+<li>如果原始切片的容量足够，<code>append</code> 函数会在原始切片的基础上进行追加；</li>
+<li>如果原始切片的容量不够，<code>append</code> 函数会创建一个新的底层数组，并将原始切片中的元素和追加的元素复制到新的底层数组中。</li>
+</ol>
+<p>因此，append 函数返回的切片可能指向一个新的底层数组，而不是原始切片所指向的底层数组。</p>
+</blockquote>
+<ol start="10">
+<li><p>数组是固定的，但 <strong> 切片具有动态长度 </strong>：切片是由一个指向数组的指针、长度和容量组成的数据结构。当我们向切片中追加元素时，如果切片的长度小于容量，新元素会直接添加到切片的末尾，切片的长度会增加。但是，如果追加元素后切片的长度超过了容量，Go 语言会创建一个新的更大的底层数组，将原来的元素复制到新的数组中，并将新元素添加到新数组的末尾。然后，切片会指向这个新数组（<strong> 相比于旧切片，引用类型的地址改变了</strong>），并且容量会成为原来的两倍（并不是每次执行 <code>append</code> 时容量都会变成旧切片的两倍，只有当长度超过容量时，才会扩充一倍容量）。这样，切片就具有了动态长度的特性。</p>
+</li>
+<li><p>切片类型的零值为 <code>nil</code>：一个 <code>nil</code> 切片的长度和容量为 0，可以使用 <code>append</code> 函数将值追加到 <code>nil</code> 切片。</p>
+</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> names []<span class="type">string</span> <span class="comment">// zero value of a slice is nil</span></span><br><span class="line"><span class="keyword">if</span> names == <span class="literal">nil</span> &#123;</span><br><span class="line">    fmt.Println(<span class="string">&quot;slice is nil going to append&quot;</span>)</span><br><span class="line">    names = <span class="built_in">append</span>(names, <span class="string">&quot;John&quot;</span>, <span class="string">&quot;Sebastian&quot;</span>, <span class="string">&quot;Vinay&quot;</span>)</span><br><span class="line">    fmt.Println(<span class="string">&quot;names contents:&quot;</span>, names)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="12">
+<li><p><code>...</code> 可将一个切片添加到另一个切片中：<code>append(slice1, slice2...)</code>。</p>
+</li>
+<li><p>切片的函数传递：切片在内部可由一个结构体类型表示，即：</p>
+</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">type</span> slice <span class="keyword">struct</span> &#123;</span><br><span class="line">    Length         <span class="type">int</span></span><br><span class="line">    Capacity       <span class="type">int</span></span><br><span class="line">    ZerothElement  *<span class="type">byte</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>切片本身包含了长度、容量和指向底层数组首个元素的指针。当切片作为参数传递给函数时，虽然是通过值传递，但是切片内部的指针变量（这里的<code>byte</code>）仍然指向相同的底层数组。因此，当函数内部修改底层数组的值时，这些修改在函数外部是可见的。</p>
+</li>
+<li><p>然而，如果函数内部修改了切片的长度或容量，将会创建一个新的切片，而不会影响原始切片。这是因为切片的长度和容量是切片结构体的字段，而非底层数组的属性。因此，修改切片的长度或容量会创建一个新的切片结构体，其中的指针变量仍然指向原始的底层数组，但是新的切片具有不同的长度和容量。</p>
+</li>
+<li><p>因此，可以说当切片传递给函数时，函数内部对底层数组的修改，在函数外部是可见的，但是对切片的长度和容量的修改是不可见的。</p>
+</li>
+</ul>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">modifySlice</span><span class="params">(s []<span class="type">int</span>)</span></span> &#123;</span><br><span class="line">    s[<span class="number">0</span>] = <span class="number">100</span> <span class="comment">// 修改底层数组的值</span></span><br><span class="line">    s = <span class="built_in">append</span>(s, <span class="number">200</span>) <span class="comment">// 创建新的切片，不影响原始切片</span></span><br><span class="line">    fmt.Println(<span class="string">&quot;Inside modifySlice:&quot;</span>, s)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    numbers := []<span class="type">int</span>&#123;<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>&#125;</span><br><span class="line">    fmt.Println(<span class="string">&quot;Before modifySlice:&quot;</span>, numbers)</span><br><span class="line">    modifySlice(numbers)</span><br><span class="line">    fmt.Println(<span class="string">&quot;After modifySlice:&quot;</span>, numbers)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Before modifySlice: [1 2 3 4 5]</span></span><br><span class="line"><span class="comment">// Inside modifySlice: [100 2 3 4 5 200]</span></span><br><span class="line"><span class="comment">// After modifySlice: [100 2 3 4 5]  // 函数内部对底层数组的修改在函数外部是可见的</span></span><br></pre></td></tr></table></figure>
+
+<ol start="14">
+<li><strong>多维切片</strong>：类似于多维数组，但每行索引对应的元素数量可以不等于其它行。</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line">pls := [][]<span class="type">string</span> &#123;</span><br><span class="line">      &#123;<span class="string">&quot;C&quot;</span>, <span class="string">&quot;C++&quot;</span>&#125;,</span><br><span class="line">      &#123;<span class="string">&quot;JavaScript&quot;</span>&#125;,</span><br><span class="line">      &#123;<span class="string">&quot;Go&quot;</span>, <span class="string">&quot;Rust&quot;</span>&#125;,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="15">
+<li>内存优化：切片持有对底层数组的引用，只要切片在内存中，数组就不能被垃圾回收。一种回收数组的方法时使用 <code>copy</code> 函数 <code>func copy(dst, src[]T) int</code> 来生成一个切片的副本，这样就可以使用新的切片，原始数组也可以被垃圾回收。注：返回的 int 类型的值为 dst 的长度。</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">countries</span><span class="params">()</span></span> []<span class="type">string</span> &#123;</span><br><span class="line">    countries := []<span class="type">string</span>&#123;<span class="string">&quot;USA&quot;</span>, <span class="string">&quot;Singapore&quot;</span>, <span class="string">&quot;Germany&quot;</span>, <span class="string">&quot;India&quot;</span>, <span class="string">&quot;Australia&quot;</span>&#125;</span><br><span class="line">    neededCountries := countries[:<span class="built_in">len</span>(countries)<span class="number">-2</span>]</span><br><span class="line">    countriesCpy := <span class="built_in">make</span>([]<span class="type">string</span>, <span class="built_in">len</span>(neededCountries))</span><br><span class="line">    <span class="built_in">copy</span>(countriesCpy, neededCountries) <span class="comment">//copies neededCountries to countriesCpy</span></span><br><span class="line">    <span class="keyword">return</span> countriesCpy</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    countriesNeeded := countries()</span><br><span class="line">    fmt.Println(countriesNeeded)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>学习链接：<a href="https://studygolang.com/subject/2">https://studygolang.com/subject/2</a>，感谢如此优秀的教程！</p>
+</blockquote>
+]]></content>
+      <categories>
+        <category>学习笔记</category>
+        <category>Golang</category>
+      </categories>
+      <tags>
+        <tag>Go数组</tag>
+        <tag>Go切片</tag>
       </tags>
   </entry>
   <entry>
