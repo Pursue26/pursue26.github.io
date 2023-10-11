@@ -476,72 +476,6 @@
       </tags>
   </entry>
   <entry>
-    <title>C 语言之多维数组</title>
-    <url>/posts/230922143003.html</url>
-    <content><![CDATA[<p>本文章主要介绍 C 语言创建多维数组的方式及其排序，包括静态多维数组、<code>malloc</code> 动态申请多维数组、指针数组的多维数组和多维结构体数组的创建。</p>
-<span id="more"></span>
-
-<h2 id="排序接口"><a href="# 排序接口" class="headerlink" title="排序接口"></a>排序接口</h2><p><code>qsort</code> 函数是 C 语言标准库中的一个排序函数，用于对数组进行快速排序。它的函数原型如下：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">qsort</span><span class="params">(</span></span><br><span class="line"><span class="params">    <span class="type">void</span> *base, </span></span><br><span class="line"><span class="params">    <span class="type">size_t</span> nmemb, </span></span><br><span class="line"><span class="params">    <span class="type">size_t</span> size, </span></span><br><span class="line"><span class="params">    <span class="type">int</span> (*compar)(<span class="type">const</span> <span class="type">void</span> *, <span class="type">const</span> <span class="type">void</span> *)</span></span><br><span class="line"><span class="params">)</span>;</span><br></pre></td></tr></table></figure>
-
-<p>参数说明：</p>
-<ul>
-<li><code>base</code>：指向需要排序的数组的第一个元素的指针。</li>
-<li><code>nmemb</code>：数组中元素的个数。</li>
-<li><code>size</code>：每个元素的大小（以字节为单位）。</li>
-<li><code>compar</code>：指向比较函数的指针，用于指定数组元素的比较规则。</li>
-</ul>
-<p><code>base</code> 指定了待排序数组的首地址，再结合 <code>nmemb * size</code> 可以确定要排序的数组的范围。</p>
-<p>比较函数 <code>compar</code> 的原型如下：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">compar</span><span class="params">(<span class="type">const</span> <span class="type">void</span> *a, <span class="type">const</span> <span class="type">void</span> *b)</span>;</span><br></pre></td></tr></table></figure>
-
-<p>参数说明：</p>
-<ul>
-<li><code>a</code> 和 <code>b</code>：指向待比较的两个元素的指针。</li>
-</ul>
-<p>比较函数 <code>compar</code> 必须返回一个整数值，表示 <code>a</code> 和 <code>b</code> 的大小关系：</p>
-<ul>
-<li>如果 <code>a</code> 小于 <code>b</code>，则返回一个负整数。</li>
-<li>如果 <code>a</code> 等于 <code>b</code>，则返回零。</li>
-<li>如果 <code>a</code> 大于 <code>b</code>，则返回一个正整数。</li>
-</ul>
-<p>通过传入不同的比较函数，<code>qsort</code> 函数可以实现对不同类型的数组进行排序。</p>
-<h2 id="静态多维数组"><a href="# 静态多维数组" class="headerlink" title="静态多维数组"></a>静态多维数组 </h2><h3 id="多维数组创建"><a href="# 多维数组创建" class="headerlink" title="多维数组创建"></a> 多维数组创建</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> rows = <span class="number">3</span>, cols = <span class="number">4</span>;</span><br><span class="line"><span class="type">int</span> arr[rows][cols];</span><br></pre></td></tr></table></figure>
-
-<h3 id="多维数组排序"><a href="# 多维数组排序" class="headerlink" title="多维数组排序"></a>多维数组排序 </h3><p> 按照二维数组第 0 列升序排序。</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">cmp</span><span class="params">(<span class="type">const</span> <span class="type">void</span> *a, <span class="type">const</span> <span class="type">void</span> *b)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> ((<span class="type">int</span> *)a)[<span class="number">0</span>] - ((<span class="type">int</span> *)b)[<span class="number">0</span>];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 传入 cmp 函数指针的 arr 是一个一维指针</span></span><br><span class="line">qsort(arr, rows, <span class="keyword">sizeof</span>(arr[<span class="number">0</span>]), cmp);  <span class="comment">// 快速排序</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="malloc 动态申请多维数组"><a href="#malloc 动态申请多维数组" class="headerlink" title="malloc 动态申请多维数组"></a>malloc 动态申请多维数组 </h2><h3 id="多维数组创建 -1"><a href="# 多维数组创建 -1" class="headerlink" title="多维数组创建"></a> 多维数组创建</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> rows = <span class="number">3</span>, cols = <span class="number">4</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 动态申请二维数组</span></span><br><span class="line"><span class="type">int</span> **arr = (<span class="type">int</span> **)<span class="built_in">malloc</span>(rows * <span class="keyword">sizeof</span>(<span class="type">int</span> *));</span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; rows; i++) &#123;</span><br><span class="line">    arr[i] = (<span class="type">int</span> *)<span class="built_in">malloc</span>(cols * <span class="keyword">sizeof</span>(<span class="type">int</span>));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 释放内存</span></span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; rows; i++) &#123;</span><br><span class="line">    <span class="built_in">free</span>(arr[i]);</span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">free</span>(arr);</span><br></pre></td></tr></table></figure>
-
-<p>释放 <code>malloc</code> 申请的多维数组时，不能直接 <code>free(arr)</code>，因为 <code>malloc</code> 和 <code>free</code> 执行次数要一致。</p>
-<h3 id="多维数组排序 -1"><a href="# 多维数组排序 -1" class="headerlink" title="多维数组排序"></a>多维数组排序 </h3><p> 按照二维数组第 0 列升序排序，若相等，则按第 1 列升序排序。</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">cmp</span><span class="params">(<span class="type">const</span> <span class="type">void</span>* a, <span class="type">const</span> <span class="type">void</span>* b)</span> &#123;</span><br><span class="line">    <span class="comment">// a 是一个指向二维数组首行的指针</span></span><br><span class="line">    <span class="comment">// 通过类型转换和解引用操作, ap 指向了 a 所指向的整型数组的首地址</span></span><br><span class="line">    <span class="type">const</span> <span class="type">int</span>* ap = *(<span class="type">int</span> **)a;</span><br><span class="line">    <span class="type">const</span> <span class="type">int</span>* bp = *(<span class="type">int</span> **)b;</span><br><span class="line">    <span class="keyword">if</span> (ap[<span class="number">0</span>] == bp[<span class="number">0</span>]) &#123;</span><br><span class="line">        <span class="keyword">return</span> ap[<span class="number">1</span>] - bp[<span class="number">1</span>];</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> ap[<span class="number">0</span>] - bp[<span class="number">0</span>];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 传入 cmp 函数指针的 arr 是一个二维指针</span></span><br><span class="line">qsort(arr, rows, <span class="keyword">sizeof</span>(arr[<span class="number">0</span>]), cmp);</span><br></pre></td></tr></table></figure>
-
-<h2 id="malloc 动态申请多维结构体数组"><a href="#malloc 动态申请多维结构体数组" class="headerlink" title="malloc 动态申请多维结构体数组"></a>malloc 动态申请多维结构体数组 </h2><h3 id="多维结构体数组创建"><a href="# 多维结构体数组创建" class="headerlink" title="多维结构体数组创建"></a> 多维结构体数组创建</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> rows = <span class="number">3</span>, cols = <span class="number">4</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">node</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> x;</span><br><span class="line">    <span class="type">int</span> y;</span><br><span class="line">    <span class="type">int</span> z;</span><br><span class="line">&#125; Node_t;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 动态申请二维数组</span></span><br><span class="line">Node_t **arr = (Node_t **)<span class="built_in">malloc</span>(rows * <span class="keyword">sizeof</span>(Node_t *));</span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; rows; i++) &#123;</span><br><span class="line">    arr[i] = (Node_t *)<span class="built_in">malloc</span>(cols * <span class="keyword">sizeof</span>(Node_t));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 释放内存</span></span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; rows; i++) &#123;</span><br><span class="line">    <span class="comment">// 如果结构体成员中有指针且申请了空间, 则需要先释放成员的空间再释放结构体的空间</span></span><br><span class="line">    <span class="built_in">free</span>(arr[i]);</span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">free</span>(arr);</span><br></pre></td></tr></table></figure>
-
-<h3 id="多维结构体数组排序"><a href="# 多维结构体数组排序" class="headerlink" title="多维结构体数组排序"></a>多维结构体数组排序 </h3><p> 按照二维数组第 0 列的结构体成员 <code>x</code> 降序排序。</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">cmp</span><span class="params">(<span class="type">const</span> <span class="type">void</span> *a, <span class="type">const</span> <span class="type">void</span> *b)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// return (Node_t *)a-&gt;x - (Node_t *)b-&gt;x;   // 错误写法</span></span><br><span class="line">    <span class="keyword">return</span> ((Node_t *)a)-&gt;x - ((Node_t *)b)-&gt;x;   <span class="comment">// 正确写法 1</span></span><br><span class="line">    <span class="comment">// return (*(Node_t *)b).x - (*(Node_t *)a).x;     // 正确写法 2</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">qsort(arr, rows, <span class="keyword">sizeof</span>(arr[<span class="number">0</span>]), cmp);</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li><code>-&gt;</code> 操作符的优先级高于 <code>()</code> 操作符。</li>
-</ul>
-<h2 id="指针数组的多维数组"><a href="# 指针数组的多维数组" class="headerlink" title="指针数组的多维数组"></a>指针数组的多维数组 </h2><p> 使用指针数组的多维数组：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> rows = <span class="number">3</span>, cols = <span class="number">4</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span>* arr[rows];</span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; cols; i++) &#123;</span><br><span class="line">    arr[i] = (<span class="type">int</span> *)<span class="built_in">malloc</span>(<span class="number">4</span> * <span class="keyword">sizeof</span>(<span class="type">int</span>));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 释放内存</span></span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; rows; i++) &#123;</span><br><span class="line">    <span class="built_in">free</span>(arr[i]);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>这种方式创建的多维数组实际上是一个指针数组，每个指针指向一个一维数组，可以在运行时动态分配每个一维数组的大小（方便创建每行元素个数不同的多维数组）。</p>
-<h3 id="多维数组排序 -2"><a href="# 多维数组排序 -2" class="headerlink" title="多维数组排序"></a>多维数组排序 </h3><p> 按照二维数组第 0 列降序排序。</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">cmp</span><span class="params">(<span class="type">const</span> <span class="type">void</span>* a, <span class="type">const</span> <span class="type">void</span>* b)</span> &#123;</span><br><span class="line">    <span class="type">const</span> <span class="type">int</span>* ap = *(<span class="type">int</span> **)a;</span><br><span class="line">    <span class="type">const</span> <span class="type">int</span>* bp = *(<span class="type">int</span> **)b;</span><br><span class="line">    <span class="keyword">return</span> bp[<span class="number">0</span>] - ap[<span class="number">0</span>];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 传入 cmp 函数指针的 arr 是一个二维指针</span></span><br><span class="line">qsort(arr, rows, <span class="keyword">sizeof</span>(arr[<span class="number">0</span>]), cmp);</span><br></pre></td></tr></table></figure>
-]]></content>
-      <categories>
-        <category>学习笔记</category>
-        <category>C语言</category>
-      </categories>
-      <tags>
-        <tag>多维数组</tag>
-        <tag>数组排序</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>C 语言之大小端知识</title>
     <url>/posts/230918114841.html</url>
     <content><![CDATA[<h2 id="字节序"><a href="# 字节序" class="headerlink" title="字节序"></a>字节序 </h2><h3 id="主机字节序"><a href="# 主机字节序" class="headerlink" title="主机字节序"></a> 主机字节序 </h3><p> 在计算机中，数据在内存中的存储是以 byte 为单位的。字节序是由于 CPU 对大于一个字节的变量，在内存中的存放顺序不同而产生的。</p>
@@ -958,101 +892,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Go 笔记之字符串和指针</title>
-    <url>/posts/230915155105.html</url>
-    <content><![CDATA[<h2 id="Go 语言学习笔记 -14：字符串"><a href="#Go 语言学习笔记 -14：字符串" class="headerlink" title="Go 语言学习笔记 -14：字符串"></a>Go 语言学习笔记 -14：字符串</h2><ol>
-<li><p>Go 语言中的字符串是一个 <strong> 字节切片</strong>。</p>
-</li>
-<li><p><code>%x</code> 格式限定符用于指定 16 进制编码，<code>%c</code> 格式限定符用于打印字符串的字符。</p>
-</li>
-<li><p>在 UTF-8 编码中，一个代码点（字符的编码）可能会占用超过一个字节的空间，所以使用 <code>%c</code> 格式打印时可能会出错，可以用 <code>rune</code> 解决。</p>
-</li>
-<li><p><code>rune</code> 是 Go 语言的内建类型，它也是 <code>int32</code> 的别称。在 Go 语言中，<code>rune</code> 表示一个代码点。代码点无论占用多少个字节，都可以用一个 <code>rune</code> 来表示。</p>
-</li>
-</ol>
-<span id="more"></span>
-
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line">s := <span class="string">&quot;Señor&quot;</span></span><br><span class="line"><span class="keyword">for</span> i:= <span class="number">0</span>; i &lt; <span class="built_in">len</span>(s); i++ &#123;</span><br><span class="line">    fmt.Printf(<span class="string">&quot;%c &quot;</span>,s[i]) <span class="comment">// 打印出错，S e Ã ± o r</span></span><br><span class="line">&#125;</span><br><span class="line">fmt.Printf(<span class="string">&quot;\n&quot;</span>)</span><br><span class="line"></span><br><span class="line">runes := []<span class="type">rune</span>(s)</span><br><span class="line"><span class="keyword">for</span> i:= <span class="number">0</span>; i &lt; <span class="built_in">len</span>(runes); i++ &#123; <span class="comment">// 字符串被转化为一个 rune 切片</span></span><br><span class="line">    fmt.Printf(<span class="string">&quot;%c &quot;</span>,runes[i]) <span class="comment">// 打印正确，S e ñ o r</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<ol start="5">
-<li>字符串的 for range 循环更简单。</li>
-</ol>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">printCharsAndBytes</span><span class="params">(s <span class="type">string</span>)</span></span> &#123;</span><br><span class="line">    <span class="keyword">for</span> index, <span class="type">rune</span> := <span class="keyword">range</span> s &#123;</span><br><span class="line">        fmt.Printf(<span class="string">&quot;%c starts at byte %d\n&quot;</span>, <span class="type">rune</span>, index)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    name := <span class="string">&quot;Señor&quot;</span></span><br><span class="line">    printCharsAndBytes(name)</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">S starts at byte 0  </span></span><br><span class="line"><span class="comment">e starts at byte 1  </span></span><br><span class="line"><span class="comment">ñ starts at byte 2  // ñ 占了两个字节</span></span><br><span class="line"><span class="comment">o starts at byte 4  </span></span><br><span class="line"><span class="comment">r starts at byte 5</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
-
-<ol start="6">
-<li>用字节切片构造字符串：</li>
-</ol>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 包含字符串 Café 用 UTF-8 编码后的 16 进制字节</span></span><br><span class="line">byteSlice := []<span class="type">byte</span>&#123;<span class="number">0x43</span>, <span class="number">0x61</span>, <span class="number">0x66</span>, <span class="number">0xC3</span>, <span class="number">0xA9</span>&#125;</span><br><span class="line">str := <span class="type">string</span>(byteSlice)</span><br><span class="line">fmt.Println(str) <span class="comment">// Café</span></span><br></pre></td></tr></table></figure>
-
-<ol start="7">
-<li>用 <code>rune</code> 切片构造字符串：</li>
-</ol>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 包含字符串 Señor 的 16 进制的 Unicode 代码点</span></span><br><span class="line">runeSlice := []<span class="type">rune</span>&#123;<span class="number">0x0053</span>, <span class="number">0x0065</span>, <span class="number">0x00f1</span>, <span class="number">0x006f</span>, <span class="number">0x0072</span>&#125;</span><br><span class="line">str := <span class="type">string</span>(runeSlice)</span><br><span class="line">fmt.Println(str) <span class="comment">// Señor</span></span><br></pre></td></tr></table></figure>
-
-<ol start="8">
-<li>字符串的长度：utf-8 package 包中的 <code>func RuneCountInString(s string) (n int)</code> 方法用来 <strong> 获取字符串的长度 </strong>。这个方法传入一个字符串参数然后<strong> 返回字符串中的 rune 的数量</strong>。</li>
-</ol>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line">word1 := <span class="string">&quot;Señor&quot;</span> </span><br><span class="line">fmt.Println(utf8.RuneCountInString(word1)) <span class="comment">// 5</span></span><br><span class="line">word2 := <span class="string">&quot;Pets&quot;</span></span><br><span class="line">fmt.Println(utf8.RuneCountInString(word2)) <span class="comment">// 4</span></span><br></pre></td></tr></table></figure>
-
-<ol start="9">
-<li>字符串是不可变的：一旦一个字符串被创建，它将不可被修改。为了修改字符串，可以把字符串转化为一个 rune 切片，这个切片可以进行任何想要的改变，最后再转化为一个字符串。</li>
-</ol>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">mutate</span><span class="params">(s []<span class="type">rune</span>)</span></span> <span class="type">string</span> &#123;  </span><br><span class="line">    s[<span class="number">0</span>] = <span class="string">&#x27;a&#x27;</span> <span class="comment">// 修改切片</span></span><br><span class="line">    <span class="keyword">return</span> <span class="type">string</span>(s) <span class="comment">// 转换为一个字符串</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;  </span><br><span class="line">    h := <span class="string">&quot;hello&quot;</span></span><br><span class="line">    fmt.Println(mutate([]<span class="type">rune</span>(h))) <span class="comment">// 用 rune 切片构造字符串，输出 aello</span></span><br><span class="line">    fmt.Println(h) <span class="comment">// 输出 hello</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<hr>
-<h2 id="Go 语言学习笔记 -15：指针"><a href="#Go 语言学习笔记 -15：指针" class="headerlink" title="Go 语言学习笔记 -15：指针"></a>Go 语言学习笔记 -15：指针</h2><ol>
-<li><p>指针是一种存储变量内存地址（Memory Address）的变量。例如，变量 b 的值为 156，而 b 的内存地址为 0x1040a124，变量 a 存储了 b 的地址。我们就称 a 指向了 b。</p>
-</li>
-<li><p>指针的声明：指针变量的类型为 <code>*T</code>，该指针指向一个 <code>T</code> 类型的变量。</p>
-</li>
-</ol>
-<ul>
-<li>&amp; 操作符用于获取变量的地址。下面的程序把 b 的地址赋值给 <code>*int</code> 类型的 a。我们称 a 指向了 b。当我们打印 a 的值时，会打印出 b 的地址。</li>
-</ul>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    b := <span class="number">255</span></span><br><span class="line">    <span class="keyword">var</span> a *<span class="type">int</span> = &amp;b</span><br><span class="line">    fmt.Printf(<span class="string">&quot;Type of a is %T\n&quot;</span>, a) <span class="comment">// *int</span></span><br><span class="line">    fmt.Println(<span class="string">&quot;address of b is&quot;</span>, a)  <span class="comment">// 0x1040a124</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<ol start="3">
-<li><p>指针的零值（Zero Value）是 <code>nil</code>。声明变量 <code>var b *int</code>，此时 <code>b == nil</code> 为 <code>true</code>。</p>
-</li>
-<li><p>指针的解引用：指针的解引用可以获取指针所指向的变量的值。将 <code>a</code> 解引用的语法是 <code>*a</code>。</p>
-</li>
-</ol>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;  </span><br><span class="line">    b := <span class="number">255</span></span><br><span class="line">    a := &amp;b</span><br><span class="line">    fmt.Println(<span class="string">&quot;address of b is&quot;</span>, a) <span class="comment">// 0x1040a124</span></span><br><span class="line">    fmt.Println(<span class="string">&quot;value of b is&quot;</span>, *a)  <span class="comment">// 255</span></span><br><span class="line">    *a++  <span class="comment">// (*a)++</span></span><br><span class="line">    fmt.Println(<span class="string">&quot;new value of b is&quot;</span>, b) <span class="comment">// 256</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<ol start="5">
-<li>向函数传递指针参数：</li>
-</ol>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">change</span><span class="params">(val *<span class="type">int</span>)</span></span> &#123;  </span><br><span class="line">    *val = <span class="number">55</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;  </span><br><span class="line">    a := <span class="number">58</span></span><br><span class="line">    fmt.Println(<span class="string">&quot;value of a before function call is&quot;</span>, a) <span class="comment">// 58</span></span><br><span class="line">    b := &amp;a</span><br><span class="line">    change(b)</span><br><span class="line">    fmt.Println(<span class="string">&quot;value of a after function call is&quot;</span>, a) <span class="comment">// 55</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<ol start="6">
-<li>假如我们想要在函数内修改一个数组，并希望调用函数的地方也能得到修改后的数组，一种解决方案是把一个指向数组的指针传递给这个函数（但 Go 语言习惯的方法是用切片处理，见序号 7）。</li>
-</ol>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">modify</span><span class="params">(arr *[3]<span class="type">int</span>)</span></span> &#123;  </span><br><span class="line">    (*arr)[<span class="number">0</span>] = <span class="number">90</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;  </span><br><span class="line">    a := [<span class="number">3</span>]<span class="type">int</span>&#123;<span class="number">89</span>, <span class="number">90</span>, <span class="number">91</span>&#125;</span><br><span class="line">    modify(&amp;a)</span><br><span class="line">    fmt.Println(a)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li><code>a[x]</code> 是 <code>(*a)[x]</code> 的简写形式，因此上面代码中的 <code>(*arr)[0]</code> 可以替换为 <code>arr[0]</code>。</li>
-</ul>
-<ol start="7">
-<li><strong>不要向函数传递数组的指针，而应该使用数组切片</strong>：</li>
-</ol>
-<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">modify</span><span class="params">(sls []<span class="type">int</span>)</span></span> &#123;  </span><br><span class="line">    sls[<span class="number">0</span>] = <span class="number">90</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;  </span><br><span class="line">    a := [<span class="number">3</span>]<span class="type">int</span>&#123;<span class="number">89</span>, <span class="number">90</span>, <span class="number">91</span>&#125;</span><br><span class="line">    modify(a[:]) <span class="comment">// 使用切片</span></span><br><span class="line">    fmt.Println(a)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>别再传递数组指针了，而是使用切片吧。上面的代码更加简洁，也更符合 Go 语言的习惯。</li>
-</ul>
-<blockquote>
-<p>学习链接：<a href="https://studygolang.com/subject/2">https://studygolang.com/subject/2</a>，感谢如此优秀的教程！</p>
-</blockquote>
-]]></content>
-      <categories>
-        <category>学习笔记</category>
-        <category>Golang</category>
-      </categories>
-      <tags>
-        <tag>Go字符串</tag>
-        <tag>Go指针</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Go 笔记之可变参数函数与 Map 集合</title>
     <url>/posts/230913161326.html</url>
     <content><![CDATA[<h2 id="Go 语言学习笔记 -12：可变参数函数"><a href="#Go 语言学习笔记 -12：可变参数函数" class="headerlink" title="Go 语言学习笔记 -12：可变参数函数"></a>Go 语言学习笔记 -12：可变参数函数</h2><ol>
@@ -1110,6 +949,88 @@
         <tag>Go可变参数函数</tag>
         <tag>Go集合Map</tag>
       </tags>
+  </entry>
+  <entry>
+    <title>C 语言之多维数组</title>
+    <url>/posts/230922143003.html</url>
+    <content><![CDATA[<p>本文章主要介绍 C 语言创建多维数组的方式及其排序，包括静态多维数组、<code>malloc</code> 动态申请多维数组、指针数组的多维数组和多维结构体数组的创建。</p>
+<span id="more"></span>
+
+<h2 id="排序接口"><a href="# 排序接口" class="headerlink" title="排序接口"></a>排序接口</h2><p><code>qsort</code> 函数是 C 语言标准库中的一个排序函数，用于对数组进行快速排序。它的函数原型如下：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">qsort</span><span class="params">(</span></span><br><span class="line"><span class="params">    <span class="type">void</span> *base, </span></span><br><span class="line"><span class="params">    <span class="type">size_t</span> nmemb, </span></span><br><span class="line"><span class="params">    <span class="type">size_t</span> size, </span></span><br><span class="line"><span class="params">    <span class="type">int</span> (*compar)(<span class="type">const</span> <span class="type">void</span> *, <span class="type">const</span> <span class="type">void</span> *)</span></span><br><span class="line"><span class="params">)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>参数说明：</p>
+<ul>
+<li><code>base</code>：指向需要排序的数组的第一个元素的指针。</li>
+<li><code>nmemb</code>：数组中元素的个数。</li>
+<li><code>size</code>：每个元素的大小（以字节为单位）。</li>
+<li><code>compar</code>：指向比较函数的指针，用于指定数组元素的比较规则。</li>
+</ul>
+<p><code>base</code> 指定了待排序数组的首地址，再结合 <code>nmemb * size</code> 可以确定要排序的数组的范围。</p>
+<p>比较函数 <code>compar</code> 的原型如下：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">compar</span><span class="params">(<span class="type">const</span> <span class="type">void</span> *a, <span class="type">const</span> <span class="type">void</span> *b)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>参数说明：</p>
+<ul>
+<li><code>a</code> 和 <code>b</code>：指向待比较的两个元素的指针。</li>
+</ul>
+<p>比较函数 <code>compar</code> 必须返回一个整数值，表示 <code>a</code> 和 <code>b</code> 的大小关系：</p>
+<ul>
+<li>如果 <code>a</code> 小于 <code>b</code>，则返回一个负整数。</li>
+<li>如果 <code>a</code> 等于 <code>b</code>，则返回零。</li>
+<li>如果 <code>a</code> 大于 <code>b</code>，则返回一个正整数。</li>
+</ul>
+<p>通过传入不同的比较函数，<code>qsort</code> 函数可以实现对不同类型的数组进行排序。</p>
+<h2 id="静态多维数组"><a href="# 静态多维数组" class="headerlink" title="静态多维数组"></a>静态多维数组 </h2><h3 id="多维数组创建"><a href="# 多维数组创建" class="headerlink" title="多维数组创建"></a> 多维数组创建</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> rows = <span class="number">3</span>, cols = <span class="number">4</span>;</span><br><span class="line"><span class="type">int</span> arr[rows][cols];</span><br></pre></td></tr></table></figure>
+
+<h3 id="多维数组排序"><a href="# 多维数组排序" class="headerlink" title="多维数组排序"></a>多维数组排序 </h3><p> 按照二维数组第 0 列升序排序。</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">cmp</span><span class="params">(<span class="type">const</span> <span class="type">void</span> *a, <span class="type">const</span> <span class="type">void</span> *b)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> ((<span class="type">int</span> *)a)[<span class="number">0</span>] - ((<span class="type">int</span> *)b)[<span class="number">0</span>];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 传入 cmp 函数指针的 arr 是一个一维指针</span></span><br><span class="line">qsort(arr, rows, <span class="keyword">sizeof</span>(arr[<span class="number">0</span>]), cmp);  <span class="comment">// 快速排序</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="malloc 动态申请多维数组"><a href="#malloc 动态申请多维数组" class="headerlink" title="malloc 动态申请多维数组"></a>malloc 动态申请多维数组 </h2><h3 id="多维数组创建 -1"><a href="# 多维数组创建 -1" class="headerlink" title="多维数组创建"></a> 多维数组创建</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> rows = <span class="number">3</span>, cols = <span class="number">4</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 动态申请二维数组</span></span><br><span class="line"><span class="type">int</span> **arr = (<span class="type">int</span> **)<span class="built_in">malloc</span>(rows * <span class="keyword">sizeof</span>(<span class="type">int</span> *));</span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; rows; i++) &#123;</span><br><span class="line">    arr[i] = (<span class="type">int</span> *)<span class="built_in">malloc</span>(cols * <span class="keyword">sizeof</span>(<span class="type">int</span>));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 释放内存</span></span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; rows; i++) &#123;</span><br><span class="line">    <span class="built_in">free</span>(arr[i]);</span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">free</span>(arr);</span><br></pre></td></tr></table></figure>
+
+<p>释放 <code>malloc</code> 申请的多维数组时，不能直接 <code>free(arr)</code>，因为 <code>malloc</code> 和 <code>free</code> 执行次数要一致。</p>
+<h3 id="多维数组排序 -1"><a href="# 多维数组排序 -1" class="headerlink" title="多维数组排序"></a>多维数组排序 </h3><p> 按照二维数组第 0 列升序排序，若相等，则按第 1 列升序排序。</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">cmp</span><span class="params">(<span class="type">const</span> <span class="type">void</span>* a, <span class="type">const</span> <span class="type">void</span>* b)</span> &#123;</span><br><span class="line">    <span class="comment">// a 是一个指向二维数组首行的指针</span></span><br><span class="line">    <span class="comment">// 通过类型转换和解引用操作, ap 指向了 a 所指向的整型数组的首地址</span></span><br><span class="line">    <span class="type">const</span> <span class="type">int</span>* ap = *(<span class="type">int</span> **)a;</span><br><span class="line">    <span class="type">const</span> <span class="type">int</span>* bp = *(<span class="type">int</span> **)b;</span><br><span class="line">    <span class="keyword">if</span> (ap[<span class="number">0</span>] == bp[<span class="number">0</span>]) &#123;</span><br><span class="line">        <span class="keyword">return</span> ap[<span class="number">1</span>] - bp[<span class="number">1</span>];</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> ap[<span class="number">0</span>] - bp[<span class="number">0</span>];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 传入 cmp 函数指针的 arr 是一个二维指针</span></span><br><span class="line">qsort(arr, rows, <span class="keyword">sizeof</span>(arr[<span class="number">0</span>]), cmp);</span><br></pre></td></tr></table></figure>
+
+<h2 id="malloc 动态申请多维结构体数组"><a href="#malloc 动态申请多维结构体数组" class="headerlink" title="malloc 动态申请多维结构体数组"></a>malloc 动态申请多维结构体数组 </h2><h3 id="多维结构体数组创建"><a href="# 多维结构体数组创建" class="headerlink" title="多维结构体数组创建"></a> 多维结构体数组创建</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> rows = <span class="number">3</span>, cols = <span class="number">4</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">node</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> x;</span><br><span class="line">    <span class="type">int</span> y;</span><br><span class="line">    <span class="type">int</span> z;</span><br><span class="line">&#125; Node_t;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 动态申请二维数组</span></span><br><span class="line">Node_t **arr = (Node_t **)<span class="built_in">malloc</span>(rows * <span class="keyword">sizeof</span>(Node_t *));</span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; rows; i++) &#123;</span><br><span class="line">    arr[i] = (Node_t *)<span class="built_in">malloc</span>(cols * <span class="keyword">sizeof</span>(Node_t));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 释放内存</span></span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; rows; i++) &#123;</span><br><span class="line">    <span class="comment">// 如果结构体成员中有指针且申请了空间, 则需要先释放成员的空间再释放结构体的空间</span></span><br><span class="line">    <span class="built_in">free</span>(arr[i]);</span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">free</span>(arr);</span><br></pre></td></tr></table></figure>
+
+<h3 id="多维结构体数组排序"><a href="# 多维结构体数组排序" class="headerlink" title="多维结构体数组排序"></a>多维结构体数组排序 </h3><p> 按照二维数组第 0 列的结构体成员 <code>x</code> 降序排序。</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">cmp</span><span class="params">(<span class="type">const</span> <span class="type">void</span> *a, <span class="type">const</span> <span class="type">void</span> *b)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// return (Node_t *)a-&gt;x - (Node_t *)b-&gt;x;   // 错误写法</span></span><br><span class="line">    <span class="keyword">return</span> ((Node_t *)a)-&gt;x - ((Node_t *)b)-&gt;x;   <span class="comment">// 正确写法 1</span></span><br><span class="line">    <span class="comment">// return (*(Node_t *)b).x - (*(Node_t *)a).x;     // 正确写法 2</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">qsort(arr, rows, <span class="keyword">sizeof</span>(arr[<span class="number">0</span>]), cmp);</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>-&gt;</code> 操作符的优先级高于 <code>()</code> 操作符。</li>
+</ul>
+<h2 id="指针数组的多维数组"><a href="# 指针数组的多维数组" class="headerlink" title="指针数组的多维数组"></a>指针数组的多维数组 </h2><p> 使用指针数组的多维数组：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> rows = <span class="number">3</span>, cols = <span class="number">4</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span>* arr[rows];</span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; cols; i++) &#123;</span><br><span class="line">    arr[i] = (<span class="type">int</span> *)<span class="built_in">malloc</span>(<span class="number">4</span> * <span class="keyword">sizeof</span>(<span class="type">int</span>));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 释放内存</span></span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; rows; i++) &#123;</span><br><span class="line">    <span class="built_in">free</span>(arr[i]);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这种方式创建的多维数组实际上是一个指针数组，每个指针指向一个一维数组，可以在运行时动态分配每个一维数组的大小（方便创建每行元素个数不同的多维数组）。</p>
+<h3 id="多维数组排序 -2"><a href="# 多维数组排序 -2" class="headerlink" title="多维数组排序"></a>多维数组排序 </h3><p> 按照二维数组第 0 列降序排序。</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">cmp</span><span class="params">(<span class="type">const</span> <span class="type">void</span>* a, <span class="type">const</span> <span class="type">void</span>* b)</span> &#123;</span><br><span class="line">    <span class="type">const</span> <span class="type">int</span>* ap = *(<span class="type">int</span> **)a;</span><br><span class="line">    <span class="type">const</span> <span class="type">int</span>* bp = *(<span class="type">int</span> **)b;</span><br><span class="line">    <span class="keyword">return</span> bp[<span class="number">0</span>] - ap[<span class="number">0</span>];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 传入 cmp 函数指针的 arr 是一个二维指针</span></span><br><span class="line">qsort(arr, rows, <span class="keyword">sizeof</span>(arr[<span class="number">0</span>]), cmp);</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>学习笔记</category>
+        <category>C语言</category>
+      </categories>
+      <tags>
+        <tag>多维数组</tag>
+        <tag>数组排序</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>博客文章分类汇总</title>
+    <url>/posts/summary.html</url>
+    <content><![CDATA[<center><b>这篇文章是个人博客中系列文章的分类汇总。</b></center>
+
+<span id="more"></span>
+
+<h1 id="基础知识"><a href="# 基础知识" class="headerlink" title="基础知识"></a>基础知识 </h1><p><a href="https://pursue26.github.io/posts/231010144856.html"> 模运算（求余运算）</a></p>
+<h1 id="C 语言系列"><a href="#C 语言系列" class="headerlink" title="C 语言系列"></a>C 语言系列</h1><p><a href="https://pursue26.github.io/posts/230916171929.html">C 语言之 main 函数参数</a><br><a href="https://pursue26.github.io/posts/230922143003.html">C 语言之多维数组</a><br><a href="https://pursue26.github.io/posts/230913200729.html">C 语言之 const 关键字</a><br><a href="https://pursue26.github.io/posts/230918174223.html">C 语言之 typedef 自定义类型基础</a><br><a href="https://pursue26.github.io/posts/230920172849.html">C 语言之 typedef 实践</a><br><a href="https://pursue26.github.io/posts/230922172626.html">C 语言之 uthash 哈希表基础</a><br><a href="https://pursue26.github.io/posts/230921094127.html">C 语言之锁与原子操作基础</a><br><a href="https://pursue26.github.io/posts/230911151334.html">C 语言之 pthread 多线程</a><br><a href="https://pursue26.github.io/posts/230918114841.html">C 语言之大小端知识</a></p>
+<h1 id="Golang 语言系列"><a href="#Golang 语言系列" class="headerlink" title="Golang 语言系列"></a>Golang 语言系列</h1><p><a href="https://pursue26.github.io/posts/230907162612.html">Go 笔记之变量与常量</a><br><a href="https://pursue26.github.io/posts/230909120145.html">Go 笔记之函数 &amp; 包 &amp; 判断 &amp; 循环</a><br><a href="https://pursue26.github.io/posts/230912152800.html">Go 笔记之数组与切片</a><br><a href="https://pursue26.github.io/posts/230913161326.html">Go 笔记之可变参数函数与 Map 集合</a><br><a href="https://pursue26.github.io/posts/230915155105.html">Go 笔记之字符串和指针</a></p>
+<h1 id="数据结构系列"><a href="# 数据结构系列" class="headerlink" title="数据结构系列"></a>数据结构系列 </h1><p><a href="https://pursue26.github.io/posts/231007174854.html"> 数据结构之链表（数组实现）</a><br><a href="https://pursue26.github.io/posts/230916094606.html">数据结构之二叉树的遍历 </a><br><a href="https://pursue26.github.io/posts/230905224335.html"> 数据结构之拓扑排序 </a><br><a href="https://pursue26.github.io/posts/230925185057.html"> 数据结构之 Trie 字典树</a></p>
+<h1 id="Docker 系列"><a href="#Docker 系列" class="headerlink" title="Docker 系列"></a>Docker 系列</h1><p><a href="https://pursue26.github.io/posts/230909171809.html">Docker 学习笔记</a></p>
+<h1 id="计算机网络系列"><a href="# 计算机网络系列" class="headerlink" title="计算机网络系列"></a>计算机网络系列 </h1><p><a href="https://pursue26.github.io/posts/231011192359.html"> 计网之 OSI 参考模型</a></p>
+<h1 id="操作系统系列"><a href="# 操作系统系列" class="headerlink" title="操作系统系列"></a>操作系统系列 </h1><h2 id="操作系统课程学习（清华大学 - 陈渝老师）"><a href="# 操作系统课程学习（清华大学 - 陈渝老师）" class="headerlink" title="操作系统课程学习（清华大学 - 陈渝老师）"></a> 操作系统课程学习（清华大学 - 陈渝老师）</h2><p><a href="https://pursue26.github.io/posts/230921190726.html">操作系统之 chapter1 概述 </a><br><a href="https://pursue26.github.io/posts/230924172528.html"> 操作系统之 chapter2 启动 &amp; 中断 &amp; 异常 &amp; 系统调用</a></p>
+]]></content>
   </entry>
   <entry>
     <title>Go 笔记之数组与切片</title>
@@ -1247,21 +1168,6 @@
       </tags>
   </entry>
   <entry>
-    <title>博客文章分类汇总</title>
-    <url>/posts/summary.html</url>
-    <content><![CDATA[<center><b>这篇文章是个人博客中系列文章的分类汇总。</b></center>
-
-<span id="more"></span>
-
-<h1 id="基础知识"><a href="# 基础知识" class="headerlink" title="基础知识"></a>基础知识 </h1><p><a href="https://pursue26.github.io/posts/231010144856.html"> 模运算（求余运算）</a></p>
-<h1 id="C 语言系列"><a href="#C 语言系列" class="headerlink" title="C 语言系列"></a>C 语言系列</h1><p><a href="https://pursue26.github.io/posts/230916171929.html">C 语言之 main 函数参数</a><br><a href="https://pursue26.github.io/posts/230922143003.html">C 语言之多维数组</a><br><a href="https://pursue26.github.io/posts/230913200729.html">C 语言之 const 关键字</a><br><a href="https://pursue26.github.io/posts/230918174223.html">C 语言之 typedef 自定义类型基础</a><br><a href="https://pursue26.github.io/posts/230920172849.html">C 语言之 typedef 实践</a><br><a href="https://pursue26.github.io/posts/230922172626.html">C 语言之 uthash 哈希表基础</a><br><a href="https://pursue26.github.io/posts/230921094127.html">C 语言之锁与原子操作基础</a><br><a href="https://pursue26.github.io/posts/230911151334.html">C 语言之 pthread 多线程</a><br><a href="https://pursue26.github.io/posts/230918114841.html">C 语言之大小端知识</a></p>
-<h1 id="Golang 语言系列"><a href="#Golang 语言系列" class="headerlink" title="Golang 语言系列"></a>Golang 语言系列</h1><p><a href="https://pursue26.github.io/posts/230907162612.html">Go 笔记之变量与常量</a><br><a href="https://pursue26.github.io/posts/230909120145.html">Go 笔记之函数 &amp; 包 &amp; 判断 &amp; 循环</a><br><a href="https://pursue26.github.io/posts/230912152800.html">Go 笔记之数组与切片</a><br><a href="https://pursue26.github.io/posts/230913161326.html">Go 笔记之可变参数函数与 Map 集合</a><br><a href="https://pursue26.github.io/posts/230915155105.html">Go 笔记之字符串和指针</a></p>
-<h1 id="数据结构系列"><a href="# 数据结构系列" class="headerlink" title="数据结构系列"></a>数据结构系列 </h1><p><a href="https://pursue26.github.io/posts/231007174854.html"> 数据结构之链表（数组实现）</a><br><a href="https://pursue26.github.io/posts/230916094606.html">数据结构之二叉树的遍历 </a><br><a href="https://pursue26.github.io/posts/230905224335.html"> 数据结构之拓扑排序 </a><br><a href="https://pursue26.github.io/posts/230925185057.html"> 数据结构之 Trie 字典树</a></p>
-<h1 id="Docker 系列"><a href="#Docker 系列" class="headerlink" title="Docker 系列"></a>Docker 系列</h1><p><a href="https://pursue26.github.io/posts/230909171809.html">Docker 学习笔记</a></p>
-<h1 id="操作系统系列"><a href="# 操作系统系列" class="headerlink" title="操作系统系列"></a>操作系统系列 </h1><h2 id="操作系统课程学习（清华大学 - 陈渝老师）"><a href="# 操作系统课程学习（清华大学 - 陈渝老师）" class="headerlink" title="操作系统课程学习（清华大学 - 陈渝老师）"></a> 操作系统课程学习（清华大学 - 陈渝老师）</h2><p><a href="https://pursue26.github.io/posts/230921190726.html">操作系统之 chapter1 概述 </a><br><a href="https://pursue26.github.io/posts/230924172528.html"> 操作系统之 chapter2 启动 &amp; 中断 &amp; 异常 &amp; 系统调用</a></p>
-]]></content>
-  </entry>
-  <entry>
     <title>操作系统之 chapter1 概述</title>
     <url>/posts/230921190726.html</url>
     <content><![CDATA[<p>这篇文章主要介绍操作系统的定义、架构层次、界面和内核、内部组成和特征等内容。</p>
@@ -1272,13 +1178,11 @@
 <li>管理应用软件：可以限制不同的应用程序占用不同的资源</li>
 <li>为应用程序提供服务：I&#x2F;O 服务，声卡、网卡的访问服务</li>
 <li>杀死应用程序</li>
-<li>资源管理：CPU、内存、外设资源</li>
-<li>管理外设，分配资源</li>
 </ul>
 <p><strong>程序角度</strong>：操作系统是资源管理器。</p>
 <ul>
-<li>管理外设</li>
-<li>抽象<ul>
+<li>管理外设，分配资源</li>
+<li>抽象化作用<ul>
 <li>CPU 抽象成进程</li>
 <li>磁盘抽象成文件</li>
 <li>内存抽象成地址空间</li>
@@ -1286,7 +1190,7 @@
 </li>
 </ul>
 <h2 id="操作系统的架构层次"><a href="# 操作系统的架构层次" class="headerlink" title="操作系统的架构层次"></a>操作系统的架构层次 </h2><p> 硬件之上、应用软件之下（为应用软件提供服务支持）。</p>
-<h2 id="操作系统的界面和内核"><a href="# 操作系统的界面和内核" class="headerlink" title="操作系统的界面和内核"></a>操作系统的界面和内核</h2><p>Linux、Windows、Android 的界面属于外壳（shell），而不是内核（kernel）。kernel 是操作系统的研究重点，在 shell 之下。</p>
+<h2 id="操作系统的界面和内核"><a href="# 操作系统的界面和内核" class="headerlink" title="操作系统的界面和内核"></a>操作系统的界面和内核</h2><p>Linux、Windows、Android 的界面属于外壳（shell），而不是内核（kernel）。kernel 是操作系统的研究重点，处于 shell 之下。</p>
 <h2 id="操作系统内部组成"><a href="# 操作系统内部组成" class="headerlink" title="操作系统内部组成"></a>操作系统内部组成 </h2><p> 操作系统（kernel）内部组件包括：</p>
 <ul>
 <li>CPU 调度器</li>
@@ -1326,9 +1230,104 @@
       </tags>
   </entry>
   <entry>
+    <title>Go 笔记之字符串和指针</title>
+    <url>/posts/230915155105.html</url>
+    <content><![CDATA[<h2 id="Go 语言学习笔记 -14：字符串"><a href="#Go 语言学习笔记 -14：字符串" class="headerlink" title="Go 语言学习笔记 -14：字符串"></a>Go 语言学习笔记 -14：字符串</h2><ol>
+<li><p>Go 语言中的字符串是一个 <strong> 字节切片</strong>。</p>
+</li>
+<li><p><code>%x</code> 格式限定符用于指定 16 进制编码，<code>%c</code> 格式限定符用于打印字符串的字符。</p>
+</li>
+<li><p>在 UTF-8 编码中，一个代码点（字符的编码）可能会占用超过一个字节的空间，所以使用 <code>%c</code> 格式打印时可能会出错，可以用 <code>rune</code> 解决。</p>
+</li>
+<li><p><code>rune</code> 是 Go 语言的内建类型，它也是 <code>int32</code> 的别称。在 Go 语言中，<code>rune</code> 表示一个代码点。代码点无论占用多少个字节，都可以用一个 <code>rune</code> 来表示。</p>
+</li>
+</ol>
+<span id="more"></span>
+
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line">s := <span class="string">&quot;Señor&quot;</span></span><br><span class="line"><span class="keyword">for</span> i:= <span class="number">0</span>; i &lt; <span class="built_in">len</span>(s); i++ &#123;</span><br><span class="line">    fmt.Printf(<span class="string">&quot;%c &quot;</span>,s[i]) <span class="comment">// 打印出错，S e Ã ± o r</span></span><br><span class="line">&#125;</span><br><span class="line">fmt.Printf(<span class="string">&quot;\n&quot;</span>)</span><br><span class="line"></span><br><span class="line">runes := []<span class="type">rune</span>(s)</span><br><span class="line"><span class="keyword">for</span> i:= <span class="number">0</span>; i &lt; <span class="built_in">len</span>(runes); i++ &#123; <span class="comment">// 字符串被转化为一个 rune 切片</span></span><br><span class="line">    fmt.Printf(<span class="string">&quot;%c &quot;</span>,runes[i]) <span class="comment">// 打印正确，S e ñ o r</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="5">
+<li>字符串的 for range 循环更简单。</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">printCharsAndBytes</span><span class="params">(s <span class="type">string</span>)</span></span> &#123;</span><br><span class="line">    <span class="keyword">for</span> index, <span class="type">rune</span> := <span class="keyword">range</span> s &#123;</span><br><span class="line">        fmt.Printf(<span class="string">&quot;%c starts at byte %d\n&quot;</span>, <span class="type">rune</span>, index)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    name := <span class="string">&quot;Señor&quot;</span></span><br><span class="line">    printCharsAndBytes(name)</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">S starts at byte 0  </span></span><br><span class="line"><span class="comment">e starts at byte 1  </span></span><br><span class="line"><span class="comment">ñ starts at byte 2  // ñ 占了两个字节</span></span><br><span class="line"><span class="comment">o starts at byte 4  </span></span><br><span class="line"><span class="comment">r starts at byte 5</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<ol start="6">
+<li>用字节切片构造字符串：</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 包含字符串 Café 用 UTF-8 编码后的 16 进制字节</span></span><br><span class="line">byteSlice := []<span class="type">byte</span>&#123;<span class="number">0x43</span>, <span class="number">0x61</span>, <span class="number">0x66</span>, <span class="number">0xC3</span>, <span class="number">0xA9</span>&#125;</span><br><span class="line">str := <span class="type">string</span>(byteSlice)</span><br><span class="line">fmt.Println(str) <span class="comment">// Café</span></span><br></pre></td></tr></table></figure>
+
+<ol start="7">
+<li>用 <code>rune</code> 切片构造字符串：</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 包含字符串 Señor 的 16 进制的 Unicode 代码点</span></span><br><span class="line">runeSlice := []<span class="type">rune</span>&#123;<span class="number">0x0053</span>, <span class="number">0x0065</span>, <span class="number">0x00f1</span>, <span class="number">0x006f</span>, <span class="number">0x0072</span>&#125;</span><br><span class="line">str := <span class="type">string</span>(runeSlice)</span><br><span class="line">fmt.Println(str) <span class="comment">// Señor</span></span><br></pre></td></tr></table></figure>
+
+<ol start="8">
+<li>字符串的长度：utf-8 package 包中的 <code>func RuneCountInString(s string) (n int)</code> 方法用来 <strong> 获取字符串的长度 </strong>。这个方法传入一个字符串参数然后<strong> 返回字符串中的 rune 的数量</strong>。</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line">word1 := <span class="string">&quot;Señor&quot;</span> </span><br><span class="line">fmt.Println(utf8.RuneCountInString(word1)) <span class="comment">// 5</span></span><br><span class="line">word2 := <span class="string">&quot;Pets&quot;</span></span><br><span class="line">fmt.Println(utf8.RuneCountInString(word2)) <span class="comment">// 4</span></span><br></pre></td></tr></table></figure>
+
+<ol start="9">
+<li>字符串是不可变的：一旦一个字符串被创建，它将不可被修改。为了修改字符串，可以把字符串转化为一个 rune 切片，这个切片可以进行任何想要的改变，最后再转化为一个字符串。</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">mutate</span><span class="params">(s []<span class="type">rune</span>)</span></span> <span class="type">string</span> &#123;  </span><br><span class="line">    s[<span class="number">0</span>] = <span class="string">&#x27;a&#x27;</span> <span class="comment">// 修改切片</span></span><br><span class="line">    <span class="keyword">return</span> <span class="type">string</span>(s) <span class="comment">// 转换为一个字符串</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;  </span><br><span class="line">    h := <span class="string">&quot;hello&quot;</span></span><br><span class="line">    fmt.Println(mutate([]<span class="type">rune</span>(h))) <span class="comment">// 用 rune 切片构造字符串，输出 aello</span></span><br><span class="line">    fmt.Println(h) <span class="comment">// 输出 hello</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="Go 语言学习笔记 -15：指针"><a href="#Go 语言学习笔记 -15：指针" class="headerlink" title="Go 语言学习笔记 -15：指针"></a>Go 语言学习笔记 -15：指针</h2><ol>
+<li><p>指针是一种存储变量内存地址（Memory Address）的变量。例如，变量 b 的值为 156，而 b 的内存地址为 0x1040a124，变量 a 存储了 b 的地址。我们就称 a 指向了 b。</p>
+</li>
+<li><p>指针的声明：指针变量的类型为 <code>*T</code>，该指针指向一个 <code>T</code> 类型的变量。</p>
+</li>
+</ol>
+<ul>
+<li>&amp; 操作符用于获取变量的地址。下面的程序把 b 的地址赋值给 <code>*int</code> 类型的 a。我们称 a 指向了 b。当我们打印 a 的值时，会打印出 b 的地址。</li>
+</ul>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    b := <span class="number">255</span></span><br><span class="line">    <span class="keyword">var</span> a *<span class="type">int</span> = &amp;b</span><br><span class="line">    fmt.Printf(<span class="string">&quot;Type of a is %T\n&quot;</span>, a) <span class="comment">// *int</span></span><br><span class="line">    fmt.Println(<span class="string">&quot;address of b is&quot;</span>, a)  <span class="comment">// 0x1040a124</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li><p>指针的零值（Zero Value）是 <code>nil</code>。声明变量 <code>var b *int</code>，此时 <code>b == nil</code> 为 <code>true</code>。</p>
+</li>
+<li><p>指针的解引用：指针的解引用可以获取指针所指向的变量的值。将 <code>a</code> 解引用的语法是 <code>*a</code>。</p>
+</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;  </span><br><span class="line">    b := <span class="number">255</span></span><br><span class="line">    a := &amp;b</span><br><span class="line">    fmt.Println(<span class="string">&quot;address of b is&quot;</span>, a) <span class="comment">// 0x1040a124</span></span><br><span class="line">    fmt.Println(<span class="string">&quot;value of b is&quot;</span>, *a)  <span class="comment">// 255</span></span><br><span class="line">    *a++  <span class="comment">// (*a)++</span></span><br><span class="line">    fmt.Println(<span class="string">&quot;new value of b is&quot;</span>, b) <span class="comment">// 256</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="5">
+<li>向函数传递指针参数：</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">change</span><span class="params">(val *<span class="type">int</span>)</span></span> &#123;  </span><br><span class="line">    *val = <span class="number">55</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;  </span><br><span class="line">    a := <span class="number">58</span></span><br><span class="line">    fmt.Println(<span class="string">&quot;value of a before function call is&quot;</span>, a) <span class="comment">// 58</span></span><br><span class="line">    b := &amp;a</span><br><span class="line">    change(b)</span><br><span class="line">    fmt.Println(<span class="string">&quot;value of a after function call is&quot;</span>, a) <span class="comment">// 55</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol start="6">
+<li>假如我们想要在函数内修改一个数组，并希望调用函数的地方也能得到修改后的数组，一种解决方案是把一个指向数组的指针传递给这个函数（但 Go 语言习惯的方法是用切片处理，见序号 7）。</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">modify</span><span class="params">(arr *[3]<span class="type">int</span>)</span></span> &#123;  </span><br><span class="line">    (*arr)[<span class="number">0</span>] = <span class="number">90</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;  </span><br><span class="line">    a := [<span class="number">3</span>]<span class="type">int</span>&#123;<span class="number">89</span>, <span class="number">90</span>, <span class="number">91</span>&#125;</span><br><span class="line">    modify(&amp;a)</span><br><span class="line">    fmt.Println(a)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>a[x]</code> 是 <code>(*a)[x]</code> 的简写形式，因此上面代码中的 <code>(*arr)[0]</code> 可以替换为 <code>arr[0]</code>。</li>
+</ul>
+<ol start="7">
+<li><strong>不要向函数传递数组的指针，而应该使用数组切片</strong>：</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">modify</span><span class="params">(sls []<span class="type">int</span>)</span></span> &#123;  </span><br><span class="line">    sls[<span class="number">0</span>] = <span class="number">90</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;  </span><br><span class="line">    a := [<span class="number">3</span>]<span class="type">int</span>&#123;<span class="number">89</span>, <span class="number">90</span>, <span class="number">91</span>&#125;</span><br><span class="line">    modify(a[:]) <span class="comment">// 使用切片</span></span><br><span class="line">    fmt.Println(a)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>别再传递数组指针了，而是使用切片吧。上面的代码更加简洁，也更符合 Go 语言的习惯。</li>
+</ul>
+<blockquote>
+<p>学习链接：<a href="https://studygolang.com/subject/2">https://studygolang.com/subject/2</a>，感谢如此优秀的教程！</p>
+</blockquote>
+]]></content>
+      <categories>
+        <category>学习笔记</category>
+        <category>Golang</category>
+      </categories>
+      <tags>
+        <tag>Go字符串</tag>
+        <tag>Go指针</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>操作系统之 chapter2 启动 &amp; 中断 &amp; 异常 &amp; 系统调用</title>
     <url>/posts/230924172528.html</url>
-    <content><![CDATA[<p>这篇文章主要介绍操作系统的启动、中断、异常、系统调用的特征 &amp; 差别，以及处理流程。</p>
+    <content><![CDATA[<p>这篇文章主要介绍操作系统的启动，中断、异常、系统调用的特征和差别，以及处理流程（机制）。</p>
 <span id="more"></span>
 
 <h2 id="操作系统启动"><a href="# 操作系统启动" class="headerlink" title="操作系统启动"></a>操作系统启动 </h2><h3 id="作用解析"><a href="# 作用解析" class="headerlink" title="作用解析"></a> 作用解析</h3><ul>
@@ -1349,16 +1348,16 @@
 <li>内核初始化：操作系统内核接管控制权后，它会进行一系列的初始化工作，包括初始化进程管理、内存管理、文件系统等重要的系统组件</li>
 <li>用户登录</li>
 </ol>
-<h3 id="BIOS 自检"><a href="#BIOS 自检" class="headerlink" title="BIOS 自检"></a>BIOS 自检</h3><p><img src="/images/os-kernel/chapter2/os-startup-layout.png" alt="计算机启动时内存和硬盘布局"></p>
+<h4 id="BIOS 自检"><a href="#BIOS 自检" class="headerlink" title="BIOS 自检"></a>BIOS 自检</h4><p><img src="/images/os-kernel/chapter2/os-startup-layout.png" alt="计算机启动时内存和硬盘布局"></p>
 <p>计算机启动时，BIOS 从一个特定地址（CS:IP &#x3D; 0xF000:FFF0）开始执行，这两个寄存器合在一起可以形成一个具体的物理内存地址。BIOS 就从这个内存地址开始执行 POST（加电自检）、寻找显卡和执行 BIOS。</p>
 <blockquote>
 <p>段寄存器（CS）和指令寄存器（IP）是计算机中的两种不同类型的寄存器：<br><strong>段寄存器 </strong> 是用于存储内存中的段地址的寄存器。在计算机中，内存被划分为多个段，每个段都有一个唯一的段地址。段寄存器存储着当前程序正在访问的段的地址。当程序需要访问内存中的数据时，它会使用段寄存器中的地址来确定要访问的段，并将其与偏移地址（存储在其他寄存器中）相加以获取最终的物理地址。<br><strong>指令寄存器（也称为程序计数器）</strong>是用于存储下一条要执行的指令的地址的寄存器。在计算机执行程序时，指令寄存器中保存着当前正在执行的指令的地址。当一条指令执行完毕后，指令寄存器会自动增加，以指向下一条将要执行的指令的地址。这样，计算机可以按顺序执行存储器中的指令序列。指令寄存器的值的改变决定了计算机下一步要执行的操作。</p>
 </blockquote>
-<h3 id="加载 BootLoader"><a href="# 加载 BootLoader" class="headerlink" title="加载 BootLoader"></a>加载 BootLoader</h3><p><img src="/images/os-kernel/chapter2/os-load-bootloader.png" alt="BIOS 加载引导程序"></p>
+<h4 id="加载 BootLoader"><a href="# 加载 BootLoader" class="headerlink" title="加载 BootLoader"></a>加载 BootLoader</h4><p><img src="/images/os-kernel/chapter2/os-load-bootloader.png" alt="BIOS 加载引导程序"></p>
 <p><strong>BIOS 负责加载 BootLoader</strong>：BIOS 会从预设的启动设备（如硬盘、光盘、USB 等）中加载引导程序（BootLoader）到内存中。引导程序通常位于硬盘的特定扇区或光盘的启动区。</p>
 <p><strong>引导程序的工作</strong>：引导程序负责初始化硬件（如 CPU、内存等），加载操作系统内核，并将控制权交给内核。它还可以提供多个操作系统的选择菜单（如 GRUB），以供用户选择启动的操作系统。</p>
+<h4 id="加载 OS"><a href="# 加载 OS" class="headerlink" title="加载 OS"></a>加载 OS</h4><p>BootLoader 放在硬盘的第一个主引导扇区（512 字节）。这样，BIOS 从硬盘的第一个扇区寻找，一下便能找到 BootLoader。</p>
 <p><img src="/images/os-kernel/chapter2/os-bootloader-address.png" alt="引导程序的内存地址空间"></p>
-<p>BootLoader 放在硬盘的第一个主引导扇区（512 字节）。这样，BIOS 从硬盘的第一个扇区寻找，一下便能找到 BootLoader。</p>
 <p><strong>BIOS 负责加载 BootLoader</strong>：将 BootLoader 从磁盘的引导扇区加载到 0x7C00 内存地址处。</p>
 <p><strong>BootLoader 负责加载 OS</strong>：将操作系统的代码和数据从硬盘加载到内存中。之后，控制权交给到 OS（跳转到 OS 的起始地址）。</p>
 <h2 id="中断、异常和系统调用"><a href="# 中断、异常和系统调用" class="headerlink" title="中断、异常和系统调用"></a>中断、异常和系统调用 </h2><p> 操作系统与设备和程序之间的交互可以通过中断、异常和系统调用来实现。</p>
@@ -1381,7 +1380,7 @@
 <p>异步：应用程序不知道什么时候会发生 <br> 同步：执行到某一条指令一定会发生该事件</p>
 </blockquote>
 <h3 id="响应状态"><a href="# 响应状态" class="headerlink" title="响应状态"></a>响应状态</h3><ul>
-<li>中断：持续，对用户应用程序是透明的</li>
+<li>中断：持续，对用户应用程序是透明的（用户程序感知不到）</li>
 <li>异常：杀死或重新执行指令</li>
 <li>系统调用：等待和持续</li>
 </ul>
@@ -1416,7 +1415,7 @@
 </tbody></table>
 <h3 id="中断和异常处理流程"><a href="# 中断和异常处理流程" class="headerlink" title="中断和异常处理流程"></a>中断和异常处理流程 </h3><p> 中断是外设的事件，异常是内部 CPU 的事件。中断和异常迫使 CPU 访问一些与中断和异常相关的功能和服务。</p>
 <h4 id="中断处理流程"><a href="# 中断处理流程" class="headerlink" title="中断处理流程"></a>中断处理流程 </h4><p> 操作系统的中断处理流程包括硬件中断处理和软件中断处理两个部分。</p>
-<p>硬件中断处理流程如下：</p>
+<p><strong>硬件中断 </strong> 处理流程如下：</p>
 <ol>
 <li>硬件设备产生中断信号，例如外设完成数据传输、定时器到达计时器溢出等。</li>
 <li><strong>CPU 检测到中断信号后，会立即停止当前正在执行的指令，并将当前执行指令的上下文（包括寄存器状态、程序计数器等）保存到内存中的堆栈中</strong>。</li>
@@ -1426,7 +1425,7 @@
 <li><strong>中断处理程序执行完毕后，将之前保存的上下文从堆栈中恢复回来</strong>。</li>
 <li>CPU 继续执行被中断的指令或者执行下一个指令。</li>
 </ol>
-<p>软件中断处理流程如下：</p>
+<p><strong>软件中断 </strong> 处理流程如下：</p>
 <ol>
 <li>程序通过系统调用或软中断指令触发软件中断。</li>
 <li>CPU 执行软中断指令后，<strong>会暂停当前正在执行的指令，并将当前执行指令的上下文保存到内存中的堆栈中</strong>。</li>
@@ -1434,8 +1433,9 @@
 <li>CPU 跳转到中断处理程序的入口地址，开始执行中断处理程序。</li>
 <li>中断处理程序根据软中断号执行相应的操作，例如系统调用、异常处理等。</li>
 <li>中断处理程序执行完毕后，<strong>将之前保存的上下文从堆栈中恢复回来</strong>。</li>
-<li>CPU 继续执行被中断的指令或者执行下一个指令。</li>
+<li>CPU 继续执行被中断的指令或者执行下一个指令。<br>可以概括为：“触发软中断——暂存上下文——查表——跳转（进入）——执行——退出——恢复上下文——继续”。</li>
 </ol>
+<p>中断处理流程可以概括为：“产生中断——暂存上下文——查表——跳转（进入）——执行——退出——恢复上下文——继续执行”。</p>
 <p>总的来说，中断处理流程包括 <strong> 中断信号的检测、上下文的保存与恢复、中断处理程序的执行 </strong> 等步骤，以保证操作系统能够及时响应硬件设备的请求或软件的触发。</p>
 <blockquote>
 <p>应用程序完全不会感知到中断的产生。</p>
@@ -1574,109 +1574,6 @@
       </categories>
       <tags>
         <tag>二叉树遍历</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>数据结构之拓扑排序</title>
-    <url>/posts/230916094606.html</url>
-    <content><![CDATA[<h2 id="什么是拓扑排序"><a href="# 什么是拓扑排序" class="headerlink" title="什么是拓扑排序"></a>什么是拓扑排序 </h2><p> 引用百度百科的拓扑排序定义：</p>
-<blockquote>
-<p>对一个有向无环图（Directed Acyclic Graph, DAG）$G$ 进行拓扑排序，是将 $G$ 中所有顶点排成一个 <strong> 线性序列 </strong>，使得图中任意一对顶点 $u$ 和 $v$，若边 $&lt;u,v&gt; \in E(G)$，则 $u$ <strong> 在线性序列中出现在 </strong> $v$ 之前。通常，这样的线性序列称为满足拓扑次序（Topological Order）的序列，简称<strong> 拓扑序列</strong>。</p>
-</blockquote>
-<p>拓扑排序可以被理解为对一个有向无环图进行排序的操作。在这个排序中，图中的顶点被排列成一个线性序列，<strong>满足以下条件：对于图中的任意一对顶点 $u$ 和 $v$，如果存在一条边 $&lt;u,v&gt;$，那么在线性序列中，顶点 $u$ 出现在顶点 $v$ 之前</strong>。</p>
-<p>换句话说，拓扑排序可以将有向无环图中的顶点按照它们的依赖关系排序，使得所有的依赖关系都被满足。这对于处理任务的依赖关系非常有用，例如工程项目中的任务调度，编译器中的源代码依赖等。</p>
-<span id="more"></span>
-
-<p>例如，下图中 <code>1-&gt;2-&gt;3-&gt;4-&gt;5</code> 是一个正确的拓扑排序，每个节点都在它所依赖的节点后面。而 <code>1-&gt;2-&gt;4-&gt;3-&gt;5</code> 则不满足拓扑排序的要求，<code>4</code> 依赖于 <code>3</code>，却出现在了 <code>3</code> 前面。</p>
-<p><img src="/images/data-structure/topo-sort.png"></p>
-<h2 id="拓扑排序基本原理"><a href="# 拓扑排序基本原理" class="headerlink" title="拓扑排序基本原理"></a>拓扑排序基本原理 </h2><p> 拓扑排序（Topological Sorting）是一种用于有向无环图（DAG）的排序算法，它将图中的节点按照依赖关系进行排序，使得所有的依赖关系都被满足。</p>
-<p>拓扑排序的一些重要知识点：</p>
-<ol>
-<li><p>有向无环图（DAG）：拓扑排序只能应用于没有环的有向图，因为有环的图存在循环依赖，无法进行拓扑排序。</p>
-</li>
-<li><p>入度和出度：在拓扑排序中，入度表示指向某个节点的边的数量，出度表示从某个节点发出的边的数量。</p>
-</li>
-<li><p>拓扑排序算法：拓扑排序算法可以通过深度优先搜索或广度优先搜索（Kahn 算法）来实现。<strong>DFS 通常使用递归或栈来实现，而 BFS 则使用队列来实现</strong>。</p>
-</li>
-<li><p>多个拓扑排序结果：一个有向图可能存在多种不同的拓扑排序结果，这取决于节点的访问顺序。一种常见的方法是使用优先队列或字典序来选择节点的顺序，以得到特定的排序结果。</p>
-</li>
-</ol>
-<h3 id="要解决的问题"><a href="# 要解决的问题" class="headerlink" title="要解决的问题"></a>要解决的问题 </h3><p> 对于有向图进行拓扑排序要解决两个问题：</p>
-<ul>
-<li>一是要判断待排序的有向图是不是无环；</li>
-<li>二是按照依赖关系生成正确的序列。</li>
-</ul>
-<h3 id="基本思想"><a href="# 基本思想" class="headerlink" title="基本思想"></a>基本思想 </h3><p> 拓扑排序的基本思想是：</p>
-<ul>
-<li><p>入度思想：首先找到图中没有前驱节点的节点（即入度为 0 的节点），将其 <strong> 顺序 </strong> 加入结果列表中，并将其从图中删除。然后，继续寻找新的没有前驱节点的节点，并重复以上过程，直到所有的节点都被加入结果列表中或者无法再找到没有前驱节点的节点为止。</p>
-</li>
-<li><p>出度思想：首先找到图中没有后驱节点的节点（即出度为 0 的节点），将其 <strong> 逆序 </strong> 加入结果列表中，并将其从图中删除。然后，继续寻找新的没有后驱节点的节点，并重复以上过程，直到所有的节点都被加入结果列表中或者无法再找到没有后驱节点的节点为止。</p>
-</li>
-</ul>
-<h3 id="BFS-Kaha 拓扑排序算法"><a href="#BFS-Kaha 拓扑排序算法" class="headerlink" title="BFS&#x2F;Kaha 拓扑排序算法"></a>BFS&#x2F;Kaha 拓扑排序算法 </h3><p> 拓扑排序的具体步骤：</p>
-<ol>
-<li>初始化一个结果列表（或者称为拓扑序列）和一个队列。</li>
-<li>遍历图中的所有节点（对），统计每个节点的入度（即有多少条边指向该节点）。</li>
-<li>将入度为 0 的节点加入队列中。</li>
-<li>当队列不为空时，执行以下操作：<ul>
-<li>取出队首节点，并将其加入结果列表中。</li>
-<li>遍历该节点的所有邻接节点（即该节点指向的节点）：<ul>
-<li>将邻接节点的入度减 1。</li>
-<li>如果邻接节点的入度减为 0，将其加入队列中。</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>如果结果列表的长度等于图中的节点数，则说明拓扑排序成功，返回结果列表，表示拓扑序列。</li>
-<li>如果结果列表的长度小于图中的节点数，则说明图中存在环，无法进行拓扑排序。</li>
-</ol>
-<p>通过循环找到入度为 0 的节点，并将其加入结果列表，然后更新与该节点相邻的节点的入度，重复此过程，最终得到一个满足拓扑次序的序列，或者判断出图中存在环。</p>
-<blockquote>
-<p>BFS &#x2F; Kaha 拓扑排序算法是从入度的角度着手的，这种方法可称之为 <strong> 入度方法</strong>。</p>
-</blockquote>
-<h3 id="BFS 拓扑排序实现"><a href="#BFS 拓扑排序实现" class="headerlink" title="BFS 拓扑排序实现"></a>BFS 拓扑排序实现 </h3><p> 以 <a href="https://leetcode.cn/problems/course-schedule-ii/">Leetcode 课程表 II</a> 为例，给出 BFS 拓扑排序算法的实现过程。</p>
-<p>题目大意：一共有 n 门课程，课程之间存在依赖关系，比如先修完 A 课程，才能修 B 课程。问这个学生能不能修完所有课程，能的话则返回一种可能的课程学习顺序。</p>
-<p>代码实现中的关键变量：</p>
-<ul>
-<li><code>indegree[]</code>：初始化每个节点的入度，并随着节点出队更新入度值；</li>
-<li><code>edges[][]</code>：记录每个节点影响的其它节点，用于该节点的入度变为 0 时更新“影响的其它节点”的入度值；</li>
-<li><code>queue</code>：队列用于入队、出队所有入度为 0 的节点；</li>
-<li><code>ans[]</code>：结果队列用于保存出队的节点；</li>
-</ul>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> ELEM_TYPE int</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// Define the structure for a node in the queue</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">Node</span> &#123;</span></span><br><span class="line">    ELEM_TYPE data;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">Node</span>* <span class="title">next</span>;</span></span><br><span class="line">&#125; Node;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Define the structure for the queue</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">Queue</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> size;</span><br><span class="line">    Node* front;</span><br><span class="line">    Node* rear;</span><br><span class="line">&#125; Queue;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Function to create a new node</span></span><br><span class="line">Node* <span class="title function_">createNode</span><span class="params">(ELEM_TYPE data)</span> &#123;</span><br><span class="line">    Node* newNode = (Node *)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(Node));</span><br><span class="line">    newNode-&gt;data = data;</span><br><span class="line">    newNode-&gt;next = <span class="literal">NULL</span>;</span><br><span class="line">    <span class="keyword">return</span> newNode;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Function to create an empty queue</span></span><br><span class="line">Queue* <span class="title function_">createQueue</span><span class="params">()</span> &#123;</span><br><span class="line">    Queue* <span class="built_in">queue</span> = (Queue *)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(Queue));</span><br><span class="line">    <span class="built_in">queue</span>-&gt;front = <span class="literal">NULL</span>;</span><br><span class="line">    <span class="built_in">queue</span>-&gt;rear = <span class="literal">NULL</span>;</span><br><span class="line">    <span class="built_in">queue</span>-&gt;size = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">queue</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Function to check if the queue is empty</span></span><br><span class="line"><span class="type">bool</span> <span class="title function_">isEmpty</span><span class="params">(Queue* <span class="built_in">queue</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">queue</span>-&gt;size == <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Function to enqueue an element into the queue</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">enQueue</span><span class="params">(Queue* <span class="built_in">queue</span>, ELEM_TYPE data)</span> &#123;</span><br><span class="line">    Node* newNode = createNode(data);</span><br><span class="line">    <span class="keyword">if</span> (isEmpty(<span class="built_in">queue</span>)) &#123;</span><br><span class="line">        <span class="built_in">queue</span>-&gt;front = <span class="built_in">queue</span>-&gt;rear = newNode;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="built_in">queue</span>-&gt;rear-&gt;next = newNode;</span><br><span class="line">        <span class="built_in">queue</span>-&gt;rear = newNode;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">queue</span>-&gt;size += <span class="number">1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Function to dequeue an element from the queue</span></span><br><span class="line">ELEM_TYPE <span class="title function_">deQueue</span><span class="params">(Queue* <span class="built_in">queue</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (isEmpty(<span class="built_in">queue</span>)) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    Node* temp = <span class="built_in">queue</span>-&gt;front;</span><br><span class="line">    ELEM_TYPE data = temp-&gt;data;</span><br><span class="line">    <span class="built_in">queue</span>-&gt;front = <span class="built_in">queue</span>-&gt;front-&gt;next;</span><br><span class="line">    <span class="built_in">queue</span>-&gt;size -= <span class="number">1</span>;</span><br><span class="line">    <span class="built_in">free</span>(temp);</span><br><span class="line">    <span class="keyword">return</span> data;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span>* <span class="title function_">findOrder</span><span class="params">(<span class="type">int</span> numCourses, <span class="type">int</span>** prerequisites, <span class="type">int</span> prerequisitesSize, <span class="type">int</span>* prerequisitesColSize, <span class="type">int</span>* returnSize)</span> &#123;</span><br><span class="line">    <span class="type">int</span> indegree[numCourses];  <span class="comment">// 每个节点的入度，入度为 0 表示不受其它节点影响 </span></span><br><span class="line">    <span class="type">int</span> **edges = (<span class="type">int</span> **)<span class="built_in">malloc</span>(numCourses * <span class="keyword">sizeof</span>(<span class="type">int</span> *));  <span class="comment">// 二维数组, 记录每个节点影响的节点们</span></span><br><span class="line">    <span class="type">int</span> edgeNums[numCourses];  <span class="comment">// 记录每个节点影响的节点数量, 用于动态扩展空间</span></span><br><span class="line">    <span class="type">int</span> *ans = (<span class="type">int</span> *)<span class="built_in">malloc</span>(numCourses * <span class="keyword">sizeof</span>(<span class="type">int</span>));</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 初始化</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; numCourses; ++i) &#123;</span><br><span class="line">        indegree[i] = <span class="number">0</span>;</span><br><span class="line">        edgeNums[i] = <span class="number">0</span>;</span><br><span class="line">        edges[i] = (<span class="type">int</span> *)<span class="built_in">malloc</span>(<span class="number">0</span> * <span class="keyword">sizeof</span>(<span class="type">int</span>));  <span class="comment">// 后续按需扩展</span></span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 遍历所有节点对</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; prerequisitesSize; ++i) &#123;</span><br><span class="line">        <span class="type">int</span> suff = prerequisites[i][<span class="number">0</span>], pre = prerequisites[i][<span class="number">1</span>];</span><br><span class="line">        edgeNums[pre]++;  <span class="comment">// suff 受到了 pre 影响, 故 pre 节点影响的节点数量 +1</span></span><br><span class="line">        indegree[suff]++;  <span class="comment">// suff 受到了 pre 影响，其入度要 +1</span></span><br><span class="line">        edges[pre] = (<span class="type">int</span> *)<span class="built_in">realloc</span>(edges[pre], edgeNums[pre] * <span class="keyword">sizeof</span>(<span class="type">int</span>));  <span class="comment">// 扩展内存</span></span><br><span class="line">        edges[pre][edgeNums[pre] - <span class="number">1</span>] = suff;  <span class="comment">// 在索引(pre, 最后位置) 记录 suff</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    Queue* <span class="built_in">queue</span> = createQueue();</span><br><span class="line">    <span class="comment">// 入度所有不受影响的节点</span></span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; i &lt; numCourses; ++i) &#123;</span><br><span class="line">        <span class="keyword">if</span> (indegree[i] == <span class="number">0</span>) &#123;</span><br><span class="line">            enQueue(<span class="built_in">queue</span>, i);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="type">int</span> count = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">while</span> (!isEmpty(<span class="built_in">queue</span>)) &#123;</span><br><span class="line">        ELEM_TYPE cur = deQueue(<span class="built_in">queue</span>);</span><br><span class="line">        ans[count++] = cur;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 遍历出队的节点影响的所有节点, 它们的受影响度将 -1</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; edgeNums[cur]; ++i) &#123;</span><br><span class="line">            <span class="type">int</span> x = edges[cur][i];</span><br><span class="line">            indegree[x]--;</span><br><span class="line">            <span class="keyword">if</span> (indegree[x] == <span class="number">0</span>) &#123;</span><br><span class="line">                enQueue(<span class="built_in">queue</span>, x);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; numCourses; ++i) &#123;</span><br><span class="line">        <span class="built_in">free</span>(edges[i]);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">free</span>(edges);</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 判断结果队列长度，确定是否可以完成拓扑排序</span></span><br><span class="line">    <span class="keyword">if</span> (count == numCourses) &#123;</span><br><span class="line">        (*returnSize) = count;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        (*returnSize) = <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> ans;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="DFS 拓扑排序算法"><a href="#DFS 拓扑排序算法" class="headerlink" title="DFS 拓扑排序算法"></a>DFS 拓扑排序算法</h3><p>DFS 拓扑排序算法的思想和 BFS 拓扑排序算法相似，但在具体步骤上有所不同。</p>
-<p>DFS 拓扑排序算法的基本思想是：通过递归遍历图中的节点，<strong>从一个起始节点开始</strong>，当遍历到一个节点时，先将其所有未访问的邻居节点进行递归遍历，之后将当前节点添加到结果列表中。如果在递归的过程中，发现当遍历到一个节点时，存在已经被访问过的邻居节点，则说明途中存在环，无法进行拓扑排序。</p>
-<p>DFS 拓扑排序的具体步骤如下：</p>
-<ol>
-<li>初始化一个空的结果列表和一个空的访问状态列表。</li>
-<li>对于图中的每个节点，如果该节点未被访问，则调用 DFS 函数进行遍历。</li>
-<li>在 DFS 函数中，首先将当前节点标记为正在访问。</li>
-<li>递归遍历当前节点的所有未访问的邻居节点，将每个邻居节点作为新的起始节点进行递归遍历。</li>
-<li>当没有未访问的邻居节点时，将当前节点的访问状态更新为已访问，并逆序添加到结果列表中。</li>
-<li>最终，结果列表中的节点正序顺序即为 DFS 拓扑排序的结果。</li>
-</ol>
-<blockquote>
-<p>需要注意的是：在进行 DFS 拓扑排序的过程中，如果发现某个节点的邻居节点已经被访问过（即已经在结果列表中），那么说明存在环，无法进行拓扑排序。在这种情况下，可以中断排序过程并返回一个表示存在环的标志。</p>
-</blockquote>
-<p>代码实现中的关键变量：</p>
-<ul>
-<li><code>visited[]</code>：记录每个节点的访问状态，0 表示未访问，1 表示正在访问，2 表示访问完成；</li>
-<li><code>edges[][]</code>：记录每个节点所有邻居节点；</li>
-<li><code>ans[]</code>：结果队列；</li>
-</ul>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">dfs</span><span class="params">(<span class="type">int</span> node, <span class="type">int</span>* visited, <span class="type">int</span>** edges, <span class="type">int</span>* edgeNums, <span class="type">int</span>* ans, <span class="type">int</span>* cnt, <span class="type">bool</span>* valid)</span> &#123;</span><br><span class="line">    visited[node] = <span class="number">1</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; edgeNums[node]; ++i) &#123;</span><br><span class="line">        <span class="type">int</span> neigNode = edges[node][i];</span><br><span class="line">        <span class="keyword">if</span> (visited[neigNode] == <span class="number">0</span>) &#123;</span><br><span class="line">            dfs(neigNode, visited, edges, edgeNums, ans, cnt, valid);</span><br><span class="line">            <span class="comment">// 这行代码测试发现不是必须的, 为什么不是必须的？加上可以有剪枝（提前终止）的作用</span></span><br><span class="line">            <span class="keyword">if</span> (!(*valid)) &#123;<span class="keyword">return</span>;&#125;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (visited[neigNode] == <span class="number">1</span>) &#123;</span><br><span class="line">            *valid = <span class="literal">false</span>;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    visited[node] = <span class="number">2</span>;</span><br><span class="line">    ans[--(*cnt)] = node;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span>* <span class="title function_">findOrder</span><span class="params">(<span class="type">int</span> numCourses, <span class="type">int</span>** prerequisites, <span class="type">int</span> prerequisitesSize, <span class="type">int</span>* prerequisitesColSize, <span class="type">int</span>* returnSize)</span> &#123;</span><br><span class="line">    <span class="type">int</span>* visited = (<span class="type">int</span> *)<span class="built_in">malloc</span>(numCourses * <span class="keyword">sizeof</span>(<span class="type">int</span>));  <span class="comment">// 记录每一个节点的访问状态</span></span><br><span class="line">    <span class="type">int</span>** edges = (<span class="type">int</span> **)<span class="built_in">malloc</span>(numCourses * <span class="keyword">sizeof</span>(<span class="type">int</span> *));  <span class="comment">// 二维数组, 记录每个节点所有邻居节点</span></span><br><span class="line">    <span class="type">int</span>* edgeNums = (<span class="type">int</span> *)<span class="built_in">malloc</span>(numCourses * <span class="keyword">sizeof</span>(<span class="type">int</span>));  <span class="comment">// 记录每个节点的邻居节点数量</span></span><br><span class="line">    <span class="type">int</span>* ans = (<span class="type">int</span> *)<span class="built_in">malloc</span>(numCourses * <span class="keyword">sizeof</span>(<span class="type">int</span>));</span><br><span class="line">    <span class="type">int</span> cnt = numCourses;</span><br><span class="line">    <span class="type">bool</span> valid = <span class="literal">true</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">memset</span>(visited, <span class="number">0</span>, numCourses * <span class="keyword">sizeof</span>(<span class="type">int</span>));</span><br><span class="line">    <span class="built_in">memset</span>(edgeNums, <span class="number">0</span>, numCourses * <span class="keyword">sizeof</span>(<span class="type">int</span>));</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; numCourses; ++i) &#123;</span><br><span class="line">        edges[i] = (<span class="type">int</span> *)<span class="built_in">malloc</span>(<span class="number">0</span> * <span class="keyword">sizeof</span>(<span class="type">int</span>));</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 构建邻接表</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; prerequisitesSize; ++i) &#123;</span><br><span class="line">        <span class="type">int</span> suff = prerequisites[i][<span class="number">0</span>], pre = prerequisites[i][<span class="number">1</span>];  <span class="comment">// edge: pre-&gt;suff</span></span><br><span class="line">        edges[pre] = (<span class="type">int</span> *)<span class="built_in">realloc</span>(edges[pre], (edgeNums[pre] + <span class="number">1</span>) * <span class="keyword">sizeof</span>(<span class="type">int</span>));</span><br><span class="line">        edges[pre][edgeNums[pre]] = suff;</span><br><span class="line">        edgeNums[pre]++;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// DFS 遍历</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; numCourses &amp;&amp; valid; ++i) &#123;</span><br><span class="line">        <span class="keyword">if</span> (!visited[i]) &#123;</span><br><span class="line">            dfs(i, visited, edges, edgeNums, ans, &amp;cnt, &amp;valid);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 释放内存</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; numCourses; ++i) &#123;</span><br><span class="line">        <span class="built_in">free</span>(edges[i]);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">free</span>(edges);</span><br><span class="line">    <span class="built_in">free</span>(visited);</span><br><span class="line">    <span class="built_in">free</span>(edgeNums);</span><br><span class="line">    </span><br><span class="line">    *returnSize = (cnt &gt; <span class="number">0</span> || !valid) ? <span class="number">0</span> : numCourses;</span><br><span class="line">    <span class="keyword">return</span> ans;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>参考链接：<a href="https://jingsam.github.io/2020/08/11/topological-sort.html">https://jingsam.github.io/2020/08/11/topological-sort.html</a></p>
-</blockquote>
-]]></content>
-      <categories>
-        <category>数据结构</category>
-        <category>拓扑排序</category>
-      </categories>
-      <tags>
-        <tag>拓扑排序</tag>
       </tags>
   </entry>
   <entry>
@@ -1912,6 +1809,228 @@
       </categories>
       <tags>
         <tag>模运算</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>计网之 OSI 模型</title>
+    <url>/posts/231011192359.html</url>
+    <content><![CDATA[<p>这篇文章主要介绍 OSI（Open System Interconnect）参考模型，以及 message、segment、datagram、packet、frame、bit 等概念。</p>
+<span id="more"></span>
+
+<h2 id="计算机网络各层代表设备"><a href="# 计算机网络各层代表设备" class="headerlink" title="计算机网络各层代表设备"></a>计算机网络各层代表设备</h2><ul>
+<li>物理层：网卡、网线、光纤、atm 线缆等；</li>
+<li>数据链路层：二层交换机；</li>
+<li>网络层：路由器、三层交换机、防火墙；</li>
+<li>传输层：代表协议，如 TCP &amp; UDP；</li>
+<li>应用层：各种协议，如 HTTP &amp; SMTP &amp; FTP；</li>
+</ul>
+<h2 id="OSI 模型中各层单位"><a href="#OSI 模型中各层单位" class="headerlink" title="OSI 模型中各层单位"></a>OSI 模型中各层单位 </h2><p> 在计算机网络中，有许多不同的概念用于描述数据在不同层次的传输和封装。以下是这些概念的简要介绍：</p>
+<table>
+<thead>
+<tr>
+<th>数据单元</th>
+<th>层次</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>message</td>
+<td>应用层</td>
+<td>在应用层发送和接收的数据单元，它可以是任意大小的数据块</td>
+</tr>
+<tr>
+<td>segment</td>
+<td>传输层</td>
+<td>在传输层（如 TCP）中使用的数据单元，segment 包含了源端口号和目的端口号，并提供可靠的、有序的数据传输</td>
+</tr>
+<tr>
+<td>datagram</td>
+<td>网络层</td>
+<td>在网络层（如 IP）中使用的数据单元，datagram 包含了源 IP 和目的 IP，并提供不可靠的、无序的数据传输</td>
+</tr>
+<tr>
+<td>packet</td>
+<td>网络层通用</td>
+<td>在网络层中使用的通用术语，用于表示在网络中传输的数据单元，可以指代 segment 或 datagram</td>
+</tr>
+<tr>
+<td>frame</td>
+<td>数据链路层</td>
+<td>在数据链路层中使用的数据单元，frame 包含了物理地址（如 MAC 地址）和错误检测码，用于在物理网络中传输数据</td>
+</tr>
+<tr>
+<td>bit</td>
+<td>物理层</td>
+<td>是计算机网络中最小的数据单位，用于表示二进制的 0 或 1</td>
+</tr>
+</tbody></table>
+<p>那么，不同层之间是在为谁提供服务呢？</p>
+<p>应用层为应用程序提供服务，传输层为应用层提供端到端的数据传输服务，网络层为传输层提供网络间的数据传输服务，数据链路层为网络层提供主机到主机的数据传输服务。</p>
+<ol>
+<li>应用层为应用程序提供服务。</li>
+<li>传输层主要为进程提供端到端的通信服务。<ul>
+<li>传输层使用端口号来标识不同的进程，将应用层的数据划分为较小的数据单元（segment），并通过网络传输到目的地。</li>
+<li>传输层可以提供可靠的数据传输，保证数据的完整性和顺序性。</li>
+<li>此外，传输层还负责多个进程间的数据分发和复用，可以同时为多个进程提供服务。</li>
+</ul>
+</li>
+<li>网络层主要为主机提供服务。<ul>
+<li>网络层负责将传输层的数据单元（segment）打包成网络层的数据单元（datagram），并通过网络进行传输。</li>
+<li>网络层使用 IP 地址来标识主机和网络，通过路由选择算法将数据传输到目的地，实现主机间的通信。</li>
+</ul>
+</li>
+<li>数据链路层主要为同一链路上的主机（或设备）提供服务。<ul>
+<li>数据链路层负责将网络层的数据单元（datagram）打包成数据链路层的数据单元（frame），并通过物理链路进行传输。</li>
+<li>数据链路层使用 MAC 地址来标识主机或设备，通过帧的发送和接收来实现同一链路上的通信。</li>
+</ul>
+</li>
+</ol>
+<p>总结成表格如下：</p>
+<table>
+<thead>
+<tr>
+<th>层级</th>
+<th>功能</th>
+<th>提供服务的对象</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>应用层</td>
+<td>为应用程序提供服务</td>
+<td>应用程序</td>
+</tr>
+<tr>
+<td>传输层</td>
+<td>为进程提供端到端的通信服务，划分数据单元，保证数据传输可靠性和顺序性，数据分发和复用</td>
+<td>进程</td>
+</tr>
+<tr>
+<td>网络层</td>
+<td>为主机提供服务，将传输层的数据单元打包成网络层的数据单元，通过网络进行传输，寻址和路由选择，实现主机间通信</td>
+<td>主机</td>
+</tr>
+<tr>
+<td>数据链路层</td>
+<td>为同一链路上的主机或设备提供服务，将网络层的数据单元打包成数据链路层的数据单元，通过物理链路进行传输，帧的封装和解封装，帧的传输和错误检测，介质访问控制</td>
+<td>同一链路上的主机或设备</td>
+</tr>
+<tr>
+<td>物理层</td>
+<td>通过物理链路进行数据传输，数据的编码和解码，数据的传输和接收</td>
+<td>物理链路上的设备和传输介质等</td>
+</tr>
+</tbody></table>
+<h2 id="OSI-vs-TCP-IP 模型"><a href="#OSI-vs-TCP-IP 模型" class="headerlink" title="OSI vs. TCP&#x2F;IP 模型"></a>OSI vs. TCP&#x2F;IP 模型</h2><p><img src="/images/computer-network/OSI-TCP-model.png" alt="OSI vs. TCP/IP 模型"></p>
+<h2 id="OSI 模型数据封装与解封装过程"><a href="#OSI 模型数据封装与解封装过程" class="headerlink" title="OSI 模型数据封装与解封装过程"></a>OSI 模型数据封装与解封装过程</h2><p><img src="/images/computer-network/OSI-data-encapsulation-unpacking.png" alt="OSI 模型数据封装与解封装过程"></p>
+]]></content>
+      <categories>
+        <category>计算机网络</category>
+      </categories>
+      <tags>
+        <tag>OSI模型</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>数据结构之拓扑排序</title>
+    <url>/posts/230916094606.html</url>
+    <content><![CDATA[<h2 id="什么是拓扑排序"><a href="# 什么是拓扑排序" class="headerlink" title="什么是拓扑排序"></a>什么是拓扑排序 </h2><p> 引用百度百科的拓扑排序定义：</p>
+<blockquote>
+<p>对一个有向无环图（Directed Acyclic Graph, DAG）$G$ 进行拓扑排序，是将 $G$ 中所有顶点排成一个 <strong> 线性序列 </strong>，使得图中任意一对顶点 $u$ 和 $v$，若边 $&lt;u,v&gt; \in E(G)$，则 $u$ <strong> 在线性序列中出现在 </strong> $v$ 之前。通常，这样的线性序列称为满足拓扑次序（Topological Order）的序列，简称<strong> 拓扑序列</strong>。</p>
+</blockquote>
+<p>拓扑排序可以被理解为对一个有向无环图进行排序的操作。在这个排序中，图中的顶点被排列成一个线性序列，<strong>满足以下条件：对于图中的任意一对顶点 $u$ 和 $v$，如果存在一条边 $&lt;u,v&gt;$，那么在线性序列中，顶点 $u$ 出现在顶点 $v$ 之前</strong>。</p>
+<p>换句话说，拓扑排序可以将有向无环图中的顶点按照它们的依赖关系排序，使得所有的依赖关系都被满足。这对于处理任务的依赖关系非常有用，例如工程项目中的任务调度，编译器中的源代码依赖等。</p>
+<span id="more"></span>
+
+<p>例如，下图中 <code>1-&gt;2-&gt;3-&gt;4-&gt;5</code> 是一个正确的拓扑排序，每个节点都在它所依赖的节点后面。而 <code>1-&gt;2-&gt;4-&gt;3-&gt;5</code> 则不满足拓扑排序的要求，<code>4</code> 依赖于 <code>3</code>，却出现在了 <code>3</code> 前面。</p>
+<p><img src="/images/data-structure/topo-sort.png"></p>
+<h2 id="拓扑排序基本原理"><a href="# 拓扑排序基本原理" class="headerlink" title="拓扑排序基本原理"></a>拓扑排序基本原理 </h2><p> 拓扑排序（Topological Sorting）是一种用于有向无环图（DAG）的排序算法，它将图中的节点按照依赖关系进行排序，使得所有的依赖关系都被满足。</p>
+<p>拓扑排序的一些重要知识点：</p>
+<ol>
+<li><p>有向无环图（DAG）：拓扑排序只能应用于没有环的有向图，因为有环的图存在循环依赖，无法进行拓扑排序。</p>
+</li>
+<li><p>入度和出度：在拓扑排序中，入度表示指向某个节点的边的数量，出度表示从某个节点发出的边的数量。</p>
+</li>
+<li><p>拓扑排序算法：拓扑排序算法可以通过深度优先搜索或广度优先搜索（Kahn 算法）来实现。<strong>DFS 通常使用递归或栈来实现，而 BFS 则使用队列来实现</strong>。</p>
+</li>
+<li><p>多个拓扑排序结果：一个有向图可能存在多种不同的拓扑排序结果，这取决于节点的访问顺序。一种常见的方法是使用优先队列或字典序来选择节点的顺序，以得到特定的排序结果。</p>
+</li>
+</ol>
+<h3 id="要解决的问题"><a href="# 要解决的问题" class="headerlink" title="要解决的问题"></a>要解决的问题 </h3><p> 对于有向图进行拓扑排序要解决两个问题：</p>
+<ul>
+<li>一是要判断待排序的有向图是不是无环；</li>
+<li>二是按照依赖关系生成正确的序列。</li>
+</ul>
+<h3 id="基本思想"><a href="# 基本思想" class="headerlink" title="基本思想"></a>基本思想 </h3><p> 拓扑排序的基本思想是：</p>
+<ul>
+<li><p>入度思想：首先找到图中没有前驱节点的节点（即入度为 0 的节点），将其 <strong> 顺序 </strong> 加入结果列表中，并将其从图中删除。然后，继续寻找新的没有前驱节点的节点，并重复以上过程，直到所有的节点都被加入结果列表中或者无法再找到没有前驱节点的节点为止。</p>
+</li>
+<li><p>出度思想：首先找到图中没有后驱节点的节点（即出度为 0 的节点），将其 <strong> 逆序 </strong> 加入结果列表中，并将其从图中删除。然后，继续寻找新的没有后驱节点的节点，并重复以上过程，直到所有的节点都被加入结果列表中或者无法再找到没有后驱节点的节点为止。</p>
+</li>
+</ul>
+<h3 id="BFS-Kaha 拓扑排序算法"><a href="#BFS-Kaha 拓扑排序算法" class="headerlink" title="BFS&#x2F;Kaha 拓扑排序算法"></a>BFS&#x2F;Kaha 拓扑排序算法 </h3><p> 拓扑排序的具体步骤：</p>
+<ol>
+<li>初始化一个结果列表（或者称为拓扑序列）和一个队列。</li>
+<li>遍历图中的所有节点（对），统计每个节点的入度（即有多少条边指向该节点）。</li>
+<li>将入度为 0 的节点加入队列中。</li>
+<li>当队列不为空时，执行以下操作：<ul>
+<li>取出队首节点，并将其加入结果列表中。</li>
+<li>遍历该节点的所有邻接节点（即该节点指向的节点）：<ul>
+<li>将邻接节点的入度减 1。</li>
+<li>如果邻接节点的入度减为 0，将其加入队列中。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>如果结果列表的长度等于图中的节点数，则说明拓扑排序成功，返回结果列表，表示拓扑序列。</li>
+<li>如果结果列表的长度小于图中的节点数，则说明图中存在环，无法进行拓扑排序。</li>
+</ol>
+<p>通过循环找到入度为 0 的节点，并将其加入结果列表，然后更新与该节点相邻的节点的入度，重复此过程，最终得到一个满足拓扑次序的序列，或者判断出图中存在环。</p>
+<blockquote>
+<p>BFS &#x2F; Kaha 拓扑排序算法是从入度的角度着手的，这种方法可称之为 <strong> 入度方法</strong>。</p>
+</blockquote>
+<h3 id="BFS 拓扑排序实现"><a href="#BFS 拓扑排序实现" class="headerlink" title="BFS 拓扑排序实现"></a>BFS 拓扑排序实现 </h3><p> 以 <a href="https://leetcode.cn/problems/course-schedule-ii/">Leetcode 课程表 II</a> 为例，给出 BFS 拓扑排序算法的实现过程。</p>
+<p>题目大意：一共有 n 门课程，课程之间存在依赖关系，比如先修完 A 课程，才能修 B 课程。问这个学生能不能修完所有课程，能的话则返回一种可能的课程学习顺序。</p>
+<p>代码实现中的关键变量：</p>
+<ul>
+<li><code>indegree[]</code>：初始化每个节点的入度，并随着节点出队更新入度值；</li>
+<li><code>edges[][]</code>：记录每个节点影响的其它节点，用于该节点的入度变为 0 时更新“影响的其它节点”的入度值；</li>
+<li><code>queue</code>：队列用于入队、出队所有入度为 0 的节点；</li>
+<li><code>ans[]</code>：结果队列用于保存出队的节点；</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> ELEM_TYPE int</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// Define the structure for a node in the queue</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">Node</span> &#123;</span></span><br><span class="line">    ELEM_TYPE data;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">Node</span>* <span class="title">next</span>;</span></span><br><span class="line">&#125; Node;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Define the structure for the queue</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">Queue</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> size;</span><br><span class="line">    Node* front;</span><br><span class="line">    Node* rear;</span><br><span class="line">&#125; Queue;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Function to create a new node</span></span><br><span class="line">Node* <span class="title function_">createNode</span><span class="params">(ELEM_TYPE data)</span> &#123;</span><br><span class="line">    Node* newNode = (Node *)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(Node));</span><br><span class="line">    newNode-&gt;data = data;</span><br><span class="line">    newNode-&gt;next = <span class="literal">NULL</span>;</span><br><span class="line">    <span class="keyword">return</span> newNode;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Function to create an empty queue</span></span><br><span class="line">Queue* <span class="title function_">createQueue</span><span class="params">()</span> &#123;</span><br><span class="line">    Queue* <span class="built_in">queue</span> = (Queue *)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(Queue));</span><br><span class="line">    <span class="built_in">queue</span>-&gt;front = <span class="literal">NULL</span>;</span><br><span class="line">    <span class="built_in">queue</span>-&gt;rear = <span class="literal">NULL</span>;</span><br><span class="line">    <span class="built_in">queue</span>-&gt;size = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">queue</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Function to check if the queue is empty</span></span><br><span class="line"><span class="type">bool</span> <span class="title function_">isEmpty</span><span class="params">(Queue* <span class="built_in">queue</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">queue</span>-&gt;size == <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Function to enqueue an element into the queue</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">enQueue</span><span class="params">(Queue* <span class="built_in">queue</span>, ELEM_TYPE data)</span> &#123;</span><br><span class="line">    Node* newNode = createNode(data);</span><br><span class="line">    <span class="keyword">if</span> (isEmpty(<span class="built_in">queue</span>)) &#123;</span><br><span class="line">        <span class="built_in">queue</span>-&gt;front = <span class="built_in">queue</span>-&gt;rear = newNode;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="built_in">queue</span>-&gt;rear-&gt;next = newNode;</span><br><span class="line">        <span class="built_in">queue</span>-&gt;rear = newNode;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">queue</span>-&gt;size += <span class="number">1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Function to dequeue an element from the queue</span></span><br><span class="line">ELEM_TYPE <span class="title function_">deQueue</span><span class="params">(Queue* <span class="built_in">queue</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (isEmpty(<span class="built_in">queue</span>)) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    Node* temp = <span class="built_in">queue</span>-&gt;front;</span><br><span class="line">    ELEM_TYPE data = temp-&gt;data;</span><br><span class="line">    <span class="built_in">queue</span>-&gt;front = <span class="built_in">queue</span>-&gt;front-&gt;next;</span><br><span class="line">    <span class="built_in">queue</span>-&gt;size -= <span class="number">1</span>;</span><br><span class="line">    <span class="built_in">free</span>(temp);</span><br><span class="line">    <span class="keyword">return</span> data;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span>* <span class="title function_">findOrder</span><span class="params">(<span class="type">int</span> numCourses, <span class="type">int</span>** prerequisites, <span class="type">int</span> prerequisitesSize, <span class="type">int</span>* prerequisitesColSize, <span class="type">int</span>* returnSize)</span> &#123;</span><br><span class="line">    <span class="type">int</span> indegree[numCourses];  <span class="comment">// 每个节点的入度，入度为 0 表示不受其它节点影响 </span></span><br><span class="line">    <span class="type">int</span> **edges = (<span class="type">int</span> **)<span class="built_in">malloc</span>(numCourses * <span class="keyword">sizeof</span>(<span class="type">int</span> *));  <span class="comment">// 二维数组, 记录每个节点影响的节点们</span></span><br><span class="line">    <span class="type">int</span> edgeNums[numCourses];  <span class="comment">// 记录每个节点影响的节点数量, 用于动态扩展空间</span></span><br><span class="line">    <span class="type">int</span> *ans = (<span class="type">int</span> *)<span class="built_in">malloc</span>(numCourses * <span class="keyword">sizeof</span>(<span class="type">int</span>));</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 初始化</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; numCourses; ++i) &#123;</span><br><span class="line">        indegree[i] = <span class="number">0</span>;</span><br><span class="line">        edgeNums[i] = <span class="number">0</span>;</span><br><span class="line">        edges[i] = (<span class="type">int</span> *)<span class="built_in">malloc</span>(<span class="number">0</span> * <span class="keyword">sizeof</span>(<span class="type">int</span>));  <span class="comment">// 后续按需扩展</span></span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 遍历所有节点对</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; prerequisitesSize; ++i) &#123;</span><br><span class="line">        <span class="type">int</span> suff = prerequisites[i][<span class="number">0</span>], pre = prerequisites[i][<span class="number">1</span>];</span><br><span class="line">        edgeNums[pre]++;  <span class="comment">// suff 受到了 pre 影响, 故 pre 节点影响的节点数量 +1</span></span><br><span class="line">        indegree[suff]++;  <span class="comment">// suff 受到了 pre 影响，其入度要 +1</span></span><br><span class="line">        edges[pre] = (<span class="type">int</span> *)<span class="built_in">realloc</span>(edges[pre], edgeNums[pre] * <span class="keyword">sizeof</span>(<span class="type">int</span>));  <span class="comment">// 扩展内存</span></span><br><span class="line">        edges[pre][edgeNums[pre] - <span class="number">1</span>] = suff;  <span class="comment">// 在索引(pre, 最后位置) 记录 suff</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    Queue* <span class="built_in">queue</span> = createQueue();</span><br><span class="line">    <span class="comment">// 入度所有不受影响的节点</span></span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; i &lt; numCourses; ++i) &#123;</span><br><span class="line">        <span class="keyword">if</span> (indegree[i] == <span class="number">0</span>) &#123;</span><br><span class="line">            enQueue(<span class="built_in">queue</span>, i);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="type">int</span> count = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">while</span> (!isEmpty(<span class="built_in">queue</span>)) &#123;</span><br><span class="line">        ELEM_TYPE cur = deQueue(<span class="built_in">queue</span>);</span><br><span class="line">        ans[count++] = cur;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 遍历出队的节点影响的所有节点, 它们的受影响度将 -1</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; edgeNums[cur]; ++i) &#123;</span><br><span class="line">            <span class="type">int</span> x = edges[cur][i];</span><br><span class="line">            indegree[x]--;</span><br><span class="line">            <span class="keyword">if</span> (indegree[x] == <span class="number">0</span>) &#123;</span><br><span class="line">                enQueue(<span class="built_in">queue</span>, x);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; numCourses; ++i) &#123;</span><br><span class="line">        <span class="built_in">free</span>(edges[i]);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">free</span>(edges);</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 判断结果队列长度，确定是否可以完成拓扑排序</span></span><br><span class="line">    <span class="keyword">if</span> (count == numCourses) &#123;</span><br><span class="line">        (*returnSize) = count;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        (*returnSize) = <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> ans;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="DFS 拓扑排序算法"><a href="#DFS 拓扑排序算法" class="headerlink" title="DFS 拓扑排序算法"></a>DFS 拓扑排序算法</h3><p>DFS 拓扑排序算法的思想和 BFS 拓扑排序算法相似，但在具体步骤上有所不同。</p>
+<p>DFS 拓扑排序算法的基本思想是：通过递归遍历图中的节点，<strong>从一个起始节点开始</strong>，当遍历到一个节点时，先将其所有未访问的邻居节点进行递归遍历，之后将当前节点添加到结果列表中。如果在递归的过程中，发现当遍历到一个节点时，存在已经被访问过的邻居节点，则说明途中存在环，无法进行拓扑排序。</p>
+<p>DFS 拓扑排序的具体步骤如下：</p>
+<ol>
+<li>初始化一个空的结果列表和一个空的访问状态列表。</li>
+<li>对于图中的每个节点，如果该节点未被访问，则调用 DFS 函数进行遍历。</li>
+<li>在 DFS 函数中，首先将当前节点标记为正在访问。</li>
+<li>递归遍历当前节点的所有未访问的邻居节点，将每个邻居节点作为新的起始节点进行递归遍历。</li>
+<li>当没有未访问的邻居节点时，将当前节点的访问状态更新为已访问，并逆序添加到结果列表中。</li>
+<li>最终，结果列表中的节点正序顺序即为 DFS 拓扑排序的结果。</li>
+</ol>
+<blockquote>
+<p>需要注意的是：在进行 DFS 拓扑排序的过程中，如果发现某个节点的邻居节点已经被访问过（即已经在结果列表中），那么说明存在环，无法进行拓扑排序。在这种情况下，可以中断排序过程并返回一个表示存在环的标志。</p>
+</blockquote>
+<p>代码实现中的关键变量：</p>
+<ul>
+<li><code>visited[]</code>：记录每个节点的访问状态，0 表示未访问，1 表示正在访问，2 表示访问完成；</li>
+<li><code>edges[][]</code>：记录每个节点所有邻居节点；</li>
+<li><code>ans[]</code>：结果队列；</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">dfs</span><span class="params">(<span class="type">int</span> node, <span class="type">int</span>* visited, <span class="type">int</span>** edges, <span class="type">int</span>* edgeNums, <span class="type">int</span>* ans, <span class="type">int</span>* cnt, <span class="type">bool</span>* valid)</span> &#123;</span><br><span class="line">    visited[node] = <span class="number">1</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; edgeNums[node]; ++i) &#123;</span><br><span class="line">        <span class="type">int</span> neigNode = edges[node][i];</span><br><span class="line">        <span class="keyword">if</span> (visited[neigNode] == <span class="number">0</span>) &#123;</span><br><span class="line">            dfs(neigNode, visited, edges, edgeNums, ans, cnt, valid);</span><br><span class="line">            <span class="comment">// 这行代码测试发现不是必须的, 为什么不是必须的？加上可以有剪枝（提前终止）的作用</span></span><br><span class="line">            <span class="keyword">if</span> (!(*valid)) &#123;<span class="keyword">return</span>;&#125;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (visited[neigNode] == <span class="number">1</span>) &#123;</span><br><span class="line">            *valid = <span class="literal">false</span>;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    visited[node] = <span class="number">2</span>;</span><br><span class="line">    ans[--(*cnt)] = node;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span>* <span class="title function_">findOrder</span><span class="params">(<span class="type">int</span> numCourses, <span class="type">int</span>** prerequisites, <span class="type">int</span> prerequisitesSize, <span class="type">int</span>* prerequisitesColSize, <span class="type">int</span>* returnSize)</span> &#123;</span><br><span class="line">    <span class="type">int</span>* visited = (<span class="type">int</span> *)<span class="built_in">malloc</span>(numCourses * <span class="keyword">sizeof</span>(<span class="type">int</span>));  <span class="comment">// 记录每一个节点的访问状态</span></span><br><span class="line">    <span class="type">int</span>** edges = (<span class="type">int</span> **)<span class="built_in">malloc</span>(numCourses * <span class="keyword">sizeof</span>(<span class="type">int</span> *));  <span class="comment">// 二维数组, 记录每个节点所有邻居节点</span></span><br><span class="line">    <span class="type">int</span>* edgeNums = (<span class="type">int</span> *)<span class="built_in">malloc</span>(numCourses * <span class="keyword">sizeof</span>(<span class="type">int</span>));  <span class="comment">// 记录每个节点的邻居节点数量</span></span><br><span class="line">    <span class="type">int</span>* ans = (<span class="type">int</span> *)<span class="built_in">malloc</span>(numCourses * <span class="keyword">sizeof</span>(<span class="type">int</span>));</span><br><span class="line">    <span class="type">int</span> cnt = numCourses;</span><br><span class="line">    <span class="type">bool</span> valid = <span class="literal">true</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">memset</span>(visited, <span class="number">0</span>, numCourses * <span class="keyword">sizeof</span>(<span class="type">int</span>));</span><br><span class="line">    <span class="built_in">memset</span>(edgeNums, <span class="number">0</span>, numCourses * <span class="keyword">sizeof</span>(<span class="type">int</span>));</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; numCourses; ++i) &#123;</span><br><span class="line">        edges[i] = (<span class="type">int</span> *)<span class="built_in">malloc</span>(<span class="number">0</span> * <span class="keyword">sizeof</span>(<span class="type">int</span>));</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 构建邻接表</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; prerequisitesSize; ++i) &#123;</span><br><span class="line">        <span class="type">int</span> suff = prerequisites[i][<span class="number">0</span>], pre = prerequisites[i][<span class="number">1</span>];  <span class="comment">// edge: pre-&gt;suff</span></span><br><span class="line">        edges[pre] = (<span class="type">int</span> *)<span class="built_in">realloc</span>(edges[pre], (edgeNums[pre] + <span class="number">1</span>) * <span class="keyword">sizeof</span>(<span class="type">int</span>));</span><br><span class="line">        edges[pre][edgeNums[pre]] = suff;</span><br><span class="line">        edgeNums[pre]++;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// DFS 遍历</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; numCourses &amp;&amp; valid; ++i) &#123;</span><br><span class="line">        <span class="keyword">if</span> (!visited[i]) &#123;</span><br><span class="line">            dfs(i, visited, edges, edgeNums, ans, &amp;cnt, &amp;valid);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 释放内存</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; numCourses; ++i) &#123;</span><br><span class="line">        <span class="built_in">free</span>(edges[i]);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">free</span>(edges);</span><br><span class="line">    <span class="built_in">free</span>(visited);</span><br><span class="line">    <span class="built_in">free</span>(edgeNums);</span><br><span class="line">    </span><br><span class="line">    *returnSize = (cnt &gt; <span class="number">0</span> || !valid) ? <span class="number">0</span> : numCourses;</span><br><span class="line">    <span class="keyword">return</span> ans;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>参考链接：<a href="https://jingsam.github.io/2020/08/11/topological-sort.html">https://jingsam.github.io/2020/08/11/topological-sort.html</a></p>
+</blockquote>
+]]></content>
+      <categories>
+        <category>数据结构</category>
+        <category>拓扑排序</category>
+      </categories>
+      <tags>
+        <tag>拓扑排序</tag>
       </tags>
   </entry>
   <entry>

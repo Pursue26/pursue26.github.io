@@ -19,28 +19,31 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"pursue26.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.18.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
 
-    <meta name="description" content="指令行操作C 语言支持从 CLI（指令行）传入参数给 main() 函数，多个命令行参数之间用空格分隔，但是如果参数本身带有空格，那么就使用双引号或单引号。 C语言的 main 函数是程序的入口函数，它可以有两种形式的参数：">
+    <meta name="description" content="这篇文章主要介绍 OSI（Open System Interconnect）参考模型，以及 message、segment、datagram、packet、frame、bit 等概念。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="C 语言之 main 函数参数">
-<meta property="og:url" content="https://pursue26.github.io/posts/230916171929.html">
+<meta property="og:title" content="计网之 OSI 模型">
+<meta property="og:url" content="https://pursue26.github.io/posts/231011192359.html">
 <meta property="og:site_name" content="aha&#39;s blog">
-<meta property="og:description" content="指令行操作C 语言支持从 CLI（指令行）传入参数给 main() 函数，多个命令行参数之间用空格分隔，但是如果参数本身带有空格，那么就使用双引号或单引号。 C语言的 main 函数是程序的入口函数，它可以有两种形式的参数：">
+<meta property="og:description" content="这篇文章主要介绍 OSI（Open System Interconnect）参考模型，以及 message、segment、datagram、packet、frame、bit 等概念。">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2023-09-16T09:19:29.000Z">
-<meta property="article:modified_time" content="2023-09-22T05:57:08.945Z">
+<meta property="og:image" content="https://pursue26.github.io/images/computer-network/OSI-TCP-model.png">
+<meta property="og:image" content="https://pursue26.github.io/images/computer-network/OSI-data-encapsulation-unpacking.png">
+<meta property="article:published_time" content="2023-10-11T11:23:59.000Z">
+<meta property="article:modified_time" content="2023-10-11T12:44:35.729Z">
 <meta property="article:author" content="aha">
-<meta property="article:tag" content="main函数参数">
+<meta property="article:tag" content="OSI模型">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pursue26.github.io/images/computer-network/OSI-TCP-model.png">
 
 
-<link rel="canonical" href="https://pursue26.github.io/posts/230916171929.html">
+<link rel="canonical" href="https://pursue26.github.io/posts/231011192359.html">
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://pursue26.github.io/posts/230916171929.html","path":"posts/230916171929.html","title":"C 语言之 main 函数参数"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://pursue26.github.io/posts/231011192359.html","path":"posts/231011192359.html","title":"计网之 OSI 模型"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>C 语言之 main 函数参数 | aha's blog</title>
+<title>计网之 OSI 模型 | aha's blog</title>
   
 
 
@@ -139,7 +142,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8C%87%E4%BB%A4%E8%A1%8C%E6%93%8D%E4%BD%9C"><span class="nav-number">1.</span> <span class="nav-text"> 指令行操作 </span></a></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E5%90%84%E5%B1%82%E4%BB%A3%E8%A1%A8%E8%AE%BE%E5%A4%87"><span class="nav-number">1.</span> <span class="nav-text">计算机网络各层代表设备</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#OSI%20%E6%A8%A1%E5%9E%8B%E4%B8%AD%E5%90%84%E5%B1%82%E5%8D%95%E4%BD%8D"><span class="nav-number">2.</span> <span class="nav-text">OSI 模型中各层单位 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#OSI-vs-TCP-IP%20%E6%A8%A1%E5%9E%8B"><span class="nav-number">3.</span> <span class="nav-text">OSI vs. TCP&#x2F;IP 模型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#OSI%20%E6%A8%A1%E5%9E%8B%E6%95%B0%E6%8D%AE%E5%B0%81%E8%A3%85%E4%B8%8E%E8%A7%A3%E5%B0%81%E8%A3%85%E8%BF%87%E7%A8%8B"><span class="nav-number">4.</span> <span class="nav-text">OSI 模型数据封装与解封装过程</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -190,7 +193,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://pursue26.github.io/posts/230916171929.html">
+    <link itemprop="mainEntityOfPage" href="https://pursue26.github.io/posts/231011192359.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -203,12 +206,12 @@
     </span>
 
     <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="C 语言之 main 函数参数 | aha's blog">
+      <meta itemprop="name" content="计网之 OSI 模型 | aha's blog">
       <meta itemprop="description" content="">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          C 语言之 main 函数参数
+          计网之 OSI 模型
         </h1>
 
         <div class="post-meta-container">
@@ -219,15 +222,9 @@
         <i class="far fa-calendar"></i>
       </span>
       <span class="post-meta-item-text">发表于</span>
+      
 
-      <time title="创建时间：2023-09-16 17:19:29" itemprop="dateCreated datePublished" datetime="2023-09-16T17:19:29+08:00">2023-09-16</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2023-09-22 13:57:08" itemprop="dateModified" datetime="2023-09-22T13:57:08+08:00">2023-09-22</time>
+      <time title="创建时间：2023-10-11 19:23:59 / 修改时间：20:44:35" itemprop="dateCreated datePublished" datetime="2023-10-11T19:23:59+08:00">2023-10-11</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -235,11 +232,7 @@
       </span>
       <span class="post-meta-item-text">分类于</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">学习笔记</span></a>
-        </span>
-          ，
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/C%E8%AF%AD%E8%A8%80/" itemprop="url" rel="index"><span itemprop="name">C语言</span></a>
+          <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" itemprop="url" rel="index"><span itemprop="name">计算机网络</span></a>
         </span>
     </span>
 
@@ -257,14 +250,14 @@
         <i class="far fa-file-word"></i>
       </span>
       <span class="post-meta-item-text">本文字数：</span>
-      <span>966</span>
+      <span>1.4k</span>
     </span>
     <span class="post-meta-item" title="阅读时长">
       <span class="post-meta-item-icon">
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">阅读时长 &asymp;</span>
-      <span>2 分钟</span>
+      <span>3 分钟</span>
     </span>
 </div>
 
@@ -274,29 +267,114 @@
     
     
     
-    <div class="post-body" itemprop="articleBody"><h2 id="指令行操作"><a href="# 指令行操作" class="headerlink" title="指令行操作"></a> 指令行操作 </h2><p>C 语言支持从 CLI（指令行）传入参数给 main() 函数，多个命令行参数之间用空格分隔，但是如果参数本身带有空格，那么就使用双引号或单引号。</p>
-<p>C 语言的 main 函数是程序的入口函数，它可以有两种形式的参数：</p>
+    <div class="post-body" itemprop="articleBody"><p>这篇文章主要介绍 OSI（Open System Interconnect）参考模型，以及 message、segment、datagram、packet、frame、bit 等概念。</p>
 <span id="more"></span>
 
+<h2 id="计算机网络各层代表设备"><a href="# 计算机网络各层代表设备" class="headerlink" title="计算机网络各层代表设备"></a>计算机网络各层代表设备</h2><ul>
+<li>物理层：网卡、网线、光纤、atm 线缆等；</li>
+<li>数据链路层：二层交换机；</li>
+<li>网络层：路由器、三层交换机、防火墙；</li>
+<li>传输层：代表协议，如 TCP &amp; UDP；</li>
+<li>应用层：各种协议，如 HTTP &amp; SMTP &amp; FTP；</li>
+</ul>
+<h2 id="OSI 模型中各层单位"><a href="#OSI 模型中各层单位" class="headerlink" title="OSI 模型中各层单位"></a>OSI 模型中各层单位 </h2><p> 在计算机网络中，有许多不同的概念用于描述数据在不同层次的传输和封装。以下是这些概念的简要介绍：</p>
+<table>
+<thead>
+<tr>
+<th>数据单元</th>
+<th>层次</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>message</td>
+<td>应用层</td>
+<td>在应用层发送和接收的数据单元，它可以是任意大小的数据块</td>
+</tr>
+<tr>
+<td>segment</td>
+<td>传输层</td>
+<td>在传输层（如 TCP）中使用的数据单元，segment 包含了源端口号和目的端口号，并提供可靠的、有序的数据传输</td>
+</tr>
+<tr>
+<td>datagram</td>
+<td>网络层</td>
+<td>在网络层（如 IP）中使用的数据单元，datagram 包含了源 IP 和目的 IP，并提供不可靠的、无序的数据传输</td>
+</tr>
+<tr>
+<td>packet</td>
+<td>网络层通用</td>
+<td>在网络层中使用的通用术语，用于表示在网络中传输的数据单元，可以指代 segment 或 datagram</td>
+</tr>
+<tr>
+<td>frame</td>
+<td>数据链路层</td>
+<td>在数据链路层中使用的数据单元，frame 包含了物理地址（如 MAC 地址）和错误检测码，用于在物理网络中传输数据</td>
+</tr>
+<tr>
+<td>bit</td>
+<td>物理层</td>
+<td>是计算机网络中最小的数据单位，用于表示二进制的 0 或 1</td>
+</tr>
+</tbody></table>
+<p>那么，不同层之间是在为谁提供服务呢？</p>
+<p>应用层为应用程序提供服务，传输层为应用层提供端到端的数据传输服务，网络层为传输层提供网络间的数据传输服务，数据链路层为网络层提供主机到主机的数据传输服务。</p>
 <ol>
-<li><p> 无参数形式：main 函数的原型可以是 <code>int main(void)</code>。这表示不接受任何参数，程序执行时不需要从命令行传递参数给 main 函数。</p>
+<li>应用层为应用程序提供服务。</li>
+<li>传输层主要为进程提供端到端的通信服务。<ul>
+<li>传输层使用端口号来标识不同的进程，将应用层的数据划分为较小的数据单元（segment），并通过网络传输到目的地。</li>
+<li>传输层可以提供可靠的数据传输，保证数据的完整性和顺序性。</li>
+<li>此外，传输层还负责多个进程间的数据分发和复用，可以同时为多个进程提供服务。</li>
+</ul>
 </li>
-<li><p> 带参数形式：main 函数的原型可以是 <code>int main(int argc, char *argv[])</code>。其中，<code>argc</code> 表示命令行参数的个数，而 <code>argv</code> 是一个字符串指针数组，每个元素都是一个命令行参数的字符串。</p>
-<ul>
-<li><code>argc</code> 标识传入的参数个数。如果没有提供任何参数，<code>argc</code> 将被设置为 1；否则，<code>argc</code> 将被设置为传入的参数个数加 1。</li>
-<li><code>argv[0]</code> 通常是程序的名称或路径的字符串。</li>
-<li><code>argv[1]</code> 到 <code>argv[argc - 1]</code> 是命令行传递给程序的参数，以空格分隔。</li>
+<li>网络层主要为主机提供服务。<ul>
+<li>网络层负责将传输层的数据单元（segment）打包成网络层的数据单元（datagram），并通过网络进行传输。</li>
+<li>网络层使用 IP 地址来标识主机和网络，通过路由选择算法将数据传输到目的地，实现主机间的通信。</li>
+</ul>
+</li>
+<li>数据链路层主要为同一链路上的主机（或设备）提供服务。<ul>
+<li>数据链路层负责将网络层的数据单元（datagram）打包成数据链路层的数据单元（frame），并通过物理链路进行传输。</li>
+<li>数据链路层使用 MAC 地址来标识主机或设备，通过帧的发送和接收来实现同一链路上的通信。</li>
 </ul>
 </li>
 </ol>
-<p> 值得注意的是，也可以使用 <code>char **argv</code> 来代替 <code>char *argv[]</code> 形参，两者具有相同的类型含义。因为数组变量名 <code>argv</code> 就是指向 <code>argv[]</code> 数组的第一个元素的指针，同时又因为第一个元素的数值就是一个指针，所以此时的数组变量名 <code>argv</code> 的本质就是一个指针的指针（双重指针）。</p>
-<p> 下面是一个例子，演示如何使用带参数的 main 函数来接收命令行参数：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span> &#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;number of params: %d\n&quot;</span>, argc);</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; argc; i++) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;param-%d: %s\n&quot;</span>, i, argv[i]);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p> 如果编译并运行这个程序，并在命令行中输入参数，例如 <code>./a.out arg1 arg2 3 arg4</code>，则输出如下：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">number of params: 5</span><br><span class="line">param-0: ./a.out</span><br><span class="line">param-1: arg1</span><br><span class="line">param-2: arg2</span><br><span class="line">param-3: 3</span><br><span class="line">param-4: arg4</span><br></pre></td></tr></table></figure>
-
-<p> 参考链接：<a target="_blank" rel="noopener" href="https://is-cloud.blog.csdn.net/article/details/105347737">https://is-cloud.blog.csdn.net/article/details/105347737</a></p>
+<p>总结成表格如下：</p>
+<table>
+<thead>
+<tr>
+<th>层级</th>
+<th>功能</th>
+<th>提供服务的对象</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>应用层</td>
+<td>为应用程序提供服务</td>
+<td>应用程序</td>
+</tr>
+<tr>
+<td>传输层</td>
+<td>为进程提供端到端的通信服务，划分数据单元，保证数据传输可靠性和顺序性，数据分发和复用</td>
+<td>进程</td>
+</tr>
+<tr>
+<td>网络层</td>
+<td>为主机提供服务，将传输层的数据单元打包成网络层的数据单元，通过网络进行传输，寻址和路由选择，实现主机间通信</td>
+<td>主机</td>
+</tr>
+<tr>
+<td>数据链路层</td>
+<td>为同一链路上的主机或设备提供服务，将网络层的数据单元打包成数据链路层的数据单元，通过物理链路进行传输，帧的封装和解封装，帧的传输和错误检测，介质访问控制</td>
+<td>同一链路上的主机或设备</td>
+</tr>
+<tr>
+<td>物理层</td>
+<td>通过物理链路进行数据传输，数据的编码和解码，数据的传输和接收</td>
+<td>物理链路上的设备和传输介质等</td>
+</tr>
+</tbody></table>
+<h2 id="OSI-vs-TCP-IP 模型"><a href="#OSI-vs-TCP-IP 模型" class="headerlink" title="OSI vs. TCP&#x2F;IP 模型"></a>OSI vs. TCP&#x2F;IP 模型</h2><p><img src="/images/computer-network/OSI-TCP-model.png" alt="OSI vs. TCP/IP 模型"></p>
+<h2 id="OSI 模型数据封装与解封装过程"><a href="#OSI 模型数据封装与解封装过程" class="headerlink" title="OSI 模型数据封装与解封装过程"></a>OSI 模型数据封装与解封装过程</h2><p><img src="/images/computer-network/OSI-data-encapsulation-unpacking.png" alt="OSI 模型数据封装与解封装过程"></p>
 
     </div>
 
@@ -306,21 +384,18 @@
 
     <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/main%E5%87%BD%E6%95%B0%E5%8F%82%E6%95%B0/" rel="tag"># main函数参数</a>
+              <a href="/tags/OSI%E6%A8%A1%E5%9E%8B/" rel="tag"># OSI模型</a>
           </div>
 
         
 
           <div class="post-nav">
             <div class="post-nav-item">
-                <a href="/posts/230916094606.html" rel="prev" title="数据结构之拓扑排序">
-                  <i class="fa fa-angle-left"></i> 数据结构之拓扑排序
+                <a href="/posts/231010144856.html" rel="prev" title="模运算（求余运算）">
+                  <i class="fa fa-angle-left"></i> 模运算（求余运算）
                 </a>
             </div>
             <div class="post-nav-item">
-                <a href="/posts/230918114841.html" rel="next" title="C 语言之大小端知识">
-                  C 语言之大小端知识 <i class="fa fa-angle-right"></i>
-                </a>
             </div>
           </div>
     </footer>
