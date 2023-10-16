@@ -172,85 +172,6 @@
       </tags>
   </entry>
   <entry>
-    <title>C 语言之 typedef 实践</title>
-    <url>/posts/230920172849.html</url>
-    <content><![CDATA[<p>在 <a href="https://pursue26.github.io/posts/230918174223.html">C 语言之 typedef 自定义类型基础</a> 中介绍了 <code>typedef</code> 的使用，下面介绍一些 <code>typedef</code> 的实践。</p>
-<span id="more"></span>
-
-<h2 id="两大陷阱"><a href="# 两大陷阱" class="headerlink" title="两大陷阱"></a>两大陷阱 </h2><h3 id="不是简单的字符串替换"><a href="# 不是简单的字符串替换" class="headerlink" title="不是简单的字符串替换"></a> 不是简单的字符串替换</h3><p><code>typedef</code> 是定义了一种类型的新别名，不同于宏，它不是简单的字符串替换。</p>
-<p>当 <code>const</code> 与 <code>typedef</code> 相结合时，如定义：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="type">char</span>* PSTR;</span><br><span class="line"><span class="type">int</span> <span class="title function_">mystrcmp</span><span class="params">(<span class="type">const</span> PSTR, <span class="type">const</span> PSTR)</span>;</span><br></pre></td></tr></table></figure>
-
-<p><code>const PSTR</code> 实际上相当于指针常量 <code>const char*</code> 吗？</p>
-<p>不是的，它实际上相当于 <code>char* const</code>。这是因为 <code>const</code> 给予了整个指针本身以常量性，也就是形成了常量指针。简单来说，记住当 <code>const</code> 和 <code>typedef</code> 一起出现时，<code>typedef</code> 不会是简单的字符串替换就行。</p>
-<h3 id="与其它存储类关键字不共存"><a href="# 与其它存储类关键字不共存" class="headerlink" title="与其它存储类关键字不共存"></a>与其它存储类关键字不共存 </h3><p><code>typedef</code> 在语法上是一个<strong> 存储类关键字</strong>，虽然它并不真正影响对象的存储特性，但变量只能被一种储类的关键字修饰。</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="type">static</span> <span class="type">int</span> SINT_t;</span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">auto</span> <span class="type">int</span> AINT_t;</span><br><span class="line"><span class="keyword">extern</span> <span class="keyword">typedef</span> <span class="type">int</span> INT_t;</span><br></pre></td></tr></table></figure>
-
-<p>上述代码中，有两个存储类关键字，会编译将失败，报错 error: multiple storage classes in declaration specifiers</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="type">int</span> INT_t;</span><br><span class="line"><span class="type">static</span> INT_t a = <span class="number">10</span>;</span><br></pre></td></tr></table></figure>
-
-<p>这种写法是合法的。</p>
-<blockquote>
-<p>其它存储类关键字有 <code>auto</code>、<code>extern</code>、<code>mutable</code>、<code>static</code>、<code>register</code> 等。</p>
-</blockquote>
-<h2 id="typedef、const 与 define 结合"><a href="#typedef、const 与 define 结合" class="headerlink" title="typedef、const 与 define 结合"></a>typedef、const 与 define 结合 </h2><p> 示例 1：通常讲，<code>typedef</code> 要比 <code>define</code> 要好，<strong>特别是在有指针的场合</strong>。</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> pStr2 char*</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">char</span>* pStr1;</span><br><span class="line"></span><br><span class="line">pStr1 s1, s2;  </span><br><span class="line">pStr2 s3, s4;</span><br></pre></td></tr></table></figure>
-
-<p>在上述的变量定义中，<code>s1</code>、<code>s2</code>、<code>s3</code>都被定义为 <code>char *</code>，而<code>s4</code> 则定义成了 <code>char</code>，不是我们所预期的指针变量，根本原因就在于<code>define</code> 只是简单的字符串替换而 <code>typedef</code> 则是为一个类型起新名字。</p>
-<p>示例 2：当 <code>const</code> 和<code>typedef</code>一起出现时，<code>typedef</code>不会是简单的字符串替换。</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="type">char</span>* pStr;</span><br><span class="line"><span class="type">char</span> s[<span class="number">4</span>] = <span class="string">&quot;abc&quot;</span>;</span><br><span class="line"><span class="type">const</span> <span class="type">char</span> *p1 = s;</span><br><span class="line"><span class="type">const</span> pStr p2 = s; <span class="comment">// 实际为 char* const p2 = s;</span></span><br><span class="line"></span><br><span class="line">p1++;  <span class="comment">// 指针常量的指针可变</span></span><br><span class="line">p2++;  <span class="comment">// 编译报错, 常量指针的指针不可变</span></span><br><span class="line">*p1 = <span class="string">&#x27;m&#x27;</span>;  <span class="comment">// 编译报错, 指针常量的值不可变</span></span><br><span class="line"></span><br><span class="line">s[<span class="number">0</span>] = <span class="string">&#x27;d&#x27;</span>;</span><br><span class="line">s[<span class="number">1</span>] = <span class="string">&#x27;e&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="built_in">printf</span>(<span class="string">&quot;s = %s, %c\r\n&quot;</span>, s, *p1, *p2);  <span class="comment">//dec, e, d</span></span><br><span class="line">*p2 = <span class="string">&#x27;m&#x27;</span>;</span><br><span class="line"><span class="built_in">printf</span>(<span class="string">&quot;s = %s, %c\r\n&quot;</span>, s, *p1, *p2);  <span class="comment">//mec, e, m</span></span><br></pre></td></tr></table></figure>
-
-<p>示例中，</p>
-<ul>
-<li><code>const char *p1</code>是限定数据类型为 <code>char *</code> 的指针变量可变，指针变量指向的对象不可变，所以 <code>p1++</code> 正确；</li>
-<li><code>p2++</code>出错了，这个问题再一次提醒我们：<code>typedef</code>和 <code>define</code> 不同，它不是简单的文本替换；</li>
-<li><code>const pStr p2</code>并不等于 <code>const char *p2</code>，<code>const pStr p2</code> 和<code>const long x</code>本质上没有区别，都是对变量进行只读限制，只不过此处变量 <code>p2</code> 的数据类型是我们自己定义的，而不是系统固有类型。因此，<code>const pStr p2</code>的含义是：限定数据类型为 <code>char *</code> 的指针变量 <code>p2</code> 为只读，因此 <code>p2++</code> 错误。</li>
-</ul>
-<h2 id="抑制劣质代码"><a href="# 抑制劣质代码" class="headerlink" title="抑制劣质代码"></a>抑制劣质代码 </h2><p> 人们常常使用 <code>typedef</code> 来编写更美观和可读的代码。所谓美观，意指 <code>typedef</code> 能隐藏笨拙的语法构造以及平台相关的数据类型，从而增强可移植性以及未来的可维护性。在编程中使用 <code>typedef</code> 目的一般有两个，一个是给变量一个易记且意义明确的新名字，另一个是简化一些比较复杂的类型声明。</p>
-<h3 id="定义易于记忆的类型名"><a href="# 定义易于记忆的类型名" class="headerlink" title="定义易于记忆的类型名"></a>定义易于记忆的类型名</h3><p><code>typedef</code> 使用最多的地方是创建易于记忆的类型名，用它来归档程序员的意图。类型出现在所声明的变量名字中，位于 <code>typedef</code> 关键字右边。例如：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="type">int</span> size;</span><br></pre></td></tr></table></figure>
-
-<p>此声明定义了一个 <code>int</code> 的同义字，名字为 <code>size</code>。注意 <code>typedef</code> 并不创建新的类型，它仅仅为现有类型添加一个同义字。因此，你可以在任何需要 <code>int</code> 的上下文中使用 <code>size</code>：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">measure</span><span class="params">(size *pSize)</span>;</span><br><span class="line">size <span class="built_in">array</span>[<span class="number">4</span>];</span><br><span class="line">size len = file.getlength();</span><br></pre></td></tr></table></figure>
-
-<p><code>typedef</code> 还可以掩饰复合类型，如指针和数组。例如，你不用像下面这样重复定义有 81 个字符元素的数组：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">char</span> line[<span class="number">81</span>];</span><br><span class="line"><span class="type">char</span> text[<span class="number">81</span>];</span><br></pre></td></tr></table></figure>
-
-<p>定义一个 <code>typedef</code>，每当要用到相同类型和大小的数组时，可以这样：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="type">char</span> Line[<span class="number">81</span>];</span><br><span class="line">Line text, secondline;</span><br><span class="line">getline(text);</span><br></pre></td></tr></table></figure>
-
-<p>同样，也可以像下面这样隐藏指针语法：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="type">const</span> <span class="type">char</span> *<span class="type">pstr_t</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">mystrcmp</span><span class="params">(<span class="type">pstr_t</span>, <span class="type">pstr_t</span>)</span>;</span><br></pre></td></tr></table></figure>
-
-<p><strong>记住</strong>，不管什么时候，只要为指针声明 <code>typedef</code>，都要在最终的 <code>typedef</code> 名称中加一个 <code>const</code>，比如：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="type">const</span> <span class="type">char</span> *<span class="type">cpstr_t</span>;  <span class="comment">// 指针常量, 使得该指针可变, 而指针指向的对象不可变（只读）</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">char</span>* <span class="type">const</span> <span class="type">cpstr_t</span>;  <span class="comment">// 常量指针, 使得该指针不可变（只读）, 但指针指向的对象可变的</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="简化代码"><a href="# 简化代码" class="headerlink" title="简化代码"></a>简化代码 </h3><p> 上面讨论的 <code>typedef</code> 行为有点像 <code>define</code> 宏，用其实际类型替代同义字。不同点是 <code>typedef</code> 在编译时被解释，因此可以让编译器来应付超越预处理器能力的文本替换。例如：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="title function_">int</span> <span class="params">(*PF)</span> <span class="params">(<span class="type">const</span> <span class="type">char</span> *, <span class="type">const</span> <span class="type">char</span> *)</span>;</span><br></pre></td></tr></table></figure>
-
-<p>这个声明引入了 <code>PF</code> 类型作为函数指针的同义字，该函数有两个 <code>const char *</code> 类型的参数以及一个 <code>int</code> 类型的返回值。如果要使用下列形式的函数声明，那么上述这个 <code>typedef</code> 是不可或缺的：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">PF <span class="title function_">Register</span><span class="params">(PF pf)</span>;</span><br></pre></td></tr></table></figure>
-
-<p><code>Register()</code> 的参数是一个 <code>PF</code> 类型的回调函数，返回某个函数的地址，其署名与先前注册的名字相同。下面我展示一下如果不用 <code>typedef</code>，我们是如何实现这个声明的：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> (*Register (<span class="type">int</span> (*pf)(<span class="type">const</span> <span class="type">char</span> *, <span class="type">const</span> <span class="type">char</span> *))) (<span class="type">const</span> <span class="type">char</span> *, <span class="type">const</span> <span class="type">char</span> *); </span><br></pre></td></tr></table></figure>
-
-<p>很少有程序员理解它是什么意思，更不用说这种费解的代码所带来的出错风险了。显然，这里使用 <code>typedef</code> 不是一种特权，而是一种必需。</p>
-<p>持怀疑态度的人可能会问：“OK，还会有人写这样的代码吗？”，快速浏览一下揭示 <code>signal()</code> 函数的头文件 <code>&lt;csinal&gt;</code>，有一个同样接口的函数：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="comment">// signal 原型</span></span><br><span class="line"><span class="type">void</span> (*signal(<span class="type">int</span> sig, <span class="type">void</span> (*func)(<span class="type">int</span>)))(<span class="type">int</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// typedef 优化后</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="title function_">void</span> <span class="params">(*pFun)</span><span class="params">(<span class="type">int</span>)</span>;</span><br><span class="line">pFun <span class="title function_">signal</span><span class="params">(<span class="type">int</span> sig, pFun func)</span>;</span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>参考链接：<a href="https://www.cnblogs.com/a-s-m/p/10995722.html">https://www.cnblogs.com/a-s-m/p/10995722.html</a></p>
-</blockquote>
-]]></content>
-      <categories>
-        <category>学习笔记</category>
-        <category>C语言</category>
-      </categories>
-      <tags>
-        <tag>自定义类型</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>C 语言之 typedef 自定义类型基础</title>
     <url>/posts/230918174223.html</url>
     <content><![CDATA[<p><code>typedef</code> 关键字用于自定义数据类型的一个别名，或者称之为「定义了一种新的数据类型」。可以有效简化定义一个复杂数据类型的代码实现。</p>
@@ -367,6 +288,85 @@
       </tags>
   </entry>
   <entry>
+    <title>C 语言之 typedef 实践</title>
+    <url>/posts/230920172849.html</url>
+    <content><![CDATA[<p>在 <a href="https://pursue26.github.io/posts/230918174223.html">C 语言之 typedef 自定义类型基础</a> 中介绍了 <code>typedef</code> 的使用，下面介绍一些 <code>typedef</code> 的实践。</p>
+<span id="more"></span>
+
+<h2 id="两大陷阱"><a href="# 两大陷阱" class="headerlink" title="两大陷阱"></a>两大陷阱 </h2><h3 id="不是简单的字符串替换"><a href="# 不是简单的字符串替换" class="headerlink" title="不是简单的字符串替换"></a> 不是简单的字符串替换</h3><p><code>typedef</code> 是定义了一种类型的新别名，不同于宏，它不是简单的字符串替换。</p>
+<p>当 <code>const</code> 与 <code>typedef</code> 相结合时，如定义：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="type">char</span>* PSTR;</span><br><span class="line"><span class="type">int</span> <span class="title function_">mystrcmp</span><span class="params">(<span class="type">const</span> PSTR, <span class="type">const</span> PSTR)</span>;</span><br></pre></td></tr></table></figure>
+
+<p><code>const PSTR</code> 实际上相当于指针常量 <code>const char*</code> 吗？</p>
+<p>不是的，它实际上相当于 <code>char* const</code>。这是因为 <code>const</code> 给予了整个指针本身以常量性，也就是形成了常量指针。简单来说，记住当 <code>const</code> 和 <code>typedef</code> 一起出现时，<code>typedef</code> 不会是简单的字符串替换就行。</p>
+<h3 id="与其它存储类关键字不共存"><a href="# 与其它存储类关键字不共存" class="headerlink" title="与其它存储类关键字不共存"></a>与其它存储类关键字不共存 </h3><p><code>typedef</code> 在语法上是一个<strong> 存储类关键字</strong>，虽然它并不真正影响对象的存储特性，但变量只能被一种储类的关键字修饰。</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="type">static</span> <span class="type">int</span> SINT_t;</span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">auto</span> <span class="type">int</span> AINT_t;</span><br><span class="line"><span class="keyword">extern</span> <span class="keyword">typedef</span> <span class="type">int</span> INT_t;</span><br></pre></td></tr></table></figure>
+
+<p>上述代码中，有两个存储类关键字，会编译将失败，报错 error: multiple storage classes in declaration specifiers</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="type">int</span> INT_t;</span><br><span class="line"><span class="type">static</span> INT_t a = <span class="number">10</span>;</span><br></pre></td></tr></table></figure>
+
+<p>这种写法是合法的。</p>
+<blockquote>
+<p>其它存储类关键字有 <code>auto</code>、<code>extern</code>、<code>mutable</code>、<code>static</code>、<code>register</code> 等。</p>
+</blockquote>
+<h2 id="typedef、const 与 define 结合"><a href="#typedef、const 与 define 结合" class="headerlink" title="typedef、const 与 define 结合"></a>typedef、const 与 define 结合 </h2><p> 示例 1：通常讲，<code>typedef</code> 要比 <code>define</code> 要好，<strong>特别是在有指针的场合</strong>。</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> pStr2 char*</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">char</span>* pStr1;</span><br><span class="line"></span><br><span class="line">pStr1 s1, s2;  </span><br><span class="line">pStr2 s3, s4;</span><br></pre></td></tr></table></figure>
+
+<p>在上述的变量定义中，<code>s1</code>、<code>s2</code>、<code>s3</code>都被定义为 <code>char *</code>，而<code>s4</code> 则定义成了 <code>char</code>，不是我们所预期的指针变量，根本原因就在于<code>define</code> 只是简单的字符串替换而 <code>typedef</code> 则是为一个类型起新名字。</p>
+<p>示例 2：当 <code>const</code> 和<code>typedef</code>一起出现时，<code>typedef</code>不会是简单的字符串替换。</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="type">char</span>* pStr;</span><br><span class="line"><span class="type">char</span> s[<span class="number">4</span>] = <span class="string">&quot;abc&quot;</span>;</span><br><span class="line"><span class="type">const</span> <span class="type">char</span> *p1 = s;</span><br><span class="line"><span class="type">const</span> pStr p2 = s; <span class="comment">// 实际为 char* const p2 = s;</span></span><br><span class="line"></span><br><span class="line">p1++;  <span class="comment">// 指针常量的指针可变</span></span><br><span class="line">p2++;  <span class="comment">// 编译报错, 常量指针的指针不可变</span></span><br><span class="line">*p1 = <span class="string">&#x27;m&#x27;</span>;  <span class="comment">// 编译报错, 指针常量的值不可变</span></span><br><span class="line"></span><br><span class="line">s[<span class="number">0</span>] = <span class="string">&#x27;d&#x27;</span>;</span><br><span class="line">s[<span class="number">1</span>] = <span class="string">&#x27;e&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="built_in">printf</span>(<span class="string">&quot;s = %s, %c\r\n&quot;</span>, s, *p1, *p2);  <span class="comment">//dec, e, d</span></span><br><span class="line">*p2 = <span class="string">&#x27;m&#x27;</span>;</span><br><span class="line"><span class="built_in">printf</span>(<span class="string">&quot;s = %s, %c\r\n&quot;</span>, s, *p1, *p2);  <span class="comment">//mec, e, m</span></span><br></pre></td></tr></table></figure>
+
+<p>示例中，</p>
+<ul>
+<li><code>const char *p1</code>是限定数据类型为 <code>char *</code> 的指针变量可变，指针变量指向的对象不可变，所以 <code>p1++</code> 正确；</li>
+<li><code>p2++</code>出错了，这个问题再一次提醒我们：<code>typedef</code>和 <code>define</code> 不同，它不是简单的文本替换；</li>
+<li><code>const pStr p2</code>并不等于 <code>const char *p2</code>，<code>const pStr p2</code> 和<code>const long x</code>本质上没有区别，都是对变量进行只读限制，只不过此处变量 <code>p2</code> 的数据类型是我们自己定义的，而不是系统固有类型。因此，<code>const pStr p2</code>的含义是：限定数据类型为 <code>char *</code> 的指针变量 <code>p2</code> 为只读，因此 <code>p2++</code> 错误。</li>
+</ul>
+<h2 id="抑制劣质代码"><a href="# 抑制劣质代码" class="headerlink" title="抑制劣质代码"></a>抑制劣质代码 </h2><p> 人们常常使用 <code>typedef</code> 来编写更美观和可读的代码。所谓美观，意指 <code>typedef</code> 能隐藏笨拙的语法构造以及平台相关的数据类型，从而增强可移植性以及未来的可维护性。在编程中使用 <code>typedef</code> 目的一般有两个，一个是给变量一个易记且意义明确的新名字，另一个是简化一些比较复杂的类型声明。</p>
+<h3 id="定义易于记忆的类型名"><a href="# 定义易于记忆的类型名" class="headerlink" title="定义易于记忆的类型名"></a>定义易于记忆的类型名</h3><p><code>typedef</code> 使用最多的地方是创建易于记忆的类型名，用它来归档程序员的意图。类型出现在所声明的变量名字中，位于 <code>typedef</code> 关键字右边。例如：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="type">int</span> size;</span><br></pre></td></tr></table></figure>
+
+<p>此声明定义了一个 <code>int</code> 的同义字，名字为 <code>size</code>。注意 <code>typedef</code> 并不创建新的类型，它仅仅为现有类型添加一个同义字。因此，你可以在任何需要 <code>int</code> 的上下文中使用 <code>size</code>：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">measure</span><span class="params">(size *pSize)</span>;</span><br><span class="line">size <span class="built_in">array</span>[<span class="number">4</span>];</span><br><span class="line">size len = file.getlength();</span><br></pre></td></tr></table></figure>
+
+<p><code>typedef</code> 还可以掩饰复合类型，如指针和数组。例如，你不用像下面这样重复定义有 81 个字符元素的数组：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">char</span> line[<span class="number">81</span>];</span><br><span class="line"><span class="type">char</span> text[<span class="number">81</span>];</span><br></pre></td></tr></table></figure>
+
+<p>定义一个 <code>typedef</code>，每当要用到相同类型和大小的数组时，可以这样：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="type">char</span> Line[<span class="number">81</span>];</span><br><span class="line">Line text, secondline;</span><br><span class="line">getline(text);</span><br></pre></td></tr></table></figure>
+
+<p>同样，也可以像下面这样隐藏指针语法：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="type">const</span> <span class="type">char</span> *<span class="type">pstr_t</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">mystrcmp</span><span class="params">(<span class="type">pstr_t</span>, <span class="type">pstr_t</span>)</span>;</span><br></pre></td></tr></table></figure>
+
+<p><strong>记住</strong>，不管什么时候，只要为指针声明 <code>typedef</code>，都要在最终的 <code>typedef</code> 名称中加一个 <code>const</code>，比如：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="type">const</span> <span class="type">char</span> *<span class="type">cpstr_t</span>;  <span class="comment">// 指针常量, 使得该指针可变, 而指针指向的对象不可变（只读）</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">char</span>* <span class="type">const</span> <span class="type">cpstr_t</span>;  <span class="comment">// 常量指针, 使得该指针不可变（只读）, 但指针指向的对象可变的</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="简化代码"><a href="# 简化代码" class="headerlink" title="简化代码"></a>简化代码 </h3><p> 上面讨论的 <code>typedef</code> 行为有点像 <code>define</code> 宏，用其实际类型替代同义字。不同点是 <code>typedef</code> 在编译时被解释，因此可以让编译器来应付超越预处理器能力的文本替换。例如：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="title function_">int</span> <span class="params">(*PF)</span> <span class="params">(<span class="type">const</span> <span class="type">char</span> *, <span class="type">const</span> <span class="type">char</span> *)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>这个声明引入了 <code>PF</code> 类型作为函数指针的同义字，该函数有两个 <code>const char *</code> 类型的参数以及一个 <code>int</code> 类型的返回值。如果要使用下列形式的函数声明，那么上述这个 <code>typedef</code> 是不可或缺的：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">PF <span class="title function_">Register</span><span class="params">(PF pf)</span>;</span><br></pre></td></tr></table></figure>
+
+<p><code>Register()</code> 的参数是一个 <code>PF</code> 类型的回调函数，返回某个函数的地址，其署名与先前注册的名字相同。下面我展示一下如果不用 <code>typedef</code>，我们是如何实现这个声明的：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> (*Register (<span class="type">int</span> (*pf)(<span class="type">const</span> <span class="type">char</span> *, <span class="type">const</span> <span class="type">char</span> *))) (<span class="type">const</span> <span class="type">char</span> *, <span class="type">const</span> <span class="type">char</span> *); </span><br></pre></td></tr></table></figure>
+
+<p>很少有程序员理解它是什么意思，更不用说这种费解的代码所带来的出错风险了。显然，这里使用 <code>typedef</code> 不是一种特权，而是一种必需。</p>
+<p>持怀疑态度的人可能会问：“OK，还会有人写这样的代码吗？”，快速浏览一下揭示 <code>signal()</code> 函数的头文件 <code>&lt;csinal&gt;</code>，有一个同样接口的函数：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="comment">// signal 原型</span></span><br><span class="line"><span class="type">void</span> (*signal(<span class="type">int</span> sig, <span class="type">void</span> (*func)(<span class="type">int</span>)))(<span class="type">int</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// typedef 优化后</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="title function_">void</span> <span class="params">(*pFun)</span><span class="params">(<span class="type">int</span>)</span>;</span><br><span class="line">pFun <span class="title function_">signal</span><span class="params">(<span class="type">int</span> sig, pFun func)</span>;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>参考链接：<a href="https://www.cnblogs.com/a-s-m/p/10995722.html">https://www.cnblogs.com/a-s-m/p/10995722.html</a></p>
+</blockquote>
+]]></content>
+      <categories>
+        <category>学习笔记</category>
+        <category>C语言</category>
+      </categories>
+      <tags>
+        <tag>自定义类型</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>C 语言之 uthash 哈希表基础</title>
     <url>/posts/230922172626.html</url>
     <content><![CDATA[<p>由于 C 语言本身不存在哈希，但当需要使用哈希表的时候，自己构建又会异常复杂。因此，我们可以调用开源的第三方库 <code>uthash.h</code>，<strong>这只是一个头文件</strong>。我们需要做的就是将头文件通过 <code>#include &quot;uthash.h&quot;</code> 引入到自己的项目中。由于 <code>uthash</code> 仅是头文件，因此没有可链接的库代码。</p>
@@ -476,6 +476,72 @@
       </tags>
   </entry>
   <entry>
+    <title>C 语言之多维数组</title>
+    <url>/posts/230922143003.html</url>
+    <content><![CDATA[<p>本文章主要介绍 C 语言创建多维数组的方式及其排序，包括静态多维数组、<code>malloc</code> 动态申请多维数组、指针数组的多维数组和多维结构体数组的创建。</p>
+<span id="more"></span>
+
+<h2 id="排序接口"><a href="# 排序接口" class="headerlink" title="排序接口"></a>排序接口</h2><p><code>qsort</code> 函数是 C 语言标准库中的一个排序函数，用于对数组进行快速排序。它的函数原型如下：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">qsort</span><span class="params">(</span></span><br><span class="line"><span class="params">    <span class="type">void</span> *base, </span></span><br><span class="line"><span class="params">    <span class="type">size_t</span> nmemb, </span></span><br><span class="line"><span class="params">    <span class="type">size_t</span> size, </span></span><br><span class="line"><span class="params">    <span class="type">int</span> (*compar)(<span class="type">const</span> <span class="type">void</span> *, <span class="type">const</span> <span class="type">void</span> *)</span></span><br><span class="line"><span class="params">)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>参数说明：</p>
+<ul>
+<li><code>base</code>：指向需要排序的数组的第一个元素的指针。</li>
+<li><code>nmemb</code>：数组中元素的个数。</li>
+<li><code>size</code>：每个元素的大小（以字节为单位）。</li>
+<li><code>compar</code>：指向比较函数的指针，用于指定数组元素的比较规则。</li>
+</ul>
+<p><code>base</code> 指定了待排序数组的首地址，再结合 <code>nmemb * size</code> 可以确定要排序的数组的范围。</p>
+<p>比较函数 <code>compar</code> 的原型如下：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">compar</span><span class="params">(<span class="type">const</span> <span class="type">void</span> *a, <span class="type">const</span> <span class="type">void</span> *b)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>参数说明：</p>
+<ul>
+<li><code>a</code> 和 <code>b</code>：指向待比较的两个元素的指针。</li>
+</ul>
+<p>比较函数 <code>compar</code> 必须返回一个整数值，表示 <code>a</code> 和 <code>b</code> 的大小关系：</p>
+<ul>
+<li>如果 <code>a</code> 小于 <code>b</code>，则返回一个负整数。</li>
+<li>如果 <code>a</code> 等于 <code>b</code>，则返回零。</li>
+<li>如果 <code>a</code> 大于 <code>b</code>，则返回一个正整数。</li>
+</ul>
+<p>通过传入不同的比较函数，<code>qsort</code> 函数可以实现对不同类型的数组进行排序。</p>
+<h2 id="静态多维数组"><a href="# 静态多维数组" class="headerlink" title="静态多维数组"></a>静态多维数组 </h2><h3 id="多维数组创建"><a href="# 多维数组创建" class="headerlink" title="多维数组创建"></a> 多维数组创建</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> rows = <span class="number">3</span>, cols = <span class="number">4</span>;</span><br><span class="line"><span class="type">int</span> arr[rows][cols];</span><br></pre></td></tr></table></figure>
+
+<h3 id="多维数组排序"><a href="# 多维数组排序" class="headerlink" title="多维数组排序"></a>多维数组排序 </h3><p> 按照二维数组第 0 列升序排序。</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">cmp</span><span class="params">(<span class="type">const</span> <span class="type">void</span> *a, <span class="type">const</span> <span class="type">void</span> *b)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> ((<span class="type">int</span> *)a)[<span class="number">0</span>] - ((<span class="type">int</span> *)b)[<span class="number">0</span>];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 传入 cmp 函数指针的 arr 是一个一维指针</span></span><br><span class="line">qsort(arr, rows, <span class="keyword">sizeof</span>(arr[<span class="number">0</span>]), cmp);  <span class="comment">// 快速排序</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="malloc 动态申请多维数组"><a href="#malloc 动态申请多维数组" class="headerlink" title="malloc 动态申请多维数组"></a>malloc 动态申请多维数组 </h2><h3 id="多维数组创建 -1"><a href="# 多维数组创建 -1" class="headerlink" title="多维数组创建"></a> 多维数组创建</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> rows = <span class="number">3</span>, cols = <span class="number">4</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 动态申请二维数组</span></span><br><span class="line"><span class="type">int</span> **arr = (<span class="type">int</span> **)<span class="built_in">malloc</span>(rows * <span class="keyword">sizeof</span>(<span class="type">int</span> *));</span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; rows; i++) &#123;</span><br><span class="line">    arr[i] = (<span class="type">int</span> *)<span class="built_in">malloc</span>(cols * <span class="keyword">sizeof</span>(<span class="type">int</span>));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 释放内存</span></span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; rows; i++) &#123;</span><br><span class="line">    <span class="built_in">free</span>(arr[i]);</span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">free</span>(arr);</span><br></pre></td></tr></table></figure>
+
+<p>释放 <code>malloc</code> 申请的多维数组时，不能直接 <code>free(arr)</code>，因为 <code>malloc</code> 和 <code>free</code> 执行次数要一致。</p>
+<h3 id="多维数组排序 -1"><a href="# 多维数组排序 -1" class="headerlink" title="多维数组排序"></a>多维数组排序 </h3><p> 按照二维数组第 0 列升序排序，若相等，则按第 1 列升序排序。</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">cmp</span><span class="params">(<span class="type">const</span> <span class="type">void</span>* a, <span class="type">const</span> <span class="type">void</span>* b)</span> &#123;</span><br><span class="line">    <span class="comment">// a 是一个指向二维数组首行的指针</span></span><br><span class="line">    <span class="comment">// 通过类型转换和解引用操作, ap 指向了 a 所指向的整型数组的首地址</span></span><br><span class="line">    <span class="type">const</span> <span class="type">int</span>* ap = *(<span class="type">int</span> **)a;</span><br><span class="line">    <span class="type">const</span> <span class="type">int</span>* bp = *(<span class="type">int</span> **)b;</span><br><span class="line">    <span class="keyword">if</span> (ap[<span class="number">0</span>] == bp[<span class="number">0</span>]) &#123;</span><br><span class="line">        <span class="keyword">return</span> ap[<span class="number">1</span>] - bp[<span class="number">1</span>];</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> ap[<span class="number">0</span>] - bp[<span class="number">0</span>];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 传入 cmp 函数指针的 arr 是一个二维指针</span></span><br><span class="line">qsort(arr, rows, <span class="keyword">sizeof</span>(arr[<span class="number">0</span>]), cmp);</span><br></pre></td></tr></table></figure>
+
+<h2 id="malloc 动态申请多维结构体数组"><a href="#malloc 动态申请多维结构体数组" class="headerlink" title="malloc 动态申请多维结构体数组"></a>malloc 动态申请多维结构体数组 </h2><h3 id="多维结构体数组创建"><a href="# 多维结构体数组创建" class="headerlink" title="多维结构体数组创建"></a> 多维结构体数组创建</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> rows = <span class="number">3</span>, cols = <span class="number">4</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">node</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> x;</span><br><span class="line">    <span class="type">int</span> y;</span><br><span class="line">    <span class="type">int</span> z;</span><br><span class="line">&#125; Node_t;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 动态申请二维数组</span></span><br><span class="line">Node_t **arr = (Node_t **)<span class="built_in">malloc</span>(rows * <span class="keyword">sizeof</span>(Node_t *));</span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; rows; i++) &#123;</span><br><span class="line">    arr[i] = (Node_t *)<span class="built_in">malloc</span>(cols * <span class="keyword">sizeof</span>(Node_t));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 释放内存</span></span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; rows; i++) &#123;</span><br><span class="line">    <span class="comment">// 如果结构体成员中有指针且申请了空间, 则需要先释放成员的空间再释放结构体的空间</span></span><br><span class="line">    <span class="built_in">free</span>(arr[i]);</span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">free</span>(arr);</span><br></pre></td></tr></table></figure>
+
+<h3 id="多维结构体数组排序"><a href="# 多维结构体数组排序" class="headerlink" title="多维结构体数组排序"></a>多维结构体数组排序 </h3><p> 按照二维数组第 0 列的结构体成员 <code>x</code> 降序排序。</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">cmp</span><span class="params">(<span class="type">const</span> <span class="type">void</span> *a, <span class="type">const</span> <span class="type">void</span> *b)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// return (Node_t *)a-&gt;x - (Node_t *)b-&gt;x;   // 错误写法</span></span><br><span class="line">    <span class="keyword">return</span> ((Node_t *)a)-&gt;x - ((Node_t *)b)-&gt;x;   <span class="comment">// 正确写法 1</span></span><br><span class="line">    <span class="comment">// return (*(Node_t *)b).x - (*(Node_t *)a).x;     // 正确写法 2</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">qsort(arr, rows, <span class="keyword">sizeof</span>(arr[<span class="number">0</span>]), cmp);</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>-&gt;</code> 操作符的优先级高于 <code>()</code> 操作符。</li>
+</ul>
+<h2 id="指针数组的多维数组"><a href="# 指针数组的多维数组" class="headerlink" title="指针数组的多维数组"></a>指针数组的多维数组 </h2><p> 使用指针数组的多维数组：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> rows = <span class="number">3</span>, cols = <span class="number">4</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span>* arr[rows];</span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; cols; i++) &#123;</span><br><span class="line">    arr[i] = (<span class="type">int</span> *)<span class="built_in">malloc</span>(<span class="number">4</span> * <span class="keyword">sizeof</span>(<span class="type">int</span>));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 释放内存</span></span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; rows; i++) &#123;</span><br><span class="line">    <span class="built_in">free</span>(arr[i]);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这种方式创建的多维数组实际上是一个指针数组，每个指针指向一个一维数组，可以在运行时动态分配每个一维数组的大小（方便创建每行元素个数不同的多维数组）。</p>
+<h3 id="多维数组排序 -2"><a href="# 多维数组排序 -2" class="headerlink" title="多维数组排序"></a>多维数组排序 </h3><p> 按照二维数组第 0 列降序排序。</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">cmp</span><span class="params">(<span class="type">const</span> <span class="type">void</span>* a, <span class="type">const</span> <span class="type">void</span>* b)</span> &#123;</span><br><span class="line">    <span class="type">const</span> <span class="type">int</span>* ap = *(<span class="type">int</span> **)a;</span><br><span class="line">    <span class="type">const</span> <span class="type">int</span>* bp = *(<span class="type">int</span> **)b;</span><br><span class="line">    <span class="keyword">return</span> bp[<span class="number">0</span>] - ap[<span class="number">0</span>];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 传入 cmp 函数指针的 arr 是一个二维指针</span></span><br><span class="line">qsort(arr, rows, <span class="keyword">sizeof</span>(arr[<span class="number">0</span>]), cmp);</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>学习笔记</category>
+        <category>C语言</category>
+      </categories>
+      <tags>
+        <tag>多维数组</tag>
+        <tag>数组排序</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>C 语言之大小端知识</title>
     <url>/posts/230918114841.html</url>
     <content><![CDATA[<h2 id="字节序"><a href="# 字节序" class="headerlink" title="字节序"></a>字节序 </h2><h3 id="主机字节序"><a href="# 主机字节序" class="headerlink" title="主机字节序"></a> 主机字节序 </h3><p> 在计算机中，数据在内存中的存储是以 byte 为单位的。字节序是由于 CPU 对大于一个字节的变量，在内存中的存放顺序不同而产生的。</p>
@@ -550,72 +616,6 @@
         <tag>大小端</tag>
         <tag>字节序</tag>
         <tag>网络字节序</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>C 语言之多维数组</title>
-    <url>/posts/230922143003.html</url>
-    <content><![CDATA[<p>本文章主要介绍 C 语言创建多维数组的方式及其排序，包括静态多维数组、<code>malloc</code> 动态申请多维数组、指针数组的多维数组和多维结构体数组的创建。</p>
-<span id="more"></span>
-
-<h2 id="排序接口"><a href="# 排序接口" class="headerlink" title="排序接口"></a>排序接口</h2><p><code>qsort</code> 函数是 C 语言标准库中的一个排序函数，用于对数组进行快速排序。它的函数原型如下：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">qsort</span><span class="params">(</span></span><br><span class="line"><span class="params">    <span class="type">void</span> *base, </span></span><br><span class="line"><span class="params">    <span class="type">size_t</span> nmemb, </span></span><br><span class="line"><span class="params">    <span class="type">size_t</span> size, </span></span><br><span class="line"><span class="params">    <span class="type">int</span> (*compar)(<span class="type">const</span> <span class="type">void</span> *, <span class="type">const</span> <span class="type">void</span> *)</span></span><br><span class="line"><span class="params">)</span>;</span><br></pre></td></tr></table></figure>
-
-<p>参数说明：</p>
-<ul>
-<li><code>base</code>：指向需要排序的数组的第一个元素的指针。</li>
-<li><code>nmemb</code>：数组中元素的个数。</li>
-<li><code>size</code>：每个元素的大小（以字节为单位）。</li>
-<li><code>compar</code>：指向比较函数的指针，用于指定数组元素的比较规则。</li>
-</ul>
-<p><code>base</code> 指定了待排序数组的首地址，再结合 <code>nmemb * size</code> 可以确定要排序的数组的范围。</p>
-<p>比较函数 <code>compar</code> 的原型如下：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">compar</span><span class="params">(<span class="type">const</span> <span class="type">void</span> *a, <span class="type">const</span> <span class="type">void</span> *b)</span>;</span><br></pre></td></tr></table></figure>
-
-<p>参数说明：</p>
-<ul>
-<li><code>a</code> 和 <code>b</code>：指向待比较的两个元素的指针。</li>
-</ul>
-<p>比较函数 <code>compar</code> 必须返回一个整数值，表示 <code>a</code> 和 <code>b</code> 的大小关系：</p>
-<ul>
-<li>如果 <code>a</code> 小于 <code>b</code>，则返回一个负整数。</li>
-<li>如果 <code>a</code> 等于 <code>b</code>，则返回零。</li>
-<li>如果 <code>a</code> 大于 <code>b</code>，则返回一个正整数。</li>
-</ul>
-<p>通过传入不同的比较函数，<code>qsort</code> 函数可以实现对不同类型的数组进行排序。</p>
-<h2 id="静态多维数组"><a href="# 静态多维数组" class="headerlink" title="静态多维数组"></a>静态多维数组 </h2><h3 id="多维数组创建"><a href="# 多维数组创建" class="headerlink" title="多维数组创建"></a> 多维数组创建</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> rows = <span class="number">3</span>, cols = <span class="number">4</span>;</span><br><span class="line"><span class="type">int</span> arr[rows][cols];</span><br></pre></td></tr></table></figure>
-
-<h3 id="多维数组排序"><a href="# 多维数组排序" class="headerlink" title="多维数组排序"></a>多维数组排序 </h3><p> 按照二维数组第 0 列升序排序。</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">cmp</span><span class="params">(<span class="type">const</span> <span class="type">void</span> *a, <span class="type">const</span> <span class="type">void</span> *b)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> ((<span class="type">int</span> *)a)[<span class="number">0</span>] - ((<span class="type">int</span> *)b)[<span class="number">0</span>];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 传入 cmp 函数指针的 arr 是一个一维指针</span></span><br><span class="line">qsort(arr, rows, <span class="keyword">sizeof</span>(arr[<span class="number">0</span>]), cmp);  <span class="comment">// 快速排序</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="malloc 动态申请多维数组"><a href="#malloc 动态申请多维数组" class="headerlink" title="malloc 动态申请多维数组"></a>malloc 动态申请多维数组 </h2><h3 id="多维数组创建 -1"><a href="# 多维数组创建 -1" class="headerlink" title="多维数组创建"></a> 多维数组创建</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> rows = <span class="number">3</span>, cols = <span class="number">4</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 动态申请二维数组</span></span><br><span class="line"><span class="type">int</span> **arr = (<span class="type">int</span> **)<span class="built_in">malloc</span>(rows * <span class="keyword">sizeof</span>(<span class="type">int</span> *));</span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; rows; i++) &#123;</span><br><span class="line">    arr[i] = (<span class="type">int</span> *)<span class="built_in">malloc</span>(cols * <span class="keyword">sizeof</span>(<span class="type">int</span>));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 释放内存</span></span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; rows; i++) &#123;</span><br><span class="line">    <span class="built_in">free</span>(arr[i]);</span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">free</span>(arr);</span><br></pre></td></tr></table></figure>
-
-<p>释放 <code>malloc</code> 申请的多维数组时，不能直接 <code>free(arr)</code>，因为 <code>malloc</code> 和 <code>free</code> 执行次数要一致。</p>
-<h3 id="多维数组排序 -1"><a href="# 多维数组排序 -1" class="headerlink" title="多维数组排序"></a>多维数组排序 </h3><p> 按照二维数组第 0 列升序排序，若相等，则按第 1 列升序排序。</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">cmp</span><span class="params">(<span class="type">const</span> <span class="type">void</span>* a, <span class="type">const</span> <span class="type">void</span>* b)</span> &#123;</span><br><span class="line">    <span class="comment">// a 是一个指向二维数组首行的指针</span></span><br><span class="line">    <span class="comment">// 通过类型转换和解引用操作, ap 指向了 a 所指向的整型数组的首地址</span></span><br><span class="line">    <span class="type">const</span> <span class="type">int</span>* ap = *(<span class="type">int</span> **)a;</span><br><span class="line">    <span class="type">const</span> <span class="type">int</span>* bp = *(<span class="type">int</span> **)b;</span><br><span class="line">    <span class="keyword">if</span> (ap[<span class="number">0</span>] == bp[<span class="number">0</span>]) &#123;</span><br><span class="line">        <span class="keyword">return</span> ap[<span class="number">1</span>] - bp[<span class="number">1</span>];</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> ap[<span class="number">0</span>] - bp[<span class="number">0</span>];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 传入 cmp 函数指针的 arr 是一个二维指针</span></span><br><span class="line">qsort(arr, rows, <span class="keyword">sizeof</span>(arr[<span class="number">0</span>]), cmp);</span><br></pre></td></tr></table></figure>
-
-<h2 id="malloc 动态申请多维结构体数组"><a href="#malloc 动态申请多维结构体数组" class="headerlink" title="malloc 动态申请多维结构体数组"></a>malloc 动态申请多维结构体数组 </h2><h3 id="多维结构体数组创建"><a href="# 多维结构体数组创建" class="headerlink" title="多维结构体数组创建"></a> 多维结构体数组创建</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> rows = <span class="number">3</span>, cols = <span class="number">4</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">node</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> x;</span><br><span class="line">    <span class="type">int</span> y;</span><br><span class="line">    <span class="type">int</span> z;</span><br><span class="line">&#125; Node_t;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 动态申请二维数组</span></span><br><span class="line">Node_t **arr = (Node_t **)<span class="built_in">malloc</span>(rows * <span class="keyword">sizeof</span>(Node_t *));</span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; rows; i++) &#123;</span><br><span class="line">    arr[i] = (Node_t *)<span class="built_in">malloc</span>(cols * <span class="keyword">sizeof</span>(Node_t));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 释放内存</span></span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; rows; i++) &#123;</span><br><span class="line">    <span class="comment">// 如果结构体成员中有指针且申请了空间, 则需要先释放成员的空间再释放结构体的空间</span></span><br><span class="line">    <span class="built_in">free</span>(arr[i]);</span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">free</span>(arr);</span><br></pre></td></tr></table></figure>
-
-<h3 id="多维结构体数组排序"><a href="# 多维结构体数组排序" class="headerlink" title="多维结构体数组排序"></a>多维结构体数组排序 </h3><p> 按照二维数组第 0 列的结构体成员 <code>x</code> 降序排序。</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">cmp</span><span class="params">(<span class="type">const</span> <span class="type">void</span> *a, <span class="type">const</span> <span class="type">void</span> *b)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// return (Node_t *)a-&gt;x - (Node_t *)b-&gt;x;   // 错误写法</span></span><br><span class="line">    <span class="keyword">return</span> ((Node_t *)a)-&gt;x - ((Node_t *)b)-&gt;x;   <span class="comment">// 正确写法 1</span></span><br><span class="line">    <span class="comment">// return (*(Node_t *)b).x - (*(Node_t *)a).x;     // 正确写法 2</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">qsort(arr, rows, <span class="keyword">sizeof</span>(arr[<span class="number">0</span>]), cmp);</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li><code>-&gt;</code> 操作符的优先级高于 <code>()</code> 操作符。</li>
-</ul>
-<h2 id="指针数组的多维数组"><a href="# 指针数组的多维数组" class="headerlink" title="指针数组的多维数组"></a>指针数组的多维数组 </h2><p> 使用指针数组的多维数组：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> rows = <span class="number">3</span>, cols = <span class="number">4</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span>* arr[rows];</span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; cols; i++) &#123;</span><br><span class="line">    arr[i] = (<span class="type">int</span> *)<span class="built_in">malloc</span>(<span class="number">4</span> * <span class="keyword">sizeof</span>(<span class="type">int</span>));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 释放内存</span></span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; rows; i++) &#123;</span><br><span class="line">    <span class="built_in">free</span>(arr[i]);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>这种方式创建的多维数组实际上是一个指针数组，每个指针指向一个一维数组，可以在运行时动态分配每个一维数组的大小（方便创建每行元素个数不同的多维数组）。</p>
-<h3 id="多维数组排序 -2"><a href="# 多维数组排序 -2" class="headerlink" title="多维数组排序"></a>多维数组排序 </h3><p> 按照二维数组第 0 列降序排序。</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">cmp</span><span class="params">(<span class="type">const</span> <span class="type">void</span>* a, <span class="type">const</span> <span class="type">void</span>* b)</span> &#123;</span><br><span class="line">    <span class="type">const</span> <span class="type">int</span>* ap = *(<span class="type">int</span> **)a;</span><br><span class="line">    <span class="type">const</span> <span class="type">int</span>* bp = *(<span class="type">int</span> **)b;</span><br><span class="line">    <span class="keyword">return</span> bp[<span class="number">0</span>] - ap[<span class="number">0</span>];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 传入 cmp 函数指针的 arr 是一个二维指针</span></span><br><span class="line">qsort(arr, rows, <span class="keyword">sizeof</span>(arr[<span class="number">0</span>]), cmp);</span><br></pre></td></tr></table></figure>
-]]></content>
-      <categories>
-        <category>学习笔记</category>
-        <category>C语言</category>
-      </categories>
-      <tags>
-        <tag>多维数组</tag>
-        <tag>数组排序</tag>
       </tags>
   </entry>
   <entry>
@@ -1247,6 +1247,82 @@
       </tags>
   </entry>
   <entry>
+    <title>博客文章分类汇总</title>
+    <url>/posts/summary.html</url>
+    <content><![CDATA[<center><b>这篇文章是个人博客中系列文章的分类汇总。</b></center>
+
+<span id="more"></span>
+
+<h1 id="基础知识"><a href="# 基础知识" class="headerlink" title="基础知识"></a>基础知识 </h1><p><a href="https://pursue26.github.io/posts/231010144856.html"> 模运算（求余运算）</a><br><a href="https://pursue26.github.io/posts/231014105311.html">异或运算</a></p>
+<h1 id="C 语言系列"><a href="#C 语言系列" class="headerlink" title="C 语言系列"></a>C 语言系列</h1><p><a href="https://pursue26.github.io/posts/230916171929.html">C 语言之 main 函数参数</a><br><a href="https://pursue26.github.io/posts/230922143003.html">C 语言之多维数组</a><br><a href="https://pursue26.github.io/posts/230913200729.html">C 语言之 const 关键字</a><br><a href="https://pursue26.github.io/posts/230918174223.html">C 语言之 typedef 自定义类型基础</a><br><a href="https://pursue26.github.io/posts/230920172849.html">C 语言之 typedef 实践</a><br><a href="https://pursue26.github.io/posts/230922172626.html">C 语言之 uthash 哈希表基础</a><br><a href="https://pursue26.github.io/posts/230921094127.html">C 语言之锁与原子操作基础</a><br><a href="https://pursue26.github.io/posts/230911151334.html">C 语言之 pthread 多线程</a><br><a href="https://pursue26.github.io/posts/230918114841.html">C 语言之大小端知识</a></p>
+<h1 id="Golang 语言系列"><a href="#Golang 语言系列" class="headerlink" title="Golang 语言系列"></a>Golang 语言系列</h1><p><a href="https://pursue26.github.io/posts/230907162612.html">Go 笔记之变量与常量</a><br><a href="https://pursue26.github.io/posts/230909120145.html">Go 笔记之函数 &amp; 包 &amp; 判断 &amp; 循环</a><br><a href="https://pursue26.github.io/posts/230912152800.html">Go 笔记之数组与切片</a><br><a href="https://pursue26.github.io/posts/230913161326.html">Go 笔记之可变参数函数与 Map 集合</a><br><a href="https://pursue26.github.io/posts/230915155105.html">Go 笔记之字符串和指针</a></p>
+<h1 id="数据结构系列"><a href="# 数据结构系列" class="headerlink" title="数据结构系列"></a>数据结构系列 </h1><p><a href="https://pursue26.github.io/posts/231007174854.html"> 数据结构之链表（数组实现）</a><br><a href="https://pursue26.github.io/posts/231016161508.html">数据结构之堆栈（数组实现）</a><br><a href="https://pursue26.github.io/posts/230916094606.html">数据结构之二叉树的遍历 </a><br><a href="https://pursue26.github.io/posts/230905224335.html"> 数据结构之拓扑排序 </a><br><a href="https://pursue26.github.io/posts/230925185057.html"> 数据结构之 Trie 字典树</a></p>
+<h1 id="Docker 系列"><a href="#Docker 系列" class="headerlink" title="Docker 系列"></a>Docker 系列</h1><p><a href="https://pursue26.github.io/posts/230909171809.html">Docker 学习笔记</a></p>
+<h1 id="计算机网络系列"><a href="# 计算机网络系列" class="headerlink" title="计算机网络系列"></a>计算机网络系列 </h1><p><a href="https://pursue26.github.io/posts/231011192359.html"> 计网之 OSI 参考模型</a></p>
+<h1 id="操作系统系列"><a href="# 操作系统系列" class="headerlink" title="操作系统系列"></a>操作系统系列 </h1><h2 id="操作系统课程学习（清华大学 - 陈渝老师）"><a href="# 操作系统课程学习（清华大学 - 陈渝老师）" class="headerlink" title="操作系统课程学习（清华大学 - 陈渝老师）"></a> 操作系统课程学习（清华大学 - 陈渝老师）</h2><p><a href="https://pursue26.github.io/posts/230921190726.html">操作系统之 chapter1 概述 </a><br><a href="https://pursue26.github.io/posts/230924172528.html"> 操作系统之 chapter2 启动 &amp; 中断 &amp; 异常 &amp; 系统调用</a></p>
+]]></content>
+  </entry>
+  <entry>
+    <title>异或运算</title>
+    <url>/posts/231014105311.html</url>
+    <content><![CDATA[<p>异或是一个数学运算符，英文为 exclusive OR，缩写成 XOR。异或的数学符号为「$\bigoplus$」，计算机符号为「XOR」。如果二进制数 a 和 b 同位置不相同，则该位置的结果为 1，反之为 0。</p>
+<span id="more"></span>
+
+<h2 id="异或也叫半加运算"><a href="# 异或也叫半加运算" class="headerlink" title="异或也叫半加运算"></a>异或也叫半加运算 </h2><p> 异或也叫半加运算，其运算法则相当于 <strong> 不带进位的二进制加法</strong>，如 $0 \bigoplus 0&#x3D;0, 1 \bigoplus 0&#x3D;1, 0 \bigoplus 1&#x3D;1, 1 \bigoplus 1&#x3D;0$，这些法则与加法是相同的，如 $0+0&#x3D;0, 1+0&#x3D;1, 0+1&#x3D;1, 1+1&#x3D;(1)0$，只是不带进位，所以异或常被认作不进位加法。</p>
+<h2 id="异或运算性质"><a href="# 异或运算性质" class="headerlink" title="异或运算性质"></a>异或运算性质</h2><ol>
+<li>归零律：任何数与自身异或都等于 0，即 $a \bigoplus a&#x3D;0$</li>
+<li>恒等律：任何数与 0 异或都等于其本身，即 $a \bigoplus 0&#x3D;0$</li>
+<li>交换律：即 $a \bigoplus b &#x3D; b \bigoplus a$</li>
+<li>结合律：即 $a \bigoplus b \bigoplus c &#x3D; a \bigoplus (b \bigoplus c) &#x3D; (a \bigoplus b) + \bigoplus c$</li>
+<li>自反性：对给定的数 b，用同样的运算因子 a 作两次异或运算后仍得到 b 本身，即 $a \bigoplus b \bigoplus a &#x3D; b$</li>
+</ol>
+<h2 id="异或运算应用"><a href="# 异或运算应用" class="headerlink" title="异或运算应用"></a>异或运算应用 </h2><h3 id="交换两个数"><a href="# 交换两个数" class="headerlink" title="交换两个数"></a> 交换两个数 </h3><p> 若需要交换两个 <strong> 整形变量 </strong> 的值，除了通常使用的借用中间变量进行交换外，还可以利用异或的自反性，仅使用两个变量进行交换，如：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">swap</span><span class="params">(<span class="type">int</span> *a, <span class="type">int</span> *b)</span> &#123;</span><br><span class="line">    (*a) = (*a)^(*b);  <span class="comment">// a1 = a^b</span></span><br><span class="line">    (*b) = (*a)^(*b);  <span class="comment">// b = (a^b)^b = a</span></span><br><span class="line">    (*a) = (*a)^(*b);  <span class="comment">// a = (a^b)^b = b</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="找出重复的数"><a href="# 找出重复的数" class="headerlink" title="找出重复的数"></a>找出重复的数 </h3><p> 假设一个集合中有 $n$ 个数，范围为 $[1, n]$，其中有 $n - 2$ 个互不相同的数，有一个数重复一次，设计一个 $O(n)$ 时间复杂度，$O(1)$ 空间复杂度的算法，找出这个数。</p>
+<p>推导：</p>
+<ol>
+<li>假设不包含重复的第二个数的所有数的异或的结果为 $1 \bigoplus2 \bigoplus … \bigoplus n &#x3D; T$；</li>
+<li>那么，包含第二个重复的数的所有数的异或结果为 $1 \bigoplus2 \bigoplus … \bigoplus n \bigoplus x &#x3D; T \bigoplus x$。</li>
+</ol>
+<p>通过自反性可以得出这个重复的数为 $T \bigoplus (T \bigoplus x) &#x3D; x$。这里利用的异或的自反性，同时需要具备一个前置条件，就是：我们需要知道集合中都出现过哪些数，这样才能求出序号 1 的结果。</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">find_duplicate</span><span class="params">(<span class="type">int</span> nums[], <span class="type">int</span> n)</span> &#123;</span><br><span class="line">    <span class="type">int</span> res = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">        res ^= nums[i];  <span class="comment">// T^x</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">1</span>; i &lt; n - <span class="number">1</span>; i++) &#123;</span><br><span class="line">        res ^= i;  <span class="comment">// res := (T^x)^T</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> res;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="找出不成对的一个数"><a href="# 找出不成对的一个数" class="headerlink" title="找出不成对的一个数"></a>找出不成对的一个数</h3><p><a href="https://leetcode.cn/problems/single-number">LeetCode 习题</a>：一个数组存放若干整数，一个数出现奇数次，其余数均出现偶数次，找出这个出现奇数次的数。</p>
+<p>思路：使用异或运算的归零律、恒等律和交换律，将数组中的所有数异或求结果，将会是偶数个 0 异或（最终结果还是 0），再异或上那个出现奇数词的数，最终结果就是 0 异或 x，即那个不成对的数。</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">singleNumber</span><span class="params">(<span class="type">int</span>* nums, <span class="type">int</span> numsSize)</span>&#123;</span><br><span class="line">    <span class="type">int</span> res = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; numsSize; i++) &#123;</span><br><span class="line">        res ^= nums[i];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> res;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="找出不成对的两个数"><a href="# 找出不成对的两个数" class="headerlink" title="找出不成对的两个数"></a>找出不成对的两个数</h3><p><a href="https://leetcode.cn/problems/single-number-iii">LeetCode 习题</a>：一个数组存放若干整数，两个不同的数出现了奇数次，其余数均出现偶数次，找出这两个出现奇数次的数。</p>
+<p>假设这两个出现奇数次的数为 x 和 y：</p>
+<ol>
+<li>按照上述方法，找到这两个数异或后的结果 z；</li>
+<li>在异或中，同位置的值不同则结果为 1。基于此，可以找到 z 的二进制中最右侧的那个 1（假设 x 的二进制在同位置为 1），然后丢弃左侧的二进制数；</li>
+<li>再次遍历数组，跳过那个同位置不为 1 的数（即 y），这就等价于数组是「成对的数中有且仅有一个不成对的数」，即找到了一个不成对的数（这里为 x）；</li>
+<li>另一个数 y 便是：x^(x^y)，即 x^z。</li>
+</ol>
+<blockquote>
+<p>序号 2 中，当然也可能跳过成对的数，但没关系，因为这个数不会跳过一个、保留一个，就当少了一对成对的数，不会对找出那个不成对的数有影响。</p>
+</blockquote>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span>* <span class="title function_">singleNumber</span><span class="params">(<span class="type">int</span>* nums, <span class="type">int</span> numsSize, <span class="type">int</span>* returnSize)</span>&#123;</span><br><span class="line">    <span class="type">int</span> *ans = (<span class="type">int</span> *)<span class="built_in">malloc</span>(<span class="number">2</span> * <span class="keyword">sizeof</span>(<span class="type">int</span>));</span><br><span class="line">    <span class="type">long</span> xor = <span class="number">0</span>, lsb = <span class="number">0</span>;  <span class="comment">// 防止溢出风险</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; numsSize; ++i) &#123;</span><br><span class="line">        xor ^= <span class="number">1LL</span> * nums[i];</span><br><span class="line">    &#125;</span><br><span class="line">    lsb = xor &amp; (~xor + <span class="number">1</span>);</span><br><span class="line">    ans[<span class="number">0</span>] = <span class="number">0</span>, ans[<span class="number">1</span>] = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i =<span class="number">0</span>; i &lt; numsSize; ++i) &#123;</span><br><span class="line">        <span class="keyword">if</span> ((nums[i] &amp; lsb) != <span class="number">0</span>) &#123;</span><br><span class="line">            ans[<span class="number">0</span>] ^= nums[i];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    ans[<span class="number">1</span>] = xor ^ ans[<span class="number">0</span>];</span><br><span class="line">    (*returnSize) = <span class="number">2</span>;</span><br><span class="line">    <span class="keyword">return</span> ans;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>是如何计算上述序号 2 中的那个二进制数的呢？</p>
+<p>一个整数 <code>x</code> 与<code>(~x+1)</code>进行按位与运算的结果是将 <code>x</code> 的最右边的 1 保留下来，其他位都置为 0。这个操作通常用于获取 <code>x</code> 的最右边的 1 所代表的值，也可以称为获取 <code>x</code> 的最低有效位（LSB）。<br>举个例子，假设 <code>x</code> 的二进制表示为 10110100，那么 <code>~x</code> 的二进制表示为 01001011，然后再加上 1，得到 <code>(~x+1)</code> 的二进制表示为 01001100。最后，将 <code>x</code> 与<code>(~x+1)</code>进行按位与运算，得到的结果就是 00000100，即 <code>x</code> 的最右边的 1 所代表的值为 4。</p>
+<blockquote>
+<p>参考资料：</p>
+<ol>
+<li><a href="https://www.cnblogs.com/jasonkoo/articles/2760411.html">https://www.cnblogs.com/jasonkoo/articles/2760411.html</a></li>
+<li><a href="https://baike.baidu.com/item/%E5%BC%82%E6%88%96/10993677">https://baike.baidu.com/item/%E5%BC%82%E6%88%96/10993677</a></li>
+</ol>
+</blockquote>
+]]></content>
+      <categories>
+        <category>基础知识</category>
+        <category>数学</category>
+      </categories>
+      <tags>
+        <tag>异或运算</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>操作系统之 chapter1 概述</title>
     <url>/posts/230921190726.html</url>
     <content><![CDATA[<p>这篇文章主要介绍操作系统的定义、架构层次、界面和内核、内部组成和特征等内容。</p>
@@ -1306,72 +1382,6 @@
       </categories>
       <tags>
         <tag>操作系统</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>博客文章分类汇总</title>
-    <url>/posts/summary.html</url>
-    <content><![CDATA[<center><b>这篇文章是个人博客中系列文章的分类汇总。</b></center>
-
-<span id="more"></span>
-
-<h1 id="基础知识"><a href="# 基础知识" class="headerlink" title="基础知识"></a>基础知识 </h1><p><a href="https://pursue26.github.io/posts/231010144856.html"> 模运算（求余运算）</a><br><a href="https://pursue26.github.io/posts/231014105311.html">异或运算</a></p>
-<h1 id="C 语言系列"><a href="#C 语言系列" class="headerlink" title="C 语言系列"></a>C 语言系列</h1><p><a href="https://pursue26.github.io/posts/230916171929.html">C 语言之 main 函数参数</a><br><a href="https://pursue26.github.io/posts/230922143003.html">C 语言之多维数组</a><br><a href="https://pursue26.github.io/posts/230913200729.html">C 语言之 const 关键字</a><br><a href="https://pursue26.github.io/posts/230918174223.html">C 语言之 typedef 自定义类型基础</a><br><a href="https://pursue26.github.io/posts/230920172849.html">C 语言之 typedef 实践</a><br><a href="https://pursue26.github.io/posts/230922172626.html">C 语言之 uthash 哈希表基础</a><br><a href="https://pursue26.github.io/posts/230921094127.html">C 语言之锁与原子操作基础</a><br><a href="https://pursue26.github.io/posts/230911151334.html">C 语言之 pthread 多线程</a><br><a href="https://pursue26.github.io/posts/230918114841.html">C 语言之大小端知识</a></p>
-<h1 id="Golang 语言系列"><a href="#Golang 语言系列" class="headerlink" title="Golang 语言系列"></a>Golang 语言系列</h1><p><a href="https://pursue26.github.io/posts/230907162612.html">Go 笔记之变量与常量</a><br><a href="https://pursue26.github.io/posts/230909120145.html">Go 笔记之函数 &amp; 包 &amp; 判断 &amp; 循环</a><br><a href="https://pursue26.github.io/posts/230912152800.html">Go 笔记之数组与切片</a><br><a href="https://pursue26.github.io/posts/230913161326.html">Go 笔记之可变参数函数与 Map 集合</a><br><a href="https://pursue26.github.io/posts/230915155105.html">Go 笔记之字符串和指针</a></p>
-<h1 id="数据结构系列"><a href="# 数据结构系列" class="headerlink" title="数据结构系列"></a>数据结构系列 </h1><p><a href="https://pursue26.github.io/posts/231007174854.html"> 数据结构之链表（数组实现）</a><br><a href="https://pursue26.github.io/posts/230916094606.html">数据结构之二叉树的遍历 </a><br><a href="https://pursue26.github.io/posts/230905224335.html"> 数据结构之拓扑排序 </a><br><a href="https://pursue26.github.io/posts/230925185057.html"> 数据结构之 Trie 字典树</a></p>
-<h1 id="Docker 系列"><a href="#Docker 系列" class="headerlink" title="Docker 系列"></a>Docker 系列</h1><p><a href="https://pursue26.github.io/posts/230909171809.html">Docker 学习笔记</a></p>
-<h1 id="计算机网络系列"><a href="# 计算机网络系列" class="headerlink" title="计算机网络系列"></a>计算机网络系列 </h1><p><a href="https://pursue26.github.io/posts/231011192359.html"> 计网之 OSI 参考模型</a></p>
-<h1 id="操作系统系列"><a href="# 操作系统系列" class="headerlink" title="操作系统系列"></a>操作系统系列 </h1><h2 id="操作系统课程学习（清华大学 - 陈渝老师）"><a href="# 操作系统课程学习（清华大学 - 陈渝老师）" class="headerlink" title="操作系统课程学习（清华大学 - 陈渝老师）"></a> 操作系统课程学习（清华大学 - 陈渝老师）</h2><p><a href="https://pursue26.github.io/posts/230921190726.html">操作系统之 chapter1 概述 </a><br><a href="https://pursue26.github.io/posts/230924172528.html"> 操作系统之 chapter2 启动 &amp; 中断 &amp; 异常 &amp; 系统调用</a></p>
-]]></content>
-  </entry>
-  <entry>
-    <title>数据结构之二叉树的遍历</title>
-    <url>/posts/230905224335.html</url>
-    <content><![CDATA[<h2 id="二叉树的遍历"><a href="# 二叉树的遍历" class="headerlink" title="二叉树的遍历"></a>二叉树的遍历 </h2><p> 二叉树是一种非常重要的数据结构，很多其它数据结构都是基于二叉树的基础演变而来的。</p>
-<p>所谓遍历 Traversal 是指沿着某条搜索路线，依次对树中每个结点均做一次且仅做一次访问。</p>
-<p>对于二叉树，有深度遍历和广度遍历，深度遍历有前序、中序以及后序遍历三种方法，广度遍历即我们平常所说的层次遍历。因为树的定义本身就是递归定义，因此采用递归的方法去实现树的三种遍历不仅容易理解而且代码很简洁，而对于广度遍历来说，需要其他数据结构的支撑。</p>
-<p>四种遍历的主要思想是：</p>
-<ul>
-<li><p>前序遍历：根节点 -&gt; 左子树 -&gt; 右子树</p>
-</li>
-<li><p>中序遍历：左子树 -&gt; 根节点 -&gt; 右子树</p>
-</li>
-<li><p>后续遍历：左子树 -&gt; 右子树 -&gt; 根节点</p>
-</li>
-<li><p>层序遍历：依二叉树的深度从左到右（右到左）按层遍历</p>
-</li>
-</ul>
-<p>其中，前、中、后续指的是「根节点」的遍历顺序，例如前序遍历是先遍历根节点。</p>
-<span id="more"></span>
-
-<p>以下为一棵二叉树不同的遍历顺序以及实现方法（非递归实现 &#x2F; 递归实现）：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">    1</span><br><span class="line">   / \</span><br><span class="line">  2   3</span><br><span class="line"> / \   \</span><br><span class="line">4   5   6</span><br><span class="line"></span><br><span class="line">层次遍历顺序：[1 2 3 4 5 6] / 非递归实现：队列 + BFS</span><br><span class="line">前序遍历顺序：[1 2 4 5 3 6] / 非递归实现：栈，递归实现：DFS</span><br><span class="line">中序遍历顺序：[4 2 5 1 3 6] / 非递归实现：栈，递归实现：DFS</span><br><span class="line">后序遍历顺序：[4 5 2 6 3 1] / 非递归实现：栈，递归实现：DFS</span><br></pre></td></tr></table></figure>
-
-<p>层次遍历使用 BFS 实现，利用的就是 BFS 一层一层遍历的特性，而前序、中序、后序遍历利用了 DFS 实现。</p>
-<blockquote>
-<p>前序、中序、后序遍只是在对节点访问的顺序有一点不同，其它都相同。</p>
-</blockquote>
-<p>下面直接从 Leetcode 练习题，学习二叉树的不同遍历方法。</p>
-<h3 id="二叉树的层序遍历"><a href="# 二叉树的层序遍历" class="headerlink" title="二叉树的层序遍历"></a>二叉树的层序遍历</h3><blockquote>
-<p>题目链接：<a href="https://leetcode-cn.com/problems/average-of-levels-in-binary-tree/">637. 二叉树的层平均值</a></p>
-</blockquote>
-<p><strong>题目</strong>：给定一个非空二叉树，返回一个由每层节点平均值组成的数组。</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">输入:</span><br><span class="line">    3</span><br><span class="line">   / \</span><br><span class="line">  9  20</span><br><span class="line">    /  \</span><br><span class="line">   15   7</span><br><span class="line">输出: [3, 14.5, 11]</span><br><span class="line">解释: 第 0 层的平均值是 3,  第 1 层是 14.5, 第 2 层是 11. 因此返回 [3, 14.5, 11].</span><br></pre></td></tr></table></figure>
-
-<p><strong>层序遍历</strong>：利用队列实现二叉树的层序遍历。</p>
-<p>python 双端队列实现二叉树的层序遍历：</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">averageOfLevels</span>(<span class="params">self, root: TreeNode</span>) -&gt; <span class="type">List</span>[<span class="built_in">float</span>]:</span><br><span class="line">    <span class="keyword">if</span> root == <span class="literal">None</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line">    <span class="keyword">import</span> collections</span><br><span class="line">    queue = collections.deque()</span><br><span class="line">    queue.append(root)</span><br><span class="line">    res = []</span><br><span class="line">    <span class="keyword">while</span> queue:</span><br><span class="line">        size = <span class="built_in">len</span>(queue)</span><br><span class="line">        <span class="built_in">sum</span>, tmp_size = <span class="number">0</span>, size</span><br><span class="line">        <span class="keyword">while</span> size &gt; <span class="number">0</span>:</span><br><span class="line">            node = queue.popleft()</span><br><span class="line">            size -= <span class="number">1</span></span><br><span class="line">            <span class="built_in">sum</span> += node.val</span><br><span class="line">            <span class="keyword">if</span> node.left:</span><br><span class="line">                queue.append(node.left)</span><br><span class="line">            <span class="keyword">if</span> node.right:</span><br><span class="line">                queue.append(node.right)</span><br><span class="line">        res.append(<span class="built_in">sum</span> / tmp_size)</span><br><span class="line">    <span class="keyword">return</span> res</span><br></pre></td></tr></table></figure>
-
-<p>C 语言实现基于链表的队列，然后基于队列实现二叉树的层序遍历：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="comment">// Definition for a binary tree node.</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">TreeNode</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> val;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">TreeNode</span> *<span class="title">left</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">TreeNode</span> *<span class="title">right</span>;</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Define the structure for a node in the queue</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">Node</span> &#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">TreeNode</span> *<span class="title">data</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">Node</span> *<span class="title">next</span>;</span></span><br><span class="line">&#125; Node;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Define the structure for the queue</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">Queue</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> size;</span><br><span class="line">    Node *front;</span><br><span class="line">    Node *rear;</span><br><span class="line">&#125; Queue;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Function to create a new node</span></span><br><span class="line">Node *<span class="title function_">createNode</span><span class="params">(<span class="keyword">struct</span> TreeNode *data)</span> &#123;</span><br><span class="line">    Node *newNode = (Node *)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(Node));</span><br><span class="line">    newNode-&gt;data = data;</span><br><span class="line">    newNode-&gt;next = <span class="literal">NULL</span>;</span><br><span class="line">    <span class="keyword">return</span> newNode;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Function to create an empty queue</span></span><br><span class="line">Queue* <span class="title function_">createQueue</span><span class="params">()</span> &#123;</span><br><span class="line">    Queue *<span class="built_in">queue</span> = (Queue *)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(Queue));</span><br><span class="line">    <span class="built_in">queue</span>-&gt;front = <span class="literal">NULL</span>;</span><br><span class="line">    <span class="built_in">queue</span>-&gt;rear = <span class="literal">NULL</span>;</span><br><span class="line">    <span class="built_in">queue</span>-&gt;size = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">queue</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Function to check if the queue is empty</span></span><br><span class="line"><span class="type">bool</span> <span class="title function_">isEmpty</span><span class="params">(Queue *<span class="built_in">queue</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">queue</span>-&gt;size == <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Function to enqueue an element into the queue</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">enQueue</span><span class="params">(Queue *<span class="built_in">queue</span>, <span class="keyword">struct</span> TreeNode *data)</span> &#123;</span><br><span class="line">    Node *newNode = createNode(data);</span><br><span class="line">    <span class="keyword">if</span> (isEmpty(<span class="built_in">queue</span>)) &#123;</span><br><span class="line">        <span class="built_in">queue</span>-&gt;front = <span class="built_in">queue</span>-&gt;rear = newNode;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="built_in">queue</span>-&gt;rear-&gt;next = newNode;</span><br><span class="line">        <span class="built_in">queue</span>-&gt;rear = newNode;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">queue</span>-&gt;size += <span class="number">1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Function to dequeue an element from the queue</span></span><br><span class="line"><span class="keyword">struct</span> TreeNode *<span class="title function_">deQueue</span><span class="params">(Queue* <span class="built_in">queue</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (isEmpty(<span class="built_in">queue</span>)) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    Node *temp = <span class="built_in">queue</span>-&gt;front;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">TreeNode</span> *<span class="title">data</span> =</span> temp-&gt;data;</span><br><span class="line">    <span class="built_in">queue</span>-&gt;front = <span class="built_in">queue</span>-&gt;front-&gt;next;</span><br><span class="line">    <span class="built_in">queue</span>-&gt;size -= <span class="number">1</span>;</span><br><span class="line">    <span class="built_in">free</span>(temp);</span><br><span class="line">    <span class="keyword">return</span> data;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">double</span>* <span class="title function_">averageOfLevels</span><span class="params">(<span class="keyword">struct</span> TreeNode* root, <span class="type">int</span>* returnSize)</span>&#123;</span><br><span class="line">    <span class="type">double</span> *ans = (<span class="type">double</span> *)<span class="built_in">malloc</span>(<span class="number">10000</span> * <span class="keyword">sizeof</span>(<span class="type">double</span>));</span><br><span class="line">    Queue *<span class="built_in">queue</span> = createQueue();</span><br><span class="line">    enQueue(<span class="built_in">queue</span>, root);</span><br><span class="line">    *returnSize = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> (!isEmpty(<span class="built_in">queue</span>)) &#123;</span><br><span class="line">        <span class="type">int</span> size = <span class="built_in">queue</span>-&gt;size;</span><br><span class="line">        <span class="type">int</span> tmp_size = size;</span><br><span class="line">        <span class="type">double</span> sum = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">while</span> (size-- &gt; <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="class"><span class="keyword">struct</span> <span class="title">TreeNode</span> *<span class="title">node</span> =</span> deQueue(<span class="built_in">queue</span>);</span><br><span class="line">            sum += node-&gt;val;</span><br><span class="line">            <span class="keyword">if</span> (node-&gt;left) &#123;</span><br><span class="line">                enQueue(<span class="built_in">queue</span>, node-&gt;left);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (node-&gt;right) &#123;</span><br><span class="line">                enQueue(<span class="built_in">queue</span>, node-&gt;right);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        ans[(*returnSize)++] = sum / tmp_size;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> ans;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-]]></content>
-      <categories>
-        <category>数据结构</category>
-        <category>二叉树</category>
-      </categories>
-      <tags>
-        <tag>二叉树遍历</tag>
       </tags>
   </entry>
   <entry>
@@ -1577,63 +1587,53 @@
       </tags>
   </entry>
   <entry>
-    <title>异或运算</title>
-    <url>/posts/231014105311.html</url>
-    <content><![CDATA[<p>异或是一个数学运算符，英文为 exclusive OR，缩写成 XOR。异或的数学符号为「$\bigoplus$」，计算机符号为「XOR」。如果二进制数 a 和 b 同位置不相同，则该位置的结果为 1，反之为 0。</p>
+    <title>数据结构之二叉树的遍历</title>
+    <url>/posts/230905224335.html</url>
+    <content><![CDATA[<h2 id="二叉树的遍历"><a href="# 二叉树的遍历" class="headerlink" title="二叉树的遍历"></a>二叉树的遍历 </h2><p> 二叉树是一种非常重要的数据结构，很多其它数据结构都是基于二叉树的基础演变而来的。</p>
+<p>所谓遍历 Traversal 是指沿着某条搜索路线，依次对树中每个结点均做一次且仅做一次访问。</p>
+<p>对于二叉树，有深度遍历和广度遍历，深度遍历有前序、中序以及后序遍历三种方法，广度遍历即我们平常所说的层次遍历。因为树的定义本身就是递归定义，因此采用递归的方法去实现树的三种遍历不仅容易理解而且代码很简洁，而对于广度遍历来说，需要其他数据结构的支撑。</p>
+<p>四种遍历的主要思想是：</p>
+<ul>
+<li><p>前序遍历：根节点 -&gt; 左子树 -&gt; 右子树</p>
+</li>
+<li><p>中序遍历：左子树 -&gt; 根节点 -&gt; 右子树</p>
+</li>
+<li><p>后续遍历：左子树 -&gt; 右子树 -&gt; 根节点</p>
+</li>
+<li><p>层序遍历：依二叉树的深度从左到右（右到左）按层遍历</p>
+</li>
+</ul>
+<p>其中，前、中、后续指的是「根节点」的遍历顺序，例如前序遍历是先遍历根节点。</p>
 <span id="more"></span>
 
-<h2 id="异或也叫半加运算"><a href="# 异或也叫半加运算" class="headerlink" title="异或也叫半加运算"></a>异或也叫半加运算 </h2><p> 异或也叫半加运算，其运算法则相当于 <strong> 不带进位的二进制加法</strong>，如 $0 \bigoplus 0&#x3D;0, 1 \bigoplus 0&#x3D;1, 0 \bigoplus 1&#x3D;1, 1 \bigoplus 1&#x3D;0$，这些法则与加法是相同的，如 $0+0&#x3D;0, 1+0&#x3D;1, 0+1&#x3D;1, 1+1&#x3D;(1)0$，只是不带进位，所以异或常被认作不进位加法。</p>
-<h2 id="异或运算性质"><a href="# 异或运算性质" class="headerlink" title="异或运算性质"></a>异或运算性质</h2><ol>
-<li>归零律：任何数与自身异或都等于 0，即 $a \bigoplus a&#x3D;0$</li>
-<li>恒等律：任何数与 0 异或都等于其本身，即 $a \bigoplus 0&#x3D;0$</li>
-<li>交换律：即 $a \bigoplus b &#x3D; b \bigoplus a$</li>
-<li>结合律：即 $a \bigoplus b \bigoplus c &#x3D; a \bigoplus (b \bigoplus c) &#x3D; (a \bigoplus b) + \bigoplus c$</li>
-<li>自反性：对给定的数 b，用同样的运算因子 a 作两次异或运算后仍得到 b 本身，即 $a \bigoplus b \bigoplus a &#x3D; b$</li>
-</ol>
-<h2 id="异或运算应用"><a href="# 异或运算应用" class="headerlink" title="异或运算应用"></a>异或运算应用 </h2><h3 id="交换两个数"><a href="# 交换两个数" class="headerlink" title="交换两个数"></a> 交换两个数 </h3><p> 若需要交换两个 <strong> 整形变量 </strong> 的值，除了通常使用的借用中间变量进行交换外，还可以利用异或的自反性，仅使用两个变量进行交换，如：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">swap</span><span class="params">(<span class="type">int</span> *a, <span class="type">int</span> *b)</span> &#123;</span><br><span class="line">    (*a) = (*a)^(*b);  <span class="comment">// a1 = a^b</span></span><br><span class="line">    (*b) = (*a)^(*b);  <span class="comment">// b = (a^b)^b = a</span></span><br><span class="line">    (*a) = (*a)^(*b);  <span class="comment">// a = (a^b)^b = b</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>以下为一棵二叉树不同的遍历顺序以及实现方法（非递归实现 &#x2F; 递归实现）：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">    1</span><br><span class="line">   / \</span><br><span class="line">  2   3</span><br><span class="line"> / \   \</span><br><span class="line">4   5   6</span><br><span class="line"></span><br><span class="line">层次遍历顺序：[1 2 3 4 5 6] / 非递归实现：队列 + BFS</span><br><span class="line">前序遍历顺序：[1 2 4 5 3 6] / 非递归实现：栈，递归实现：DFS</span><br><span class="line">中序遍历顺序：[4 2 5 1 3 6] / 非递归实现：栈，递归实现：DFS</span><br><span class="line">后序遍历顺序：[4 5 2 6 3 1] / 非递归实现：栈，递归实现：DFS</span><br></pre></td></tr></table></figure>
 
-<h3 id="找出重复的数"><a href="# 找出重复的数" class="headerlink" title="找出重复的数"></a>找出重复的数 </h3><p> 假设一个集合中有 $n$ 个数，范围为 $[1, n]$，其中有 $n - 2$ 个互不相同的数，有一个数重复一次，设计一个 $O(n)$ 时间复杂度，$O(1)$ 空间复杂度的算法，找出这个数。</p>
-<p>推导：</p>
-<ol>
-<li>假设不包含重复的第二个数的所有数的异或的结果为 $1 \bigoplus2 \bigoplus … \bigoplus n &#x3D; T$；</li>
-<li>那么，包含第二个重复的数的所有数的异或结果为 $1 \bigoplus2 \bigoplus … \bigoplus n \bigoplus x &#x3D; T \bigoplus x$。</li>
-</ol>
-<p>通过自反性可以得出这个重复的数为 $T \bigoplus (T \bigoplus x) &#x3D; x$。这里利用的异或的自反性，同时需要具备一个前置条件，就是：我们需要知道集合中都出现过哪些数，这样才能求出序号 1 的结果。</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">find_duplicate</span><span class="params">(<span class="type">int</span> nums[], <span class="type">int</span> n)</span> &#123;</span><br><span class="line">    <span class="type">int</span> res = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">        res ^= nums[i];  <span class="comment">// T^x</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">1</span>; i &lt; n - <span class="number">1</span>; i++) &#123;</span><br><span class="line">        res ^= i;  <span class="comment">// res := (T^x)^T</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> res;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="找出不成对的一个数"><a href="# 找出不成对的一个数" class="headerlink" title="找出不成对的一个数"></a>找出不成对的一个数 </h3><p> 一个数组存放若干整数，一个数出现奇数次，其余数均出现偶数次，找出这个出现奇数次的数。</p>
-<p>思路：使用异或运算的归零律、恒等律和交换律，将数组中的所有数异或求结果，将会是偶数个 0 异或（最终结果还是 0），再异或上那个出现奇数词的数，最终结果就是 0 异或 x，即那个不成对的数。</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">singleNumber</span><span class="params">(<span class="type">int</span>* nums, <span class="type">int</span> numsSize)</span>&#123;</span><br><span class="line">    <span class="type">int</span> res = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; numsSize; i++) &#123;</span><br><span class="line">        res ^= nums[i];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> res;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="找出不成对的两个数"><a href="# 找出不成对的两个数" class="headerlink" title="找出不成对的两个数"></a>找出不成对的两个数 </h3><p> 一个数组存放若干整数，两个不同的数出现了奇数次，其余数均出现偶数次，找出这两个出现奇数次的数。</p>
-<p>假设这两个出现奇数次的数为 x 和 y：</p>
-<ol>
-<li>按照上述方法，找到这两个数异或后的结果 z；</li>
-<li>在异或中，同位置的值不同则结果为 1。基于此，可以找到 z 的二进制中最右侧的那个 1（假设 x 的二进制在同位置为 1），然后丢弃左侧的二进制数；</li>
-<li>再次遍历数组，跳过那个同位置不为 1 的数（即 y），这就等价于数组是「成对的数中有且仅有一个不成对的数」，即找到了一个不成对的数（这里为 x）；</li>
-<li>另一个数 y 便是：x^(x^y)，即 x^z。</li>
-</ol>
+<p>层次遍历使用 BFS 实现，利用的就是 BFS 一层一层遍历的特性，而前序、中序、后序遍历利用了 DFS 实现。</p>
 <blockquote>
-<p>序号 2 中，当然也可能跳过成对的数，但没关系，因为这个数不会跳过一个、保留一个，就当少了一对成对的数，不会对找出那个不成对的数有影响。</p>
+<p>前序、中序、后序遍只是在对节点访问的顺序有一点不同，其它都相同。</p>
 </blockquote>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">oddTimesNum</span><span class="params">(<span class="type">int</span> arr[], <span class="type">int</span> n)</span> &#123;</span><br><span class="line">    <span class="type">int</span> xor = <span class="number">0</span>, onlyOne = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">        xor ^= arr[i];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="type">int</span> rightOne = xor &amp; (~xor + <span class="number">1</span>);</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">        <span class="keyword">if</span> ((arr[i] &amp; rightOne) != <span class="number">0</span>) &#123;</span><br><span class="line">            onlyOne ^= arr[i];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%d, %d\n&quot;</span>, onlyOne, onlyOne ^ xor);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>下面直接从 Leetcode 练习题，学习二叉树的不同遍历方法。</p>
+<h3 id="二叉树的层序遍历"><a href="# 二叉树的层序遍历" class="headerlink" title="二叉树的层序遍历"></a>二叉树的层序遍历</h3><blockquote>
+<p>题目链接：<a href="https://leetcode-cn.com/problems/average-of-levels-in-binary-tree/">637. 二叉树的层平均值</a></p>
+</blockquote>
+<p><strong>题目</strong>：给定一个非空二叉树，返回一个由每层节点平均值组成的数组。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">输入:</span><br><span class="line">    3</span><br><span class="line">   / \</span><br><span class="line">  9  20</span><br><span class="line">    /  \</span><br><span class="line">   15   7</span><br><span class="line">输出: [3, 14.5, 11]</span><br><span class="line">解释: 第 0 层的平均值是 3,  第 1 层是 14.5, 第 2 层是 11. 因此返回 [3, 14.5, 11].</span><br></pre></td></tr></table></figure>
 
-<p>是如何计算上述序号 2 中的那个二进制数的呢？</p>
-<p>一个整数 <code>x</code> 与<code>(~x+1)</code>进行按位与运算的结果是将 <code>x</code> 的最右边的 1 保留下来，其他位都置为 0。这个操作通常用于获取 <code>x</code> 的最右边的 1 所代表的值，也可以称为获取 <code>x</code> 的最低有效位（LSB）。<br>举个例子，假设 <code>x</code> 的二进制表示为 10110100，那么 <code>~x</code> 的二进制表示为 01001011，然后再加上 1，得到 <code>(~x+1)</code> 的二进制表示为 01001100。最后，将 <code>x</code> 与<code>(~x+1)</code>进行按位与运算，得到的结果就是 00000100，即 <code>x</code> 的最右边的 1 所代表的值为 4。</p>
-<blockquote>
-<p>参考资料：</p>
-<ol>
-<li><a href="https://www.cnblogs.com/jasonkoo/articles/2760411.html">https://www.cnblogs.com/jasonkoo/articles/2760411.html</a></li>
-<li><a href="https://baike.baidu.com/item/%E5%BC%82%E6%88%96/10993677">https://baike.baidu.com/item/%E5%BC%82%E6%88%96/10993677</a></li>
-</ol>
-</blockquote>
+<p><strong>层序遍历</strong>：利用队列实现二叉树的层序遍历。</p>
+<p>python 双端队列实现二叉树的层序遍历：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">averageOfLevels</span>(<span class="params">self, root: TreeNode</span>) -&gt; <span class="type">List</span>[<span class="built_in">float</span>]:</span><br><span class="line">    <span class="keyword">if</span> root == <span class="literal">None</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line">    <span class="keyword">import</span> collections</span><br><span class="line">    queue = collections.deque()</span><br><span class="line">    queue.append(root)</span><br><span class="line">    res = []</span><br><span class="line">    <span class="keyword">while</span> queue:</span><br><span class="line">        size = <span class="built_in">len</span>(queue)</span><br><span class="line">        <span class="built_in">sum</span>, tmp_size = <span class="number">0</span>, size</span><br><span class="line">        <span class="keyword">while</span> size &gt; <span class="number">0</span>:</span><br><span class="line">            node = queue.popleft()</span><br><span class="line">            size -= <span class="number">1</span></span><br><span class="line">            <span class="built_in">sum</span> += node.val</span><br><span class="line">            <span class="keyword">if</span> node.left:</span><br><span class="line">                queue.append(node.left)</span><br><span class="line">            <span class="keyword">if</span> node.right:</span><br><span class="line">                queue.append(node.right)</span><br><span class="line">        res.append(<span class="built_in">sum</span> / tmp_size)</span><br><span class="line">    <span class="keyword">return</span> res</span><br></pre></td></tr></table></figure>
+
+<p>C 语言实现基于链表的队列，然后基于队列实现二叉树的层序遍历：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="comment">// Definition for a binary tree node.</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">TreeNode</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> val;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">TreeNode</span> *<span class="title">left</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">TreeNode</span> *<span class="title">right</span>;</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Define the structure for a node in the queue</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">Node</span> &#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">TreeNode</span> *<span class="title">data</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">Node</span> *<span class="title">next</span>;</span></span><br><span class="line">&#125; Node;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Define the structure for the queue</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">Queue</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> size;</span><br><span class="line">    Node *front;</span><br><span class="line">    Node *rear;</span><br><span class="line">&#125; Queue;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Function to create a new node</span></span><br><span class="line">Node *<span class="title function_">createNode</span><span class="params">(<span class="keyword">struct</span> TreeNode *data)</span> &#123;</span><br><span class="line">    Node *newNode = (Node *)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(Node));</span><br><span class="line">    newNode-&gt;data = data;</span><br><span class="line">    newNode-&gt;next = <span class="literal">NULL</span>;</span><br><span class="line">    <span class="keyword">return</span> newNode;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Function to create an empty queue</span></span><br><span class="line">Queue* <span class="title function_">createQueue</span><span class="params">()</span> &#123;</span><br><span class="line">    Queue *<span class="built_in">queue</span> = (Queue *)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(Queue));</span><br><span class="line">    <span class="built_in">queue</span>-&gt;front = <span class="literal">NULL</span>;</span><br><span class="line">    <span class="built_in">queue</span>-&gt;rear = <span class="literal">NULL</span>;</span><br><span class="line">    <span class="built_in">queue</span>-&gt;size = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">queue</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Function to check if the queue is empty</span></span><br><span class="line"><span class="type">bool</span> <span class="title function_">isEmpty</span><span class="params">(Queue *<span class="built_in">queue</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">queue</span>-&gt;size == <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Function to enqueue an element into the queue</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">enQueue</span><span class="params">(Queue *<span class="built_in">queue</span>, <span class="keyword">struct</span> TreeNode *data)</span> &#123;</span><br><span class="line">    Node *newNode = createNode(data);</span><br><span class="line">    <span class="keyword">if</span> (isEmpty(<span class="built_in">queue</span>)) &#123;</span><br><span class="line">        <span class="built_in">queue</span>-&gt;front = <span class="built_in">queue</span>-&gt;rear = newNode;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="built_in">queue</span>-&gt;rear-&gt;next = newNode;</span><br><span class="line">        <span class="built_in">queue</span>-&gt;rear = newNode;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">queue</span>-&gt;size += <span class="number">1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Function to dequeue an element from the queue</span></span><br><span class="line"><span class="keyword">struct</span> TreeNode *<span class="title function_">deQueue</span><span class="params">(Queue* <span class="built_in">queue</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (isEmpty(<span class="built_in">queue</span>)) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    Node *temp = <span class="built_in">queue</span>-&gt;front;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">TreeNode</span> *<span class="title">data</span> =</span> temp-&gt;data;</span><br><span class="line">    <span class="built_in">queue</span>-&gt;front = <span class="built_in">queue</span>-&gt;front-&gt;next;</span><br><span class="line">    <span class="built_in">queue</span>-&gt;size -= <span class="number">1</span>;</span><br><span class="line">    <span class="built_in">free</span>(temp);</span><br><span class="line">    <span class="keyword">return</span> data;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">double</span>* <span class="title function_">averageOfLevels</span><span class="params">(<span class="keyword">struct</span> TreeNode* root, <span class="type">int</span>* returnSize)</span>&#123;</span><br><span class="line">    <span class="type">double</span> *ans = (<span class="type">double</span> *)<span class="built_in">malloc</span>(<span class="number">10000</span> * <span class="keyword">sizeof</span>(<span class="type">double</span>));</span><br><span class="line">    Queue *<span class="built_in">queue</span> = createQueue();</span><br><span class="line">    enQueue(<span class="built_in">queue</span>, root);</span><br><span class="line">    *returnSize = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> (!isEmpty(<span class="built_in">queue</span>)) &#123;</span><br><span class="line">        <span class="type">int</span> size = <span class="built_in">queue</span>-&gt;size;</span><br><span class="line">        <span class="type">int</span> tmp_size = size;</span><br><span class="line">        <span class="type">double</span> sum = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">while</span> (size-- &gt; <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="class"><span class="keyword">struct</span> <span class="title">TreeNode</span> *<span class="title">node</span> =</span> deQueue(<span class="built_in">queue</span>);</span><br><span class="line">            sum += node-&gt;val;</span><br><span class="line">            <span class="keyword">if</span> (node-&gt;left) &#123;</span><br><span class="line">                enQueue(<span class="built_in">queue</span>, node-&gt;left);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (node-&gt;right) &#123;</span><br><span class="line">                enQueue(<span class="built_in">queue</span>, node-&gt;right);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        ans[(*returnSize)++] = sum / tmp_size;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> ans;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 ]]></content>
       <categories>
-        <category>基础知识</category>
-        <category>数学</category>
+        <category>数据结构</category>
+        <category>二叉树</category>
       </categories>
       <tags>
-        <tag>异或运算</tag>
+        <tag>二叉树遍历</tag>
       </tags>
   </entry>
   <entry>
@@ -1802,6 +1802,54 @@
       </categories>
       <tags>
         <tag>链表</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>数据结构之堆栈（数组实现）</title>
+    <url>/posts/231016161508.html</url>
+    <content><![CDATA[<p>栈与数组类似，但功能受限，只能通过 push 将新元素添加到栈的顶部，通过 pop 从栈中移除顶部的元素，并通过 peek 查看顶部的元素而不将其弹出。栈提供了后进先出（LIFO, last-in first-out）的顺序，最后推入的元素将在下一次弹出时首先出栈。</p>
+<span id="more"></span>
+
+<h2 id="堆栈实现的方式"><a href="# 堆栈实现的方式" class="headerlink" title="堆栈实现的方式"></a>堆栈实现的方式 </h2><p> 在 C 语言中，可以使用以下方法来实现堆栈（stack）数据结构：</p>
+<ol>
+<li><p>使用数组：可以使用一个固定大小的数组来表示堆栈。堆栈有两个重要的指针：一个是指向栈顶的指针，另一个是指向栈底的指针。在数组中，栈顶指针指向最新添加的元素，栈底指针指向最旧的元素。可以使用数组的索引来实现栈的推入 (push) 和弹出 (pop) 操作。</p>
+</li>
+<li><p>使用链表：可以使用链表来表示堆栈。链表中的每个节点包含一个元素和一个指向下一个节点的指针。栈顶指针指向链表的第一个节点，栈底指针指向链表的最后一个节点。推入操作将创建一个新节点，并将其插入链表的开头；弹出操作将删除链表的第一个节点。</p>
+</li>
+</ol>
+<blockquote>
+<p>链表实现堆栈时，<strong>采用头插法</strong>，即在链表头结点前插入新节点、删除节点。这样做，方便 push 和 pop 操作；如果在链表的最后插入新节点，那么在 pop 操作时，更新栈顶的节点指针将会很麻烦 &amp; 费时。</p>
+</blockquote>
+<p>这篇文章将介绍使用数组实现堆栈这种数据结构。</p>
+<h2 id="数组实现堆栈"><a href="# 数组实现堆栈" class="headerlink" title="数组实现堆栈"></a>数组实现堆栈 </h2><h3 id="定义并初始化堆栈结构"><a href="# 定义并初始化堆栈结构" class="headerlink" title="定义并初始化堆栈结构"></a> 定义并初始化堆栈结构 </h3><p> 使用一个固定长度的数组来实现具有先进先出的堆栈结构。为了将不同的堆栈和栈顶位置对应起来，这里使用一个结构体来组合堆栈和栈顶位置。</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> MAX_SIZE (3)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> EXCEPTION_VALUE (-1) </span></span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">stack</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> data[MAX_SIZE];  <span class="comment">// 数组实现堆栈</span></span><br><span class="line">    <span class="type">int</span> top;  <span class="comment">// 初始化栈顶位置</span></span><br><span class="line">&#125; Stack;</span><br></pre></td></tr></table></figure>
+
+<h3 id="初始化堆栈"><a href="# 初始化堆栈" class="headerlink" title="初始化堆栈"></a>初始化堆栈</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">initStack</span><span class="params">(Stack *<span class="built_in">stack</span>)</span> &#123;</span><br><span class="line">    <span class="comment">// memset(stack-&gt;data, 0, MAX_SIZE * sizeof(int));</span></span><br><span class="line">    <span class="built_in">stack</span>-&gt;top = <span class="number">-1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="判断堆栈是否为空"><a href="# 判断堆栈是否为空" class="headerlink" title="判断堆栈是否为空"></a>判断堆栈是否为空</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 判断堆栈是否为空</span></span><br><span class="line"><span class="type">bool</span> <span class="title function_">isEmpty</span><span class="params">(Stack *<span class="built_in">stack</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">stack</span>-&gt;top == <span class="number">-1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="判断堆栈是否已满"><a href="# 判断堆栈是否已满" class="headerlink" title="判断堆栈是否已满"></a>判断堆栈是否已满</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 判断堆栈是否已满</span></span><br><span class="line"><span class="type">bool</span> <span class="title function_">isFull</span><span class="params">(Stack *<span class="built_in">stack</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">stack</span>-&gt;top == MAX_SIZE - <span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="入栈操作"><a href="# 入栈操作" class="headerlink" title="入栈操作"></a>入栈操作</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 元素入栈</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">push</span><span class="params">(Stack *<span class="built_in">stack</span>, <span class="type">int</span> element)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (isFull(<span class="built_in">stack</span>)) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Stack is full\n&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> EXCEPTION_VALUE;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        (<span class="built_in">stack</span>-&gt;top)++;</span><br><span class="line">        <span class="built_in">stack</span>-&gt;data[<span class="built_in">stack</span>-&gt;top] = element;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="出栈操作"><a href="# 出栈操作" class="headerlink" title="出栈操作"></a>出栈操作</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 元素出栈</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pop</span><span class="params">(Stack *<span class="built_in">stack</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (isEmpty(<span class="built_in">stack</span>)) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Stack is empty\n&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> EXCEPTION_VALUE;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        (<span class="built_in">stack</span>-&gt;top)--;</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">stack</span>-&gt;data[<span class="built_in">stack</span>-&gt;top];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>为了区分栈空时的返回值与正常出栈的数据，需要定义异常值为不会出现在正常数据中的值；或者修改函数的返回值为指针类型，返回值不为空时对应着有效数据。</p>
+<h3 id="获取栈顶元素"><a href="# 获取栈顶元素" class="headerlink" title="获取栈顶元素"></a>获取栈顶元素</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 获取栈顶元素</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">peek</span><span class="params">(Stack *<span class="built_in">stack</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (isEmpty(<span class="built_in">stack</span>)) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Stack is empty\n&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> EXCEPTION_VALUE;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">stack</span>-&gt;data[<span class="built_in">stack</span>-&gt;top];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="打印堆栈数据"><a href="# 打印堆栈数据" class="headerlink" title="打印堆栈数据"></a>打印堆栈数据</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 打印堆栈中的元素</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">printStack</span><span class="params">(Stack *<span class="built_in">stack</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (isEmpty(<span class="built_in">stack</span>)) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Stack is empty\n&quot;</span>);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Stack: &quot;</span>);</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt;= <span class="built_in">stack</span>-&gt;top; i++) &#123;</span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">&quot;%d &quot;</span>, <span class="built_in">stack</span>-&gt;data[i]);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;\n&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="数组实现堆栈完整代码"><a href="# 数组实现堆栈完整代码" class="headerlink" title="数组实现堆栈完整代码"></a>数组实现堆栈完整代码</h2><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdbool.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> MAX_SIZE (3)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> EXCEPTION_VALUE (-1) </span></span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">stack</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> data[MAX_SIZE];  <span class="comment">// 数组实现堆栈</span></span><br><span class="line">    <span class="type">int</span> top;  <span class="comment">// 初始化栈顶位置</span></span><br><span class="line">&#125; Stack;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">initStack</span><span class="params">(Stack *<span class="built_in">stack</span>)</span> &#123;</span><br><span class="line">    <span class="comment">// memset(stack-&gt;data, 0, MAX_SIZE * sizeof(int));</span></span><br><span class="line">    <span class="built_in">stack</span>-&gt;top = <span class="number">-1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">bool</span> <span class="title function_">isEmpty</span><span class="params">(Stack *<span class="built_in">stack</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">stack</span>-&gt;top == <span class="number">-1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">bool</span> <span class="title function_">isFull</span><span class="params">(Stack *<span class="built_in">stack</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">stack</span>-&gt;top == MAX_SIZE - <span class="number">1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">push</span><span class="params">(Stack *<span class="built_in">stack</span>, <span class="type">int</span> element)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (isFull(<span class="built_in">stack</span>)) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Stack is full\n&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> EXCEPTION_VALUE;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        (<span class="built_in">stack</span>-&gt;top)++;</span><br><span class="line">        <span class="built_in">stack</span>-&gt;data[<span class="built_in">stack</span>-&gt;top] = element;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">pop</span><span class="params">(Stack *<span class="built_in">stack</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (isEmpty(<span class="built_in">stack</span>)) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Stack is empty\n&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> EXCEPTION_VALUE;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        (<span class="built_in">stack</span>-&gt;top)--;</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">stack</span>-&gt;data[<span class="built_in">stack</span>-&gt;top];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">peek</span><span class="params">(Stack *<span class="built_in">stack</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (isEmpty(<span class="built_in">stack</span>)) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Stack is empty\n&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> EXCEPTION_VALUE;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">stack</span>-&gt;data[<span class="built_in">stack</span>-&gt;top];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">printStack</span><span class="params">(Stack *<span class="built_in">stack</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (isEmpty(<span class="built_in">stack</span>)) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Stack is empty\n&quot;</span>);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Stack: &quot;</span>);</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt;= <span class="built_in">stack</span>-&gt;top; i++) &#123;</span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">&quot;%d &quot;</span>, <span class="built_in">stack</span>-&gt;data[i]);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;\n&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> *argc, <span class="type">char</span> *argv[])</span> &#123;</span><br><span class="line">    Stack stack1;</span><br><span class="line">    initStack(&amp;stack1);</span><br><span class="line"></span><br><span class="line">    printStack(&amp;stack1);</span><br><span class="line">    push(&amp;stack1, <span class="number">1</span>);</span><br><span class="line">    push(&amp;stack1, <span class="number">2</span>);</span><br><span class="line">    push(&amp;stack1, <span class="number">3</span>);</span><br><span class="line">    printStack(&amp;stack1);</span><br><span class="line">    push(&amp;stack1, <span class="number">4</span>);</span><br><span class="line">    printStack(&amp;stack1);</span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Pop element: %d\n&quot;</span>, pop(&amp;stack1));</span><br><span class="line">    printStack(&amp;stack1);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Top element: %d\n&quot;</span>, peek(&amp;stack1));</span><br><span class="line">    printStack(&amp;stack1);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>程序的输出结果为：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Stack: </span><br><span class="line">Stack: 1 2 3</span><br><span class="line">Stack is full</span><br><span class="line">Stack: 1 2 3</span><br><span class="line">Pop element: 2</span><br><span class="line">Stack: 1 2</span><br><span class="line">Top element: 2</span><br><span class="line">Stack: 1 2</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>数据结构</category>
+        <category>堆栈</category>
+      </categories>
+      <tags>
+        <tag>堆栈</tag>
       </tags>
   </entry>
   <entry>
