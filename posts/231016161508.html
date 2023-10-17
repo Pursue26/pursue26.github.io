@@ -27,7 +27,7 @@
 <meta property="og:description" content="栈与数组类似，但功能受限，只能通过 push 将新元素添加到栈的顶部，通过 pop 从栈中移除顶部的元素，并通过 peek 查看顶部的元素而不将其弹出。栈提供了后进先出（LIFO, last-in first-out）的顺序，最后推入的元素将在下一次弹出时首先出栈。">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2023-10-16T08:15:08.000Z">
-<meta property="article:modified_time" content="2023-10-16T11:33:30.629Z">
+<meta property="article:modified_time" content="2023-10-17T03:00:19.479Z">
 <meta property="article:author" content="aha">
 <meta property="article:tag" content="堆栈">
 <meta name="twitter:card" content="summary">
@@ -139,7 +139,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A0%86%E6%A0%88%E5%AE%9E%E7%8E%B0%E7%9A%84%E6%96%B9%E5%BC%8F"><span class="nav-number">1.</span> <span class="nav-text">堆栈实现的方式 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E7%BB%84%E5%AE%9E%E7%8E%B0%E5%A0%86%E6%A0%88"><span class="nav-number">2.</span> <span class="nav-text">数组实现堆栈 </span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9A%E4%B9%89%E5%B9%B6%E5%88%9D%E5%A7%8B%E5%8C%96%E5%A0%86%E6%A0%88%E7%BB%93%E6%9E%84"><span class="nav-number">2.1.</span> <span class="nav-text"> 定义并初始化堆栈结构 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%9D%E5%A7%8B%E5%8C%96%E5%A0%86%E6%A0%88"><span class="nav-number">2.2.</span> <span class="nav-text">初始化堆栈</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A4%E6%96%AD%E5%A0%86%E6%A0%88%E6%98%AF%E5%90%A6%E4%B8%BA%E7%A9%BA"><span class="nav-number">2.3.</span> <span class="nav-text">判断堆栈是否为空</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A4%E6%96%AD%E5%A0%86%E6%A0%88%E6%98%AF%E5%90%A6%E5%B7%B2%E6%BB%A1"><span class="nav-number">2.4.</span> <span class="nav-text">判断堆栈是否已满</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%A5%E6%A0%88%E6%93%8D%E4%BD%9C"><span class="nav-number">2.5.</span> <span class="nav-text">入栈操作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%87%BA%E6%A0%88%E6%93%8D%E4%BD%9C"><span class="nav-number">2.6.</span> <span class="nav-text">出栈操作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96%E6%A0%88%E9%A1%B6%E5%85%83%E7%B4%A0"><span class="nav-number">2.7.</span> <span class="nav-text">获取栈顶元素</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%89%93%E5%8D%B0%E5%A0%86%E6%A0%88%E6%95%B0%E6%8D%AE"><span class="nav-number">2.8.</span> <span class="nav-text">打印堆栈数据</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E7%BB%84%E5%AE%9E%E7%8E%B0%E5%A0%86%E6%A0%88%E5%AE%8C%E6%95%B4%E4%BB%A3%E7%A0%81"><span class="nav-number">3.</span> <span class="nav-text">数组实现堆栈完整代码</span></a></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A0%86%E6%A0%88%E7%9A%84%E5%AE%9E%E7%8E%B0%E6%96%B9%E5%BC%8F"><span class="nav-number">1.</span> <span class="nav-text">堆栈的实现方式 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E7%BB%84%E5%AE%9E%E7%8E%B0%E5%A0%86%E6%A0%88"><span class="nav-number">2.</span> <span class="nav-text">数组实现堆栈 </span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9A%E4%B9%89%E5%B9%B6%E5%88%9D%E5%A7%8B%E5%8C%96%E5%A0%86%E6%A0%88%E7%BB%93%E6%9E%84"><span class="nav-number">2.1.</span> <span class="nav-text"> 定义并初始化堆栈结构 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%9D%E5%A7%8B%E5%8C%96%E5%A0%86%E6%A0%88"><span class="nav-number">2.2.</span> <span class="nav-text">初始化堆栈</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A4%E6%96%AD%E5%A0%86%E6%A0%88%E6%98%AF%E5%90%A6%E4%B8%BA%E7%A9%BA"><span class="nav-number">2.3.</span> <span class="nav-text">判断堆栈是否为空</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A4%E6%96%AD%E5%A0%86%E6%A0%88%E6%98%AF%E5%90%A6%E5%B7%B2%E6%BB%A1"><span class="nav-number">2.4.</span> <span class="nav-text">判断堆栈是否已满</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%A5%E6%A0%88%E6%93%8D%E4%BD%9C"><span class="nav-number">2.5.</span> <span class="nav-text">入栈操作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%87%BA%E6%A0%88%E6%93%8D%E4%BD%9C"><span class="nav-number">2.6.</span> <span class="nav-text">出栈操作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96%E6%A0%88%E9%A1%B6%E5%85%83%E7%B4%A0"><span class="nav-number">2.7.</span> <span class="nav-text">获取栈顶元素</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%89%93%E5%8D%B0%E5%A0%86%E6%A0%88%E6%95%B0%E6%8D%AE"><span class="nav-number">2.8.</span> <span class="nav-text">打印堆栈数据</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E7%BB%84%E5%AE%9E%E7%8E%B0%E5%A0%86%E6%A0%88%E5%AE%8C%E6%95%B4%E4%BB%A3%E7%A0%81"><span class="nav-number">3.</span> <span class="nav-text">数组实现堆栈完整代码</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -152,18 +152,18 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">27</span>
+          <span class="site-state-item-count">29</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
           <a href="/categories/">
-        <span class="site-state-item-count">14</span>
+        <span class="site-state-item-count">15</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">37</span>
+        <span class="site-state-item-count">39</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -219,9 +219,15 @@
         <i class="far fa-calendar"></i>
       </span>
       <span class="post-meta-item-text">发表于</span>
-      
 
-      <time title="创建时间：2023-10-16 16:15:08 / 修改时间：19:33:30" itemprop="dateCreated datePublished" datetime="2023-10-16T16:15:08+08:00">2023-10-16</time>
+      <time title="创建时间：2023-10-16 16:15:08" itemprop="dateCreated datePublished" datetime="2023-10-16T16:15:08+08:00">2023-10-16</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2023-10-17 11:00:19" itemprop="dateModified" datetime="2023-10-17T11:00:19+08:00">2023-10-17</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -271,7 +277,7 @@
     <div class="post-body" itemprop="articleBody"><p>栈与数组类似，但功能受限，只能通过 push 将新元素添加到栈的顶部，通过 pop 从栈中移除顶部的元素，并通过 peek 查看顶部的元素而不将其弹出。栈提供了后进先出（LIFO, last-in first-out）的顺序，最后推入的元素将在下一次弹出时首先出栈。</p>
 <span id="more"></span>
 
-<h2 id="堆栈实现的方式"><a href="# 堆栈实现的方式" class="headerlink" title="堆栈实现的方式"></a>堆栈实现的方式 </h2><p> 在 C 语言中，可以使用以下方法来实现堆栈（stack）数据结构：</p>
+<h2 id="堆栈的实现方式"><a href="# 堆栈的实现方式" class="headerlink" title="堆栈的实现方式"></a>堆栈的实现方式 </h2><p> 在 C 语言中，可以使用以下方法来实现堆栈（stack）数据结构：</p>
 <ol>
 <li><p>使用数组：可以使用一个固定大小的数组来表示堆栈。堆栈有两个重要的指针：一个是指向栈顶的指针，另一个是指向栈底的指针。在数组中，栈顶指针指向最新添加的元素，栈底指针指向最旧的元素。可以使用数组的索引来实现栈的推入 (push) 和弹出 (pop) 操作。</p>
 </li>
@@ -358,13 +364,13 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-line"></i>
     </span>
-    <span title="站点总字数">120k</span>
+    <span title="站点总字数">134k</span>
   </span>
   <span class="post-meta-item">
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">3:38</span>
+    <span title="站点阅读时长">4:04</span>
   </span>
 </div>
 <div class="busuanzi-count">
