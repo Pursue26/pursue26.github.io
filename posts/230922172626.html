@@ -152,18 +152,18 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">29</span>
+          <span class="site-state-item-count">30</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
           <a href="/categories/">
-        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-count">16</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">39</span>
+        <span class="site-state-item-count">41</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -317,7 +317,7 @@
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* good */</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">add_user</span><span class="params">(HashItem **obj, <span class="type">int</span> user_id, <span class="type">char</span> *name)</span> &#123;</span><br><span class="line">  ...</span><br><span class="line">  HASH_ADD_INT(*obj, id, hashNode);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p><strong>必须处理「指向哈希指针的指针」的原因很简单：散列宏会修改它（换句话说，它们修改指针地址本身，而不仅仅是它指向的内容）</strong>。</p>
-<p>The reason it’s necessary to deal with a pointer to the hash pointer is simple: the hash macros modify it (in other words, they modify the <em>pointer itself</em> not just what it points to).</p>
+<p>The reason it’s necessary to deal with a pointer to the hash pointer is simple: the hash macros modify it (in other words, they modify the <em>pointer itself</em> not just what it points to).</p>
 <blockquote>
 <p>假设哈希表 <code>hashTbl</code> 的指针（地址）是 <code>0x7fffd69b9a10</code>，那么通过运算符 <code>&amp;</code> 可以得到存放该地址的地址，假如为 <code>0x8defd69b9a26</code>，那么后续散列宏修改了哈希指针后，我们还可以通过地址 <code>0x8defd69b9a26</code> 指向的内容（哈希表的地址）来获取最新的哈希表地址。</p>
 </blockquote>
@@ -364,7 +364,7 @@
 <li>然后，将数组中的键 - 值对（索引对应的值 - 索引）依次添加到哈希表中，并使用操作符 <code>&amp;</code> 获取指向哈希指针的指针；</li>
 <li>最后，经过查找后，不再使用哈希表，这时通过释放接口，将哈希表中的所有哈希结点迭代地删除并释放对应的内存空间。</li>
 </ol>
-<p>如果哈希表的键值不是整形，而是字符类型呢，应该怎么使用呢？可以参考 <a href="https://pursue26.github.io/posts/230925185057.html#%20%E5%93%88%E5%B8%8C%E8%A1%A8%E5%AE%9E%E7%8E%B0%E7%9A%84%E5%AD%97%E5%85%B8%E6%A0%91"> 这里 </a> 的一个例子。</p>
+<p>如果哈希表的键值不是整形，而是字符类型呢，应该怎么使用呢？可以参考 <a href="https://pursue26.github.io/posts/230925185057.html#%20 哈希表实现的字典树"> 这里 </a> 的一个例子。</p>
 <blockquote>
 <p>源码地址：<a target="_blank" rel="noopener" href="https://github.com/troydhanson/uthash">https://github.com/troydhanson/uthash</a></p>
 </blockquote>
@@ -425,13 +425,13 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-line"></i>
     </span>
-    <span title="站点总字数">134k</span>
+    <span title="站点总字数">143k</span>
   </span>
   <span class="post-meta-item">
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">4:04</span>
+    <span title="站点阅读时长">4:21</span>
   </span>
 </div>
 <div class="busuanzi-count">

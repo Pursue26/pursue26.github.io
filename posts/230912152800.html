@@ -153,18 +153,18 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">29</span>
+          <span class="site-state-item-count">30</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
           <a href="/categories/">
-        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-count">16</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">39</span>
+        <span class="site-state-item-count">41</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -345,7 +345,7 @@
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    fruitarray := [...]<span class="type">string</span>&#123;<span class="string">&quot;a&quot;</span>, <span class="string">&quot;b&quot;</span>, <span class="string">&quot;c&quot;</span>, <span class="string">&quot;d&quot;</span>&#125;</span><br><span class="line">    fruitslice := fruitarray[<span class="number">1</span>:<span class="number">3</span>]</span><br><span class="line">    fmt.Println(<span class="string">&quot;length of slice: %d, capacity: %d&quot;</span>, <span class="built_in">len</span>(fruitslice), <span class="built_in">cap</span>(fruitslice)) <span class="comment">// 2, 3. print: [b, c]</span></span><br><span class="line">    fruitslice = fruitslice[:<span class="built_in">cap</span>(fruitslice)] <span class="comment">// re-slicing furitslice till its capacity. print: [b, c, d]</span></span><br><span class="line">    fmt.Println(<span class="string">&quot;After re-slicing length is&quot;</span>, <span class="built_in">len</span>(fruitslice), <span class="string">&quot;and capacity is&quot;</span>, <span class="built_in">cap</span>(fruitslice)) <span class="comment">// 3, 3</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <ol start="8">
-<li><p><strong>使用 <code>make</code> 创建一个切片</strong>：<code>func make ([]T, len, cap)</code> 通过传递类型、长度和容量来创建切片。其中，容量是可选参数，默认值为切片长度。**<code>make</code> 函数创建一个数组，并返回引用该数组的切片 **。如 <code>arrslice := make([]float64, 5, 5)</code>。</p>
+<li><p><strong>使用 <code>make</code> 创建一个切片</strong>：<code>func make ([]T, len, cap)</code> 通过传递类型、长度和容量来创建切片。其中，容量是可选参数，默认值为切片长度。<strong><code>make</code> 函数创建一个数组，并返回引用该数组的切片</strong>。如 <code>arrslice := make([]float64, 5, 5)</code>。</p>
 </li>
 <li><p>切片是动态的，可以使用 <code>append</code> 将新元素追加到切片上。<code>append</code> 函数定义为：<code>func append(slice []T, x ...T) []T</code>，其中 <code>x...T</code> 表示该函数接收 T 类型的参数 x 的个数是可变的，如：<code>arrslice = append(arrslice, 5.6, 7.3)</code>。</p>
 </li>
@@ -452,13 +452,13 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-line"></i>
     </span>
-    <span title="站点总字数">134k</span>
+    <span title="站点总字数">143k</span>
   </span>
   <span class="post-meta-item">
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">4:04</span>
+    <span title="站点阅读时长">4:21</span>
   </span>
 </div>
 <div class="busuanzi-count">

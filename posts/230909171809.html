@@ -152,18 +152,18 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">29</span>
+          <span class="site-state-item-count">30</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
           <a href="/categories/">
-        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-count">16</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">39</span>
+        <span class="site-state-item-count">41</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -279,7 +279,7 @@
 <ul>
 <li><p><strong>容器（Container）</strong>：一个 <strong> 独立 </strong> 运行的沙箱（sandboxed）应用程序实例，包含应用程序及其所有依赖项。容器是 Docker 的基本构建块，有以下特点：</p>
 <ul>
-<li><p>利用 <a target="_blank" rel="noopener" href="https://medium.com/@saschagrunert/demystifying-containers-part-i-kernel-space-2c53d6979504">kernel namespaces and cgroups</a> 实现隔离 &#x2F; 独立。</p>
+<li><p>利用 <a target="_blank" rel="noopener" href="https://medium.com/@saschagrunert/demystifying-containers-part-i-kernel-space-2c53d6979504">kernel namespaces and cgroups</a> 实现隔离 / 独立。</p>
 </li>
 <li><p>是一个可运行的镜像的实例，可以使用 DockerAPI 或 CLI 创建、开始、停止、移动、删除一个容器。</p>
 </li>
@@ -346,7 +346,7 @@
 </ol>
 <ul>
 <li><strong>Ubuntu</strong>：<code>/etc/docker/daemon.json</code></li>
-<li><strong>MacOS</strong> &#x2F; <strong>Windows</strong>：Docker Desktop 应用程序 &gt; Preferences &gt; Docker Engine</li>
+<li><strong>MacOS</strong> / <strong>Windows</strong>：Docker Desktop 应用程序 &gt; Preferences &gt; Docker Engine</li>
 </ul>
 <ol start="2">
 <li>如果文件不存在，创建它。然后，将以下内容添加到配置文件中：</li>
@@ -362,7 +362,7 @@
 <li><code>sudo systemctl restart docker</code></li>
 </ul>
 </li>
-<li><strong>MacOS</strong> &#x2F; <strong>Windows</strong>：在 Docker Desktop 应用程序中点击重启按钮。</li>
+<li><strong>MacOS</strong> / <strong>Windows</strong>：在 Docker Desktop 应用程序中点击重启按钮。</li>
 </ul>
 <h2 id="3- 使用 Docker"><a href="#3- 使用 Docker" class="headerlink" title="3. 使用 Docker"></a>3. 使用 Docker</h2><h3 id="3-1- 运行容器"><a href="#3-1- 运行容器" class="headerlink" title="3.1 运行容器"></a>3.1 运行容器 </h3><p> 要运行一个容器，首先需要一个 Docker 镜像。可以从 Docker 仓库中获取现有的镜像，或者自己创建一个。以下是一个运行基于 Ubuntu 的容器的示例：</p>
 <ol>
@@ -546,11 +546,11 @@
 </blockquote>
 <h3 id="5-1- 容器网络特性"><a href="#5-1- 容器网络特性" class="headerlink" title="5.1 容器网络特性"></a>5.1 容器网络特性 </h3><p> 容器网络是 Docker 中一个重要的概念，它允许 <strong> 在容器之间建立网络连接和通信</strong>。通过容器网络，可以实现容器间的数据传输、服务发现和跨主机的容器通信等功能。以下是容器网络的一些关键点和特性：</p>
 <ul>
-<li><p>** 网络命名空间 (Network Namespace)**：每个容器都有自己独立的网络命名空间，使得容器可以拥有自己的网络栈，包括网络接口、IP 地址和路由表等。这样可以实现容器之间的网络隔离，避免网络冲突和干扰。</p>
+<li><p><strong>网络命名空间 (Network Namespace)</strong>：每个容器都有自己独立的网络命名空间，使得容器可以拥有自己的网络栈，包括网络接口、IP 地址和路由表等。这样可以实现容器之间的网络隔离，避免网络冲突和干扰。</p>
 </li>
-<li><p><strong>虚拟以太网桥 (Virtual Ethernet Bridge)<strong>：Docker 使用虚拟以太网桥来连接容器和宿主机的网络。每个宿主机上的 Docker 守护进程会创建一个名为 docker0 的桥接接口，</strong>通过该接口与容器的网络命名空间相连</strong>。</p>
+<li><p><strong>虚拟以太网桥 (Virtual Ethernet Bridge)</strong>：Docker 使用虚拟以太网桥来连接容器和宿主机的网络。每个宿主机上的 Docker 守护进程会创建一个名为 docker0 的桥接接口，<strong>通过该接口与容器的网络命名空间相连</strong>。</p>
 </li>
-<li><p>** 网络驱动程序 (Network Drivers)**：Docker 提供了多种网络驱动程序，用于实现不同的网络功能和配置选项。默认情况下，Docker 使用桥接网络驱动程序 (Bridge Network Driver)，但还支持其他驱动程序，如 Overlay、Host、Macvlan 等，以满足不同的网络需求。</p>
+<li><p><strong>网络驱动程序 (Network Drivers)</strong>：Docker 提供了多种网络驱动程序，用于实现不同的网络功能和配置选项。默认情况下，Docker 使用桥接网络驱动程序 (Bridge Network Driver)，但还支持其他驱动程序，如 Overlay、Host、Macvlan 等，以满足不同的网络需求。</p>
 </li>
 <li><p><strong>容器间通信 </strong>：容器可以通过使用网络连接和端口来实现相互通信。<strong> 可以使用容器的 IP 地址、端口号或容器名称来访问其他容器上的服务</strong>。容器网络还支持多个容器共享同一个网络端口的负载均衡和服务发现功能。</p>
 </li>
@@ -656,13 +656,13 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-line"></i>
     </span>
-    <span title="站点总字数">134k</span>
+    <span title="站点总字数">143k</span>
   </span>
   <span class="post-meta-item">
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">4:04</span>
+    <span title="站点阅读时长">4:21</span>
   </span>
 </div>
 <div class="busuanzi-count">

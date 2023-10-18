@@ -19,12 +19,12 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"pursue26.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.18.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
 
-    <meta name="description" content="Go语言学习笔记-1：HelloWorldGo语言是一种编译型语言，源代码都会编译成二进制机器码。 所有 Go 源文件都应该放置在工作区里的 src 目录下。Linux 的工作区（Workspace）应该设置在 $HOME&#x2F;go，也可以通过设置 GOPATH 环境变量，用其他目录来作为工作区。 123456go  bin &#x2F;&#x2F; 编译生成的二进制文件存储位置    hello  src &#x2F;">
+    <meta name="description" content="Go语言学习笔记-1：HelloWorldGo语言是一种编译型语言，源代码都会编译成二进制机器码。 所有 Go 源文件都应该放置在工作区里的 src 目录下。Linux 的工作区（Workspace）应该设置在 $HOME&#x2F;go，也可以通过设置 GOPATH 环境变量，用其他目录来作为工作区。 123456go  bin &#x2F;&#x2F; 编译生成的二进制文件存储位置    hello  src &#x2F;&#x2F; 所有">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Go 笔记之变量与常量">
 <meta property="og:url" content="https://pursue26.github.io/posts/230907162612.html">
 <meta property="og:site_name" content="aha&#39;s blog">
-<meta property="og:description" content="Go语言学习笔记-1：HelloWorldGo语言是一种编译型语言，源代码都会编译成二进制机器码。 所有 Go 源文件都应该放置在工作区里的 src 目录下。Linux 的工作区（Workspace）应该设置在 $HOME&#x2F;go，也可以通过设置 GOPATH 环境变量，用其他目录来作为工作区。 123456go  bin &#x2F;&#x2F; 编译生成的二进制文件存储位置    hello  src &#x2F;">
+<meta property="og:description" content="Go语言学习笔记-1：HelloWorldGo语言是一种编译型语言，源代码都会编译成二进制机器码。 所有 Go 源文件都应该放置在工作区里的 src 目录下。Linux 的工作区（Workspace）应该设置在 $HOME&#x2F;go，也可以通过设置 GOPATH 环境变量，用其他目录来作为工作区。 123456go  bin &#x2F;&#x2F; 编译生成的二进制文件存储位置    hello  src &#x2F;&#x2F; 所有">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2023-09-07T08:26:12.000Z">
 <meta property="article:modified_time" content="2023-09-22T03:52:46.167Z">
@@ -152,18 +152,18 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">29</span>
+          <span class="site-state-item-count">30</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
           <a href="/categories/">
-        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-count">16</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">39</span>
+        <span class="site-state-item-count">41</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -257,7 +257,7 @@
         <i class="far fa-file-word"></i>
       </span>
       <span class="post-meta-item-text">本文字数：</span>
-      <span>2.7k</span>
+      <span>2.6k</span>
     </span>
     <span class="post-meta-item" title="阅读时长">
       <span class="post-meta-item-icon">
@@ -275,7 +275,7 @@
     
     
     <div class="post-body" itemprop="articleBody"><h2 id="Go 语言学习笔记 -1：HelloWorld"><a href="#Go 语言学习笔记 -1：HelloWorld" class="headerlink" title="Go 语言学习笔记 -1：HelloWorld"></a>Go 语言学习笔记 -1：HelloWorld</h2><p>Go 语言是一种编译型语言，源代码都会编译成二进制机器码。</p>
-<p>所有 Go 源文件都应该放置在工作区里的 src 目录下。Linux 的工作区（Workspace）应该设置在 $HOME&#x2F;go，也可以通过设置 GOPATH 环境变量，用其他目录来作为工作区。</p>
+<p>所有 Go 源文件都应该放置在工作区里的 src 目录下。Linux 的工作区（Workspace）应该设置在 $HOME/go，也可以通过设置 GOPATH 环境变量，用其他目录来作为工作区。</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">go</span></span><br><span class="line">  bin <span class="comment">// 编译生成的二进制文件存储位置</span></span><br><span class="line">    hello</span><br><span class="line">  src <span class="comment">// 所有 Go 源文件都应该放置在工作区里的 src 目录下</span></span><br><span class="line">    hello <span class="comment">// 为每个 project 新建一个文件夹</span></span><br><span class="line">      helloworld.<span class="keyword">go</span></span><br></pre></td></tr></table></figure>
 
 <p>第一个 Go 程序</p>
@@ -299,11 +299,11 @@
 <ol>
 <li><p>声明单个变量：var name type，例如：var age int</p>
 </li>
-<li><p>声明变量并初始化：var name type &#x3D; initialValue</p>
+<li><p>声明变量并初始化：var name type = initialValue</p>
 </li>
-<li><p>类型推断：如果变量有初始值，那么 Go 能够自动推断具有初始值的变量的类型。因此，如果变量有初始值，就可以在变量声明中省略 type， 如 var age &#x3D; 16 指 age 类型为 int 型。</p>
+<li><p>类型推断：如果变量有初始值，那么 Go 能够自动推断具有初始值的变量的类型。因此，如果变量有初始值，就可以在变量声明中省略 type， 如 var age = 16 指 age 类型为 int 型。</p>
 </li>
-<li><p>声明多个变量：var name1, name2 type &#x3D; initialValue1, initialValue2</p>
+<li><p>声明多个变量：var name1, name2 type = initialValue1, initialValue2</p>
 </li>
 <li><p>在一个语句中声明不同类型的变量，如：</p>
 </li>
@@ -428,13 +428,13 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-line"></i>
     </span>
-    <span title="站点总字数">134k</span>
+    <span title="站点总字数">143k</span>
   </span>
   <span class="post-meta-item">
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">4:04</span>
+    <span title="站点阅读时长">4:21</span>
   </span>
 </div>
 <div class="busuanzi-count">

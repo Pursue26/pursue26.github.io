@@ -153,18 +153,18 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">29</span>
+          <span class="site-state-item-count">30</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
           <a href="/categories/">
-        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-count">16</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">39</span>
+        <span class="site-state-item-count">41</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -313,7 +313,7 @@
 <p>虽然单核 CPU 只有一个物理处理单元，但它可以 <strong> 通过时间分片的方式支持多线程</strong>。在单核 CPU 中，操作系统通过时间片轮转算法将 CPU 时间划分为多个时间片段，每个时间片段分配给一个线程执行。当一个线程的时间片用完后，操作系统会暂停该线程的执行，并切换到下一个线程继续执行。这种切换是非常快速的，以至于我们感觉多个线程在同时执行。</p>
 <p>需要注意的是，在单核 CPU 上并发执行的多线程是通过时间片轮转调度实现的，每个线程在任意给定的时间点上 <strong> 只能有一个 </strong> 线程在执行。而在多核 CPU 上，可以实现真正的并行执行，每个核心可以同时执行一个线程，从而提高并发性能。</p>
 </blockquote>
-<h4 id="上下文切换 -1"><a href="# 上下文切换 -1" class="headerlink" title="上下文切换"></a>上下文切换 </h4><p><strong> 线程上下文 </strong>：是指某一时间点 CPU <strong> 寄存器和程序计数器的内容</strong>，CPU 通过时间片分配算法来循环执行任务（线程），因为时间片非常短，所以 CPU 通过不停地切换线程执行。</p>
+<h4 id="上下文切换 -1"><a href="# 上下文切换 -1" class="headerlink" title="上下文切换"></a>上下文切换 </h4><p><strong> 线程上下文 </strong>：是指某一时间点 CPU <strong> 寄存器和程序计数器的内容</strong>，CPU 通过时间片分配算法来循环执行任务（线程），因为时间片非常短，所以 CPU 通过不停地切换线程执行。</p>
 <p>换言之，单 CPU 这么频繁，多核 CPU 一定程度上可以减少上下文切换。</p>
 <p><strong>上下文切换 </strong>：CPU 切换前把当前任务的状态保存下来（以便下次切换回这个任务时可以再次加载这个任务的状态），然后加载下一任务的状态并执行。<strong> 任务的状态保存及再加载</strong>，这段过程就叫做上下文切换。</p>
 <h3 id="多线程编程"><a href="# 多线程编程" class="headerlink" title="多线程编程"></a>多线程编程</h3><ul>
@@ -329,7 +329,7 @@
 <li>New 创建</li>
 <li>Runnable 就绪，等待调度</li>
 <li>Running 运行</li>
-<li>Blocked 阻塞，阻塞可能在 Wait &#x2F; Locked &#x2F; Sleeping 阶段</li>
+<li>Blocked 阻塞，阻塞可能在 Wait / Locked / Sleeping 阶段</li>
 <li>Dead 消亡</li>
 </ol>
 <p>线程有着不同的状态，也有不同的类型。大致可分为：</p>
@@ -544,13 +544,13 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-line"></i>
     </span>
-    <span title="站点总字数">134k</span>
+    <span title="站点总字数">143k</span>
   </span>
   <span class="post-meta-item">
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">4:04</span>
+    <span title="站点阅读时长">4:21</span>
   </span>
 </div>
 <div class="busuanzi-count">

@@ -159,18 +159,18 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">29</span>
+          <span class="site-state-item-count">30</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
           <a href="/categories/">
-        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-count">16</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">39</span>
+        <span class="site-state-item-count">41</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -267,7 +267,7 @@
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">阅读时长 &asymp;</span>
-      <span>9 分钟</span>
+      <span>8 分钟</span>
     </span>
 </div>
 
@@ -282,7 +282,7 @@
 
 <h2 id="操作系统启动"><a href="# 操作系统启动" class="headerlink" title="操作系统启动"></a>操作系统启动 </h2><h3 id="作用解析"><a href="# 作用解析" class="headerlink" title="作用解析"></a> 作用解析</h3><ul>
 <li>硬盘（disk）：存放 OS 和 BootLoader</li>
-<li>BIOS：基本 I&#x2F;O 处理系统</li>
+<li>BIOS：基本 I/O 处理系统</li>
 <li>BootLoader：用于加载 OS，将 OS 从 disk 加载到内存中</li>
 </ul>
 <blockquote>
@@ -299,7 +299,7 @@
 <li>用户登录</li>
 </ol>
 <h4 id="BIOS 自检"><a href="#BIOS 自检" class="headerlink" title="BIOS 自检"></a>BIOS 自检</h4><p><img src="/images/os-kernel/chapter2/os-startup-layout.png" alt="计算机启动时内存和硬盘布局"></p>
-<p>计算机启动时，BIOS 从一个特定地址（CS:IP &#x3D; 0xF000:FFF0）开始执行，这两个寄存器合在一起可以形成一个具体的物理内存地址。BIOS 就从这个内存地址开始执行 POST（加电自检）、寻找显卡和执行 BIOS。</p>
+<p>计算机启动时，BIOS 从一个特定地址（CS:IP = 0xF000:FFF0）开始执行，这两个寄存器合在一起可以形成一个具体的物理内存地址。BIOS 就从这个内存地址开始执行 POST（加电自检）、寻找显卡和执行 BIOS。</p>
 <blockquote>
 <p>段寄存器（CS）和指令寄存器（IP）是计算机中的两种不同类型的寄存器：<br><strong>段寄存器 </strong> 是用于存储内存中的段地址的寄存器。在计算机中，内存被划分为多个段，每个段都有一个唯一的段地址。段寄存器存储着当前程序正在访问的段的地址。当程序需要访问内存中的数据时，它会使用段寄存器中的地址来确定要访问的段，并将其与偏移地址（存储在其他寄存器中）相加以获取最终的物理地址。<br><strong>指令寄存器（也称为程序计数器）</strong>是用于存储下一条要执行的指令的地址的寄存器。在计算机执行程序时，指令寄存器中保存着当前正在执行的指令的地址。当一条指令执行完毕后，指令寄存器会自动增加，以指向下一条将要执行的指令的地址。这样，计算机可以按顺序执行存储器中的指令序列。指令寄存器的值的改变决定了计算机下一步要执行的操作。</p>
 </blockquote>
@@ -426,8 +426,8 @@
 </ul>
 </li>
 </ul>
-<p><strong>用户态</strong>：操作系统运行中，CPU 所处的特权级别特别低，不能访问特权指令、I&#x2F;O 指令。</p>
-<p><strong>内核态</strong>：操作系统运行中，CPU 所处的级别很高，可以执行任何一条指令，包括特权指令、I&#x2F;O 指令。</p>
+<p><strong>用户态</strong>：操作系统运行中，CPU 所处的特权级别特别低，不能访问特权指令、I/O 指令。</p>
+<p><strong>内核态</strong>：操作系统运行中，CPU 所处的级别很高，可以执行任何一条指令，包括特权指令、I/O 指令。</p>
 <p><strong>系统调用 </strong>：触发 CPU<strong> 从用户态到内核态的转换</strong>。切换程序和内核的堆栈，需要一定的开销，但是换来了安全。</p>
 <p><strong>系统调用是跨越操作系统边界的开销</strong>（值得的且必须的，保证了操作系统的安全性）：</p>
 <ul>
@@ -522,13 +522,13 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-line"></i>
     </span>
-    <span title="站点总字数">134k</span>
+    <span title="站点总字数">143k</span>
   </span>
   <span class="post-meta-item">
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">4:04</span>
+    <span title="站点阅读时长">4:21</span>
   </span>
 </div>
 <div class="busuanzi-count">
