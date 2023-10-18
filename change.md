@@ -84,3 +84,6 @@ module.exports = function(locals) {
   });
 };
 ```
+
+3. 支持多行公式：https://blog.csdn.net/weixin_44634312/article/details/120197899
+- 可在项目中搜索<修改>二字，快速查找修改位置
