@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha256-HtsXJanqjKTc8vVQjO4YMhiqFoXkfBsjBWcX91T1jr8=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pursue26.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.18.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":null},"fold":{"enable":false,"height":500},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="优先队列（priority queue）是最重要的元素始终位于最前面的队列。与普通队列不同的是，优先队列中的元素并不是按照先进先出的顺序进行处理，而是根据其优先级决定处理顺序，具有较高优先级的元素会优先被处理。优先队列可以是最大优先队列（最大的元素在前）或最小优先队列（最小的元素在先）。优先队列对于需要处理大数据量，并且需要反复确定哪一个现在是最大的或最小（最重要）的数据的算法非常有用。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="数据结构之优先队列（堆实现）">
+<meta property="og:url" content="https://pursue26.github.io/posts/231019102311.html">
+<meta property="og:site_name" content="aha&#39;s blog">
+<meta property="og:description" content="优先队列（priority queue）是最重要的元素始终位于最前面的队列。与普通队列不同的是，优先队列中的元素并不是按照先进先出的顺序进行处理，而是根据其优先级决定处理顺序，具有较高优先级的元素会优先被处理。优先队列可以是最大优先队列（最大的元素在前）或最小优先队列（最小的元素在先）。优先队列对于需要处理大数据量，并且需要反复确定哪一个现在是最大的或最小（最重要）的数据的算法非常有用。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-10-19T02:23:11.000Z">
+<meta property="article:modified_time" content="2023-10-19T07:33:06.009Z">
+<meta property="article:author" content="aha">
+<meta property="article:tag" content="优先队列">
+<meta property="article:tag" content="堆">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://pursue26.github.io/posts/231019102311.html">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://pursue26.github.io/posts/231019102311.html","path":"posts/231019102311.html","title":"数据结构之优先队列（堆实现）"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>数据结构之优先队列（堆实现） | aha's blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">aha's blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-dailyblog"><a href="/random.html" rel="section"><i class="fa fa-file fa-fw"></i>每日博客</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BC%98%E5%85%88%E9%98%9F%E5%88%97%E7%9A%84%E5%AE%9E%E7%8E%B0%E6%96%B9%E5%BC%8F"><span class="nav-number">1.</span> <span class="nav-text">优先队列的实现方式 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E5%A0%86%E5%AE%9E%E7%8E%B0%E4%BC%98%E5%85%88%E9%98%9F%E5%88%97"><span class="nav-number">2.</span> <span class="nav-text">基于堆实现优先队列 </span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BC%98%E5%85%88%E9%98%9F%E5%88%97%E7%BB%93%E6%9E%84%E5%AE%9A%E4%B9%89"><span class="nav-number">2.1.</span> <span class="nav-text">优先队列结构定义 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BC%98%E5%85%88%E9%98%9F%E5%88%97%E5%AE%8C%E6%95%B4%E4%BB%A3%E7%A0%81"><span class="nav-number">2.2.</span> <span class="nav-text">优先队列完整代码 </span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">aha</p>
+  <div class="site-description" itemprop="description">经历一个过程然后成为更好的自己</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">31</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">17</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">41</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://pursue26.github.io/posts/231019102311.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="aha">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="aha's blog">
+      <meta itemprop="description" content="经历一个过程然后成为更好的自己">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="数据结构之优先队列（堆实现） | aha's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          数据结构之优先队列（堆实现）
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+  
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2023-10-19 10:23:11 / 修改时间：15:33:06" itemprop="dateCreated datePublished" datetime="2023-10-19T10:23:11+08:00">2023-10-19</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" itemprop="url" rel="index"><span itemprop="name">数据结构</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/%E4%BC%98%E5%85%88%E9%98%9F%E5%88%97/" itemprop="url" rel="index"><span itemprop="name">优先队列</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>7k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>13 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>优先队列（priority queue）是最重要的元素始终位于最前面的队列。与普通队列不同的是，优先队列中的元素并不是按照先进先出的顺序进行处理，而是根据其优先级决定处理顺序，具有较高优先级的元素会优先被处理。<br>优先队列可以是最大优先队列（最大的元素在前）或最小优先队列（最小的元素在先）。优先队列对于需要处理大数据量，并且需要反复确定哪一个现在是最大的或最小（最重要）的数据的算法非常有用。</p>
+<span id="more"></span>
+
+<h2 id="优先队列的实现方式"><a href="# 优先队列的实现方式" class="headerlink" title="优先队列的实现方式"></a>优先队列的实现方式 </h2><p> 在实现上，优先队列可以使用不同的数据结构来实现，例如堆、二叉搜索树、有序动态数组等。</p>
+<ol>
+<li><strong>使用有序动态数组实现</strong>：将最重要的数据放在数组的末尾。<ul>
+<li>缺点：插入新数据很慢，因为插入的数据必须保证数组依然有序。这就需要利用二分搜索算法确定插入的位置，并使用线性时间向后移动数组，以便新数据插入到那里。</li>
+</ul>
+</li>
+<li><strong>使用平衡二叉树实现</strong>：这对于构建双端优先队列非常有用，因为它同时有效地实现了「查找最小值」和「查找最大值」（最重要和最不重要）。</li>
+<li><strong>使用堆实现</strong>：堆是实现优先队列的天然数据结构。事实上，堆和优先队列这两个术语经常被用作同义词。<ul>
+<li>优点：堆比有序动态数组更有效，因为堆只需部分排序，堆的插入和删除操作都是 <code>O(log n)</code> 时间复杂度。</li>
+</ul>
+</li>
+</ol>
+<blockquote>
+<p>使用堆来实现优先队列是最常见和高效的方式。</p>
+</blockquote>
+<h2 id="基于堆实现优先队列"><a href="# 基于堆实现优先队列" class="headerlink" title="基于堆实现优先队列"></a>基于堆实现优先队列 </h2><p><a href="https://pursue26.github.io/posts/231018102559.html"> 数据结构之堆基础与堆结构（数组实现）</a>介绍了堆的基本理论知识和最大堆的实现。因此，我们基于这篇文章中实现的最大堆，进行简单的修改，实现优先队列这种数据结构。</p>
+<h3 id="优先队列结构定义"><a href="# 优先队列结构定义" class="headerlink" title="优先队列结构定义"></a>优先队列结构定义 </h3><p> 为了体现堆中数据的复杂性，不再使用整形数值作为堆中的数据，而是使用结构体作为堆中的数据节点。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 定义堆中的数据, 不同优先级的待学习课程</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">Node</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> priority;</span><br><span class="line">    <span class="type">char</span> *course;</span><br><span class="line">&#125; Node_t;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">Heap</span> &#123;</span></span><br><span class="line">    Node_t *heap;   <span class="comment">// 堆的数组</span></span><br><span class="line">    <span class="type">int</span> size;       <span class="comment">// 堆的当前大小</span></span><br><span class="line">    <span class="type">int</span> capacity;   <span class="comment">// 堆的容量</span></span><br><span class="line">&#125; PriorityQueue_t;</span><br></pre></td></tr></table></figure>
+
+<h3 id="优先队列完整代码"><a href="# 优先队列完整代码" class="headerlink" title="优先队列完整代码"></a>优先队列完整代码 </h3><p> 这里，我们直接给出优先队列数据结构的完整代码，不明白的函数可以参考 <a href="https://pursue26.github.io/posts/231018102559.html"> 数据结构之堆基础与堆结构（数组实现）</a>中对应的小节。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdbool.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 定义堆中的数据, 不同优先级的待学习课程</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">Node</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> priority;</span><br><span class="line">    <span class="type">char</span> *course;</span><br><span class="line">&#125; Node_t;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">Heap</span> &#123;</span></span><br><span class="line">    Node_t *heap;   <span class="comment">// 堆的数组</span></span><br><span class="line">    <span class="type">int</span> size;       <span class="comment">// 堆的当前大小</span></span><br><span class="line">    <span class="type">int</span> capacity;   <span class="comment">// 堆的容量</span></span><br><span class="line">&#125; PriorityQueue_t;</span><br><span class="line"></span><br><span class="line">PriorityQueue_t* <span class="title function_">initPriorityQueue</span><span class="params">(<span class="type">int</span> capacity)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (capacity &lt;= <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    PriorityQueue_t *<span class="built_in">queue</span> = (PriorityQueue_t *)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(PriorityQueue_t));</span><br><span class="line">    <span class="built_in">queue</span>-&gt;heap = (Node_t *)<span class="built_in">malloc</span>(capacity * <span class="keyword">sizeof</span>(Node_t));</span><br><span class="line">    <span class="built_in">queue</span>-&gt;size = <span class="number">0</span>;</span><br><span class="line">    <span class="built_in">queue</span>-&gt;capacity = capacity;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">queue</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">getParentIndex</span><span class="params">(<span class="type">int</span> index)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> (index - <span class="number">1</span>) &gt;&gt; <span class="number">1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">getLeftChildIndex</span><span class="params">(<span class="type">int</span> index)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> (index &lt;&lt; <span class="number">1</span>) + <span class="number">1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">getRightChildIndex</span><span class="params">(<span class="type">int</span> index)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> (index &lt;&lt; <span class="number">1</span>) + <span class="number">2</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">swap</span><span class="params">(Node_t *s1, Node_t *s2)</span> &#123;</span><br><span class="line">    Node_t temp = *s1;</span><br><span class="line">    <span class="built_in">memcpy</span>(s1, s2, <span class="keyword">sizeof</span>(Node_t));</span><br><span class="line">    <span class="built_in">memcpy</span>(s2, &amp;temp, <span class="keyword">sizeof</span>(Node_t));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">siftUp</span><span class="params">(PriorityQueue_t *<span class="built_in">queue</span>, <span class="type">int</span> index)</span> &#123;</span><br><span class="line">    Node_t *heap = <span class="built_in">queue</span>-&gt;heap;</span><br><span class="line">    <span class="type">int</span> parentIndex = getParentIndex(index);</span><br><span class="line">    <span class="keyword">while</span> ((index &gt; <span class="number">0</span>) &amp;&amp; (heap[index].priority &gt; heap[parentIndex].priority)) &#123;</span><br><span class="line">        swap(&amp;(heap[index]), &amp;(heap[parentIndex]));</span><br><span class="line">        index = parentIndex;  <span class="comment">// 交换节点后, 更新当前节点的位置</span></span><br><span class="line">        parentIndex = getParentIndex(index);  <span class="comment">// 重新获取父节点位置</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">siftDown</span><span class="params">(PriorityQueue_t* <span class="built_in">queue</span>, <span class="type">int</span> index)</span> &#123;</span><br><span class="line">    <span class="type">int</span> maxIndex = index;</span><br><span class="line">    <span class="type">int</span> leftChildIndex = getLeftChildIndex(index);</span><br><span class="line">    <span class="type">int</span> rightChildIndex = getRightChildIndex(index);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 接下来的两个判断为找出具有更大值的孩子的索引</span></span><br><span class="line">    <span class="keyword">if</span> (leftChildIndex &lt; <span class="built_in">queue</span>-&gt;size &amp;&amp; <span class="built_in">queue</span>-&gt;heap[leftChildIndex].priority &gt; <span class="built_in">queue</span>-&gt;heap[maxIndex].priority) &#123;</span><br><span class="line">        maxIndex = leftChildIndex;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (rightChildIndex &lt; <span class="built_in">queue</span>-&gt;size &amp;&amp; <span class="built_in">queue</span>-&gt;heap[rightChildIndex].priority &gt; <span class="built_in">queue</span>-&gt;heap[maxIndex].priority) &#123;</span><br><span class="line">        maxIndex = rightChildIndex;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (index != maxIndex) &#123;</span><br><span class="line">        swap(&amp;(<span class="built_in">queue</span>-&gt;heap[index]), &amp;(<span class="built_in">queue</span>-&gt;heap[maxIndex]));</span><br><span class="line">        siftDown(<span class="built_in">queue</span>, maxIndex);  <span class="comment">// 递归方式</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">push</span><span class="params">(PriorityQueue_t *<span class="built_in">queue</span>, Node_t *node)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">queue</span>-&gt;size &gt;= <span class="built_in">queue</span>-&gt;capacity) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Heap is full!\n&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">queue</span>-&gt;heap[<span class="built_in">queue</span>-&gt;size] = *node;  <span class="comment">// 存储在堆数组的最后一个索引后面</span></span><br><span class="line">    siftUp(<span class="built_in">queue</span>, <span class="built_in">queue</span>-&gt;size);  <span class="comment">// 进行堆化中的上浮操作</span></span><br><span class="line">    <span class="built_in">queue</span>-&gt;size++;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">peek</span><span class="params">(PriorityQueue_t *<span class="built_in">queue</span>, Node_t* top)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">queue</span>-&gt;size &lt;= <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="built_in">memset</span>(top, <span class="number">0</span>, <span class="keyword">sizeof</span>(Node_t));</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Heap is empty!\n&quot;</span>);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="built_in">memcpy</span>(top, &amp;(<span class="built_in">queue</span>-&gt;heap[<span class="number">0</span>]), <span class="keyword">sizeof</span>(Node_t));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">pop</span><span class="params">(PriorityQueue_t *<span class="built_in">queue</span>, Node_t* top)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">queue</span>-&gt;size &lt;= <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="built_in">memset</span>(top, <span class="number">0</span>, <span class="keyword">sizeof</span>(Node_t));</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Heap is empty!\n&quot;</span>);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="built_in">memcpy</span>(top, &amp;(<span class="built_in">queue</span>-&gt;heap[<span class="number">0</span>]), <span class="keyword">sizeof</span>(Node_t));</span><br><span class="line">        <span class="built_in">queue</span>-&gt;heap[<span class="number">0</span>] = <span class="built_in">queue</span>-&gt;heap[<span class="built_in">queue</span>-&gt;size - <span class="number">1</span>];</span><br><span class="line">        <span class="built_in">queue</span>-&gt;size--;</span><br><span class="line">        siftDown(<span class="built_in">queue</span>, <span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">printPriorityQueue</span><span class="params">(PriorityQueue_t *<span class="built_in">queue</span>)</span> &#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Priority queue:\n&quot;</span>);</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="built_in">queue</span>-&gt;size; ++i) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;    %s: %d\n&quot;</span>, <span class="built_in">queue</span>-&gt;heap[i].course, <span class="built_in">queue</span>-&gt;heap[i].priority);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">destroyPriorityQueue</span><span class="params">(PriorityQueue_t *<span class="built_in">queue</span>)</span> &#123;</span><br><span class="line">    <span class="built_in">free</span>(<span class="built_in">queue</span>-&gt;heap);</span><br><span class="line">    <span class="built_in">free</span>(<span class="built_in">queue</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span> &#123;</span><br><span class="line">    <span class="type">int</span> size = <span class="number">10</span>, capacity = <span class="number">10</span>;</span><br><span class="line">    Node_t node[] = &#123;</span><br><span class="line">        &#123;<span class="number">2</span>, <span class="string">&quot;Computer Science&quot;</span>&#125;,</span><br><span class="line">        &#123;<span class="number">7</span>, <span class="string">&quot;Discrete Mathematics&quot;</span>&#125;,</span><br><span class="line">        &#123;<span class="number">26</span>, <span class="string">&quot;Data Structures and Algorithms&quot;</span>&#125;,</span><br><span class="line">        &#123;<span class="number">25</span>, <span class="string">&quot;Operating Systems&quot;</span>&#125;,</span><br><span class="line">        &#123;<span class="number">19</span>, <span class="string">&quot;C Programming Languages&quot;</span>&#125;,</span><br><span class="line">        &#123;<span class="number">17</span>, <span class="string">&quot;Computer Networks&quot;</span>&#125;,</span><br><span class="line">        &#123;<span class="number">1</span>, <span class="string">&quot;Database Management Systems&quot;</span>&#125;,</span><br><span class="line">        &#123;<span class="number">90</span>, <span class="string">&quot;Artificial Intelligence&quot;</span>&#125;,</span><br><span class="line">        &#123;<span class="number">3</span>, <span class="string">&quot;Linear Algebra&quot;</span>&#125;,</span><br><span class="line">        &#123;<span class="number">36</span>, <span class="string">&quot;Calculus&quot;</span>&#125;</span><br><span class="line">    &#125;;</span><br><span class="line">    PriorityQueue_t *<span class="built_in">queue</span> = initPriorityQueue(capacity);</span><br><span class="line">    Node_t *topNode = (Node_t *)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(Node_t));</span><br><span class="line">    <span class="built_in">memset</span>(topNode, <span class="number">0</span>, <span class="keyword">sizeof</span>(Node_t));</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; size; ++i) &#123;</span><br><span class="line">        push(<span class="built_in">queue</span>, &amp;(node[i]));</span><br><span class="line">    &#125;</span><br><span class="line">    printPriorityQueue(<span class="built_in">queue</span>);</span><br><span class="line"></span><br><span class="line">    peek(<span class="built_in">queue</span>, topNode);</span><br><span class="line">    <span class="keyword">if</span> (topNode-&gt;course &amp;&amp; topNode != <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Priority queue top course: %s\n&quot;</span>, topNode-&gt;course);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    pop(<span class="built_in">queue</span>, topNode);</span><br><span class="line">    <span class="keyword">if</span> (topNode-&gt;course &amp;&amp; topNode != <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Priority queue pop course: %s\n&quot;</span>, topNode-&gt;course);</span><br><span class="line">    &#125;</span><br><span class="line">    printPriorityQueue(<span class="built_in">queue</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; size; ++i) &#123;</span><br><span class="line">        pop(<span class="built_in">queue</span>, topNode);</span><br><span class="line">        <span class="keyword">if</span> (topNode-&gt;course &amp;&amp; topNode != <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">&quot;Priority queue pop course: %s\n&quot;</span>, topNode-&gt;course);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">free</span>(topNode);</span><br><span class="line">    destroyPriorityQueue(<span class="built_in">queue</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>程序的输出结果为：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">Priority queue:</span><br><span class="line">    Artificial Intelligence: 90</span><br><span class="line">    Calculus: 36</span><br><span class="line">    Computer Networks: 17</span><br><span class="line">    Operating Systems: 25</span><br><span class="line">    Data Structures and Algorithms: 26</span><br><span class="line">    Discrete Mathematics: 7</span><br><span class="line">    Database Management Systems: 1</span><br><span class="line">    Computer Science: 2</span><br><span class="line">    Linear Algebra: 3</span><br><span class="line">    C Programming Languages: 19</span><br><span class="line">Priority queue top course: Artificial Intelligence</span><br><span class="line">Priority queue pop course: Artificial Intelligence</span><br><span class="line">Priority queue:</span><br><span class="line">    Calculus: 36</span><br><span class="line">    Data Structures and Algorithms: 26</span><br><span class="line">    Computer Networks: 17</span><br><span class="line">    Operating Systems: 25</span><br><span class="line">    C Programming Languages: 19</span><br><span class="line">    Discrete Mathematics: 7</span><br><span class="line">    Database Management Systems: 1</span><br><span class="line">    Computer Science: 2</span><br><span class="line">    Linear Algebra: 3</span><br><span class="line">Priority queue pop course: Calculus</span><br><span class="line">Priority queue pop course: Data Structures and Algorithms</span><br><span class="line">Priority queue pop course: Operating Systems</span><br><span class="line">Priority queue pop course: C Programming Languages</span><br><span class="line">Priority queue pop course: Computer Networks</span><br><span class="line">Priority queue pop course: Discrete Mathematics</span><br><span class="line">Priority queue pop course: Linear Algebra</span><br><span class="line">Priority queue pop course: Computer Science</span><br><span class="line">Priority queue pop course: Database Management Systems</span><br><span class="line">Heap is empty!</span><br></pre></td></tr></table></figure>
+
+<p>在这个代码中，你可能已经注意到函数 <code>peek</code> 和 <code>pop</code> 的返回值类型是 <code>void</code>，且增加了一个入参 <code>Node_t *</code>。这是因为，这里实现的堆优先队列中存储的是复杂的结构体，我们在获取堆顶数据或弹出堆顶数据时，需要保存数据的所有内容。完成这个目的可以考虑以下两种方式：</p>
+<ol>
+<li>增加一个 <code>Node_t *</code> 入参：将外部申请的一块空间的地址传进来，用于保存堆顶数据，同时也可以处理堆优先队列为空的分支。这种方式，在读取数据及时的情况下，可以实现重复利用这块空间。</li>
+<li>将函数 <code>peek</code> 和 <code>pop</code> 的返回值修改为 <code>Node_t *</code>：这种方式需要在函数内部 <code>malloc</code> 一块空间用于保存返回的数据块，后续需要由用户手动释放每次函数调用所申请的空间，避免内存泄漏。<ul>
+<li>这种方式，需要多次 <code>malloc</code> 申请空间和多次 <code>free</code> 释放空间，且没有尽可能地遵循谁申请谁释放的原则。</li>
+<li><strong>我们不能将堆顶的地址直接作为函数的返回值，因为堆顶的地址的数据是不固定的（在堆化时会被修改）</strong>。</li>
+</ul>
+</li>
+</ol>
+<blockquote>
+<p>参考资料：</p>
+<ol>
+<li><a target="_blank" rel="noopener" href="https://github.com/kodecocodes/swift-algorithm-club/tree/master/Priority%20Queue">Priority Queue in swift-algorithm-club</a></li>
+</ol>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E4%BC%98%E5%85%88%E9%98%9F%E5%88%97/" rel="tag"># 优先队列</a>
+              <a href="/tags/%E5%A0%86/" rel="tag"># 堆</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/231018102559.html" rel="prev" title="数据结构之堆基础与堆结构（数组实现）">
+                  <i class="fa fa-angle-left"></i> 数据结构之堆基础与堆结构（数组实现）
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2023</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">aha</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">150k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">4:33</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+</div>
+  <div class="powered-by">
+    <!--由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动 -->
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script size="150" alpha="0.6" zIndex="-1" src="https://cdnjs.cloudflare.com/ajax/libs/ribbon.js/1.0.2/ribbon.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+
+</body>
+</html>
