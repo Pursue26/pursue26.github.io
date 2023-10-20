@@ -137,6 +137,41 @@
       </tags>
   </entry>
   <entry>
+    <title>C 语言之 main 函数参数</title>
+    <url>/posts/230916171929.html</url>
+    <content><![CDATA[<h2 id="指令行操作"><a href="# 指令行操作" class="headerlink" title="指令行操作"></a> 指令行操作 </h2><p>C 语言支持从 CLI（指令行）传入参数给 main() 函数，多个命令行参数之间用空格分隔，但是如果参数本身带有空格，那么就使用双引号或单引号。</p>
+<p>C 语言的 main 函数是程序的入口函数，它可以有两种形式的参数：</p>
+<span id="more"></span>
+
+<ol>
+<li><p> 无参数形式：main 函数的原型可以是 <code>int main(void)</code>。这表示不接受任何参数，程序执行时不需要从命令行传递参数给 main 函数。</p>
+</li>
+<li><p> 带参数形式：main 函数的原型可以是 <code>int main(int argc, char *argv[])</code>。其中，<code>argc</code> 表示命令行参数的个数，而 <code>argv</code> 是一个字符串指针数组，每个元素都是一个命令行参数的字符串。</p>
+<ul>
+<li><code>argc</code> 标识传入的参数个数。如果没有提供任何参数，<code>argc</code> 将被设置为 1；否则，<code>argc</code> 将被设置为传入的参数个数加 1。</li>
+<li><code>argv[0]</code> 通常是程序的名称或路径的字符串。</li>
+<li><code>argv[1]</code> 到 <code>argv[argc - 1]</code> 是命令行传递给程序的参数，以空格分隔。</li>
+</ul>
+</li>
+</ol>
+<p> 值得注意的是，也可以使用 <code>char **argv</code> 来代替 <code>char *argv[]</code> 形参，两者具有相同的类型含义。因为数组变量名 <code>argv</code> 就是指向 <code>argv[]</code> 数组的第一个元素的指针，同时又因为第一个元素的数值就是一个指针，所以此时的数组变量名 <code>argv</code> 的本质就是一个指针的指针（双重指针）。</p>
+<p> 下面是一个例子，演示如何使用带参数的 main 函数来接收命令行参数：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span> &#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;number of params: %d\n&quot;</span>, argc);</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; argc; i++) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;param-%d: %s\n&quot;</span>, i, argv[i]);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p> 如果编译并运行这个程序，并在命令行中输入参数，例如 <code>./a.out arg1 arg2 3 arg4</code>，则输出如下：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">number of params: 5</span><br><span class="line">param-0: ./a.out</span><br><span class="line">param-1: arg1</span><br><span class="line">param-2: arg2</span><br><span class="line">param-3: 3</span><br><span class="line">param-4: arg4</span><br></pre></td></tr></table></figure>
+
+<p> 参考链接：<a href="https://is-cloud.blog.csdn.net/article/details/105347737">https://is-cloud.blog.csdn.net/article/details/105347737</a></p>
+]]></content>
+      <categories>
+        <category>学习笔记</category>
+        <category>C语言</category>
+      </categories>
+      <tags>
+        <tag>main函数参数</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>C 语言之 typedef 实践</title>
     <url>/posts/230920172849.html</url>
     <content><![CDATA[<p>在 <a href="https://pursue26.github.io/posts/230918174223.html">C 语言之 typedef 自定义类型基础</a> 中介绍了 <code>typedef</code> 的使用，下面介绍一些 <code>typedef</code> 的实践。</p>
@@ -1077,6 +1112,22 @@
       </tags>
   </entry>
   <entry>
+    <title>博客文章分类汇总</title>
+    <url>/posts/summary.html</url>
+    <content><![CDATA[<center><b>这篇文章是个人博客中系列文章的分类汇总。</b></center>
+
+<span id="more"></span>
+
+<h1 id="基础知识"><a href="# 基础知识" class="headerlink" title="基础知识"></a>基础知识 </h1><p><a href="https://pursue26.github.io/posts/231010144856.html"> 模运算（求余运算）</a><br><a href="https://pursue26.github.io/posts/231014105311.html">异或运算</a></p>
+<h1 id="C 语言系列"><a href="#C 语言系列" class="headerlink" title="C 语言系列"></a>C 语言系列</h1><p><a href="https://pursue26.github.io/posts/230916171929.html">C 语言之 main 函数参数</a><br><a href="https://pursue26.github.io/posts/230922143003.html">C 语言之多维数组</a><br><a href="https://pursue26.github.io/posts/230913200729.html">C 语言之 const 关键字</a><br><a href="https://pursue26.github.io/posts/230918174223.html">C 语言之 typedef 自定义类型基础</a><br><a href="https://pursue26.github.io/posts/230920172849.html">C 语言之 typedef 实践</a><br><a href="https://pursue26.github.io/posts/230922172626.html">C 语言之 uthash 哈希表基础</a><br><a href="https://pursue26.github.io/posts/230921094127.html">C 语言之锁与原子操作基础</a><br><a href="https://pursue26.github.io/posts/230911151334.html">C 语言之 pthread 多线程</a><br><a href="https://pursue26.github.io/posts/230918114841.html">C 语言之大小端知识</a></p>
+<h1 id="Golang 语言系列"><a href="#Golang 语言系列" class="headerlink" title="Golang 语言系列"></a>Golang 语言系列</h1><p><a href="https://pursue26.github.io/posts/230907162612.html">Go 笔记之变量与常量</a><br><a href="https://pursue26.github.io/posts/230909120145.html">Go 笔记之函数 &amp; 包 &amp; 判断 &amp; 循环</a><br><a href="https://pursue26.github.io/posts/230912152800.html">Go 笔记之数组与切片</a><br><a href="https://pursue26.github.io/posts/230913161326.html">Go 笔记之可变参数函数与 Map 集合</a><br><a href="https://pursue26.github.io/posts/230915155105.html">Go 笔记之字符串和指针</a></p>
+<h1 id="数据结构系列"><a href="# 数据结构系列" class="headerlink" title="数据结构系列"></a>数据结构系列 </h1><p><a href="https://pursue26.github.io/posts/231007174854.html"> 数据结构之链表（数组实现）</a><br><a href="https://pursue26.github.io/posts/231016161508.html">数据结构之堆栈（数组实现）</a><br><a href="https://pursue26.github.io/posts/231016184406.html">数据结构之堆栈（链表实现）</a><br><a href="https://pursue26.github.io/posts/231017105123.html">数据结构之队列（链表实现）</a><br><a href="https://pursue26.github.io/posts/231017154121.html">数据结构之双端队列（链表实现）</a><br><a href="https://pursue26.github.io/posts/231018102559.html">数据结构之堆基础与堆结构（数组实现）</a><br><a href="https://pursue26.github.io/posts/231019102311.html">数据结构之优先队列（堆实现）</a><br><a href="https://pursue26.github.io/posts/230905224335.html">数据结构之二叉树的遍历 </a><br><a href="https://pursue26.github.io/posts/230916094606.html"> 数据结构之拓扑排序 </a><br><a href="https://pursue26.github.io/posts/230925185057.html"> 数据结构之 Trie 字典树</a></p>
+<h1 id="Docker 系列"><a href="#Docker 系列" class="headerlink" title="Docker 系列"></a>Docker 系列</h1><p><a href="https://pursue26.github.io/posts/230909171809.html">Docker 学习笔记</a></p>
+<h1 id="计算机网络系列"><a href="# 计算机网络系列" class="headerlink" title="计算机网络系列"></a>计算机网络系列 </h1><p><a href="https://pursue26.github.io/posts/231011192359.html"> 计网之 OSI 参考模型</a></p>
+<h1 id="操作系统系列"><a href="# 操作系统系列" class="headerlink" title="操作系统系列"></a>操作系统系列 </h1><h2 id="操作系统课程学习（清华大学 - 陈渝老师）"><a href="# 操作系统课程学习（清华大学 - 陈渝老师）" class="headerlink" title="操作系统课程学习（清华大学 - 陈渝老师）"></a> 操作系统课程学习（清华大学 - 陈渝老师）</h2><p><a href="https://pursue26.github.io/posts/230921190726.html">操作系统之 chapter1 概述 </a><br><a href="https://pursue26.github.io/posts/230924172528.html"> 操作系统之 chapter2 启动 &amp; 中断 &amp; 异常 &amp; 系统调用 </a><br><a href="https://pursue26.github.io/posts/231017195157.html"> 操作系统之 chapter3 内存分层体系与地址空间生成</a></p>
+]]></content>
+  </entry>
+  <entry>
     <title>Go 笔记之数组与切片</title>
     <url>/posts/230912152800.html</url>
     <content><![CDATA[<h2 id="Go 语言学习笔记 -10：数组"><a href="#Go 语言学习笔记 -10：数组" class="headerlink" title="Go 语言学习笔记 -10：数组"></a>Go 语言学习笔记 -10：数组</h2><ol>
@@ -1210,22 +1261,6 @@
         <tag>Go数组</tag>
         <tag>Go切片</tag>
       </tags>
-  </entry>
-  <entry>
-    <title>博客文章分类汇总</title>
-    <url>/posts/summary.html</url>
-    <content><![CDATA[<center><b>这篇文章是个人博客中系列文章的分类汇总。</b></center>
-
-<span id="more"></span>
-
-<h1 id="基础知识"><a href="# 基础知识" class="headerlink" title="基础知识"></a>基础知识 </h1><p><a href="https://pursue26.github.io/posts/231010144856.html"> 模运算（求余运算）</a><br><a href="https://pursue26.github.io/posts/231014105311.html">异或运算</a></p>
-<h1 id="C 语言系列"><a href="#C 语言系列" class="headerlink" title="C 语言系列"></a>C 语言系列</h1><p><a href="https://pursue26.github.io/posts/230916171929.html">C 语言之 main 函数参数</a><br><a href="https://pursue26.github.io/posts/230922143003.html">C 语言之多维数组</a><br><a href="https://pursue26.github.io/posts/230913200729.html">C 语言之 const 关键字</a><br><a href="https://pursue26.github.io/posts/230918174223.html">C 语言之 typedef 自定义类型基础</a><br><a href="https://pursue26.github.io/posts/230920172849.html">C 语言之 typedef 实践</a><br><a href="https://pursue26.github.io/posts/230922172626.html">C 语言之 uthash 哈希表基础</a><br><a href="https://pursue26.github.io/posts/230921094127.html">C 语言之锁与原子操作基础</a><br><a href="https://pursue26.github.io/posts/230911151334.html">C 语言之 pthread 多线程</a><br><a href="https://pursue26.github.io/posts/230918114841.html">C 语言之大小端知识</a></p>
-<h1 id="Golang 语言系列"><a href="#Golang 语言系列" class="headerlink" title="Golang 语言系列"></a>Golang 语言系列</h1><p><a href="https://pursue26.github.io/posts/230907162612.html">Go 笔记之变量与常量</a><br><a href="https://pursue26.github.io/posts/230909120145.html">Go 笔记之函数 &amp; 包 &amp; 判断 &amp; 循环</a><br><a href="https://pursue26.github.io/posts/230912152800.html">Go 笔记之数组与切片</a><br><a href="https://pursue26.github.io/posts/230913161326.html">Go 笔记之可变参数函数与 Map 集合</a><br><a href="https://pursue26.github.io/posts/230915155105.html">Go 笔记之字符串和指针</a></p>
-<h1 id="数据结构系列"><a href="# 数据结构系列" class="headerlink" title="数据结构系列"></a>数据结构系列 </h1><p><a href="https://pursue26.github.io/posts/231007174854.html"> 数据结构之链表（数组实现）</a><br><a href="https://pursue26.github.io/posts/231016161508.html">数据结构之堆栈（数组实现）</a><br><a href="https://pursue26.github.io/posts/231016184406.html">数据结构之堆栈（链表实现）</a><br><a href="https://pursue26.github.io/posts/231017105123.html">数据结构之队列（链表实现）</a><br><a href="https://pursue26.github.io/posts/231017154121.html">数据结构之双端队列（链表实现）</a><br><a href="https://pursue26.github.io/posts/231018102559.html">数据结构之堆基础与堆结构（数组实现）</a><br><a href="https://pursue26.github.io/posts/231019102311.html">数据结构之优先队列（堆实现）</a><br><a href="https://pursue26.github.io/posts/230905224335.html">数据结构之二叉树的遍历 </a><br><a href="https://pursue26.github.io/posts/230916094606.html"> 数据结构之拓扑排序 </a><br><a href="https://pursue26.github.io/posts/230925185057.html"> 数据结构之 Trie 字典树</a></p>
-<h1 id="Docker 系列"><a href="#Docker 系列" class="headerlink" title="Docker 系列"></a>Docker 系列</h1><p><a href="https://pursue26.github.io/posts/230909171809.html">Docker 学习笔记</a></p>
-<h1 id="计算机网络系列"><a href="# 计算机网络系列" class="headerlink" title="计算机网络系列"></a>计算机网络系列 </h1><p><a href="https://pursue26.github.io/posts/231011192359.html"> 计网之 OSI 参考模型</a></p>
-<h1 id="操作系统系列"><a href="# 操作系统系列" class="headerlink" title="操作系统系列"></a>操作系统系列 </h1><h2 id="操作系统课程学习（清华大学 - 陈渝老师）"><a href="# 操作系统课程学习（清华大学 - 陈渝老师）" class="headerlink" title="操作系统课程学习（清华大学 - 陈渝老师）"></a> 操作系统课程学习（清华大学 - 陈渝老师）</h2><p><a href="https://pursue26.github.io/posts/230921190726.html">操作系统之 chapter1 概述 </a><br><a href="https://pursue26.github.io/posts/230924172528.html"> 操作系统之 chapter2 启动 &amp; 中断 &amp; 异常 &amp; 系统调用</a></p>
-]]></content>
   </entry>
   <entry>
     <title>异或运算</title>
@@ -1363,7 +1398,8 @@
 <blockquote>
 <p>BIOS 是一种固化在计算机主板上的软件程序，其中的一个主要作用就是：启动计算机 —— 当你启动计算机时，<strong>BIOS 是第一个被执行的程序</strong>。它负责进行硬件自检（POST，Power-On Self-Test）以及初始化计算机的硬件设备，包括处理器、内存、硬盘、显卡等。<strong>BIOS 还负责加载操作系统的引导程序（BootLoader）</strong>。</p>
 </blockquote>
-<h3 id="启动步骤"><a href="# 启动步骤" class="headerlink" title="启动步骤"></a>启动步骤</h3><p><img src="/images/os-kernel/chapter2/os-startup.png" alt="计算机启动流程"></p>
+<h3 id="启动步骤"><a href="# 启动步骤" class="headerlink" title="启动步骤"></a>启动步骤</h3><img src="/images/os-kernel/chapter2/os-startup.png" alt="计算机启动流程" width="60%" height="60%">
+
 <p>操作系统启动过程可以概括为以下几个步骤：</p>
 <ol>
 <li>电源启动</li>
@@ -1373,16 +1409,19 @@
 <li>内核初始化：操作系统内核接管控制权后，它会进行一系列的初始化工作，包括初始化进程管理、内存管理、文件系统等重要的系统组件</li>
 <li>用户登录</li>
 </ol>
-<h4 id="BIOS 自检"><a href="#BIOS 自检" class="headerlink" title="BIOS 自检"></a>BIOS 自检</h4><p><img src="/images/os-kernel/chapter2/os-startup-layout.png" alt="计算机启动时内存和硬盘布局"></p>
+<h4 id="BIOS 自检"><a href="#BIOS 自检" class="headerlink" title="BIOS 自检"></a>BIOS 自检</h4><img src="/images/os-kernel/chapter2/os-startup-layout.png" alt="计算机启动时内存和硬盘布局" width="60%" height="60%">
+
 <p>计算机启动时，BIOS 从一个特定地址（CS:IP = 0xF000:FFF0）开始执行，这两个寄存器合在一起可以形成一个具体的物理内存地址。BIOS 就从这个内存地址开始执行 POST（加电自检）、寻找显卡和执行 BIOS。</p>
 <blockquote>
 <p>段寄存器（CS）和指令寄存器（IP）是计算机中的两种不同类型的寄存器：<br><strong>段寄存器 </strong> 是用于存储内存中的段地址的寄存器。在计算机中，内存被划分为多个段，每个段都有一个唯一的段地址。段寄存器存储着当前程序正在访问的段的地址。当程序需要访问内存中的数据时，它会使用段寄存器中的地址来确定要访问的段，并将其与偏移地址（存储在其他寄存器中）相加以获取最终的物理地址。<br><strong>指令寄存器（也称为程序计数器）</strong>是用于存储下一条要执行的指令的地址的寄存器。在计算机执行程序时，指令寄存器中保存着当前正在执行的指令的地址。当一条指令执行完毕后，指令寄存器会自动增加，以指向下一条将要执行的指令的地址。这样，计算机可以按顺序执行存储器中的指令序列。指令寄存器的值的改变决定了计算机下一步要执行的操作。</p>
 </blockquote>
-<h4 id="加载 BootLoader"><a href="# 加载 BootLoader" class="headerlink" title="加载 BootLoader"></a>加载 BootLoader</h4><p><img src="/images/os-kernel/chapter2/os-load-bootloader.png" alt="BIOS 加载引导程序"></p>
+<h4 id="加载 BootLoader"><a href="# 加载 BootLoader" class="headerlink" title="加载 BootLoader"></a>加载 BootLoader</h4><img src="/images/os-kernel/chapter2/os-load-bootloader.png" alt="BIOS 加载引导程序" width="60%" height="60%">
+
 <p><strong>BIOS 负责加载 BootLoader</strong>：BIOS 会从预设的启动设备（如硬盘、光盘、USB 等）中加载引导程序（BootLoader）到内存中。引导程序通常位于硬盘的特定扇区或光盘的启动区。</p>
 <p><strong>引导程序的工作</strong>：引导程序负责初始化硬件（如 CPU、内存等），加载操作系统内核，并将控制权交给内核。它还可以提供多个操作系统的选择菜单（如 GRUB），以供用户选择启动的操作系统。</p>
 <h4 id="加载 OS"><a href="# 加载 OS" class="headerlink" title="加载 OS"></a>加载 OS</h4><p>BootLoader 放在硬盘的第一个主引导扇区（512 字节）。这样，BIOS 从硬盘的第一个扇区寻找，一下便能找到 BootLoader。</p>
-<p><img src="/images/os-kernel/chapter2/os-bootloader-address.png" alt="引导程序的内存地址空间"></p>
+<img src="/images/os-kernel/chapter2/os-bootloader-address.png" alt="引导程序的内存地址空间" width="60%" height="60%">
+
 <p><strong>BIOS 负责加载 BootLoader</strong>：将 BootLoader 从磁盘的引导扇区加载到 0x7C00 内存地址处。</p>
 <p><strong>BootLoader 负责加载 OS</strong>：将操作系统的代码和数据从硬盘加载到内存中。之后，控制权交给到 OS（跳转到 OS 的起始地址）。</p>
 <h2 id="中断、异常和系统调用"><a href="# 中断、异常和系统调用" class="headerlink" title="中断、异常和系统调用"></a>中断、异常和系统调用 </h2><p> 操作系统与设备和程序之间的交互可以通过中断、异常和系统调用来实现。</p>
@@ -1409,7 +1448,8 @@
 <li>异常：杀死或重新执行指令</li>
 <li>系统调用：等待和持续</li>
 </ul>
-<h3 id="中断、异常和系统调用比较"><a href="# 中断、异常和系统调用比较" class="headerlink" title="中断、异常和系统调用比较"></a>中断、异常和系统调用比较</h3><p><img src="/images/os-kernel/chapter2/os-interrupt-exception-syscall-compare.png" alt="中断、异常和系统调用比较"></p>
+<h3 id="中断、异常和系统调用比较"><a href="# 中断、异常和系统调用比较" class="headerlink" title="中断、异常和系统调用比较"></a>中断、异常和系统调用比较</h3><img src="/images/os-kernel/chapter2/os-interrupt-exception-syscall-compare.png" alt="中断、异常和系统调用比较" width="60%" height="60%">
+
 <table>
 <thead>
 <tr>
@@ -1478,7 +1518,8 @@
 </ol>
 <p>总的来说，异常处理流程包括 <strong> 异常信号的检测、上下文的保存与恢复、异常处理程序的执行 </strong> 等步骤，异常处理流程的目的是在程序出现异常时能够及时处理异常情况，保证系统的稳定性和可靠性。</p>
 <h3 id="系统调用"><a href="# 系统调用" class="headerlink" title="系统调用"></a>系统调用 </h3><p> 系统调用来源于应用程序，需要操作系统提供服务，这些服务需要操作系统来执行，这个过程就需要一个接口：<strong>系统调用接口</strong>。应用程序访问主要是通过高层次的 API 接口，而不是直接进行系统调用。</p>
-<p><img src="/images/os-kernel/chapter2/os-syscall.png" alt="系统调用示例"></p>
+<img src="/images/os-kernel/chapter2/os-syscall.png" alt="系统调用示例" width="60%" height="60%">
+
 <p><strong>三种最常用的 APIs</strong>：</p>
 <ul>
 <li>Win32 API：用于 Windows</li>
@@ -1541,7 +1582,7 @@
 <li>方便性：操作系统提供了一些高级功能和服务，如文件系统、网络协议等，应用程序可以更方便地使用这些功能。</li>
 </ol>
 <blockquote>
-<p>参考 1：<a href="https://github.com/OXygenMoon/OperatingSystemInDepth">https://github.com/OXygenMoon/OperatingSystemInDepth</a><br>参考 2：<a href="https://blog.csdn.net/weixin_53407527/category_11825873.html">https://blog.csdn.net/weixin_53407527/category_11825873.html</a></p>
+<p>参考资料<br>1：<a href="https://github.com/OXygenMoon/OperatingSystemInDepth">https://github.com/OXygenMoon/OperatingSystemInDepth</a><br>2：<a href="https://blog.csdn.net/weixin_53407527/category_11825873.html">https://blog.csdn.net/weixin_53407527/category_11825873.html</a></p>
 </blockquote>
 ]]></content>
       <categories>
@@ -1549,6 +1590,142 @@
       </categories>
       <tags>
         <tag>操作系统</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>操作系统之 chapter3 内存分层体系与地址空间生成</title>
+    <url>/posts/231017195157.html</url>
+    <content><![CDATA[<p>这篇文章主要介绍计算机的体系结构，内存的分层体系，操作系统的内存管理，地址空间和地址生成等内容。</p>
+<span id="more"></span>
+
+<h2 id="计算机体系结构"><a href="# 计算机体系结构" class="headerlink" title="计算机体系结构"></a>计算机体系结构 </h2><p>CPU：主要完成了对整个程序或软件的执行的控制。<br> 内存：主要是放置了程序的代码和它所处理的数据。<br>外设：各种外部设备配合程序更好的完成工作。</p>
+<img src="/images/os-kernel/chapter3/computer-architecture.png" alt="计算机体系结构" width="60%" height="60%">
+
+<h2 id="内存分层体系"><a href="# 内存分层体系" class="headerlink" title="内存分层体系"></a>内存分层体系</h2><img src="/images/os-kernel/chapter3/memory-layering.png" alt="内存分层体系" width="60%" height="60%">
+
+<p>计算机内存包含多个层次，包括 CPU 寄存器、cache 和主存（物理内存）、硬盘（虚拟内存）。硬盘用于保存持久化数据。</p>
+<ul>
+<li>CPU 寄存器和 cache：<ul>
+<li>访问速度快，但容量小；</li>
+<li>寄存器是 CPU 内部的存储单元，用于存储临时数据和指令；</li>
+<li>cache 是位于 CPU 和主存之间的高速缓存，<strong>用于加速对主存的访问</strong>。</li>
+</ul>
+</li>
+<li>主存（物理内存）：<ul>
+<li>存放操作系统和程序代码等数据；</li>
+<li>容量较大，但访问速度相对较慢；</li>
+<li>主存中的数据掉电会丢失。</li>
+</ul>
+</li>
+<li>硬盘（虚拟内存）：<ul>
+<li>保存持久化数据，即使掉电也不会丢失；</li>
+<li>访问速度较慢，但容量可以很大。</li>
+</ul>
+</li>
+</ul>
+<p>操作系统会根据需要将数据从主存中放到硬盘中，以便管理数据的容量和提高运行效率。</p>
+<h2 id="操作系统的内存管理"><a href="# 操作系统的内存管理" class="headerlink" title="操作系统的内存管理"></a>操作系统的内存管理 </h2><h3 id="目标"><a href="# 目标" class="headerlink" title="目标"></a> 目标 </h3><p> 操作系统的内存管理到底要做什么事情呢？它有如下几个重要的目标。</p>
+<ul>
+<li>抽象：逻辑地址空间<ul>
+<li>操作系统通过提供逻辑地址空间，将底层细节抽象化，使应用程序不需要关心物理内存和外设的管理。</li>
+</ul>
+</li>
+<li>保护：独立地址空间<ul>
+<li>为了避免应用程序相互访问彼此的地址空间，操作系统提供了独立的地址空间，将它们隔离，以保护应用程序免受破坏。</li>
+</ul>
+</li>
+<li>共享：访问相同内存<ul>
+<li>多个应用程序之间也可能进行交互，操作系统允许多个应用程序共享相同的内存空间，以实现高效和可靠的数据传递。</li>
+</ul>
+</li>
+<li>虚拟：更多的地址空间<ul>
+<li>物理内存空间有限，操作系统将必要的数据放在主存中，而将暂时不需要访问的数据临时存放在磁盘上，从而扩展了可用的地址空间。</li>
+</ul>
+</li>
+</ul>
+<img src="/images/os-kernel/chapter3/os-memory-management.png" alt="操作系统的内存管理" width="60%" height="60%">
+
+<p>在这张图中，操作系统将进程 P1、进程 P2、进程 P3 和进程 P4 将必要的数据被放在主存中（进程 P1 优先级最高，所有的数据都在主存中），暂时不需要访问的数据（进程 P4/P2/P3 的一部分数据）临时存放在磁盘上。</p>
+<p>从上图中，也可以看出进程（我们的程序）属于逻辑地址空间，主存和磁盘的内存空间属于物理内存空间。</p>
+<h3 id="内存管理的不同方法"><a href="# 内存管理的不同方法" class="headerlink" title="内存管理的不同方法"></a>内存管理的不同方法</h3><ul>
+<li>程序重定位（relocation）</li>
+<li>分段（segmentation）</li>
+<li>分页（page）</li>
+<li>虚拟内存（virtual memory）</li>
+<li>按需分页虚拟内存<ul>
+<li>目前多数操作系统（如 Linux）采用</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>内存管理的实现高度依赖于硬件：</p>
+<ul>
+<li>必须知道内存架构（与计算机存储架构紧耦合）</li>
+<li>MMU（内存管理单元）：硬件组件负责处理 CPU 的内存访问请求</li>
+</ul>
+</blockquote>
+<h2 id="地址空间与地址生成"><a href="# 地址空间与地址生成" class="headerlink" title="地址空间与地址生成"></a>地址空间与地址生成 </h2><h3 id="地址空间定义"><a href="# 地址空间定义" class="headerlink" title="地址空间定义"></a> 地址空间定义 </h3><p> 物理地址空间就是内存条和硬盘的空间，它的管理和控制由硬件来完成的。</p>
+<p>逻辑地址空间就是一个运行的程序所拥有的的内存空间，是一种一维的线性地址空间（这种设计可以使得应用程序很容易的进行数据访问操作）。</p>
+<blockquote>
+<p>逻辑地址空间的设计使得数据访问更加方便的「其中一个原因」就是：<br>逻辑地址空间是一维的线性地址空间，即内存地址在逻辑上是连续的。这种设计使得程序可以使用简单的地址计算来访问数据，而不需要考虑数据在内存中的实际物理位置。这样，程序员可以通过 <strong> 使用相对地址来访问数据，而不需要关注数据的具体位置</strong>。</p>
+</blockquote>
+<img src="/images/os-kernel/chapter3/memory-space.png" alt="地址空间" width="60%" height="60%">
+
+<h3 id="物理 -vs- 逻辑地址空间对应关系"><a href="# 物理 -vs- 逻辑地址空间对应关系" class="headerlink" title="物理 vs. 逻辑地址空间对应关系"></a>物理 vs. 逻辑地址空间对应关系</h3><p>「物理地址空间 vs. 逻辑地址空间」是如何建立对应关系的？</p>
+<p>一个运行的程序所访问的逻辑地址空间，最终都会对应着物理地址空间中的某一位置，可能放在主存中、也可能放在硬盘中。物理地址空间和逻辑地址空间通过映射关系对应起来（映射关系由操作系统进行有效地管理）。</p>
+<h3 id="逻辑地址生成"><a href="# 逻辑地址生成" class="headerlink" title="逻辑地址生成"></a>逻辑地址生成 </h3><p> 下图展示了逻辑地址的生成过程。</p>
+<img src="/images/os-kernel/chapter3/logical-address-generation.png" alt="逻辑地址生成" width="60%" height="60%">
+
+<ol>
+<li>C 程序文件（.c 文件）中的函数和变量名即逻辑地址。编译器会将 C 程序转换为汇编语言程序（.s 文件），并在汇编代码中使用符号来代表函数和变量的名字。</li>
+<li>汇编语言程序（.s 文件）中的符号仍然是逻辑地址。编译器将汇编语言程序转换为机器语言程序（.o 文件），并将变量和函数的符号名转换为逻辑地址。</li>
+<li>链接器（linker）将多个机器语言程序（.o 文件）链接在一起，形成一个单一的可执行文件（.exe 文件）。链接器会为每个变量和函数分配唯一的逻辑地址，并解决不同文件之间的符号引用关系。</li>
+<li>加载器（loader）将可执行文件（.exe 文件）加载到内存中运行。加载器会将可执行文件的代码和数据加载到内存的适当位置，并进行地址的重定位。由于加载过程中会存在一定的偏移量，程序需要根据偏移量来进行正确的数据访问和指令操作。</li>
+</ol>
+<blockquote>
+<p>逻辑地址生成的过程可以在编译器、链接器和加载器等工具的协同作用下完成，操作系统通常不需要干预该过程。这样的设计使得程序员可以方便地使用符号和逻辑地址进行开发，而无需关心实际的物理地址和内存布局。</p>
+</blockquote>
+<h3 id="物理地址生成"><a href="# 物理地址生成" class="headerlink" title="物理地址生成"></a>物理地址生成 </h3><p> 下图展示了物理地址的生成过程。</p>
+<img src="/images/os-kernel/chapter3/physical-address-generation.png" alt="物理地址生成" width="60%" height="60%">
+
+<p>物理地址的生成过程是由操作系统的内存管理单元（MMU）来完成的。MMU 负责将逻辑地址转换为物理地址，使得程序能够正确地访问内存。</p>
+<ol>
+<li>分页：操作系统将整个物理内存划分为固定大小的页面（page），通常是 4KB 或者更大的大小。同时，逻辑地址空间也被划分为相同大小的页面。</li>
+<li>页表：每个进程都有一个页表，用于记录逻辑地址与物理地址的映射关系。页表的每个表项（entry）记录了逻辑页面号与物理页面号的对应关系。</li>
+<li>地址转换：当程序访问某个逻辑地址时，MMU 会根据页表中的映射关系将逻辑地址转换为物理地址。具体的转换过程是 <strong> 通过逻辑地址中的页号（page number）和页内偏移（page offset）进行计算得到</strong>。</li>
+<li>物理地址访问：得到物理地址后，程序就可以使用该地址直接访问内存中的数据或指令。</li>
+</ol>
+<blockquote>
+<p>需要注意的是，物理地址生成的过程是 <strong> 在程序运行时 </strong> 由硬件执行的，而不是编译、链接或加载阶段进行的。<strong>操作系统会在程序加载到内存时设置好页表，并将页表的基地址告诉 MMU，以便进行地址转换</strong>。这样，程序在运行过程中，无需关心物理地址的生成和管理，而是通过逻辑地址进行访问。</p>
+</blockquote>
+<p>为了加快地址转换的速度，操作系统会将逻辑地址到物理地址的映射关系存储在内存中，并由 CPU 进行缓存。</p>
+<blockquote>
+<p>具体来说，当 CPU 首次访问某个逻辑地址时，MMU 会根据页表将逻辑地址转换为物理地址，并将该映射关系存储在一个特殊的高速缓存中，称为转换后备缓冲器（Translation Lookaside Buffer，简称 TLB）。TLB 是一种硬件缓存，用于临时存储逻辑地址到物理地址的映射关系。<br>当程序再次访问相同的逻辑地址时，CPU 会首先检查 TLB 中是否存在该映射关系：</p>
+<ul>
+<li>如果存在，则可以直接从 TLB 中获取物理地址，从而避免了访问内存的开销；</li>
+<li>如果 TLB 中没有找到对应的映射关系，则需要通过页表来进行地址转换，并将新的映射关系存储到 TLB 中，以便下次访问时可以直接使用。</li>
+</ul>
+</blockquote>
+<h3 id="地址安全检查"><a href="# 地址安全检查" class="headerlink" title="地址安全检查"></a>地址安全检查 </h3><p> 为了避免应用程序相互访问彼此的地址空间，操作系统提供了独立的地址空间，将它们隔离，以保护应用程序免受破坏。</p>
+<img src="/images/os-kernel/chapter3/address-security-check.png" alt="地址安全检查" width="60%" height="60%">
+
+
+<p>地址安全检查使应用程序在内存中正常执行，同时保证在内存中不同的应用程序之间不会相互破坏。</p>
+<blockquote>
+<p>参考资料：</p>
+<ol>
+<li><a href="https://blog.csdn.net/weixin_53407527/article/details/124930556">Operation System- 第 3 章 - 内存分层体系 &amp; 地址空间生成</a></li>
+<li>部分内容由 GPT 二次编辑 &amp; 润色生成。</li>
+</ol>
+</blockquote>
+]]></content>
+      <categories>
+        <category>操作系统</category>
+      </categories>
+      <tags>
+        <tag>操作系统</tag>
+        <tag>内存分层体系</tag>
+        <tag>地址空间生成</tag>
       </tags>
   </entry>
   <entry>
@@ -1627,10 +1804,10 @@
 <figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 定义堆中的数据, 不同优先级的待学习课程</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">Node</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> priority;</span><br><span class="line">    <span class="type">char</span> *course;</span><br><span class="line">&#125; Node_t;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">Heap</span> &#123;</span></span><br><span class="line">    Node_t *heap;   <span class="comment">// 堆的数组</span></span><br><span class="line">    <span class="type">int</span> size;       <span class="comment">// 堆的当前大小</span></span><br><span class="line">    <span class="type">int</span> capacity;   <span class="comment">// 堆的容量</span></span><br><span class="line">&#125; PriorityQueue_t;</span><br></pre></td></tr></table></figure>
 
 <h3 id="优先队列完整代码"><a href="# 优先队列完整代码" class="headerlink" title="优先队列完整代码"></a>优先队列完整代码 </h3><p> 这里，我们直接给出优先队列数据结构的完整代码，不明白的函数可以参考 <a href="https://pursue26.github.io/posts/231018102559.html"> 数据结构之堆基础与堆结构（数组实现）</a>中对应的小节。</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdbool.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 定义堆中的数据, 不同优先级的待学习课程</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">Node</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> priority;</span><br><span class="line">    <span class="type">char</span> *course;</span><br><span class="line">&#125; Node_t;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">Heap</span> &#123;</span></span><br><span class="line">    Node_t *heap;   <span class="comment">// 堆的数组</span></span><br><span class="line">    <span class="type">int</span> size;       <span class="comment">// 堆的当前大小</span></span><br><span class="line">    <span class="type">int</span> capacity;   <span class="comment">// 堆的容量</span></span><br><span class="line">&#125; PriorityQueue_t;</span><br><span class="line"></span><br><span class="line">PriorityQueue_t* <span class="title function_">initPriorityQueue</span><span class="params">(<span class="type">int</span> capacity)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (capacity &lt;= <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    PriorityQueue_t *<span class="built_in">queue</span> = (PriorityQueue_t *)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(PriorityQueue_t));</span><br><span class="line">    <span class="built_in">queue</span>-&gt;heap = (Node_t *)<span class="built_in">malloc</span>(capacity * <span class="keyword">sizeof</span>(Node_t));</span><br><span class="line">    <span class="built_in">queue</span>-&gt;size = <span class="number">0</span>;</span><br><span class="line">    <span class="built_in">queue</span>-&gt;capacity = capacity;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">queue</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">getParentIndex</span><span class="params">(<span class="type">int</span> index)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> (index - <span class="number">1</span>) &gt;&gt; <span class="number">1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">getLeftChildIndex</span><span class="params">(<span class="type">int</span> index)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> (index &lt;&lt; <span class="number">1</span>) + <span class="number">1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">getRightChildIndex</span><span class="params">(<span class="type">int</span> index)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> (index &lt;&lt; <span class="number">1</span>) + <span class="number">2</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">swap</span><span class="params">(Node_t *s1, Node_t *s2)</span> &#123;</span><br><span class="line">    Node_t temp = *s1;</span><br><span class="line">    <span class="built_in">memcpy</span>(s1, s2, <span class="keyword">sizeof</span>(Node_t));</span><br><span class="line">    <span class="built_in">memcpy</span>(s2, &amp;temp, <span class="keyword">sizeof</span>(Node_t));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">siftUp</span><span class="params">(PriorityQueue_t *<span class="built_in">queue</span>, <span class="type">int</span> index)</span> &#123;</span><br><span class="line">    Node_t *heap = <span class="built_in">queue</span>-&gt;heap;</span><br><span class="line">    <span class="type">int</span> parentIndex = getParentIndex(index);</span><br><span class="line">    <span class="keyword">while</span> ((index &gt; <span class="number">0</span>) &amp;&amp; (heap[index].priority &gt; heap[parentIndex].priority)) &#123;</span><br><span class="line">        swap(&amp;(heap[index]), &amp;(heap[parentIndex]));</span><br><span class="line">        index = parentIndex;  <span class="comment">// 交换节点后, 更新当前节点的位置</span></span><br><span class="line">        parentIndex = getParentIndex(index);  <span class="comment">// 重新获取父节点位置</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">siftDown</span><span class="params">(PriorityQueue_t* <span class="built_in">queue</span>, <span class="type">int</span> index)</span> &#123;</span><br><span class="line">    <span class="type">int</span> maxIndex = index;</span><br><span class="line">    <span class="type">int</span> leftChildIndex = getLeftChildIndex(index);</span><br><span class="line">    <span class="type">int</span> rightChildIndex = getRightChildIndex(index);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 接下来的两个判断为找出具有更大值的孩子的索引</span></span><br><span class="line">    <span class="keyword">if</span> (leftChildIndex &lt; <span class="built_in">queue</span>-&gt;size &amp;&amp; <span class="built_in">queue</span>-&gt;heap[leftChildIndex].priority &gt; <span class="built_in">queue</span>-&gt;heap[maxIndex].priority) &#123;</span><br><span class="line">        maxIndex = leftChildIndex;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (rightChildIndex &lt; <span class="built_in">queue</span>-&gt;size &amp;&amp; <span class="built_in">queue</span>-&gt;heap[rightChildIndex].priority &gt; <span class="built_in">queue</span>-&gt;heap[maxIndex].priority) &#123;</span><br><span class="line">        maxIndex = rightChildIndex;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (index != maxIndex) &#123;</span><br><span class="line">        swap(&amp;(<span class="built_in">queue</span>-&gt;heap[index]), &amp;(<span class="built_in">queue</span>-&gt;heap[maxIndex]));</span><br><span class="line">        siftDown(<span class="built_in">queue</span>, maxIndex);  <span class="comment">// 递归方式</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">push</span><span class="params">(PriorityQueue_t *<span class="built_in">queue</span>, Node_t *node)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">queue</span>-&gt;size &gt;= <span class="built_in">queue</span>-&gt;capacity) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Heap is full!\n&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">queue</span>-&gt;heap[<span class="built_in">queue</span>-&gt;size] = *node;  <span class="comment">// 存储在堆数组的最后一个索引后面</span></span><br><span class="line">    siftUp(<span class="built_in">queue</span>, <span class="built_in">queue</span>-&gt;size);  <span class="comment">// 进行堆化中的上浮操作</span></span><br><span class="line">    <span class="built_in">queue</span>-&gt;size++;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">peek</span><span class="params">(PriorityQueue_t *<span class="built_in">queue</span>, Node_t* top)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">queue</span>-&gt;size &lt;= <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="built_in">memset</span>(top, <span class="number">0</span>, <span class="keyword">sizeof</span>(Node_t));</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Heap is empty!\n&quot;</span>);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="built_in">memcpy</span>(top, &amp;(<span class="built_in">queue</span>-&gt;heap[<span class="number">0</span>]), <span class="keyword">sizeof</span>(Node_t));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">pop</span><span class="params">(PriorityQueue_t *<span class="built_in">queue</span>, Node_t* top)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">queue</span>-&gt;size &lt;= <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="built_in">memset</span>(top, <span class="number">0</span>, <span class="keyword">sizeof</span>(Node_t));</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Heap is empty!\n&quot;</span>);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="built_in">memcpy</span>(top, &amp;(<span class="built_in">queue</span>-&gt;heap[<span class="number">0</span>]), <span class="keyword">sizeof</span>(Node_t));</span><br><span class="line">        <span class="built_in">queue</span>-&gt;heap[<span class="number">0</span>] = <span class="built_in">queue</span>-&gt;heap[<span class="built_in">queue</span>-&gt;size - <span class="number">1</span>];</span><br><span class="line">        <span class="built_in">queue</span>-&gt;size--;</span><br><span class="line">        siftDown(<span class="built_in">queue</span>, <span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">printPriorityQueue</span><span class="params">(PriorityQueue_t *<span class="built_in">queue</span>)</span> &#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Priority queue:\n&quot;</span>);</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="built_in">queue</span>-&gt;size; ++i) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;    %s: %d\n&quot;</span>, <span class="built_in">queue</span>-&gt;heap[i].course, <span class="built_in">queue</span>-&gt;heap[i].priority);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">destroyPriorityQueue</span><span class="params">(PriorityQueue_t *<span class="built_in">queue</span>)</span> &#123;</span><br><span class="line">    <span class="built_in">free</span>(<span class="built_in">queue</span>-&gt;heap);</span><br><span class="line">    <span class="built_in">free</span>(<span class="built_in">queue</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span> &#123;</span><br><span class="line">    <span class="type">int</span> size = <span class="number">10</span>, capacity = <span class="number">10</span>;</span><br><span class="line">    Node_t node[] = &#123;</span><br><span class="line">        &#123;<span class="number">2</span>, <span class="string">&quot;Computer Science&quot;</span>&#125;,</span><br><span class="line">        &#123;<span class="number">7</span>, <span class="string">&quot;Discrete Mathematics&quot;</span>&#125;,</span><br><span class="line">        &#123;<span class="number">26</span>, <span class="string">&quot;Data Structures and Algorithms&quot;</span>&#125;,</span><br><span class="line">        &#123;<span class="number">25</span>, <span class="string">&quot;Operating Systems&quot;</span>&#125;,</span><br><span class="line">        &#123;<span class="number">19</span>, <span class="string">&quot;C Programming Languages&quot;</span>&#125;,</span><br><span class="line">        &#123;<span class="number">17</span>, <span class="string">&quot;Computer Networks&quot;</span>&#125;,</span><br><span class="line">        &#123;<span class="number">1</span>, <span class="string">&quot;Database Management Systems&quot;</span>&#125;,</span><br><span class="line">        &#123;<span class="number">90</span>, <span class="string">&quot;Artificial Intelligence&quot;</span>&#125;,</span><br><span class="line">        &#123;<span class="number">3</span>, <span class="string">&quot;Linear Algebra&quot;</span>&#125;,</span><br><span class="line">        &#123;<span class="number">36</span>, <span class="string">&quot;Calculus&quot;</span>&#125;</span><br><span class="line">    &#125;;</span><br><span class="line">    PriorityQueue_t *<span class="built_in">queue</span> = initPriorityQueue(capacity);</span><br><span class="line">    Node_t *topNode = (Node_t *)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(Node_t));</span><br><span class="line">    <span class="built_in">memset</span>(topNode, <span class="number">0</span>, <span class="keyword">sizeof</span>(Node_t));</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; size; ++i) &#123;</span><br><span class="line">        push(<span class="built_in">queue</span>, &amp;(node[i]));</span><br><span class="line">    &#125;</span><br><span class="line">    printPriorityQueue(<span class="built_in">queue</span>);</span><br><span class="line"></span><br><span class="line">    peek(<span class="built_in">queue</span>, topNode);</span><br><span class="line">    <span class="keyword">if</span> (topNode-&gt;course &amp;&amp; topNode != <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Priority queue top course: %s\n&quot;</span>, topNode-&gt;course);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    pop(<span class="built_in">queue</span>, topNode);</span><br><span class="line">    <span class="keyword">if</span> (topNode-&gt;course &amp;&amp; topNode != <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Priority queue pop course: %s\n&quot;</span>, topNode-&gt;course);</span><br><span class="line">    &#125;</span><br><span class="line">    printPriorityQueue(<span class="built_in">queue</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; size; ++i) &#123;</span><br><span class="line">        pop(<span class="built_in">queue</span>, topNode);</span><br><span class="line">        <span class="keyword">if</span> (topNode-&gt;course &amp;&amp; topNode != <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">&quot;Priority queue pop course: %s\n&quot;</span>, topNode-&gt;course);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">free</span>(topNode);</span><br><span class="line">    destroyPriorityQueue(<span class="built_in">queue</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdbool.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 定义堆中的数据, 不同优先级的待学习课程</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">Node</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> priority;</span><br><span class="line">    <span class="type">char</span> *course;</span><br><span class="line">&#125; Node_t;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">Heap</span> &#123;</span></span><br><span class="line">    Node_t *heap;   <span class="comment">// 堆的数组</span></span><br><span class="line">    <span class="type">int</span> size;       <span class="comment">// 堆的当前大小</span></span><br><span class="line">    <span class="type">int</span> capacity;   <span class="comment">// 堆的容量</span></span><br><span class="line">&#125; PriorityQueue_t;</span><br><span class="line"></span><br><span class="line">PriorityQueue_t* <span class="title function_">initPriorityQueue</span><span class="params">(<span class="type">int</span> capacity)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (capacity &lt;= <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    PriorityQueue_t *<span class="built_in">queue</span> = (PriorityQueue_t *)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(PriorityQueue_t));</span><br><span class="line">    <span class="built_in">queue</span>-&gt;heap = (Node_t *)<span class="built_in">malloc</span>(capacity * <span class="keyword">sizeof</span>(Node_t));</span><br><span class="line">    <span class="built_in">queue</span>-&gt;size = <span class="number">0</span>;</span><br><span class="line">    <span class="built_in">queue</span>-&gt;capacity = capacity;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">queue</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">getParentIndex</span><span class="params">(<span class="type">int</span> index)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> (index - <span class="number">1</span>) &gt;&gt; <span class="number">1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">getLeftChildIndex</span><span class="params">(<span class="type">int</span> index)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> (index &lt;&lt; <span class="number">1</span>) + <span class="number">1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">getRightChildIndex</span><span class="params">(<span class="type">int</span> index)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> (index &lt;&lt; <span class="number">1</span>) + <span class="number">2</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">swap</span><span class="params">(Node_t *s1, Node_t *s2)</span> &#123;</span><br><span class="line">    Node_t temp = *s1;</span><br><span class="line">    <span class="built_in">memcpy</span>(s1, s2, <span class="keyword">sizeof</span>(Node_t));</span><br><span class="line">    <span class="built_in">memcpy</span>(s2, &amp;temp, <span class="keyword">sizeof</span>(Node_t));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">siftUp</span><span class="params">(PriorityQueue_t *<span class="built_in">queue</span>, <span class="type">int</span> index)</span> &#123;</span><br><span class="line">    Node_t *heap = <span class="built_in">queue</span>-&gt;heap;</span><br><span class="line">    <span class="type">int</span> parentIndex = getParentIndex(index);</span><br><span class="line">    <span class="keyword">while</span> ((index &gt; <span class="number">0</span>) &amp;&amp; (heap[index].priority &gt; heap[parentIndex].priority)) &#123;</span><br><span class="line">        swap(&amp;(heap[index]), &amp;(heap[parentIndex]));</span><br><span class="line">        index = parentIndex;  <span class="comment">// 交换节点后, 更新当前节点的位置</span></span><br><span class="line">        parentIndex = getParentIndex(index);  <span class="comment">// 重新获取父节点位置</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">siftDown</span><span class="params">(PriorityQueue_t* <span class="built_in">queue</span>, <span class="type">int</span> index)</span> &#123;</span><br><span class="line">    <span class="type">int</span> maxIndex = index;</span><br><span class="line">    <span class="type">int</span> leftChildIndex = getLeftChildIndex(index);</span><br><span class="line">    <span class="type">int</span> rightChildIndex = getRightChildIndex(index);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 接下来的两个判断为找出具有更大值的孩子的索引</span></span><br><span class="line">    <span class="keyword">if</span> (leftChildIndex &lt; <span class="built_in">queue</span>-&gt;size &amp;&amp; <span class="built_in">queue</span>-&gt;heap[leftChildIndex].priority &gt; <span class="built_in">queue</span>-&gt;heap[maxIndex].priority) &#123;</span><br><span class="line">        maxIndex = leftChildIndex;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (rightChildIndex &lt; <span class="built_in">queue</span>-&gt;size &amp;&amp; <span class="built_in">queue</span>-&gt;heap[rightChildIndex].priority &gt; <span class="built_in">queue</span>-&gt;heap[maxIndex].priority) &#123;</span><br><span class="line">        maxIndex = rightChildIndex;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (index != maxIndex) &#123;</span><br><span class="line">        swap(&amp;(<span class="built_in">queue</span>-&gt;heap[index]), &amp;(<span class="built_in">queue</span>-&gt;heap[maxIndex]));</span><br><span class="line">        siftDown(<span class="built_in">queue</span>, maxIndex);  <span class="comment">// 递归方式</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">push</span><span class="params">(PriorityQueue_t *<span class="built_in">queue</span>, Node_t *node)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">queue</span>-&gt;size &gt;= <span class="built_in">queue</span>-&gt;capacity) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Queue is full!\n&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">queue</span>-&gt;heap[<span class="built_in">queue</span>-&gt;size] = *node;  <span class="comment">// 存储在堆数组的最后一个索引后面</span></span><br><span class="line">    siftUp(<span class="built_in">queue</span>, <span class="built_in">queue</span>-&gt;size);  <span class="comment">// 进行堆化中的上浮操作</span></span><br><span class="line">    <span class="built_in">queue</span>-&gt;size++;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">peek</span><span class="params">(PriorityQueue_t *<span class="built_in">queue</span>, Node_t* top)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">queue</span>-&gt;size &lt;= <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="built_in">memset</span>(top, <span class="number">0</span>, <span class="keyword">sizeof</span>(Node_t));</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Queue is empty!\n&quot;</span>);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="built_in">memcpy</span>(top, &amp;(<span class="built_in">queue</span>-&gt;heap[<span class="number">0</span>]), <span class="keyword">sizeof</span>(Node_t));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">pop</span><span class="params">(PriorityQueue_t *<span class="built_in">queue</span>, Node_t* top)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">queue</span>-&gt;size &lt;= <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="built_in">memset</span>(top, <span class="number">0</span>, <span class="keyword">sizeof</span>(Node_t));</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Queue is empty!\n&quot;</span>);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="built_in">memcpy</span>(top, &amp;(<span class="built_in">queue</span>-&gt;heap[<span class="number">0</span>]), <span class="keyword">sizeof</span>(Node_t));</span><br><span class="line">        <span class="built_in">queue</span>-&gt;heap[<span class="number">0</span>] = <span class="built_in">queue</span>-&gt;heap[<span class="built_in">queue</span>-&gt;size - <span class="number">1</span>];</span><br><span class="line">        <span class="built_in">queue</span>-&gt;size--;</span><br><span class="line">        siftDown(<span class="built_in">queue</span>, <span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">printPriorityQueue</span><span class="params">(PriorityQueue_t *<span class="built_in">queue</span>)</span> &#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Priority queue:\n&quot;</span>);</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="built_in">queue</span>-&gt;size; ++i) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;    %s: %d\n&quot;</span>, <span class="built_in">queue</span>-&gt;heap[i].course, <span class="built_in">queue</span>-&gt;heap[i].priority);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">destroyPriorityQueue</span><span class="params">(PriorityQueue_t *<span class="built_in">queue</span>)</span> &#123;</span><br><span class="line">    <span class="built_in">free</span>(<span class="built_in">queue</span>-&gt;heap);</span><br><span class="line">    <span class="built_in">free</span>(<span class="built_in">queue</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span> &#123;</span><br><span class="line">    <span class="type">int</span> size = <span class="number">10</span>, capacity = <span class="number">10</span>;</span><br><span class="line">    Node_t node[] = &#123;</span><br><span class="line">        &#123;<span class="number">2</span>, <span class="string">&quot;Computer Science&quot;</span>&#125;,</span><br><span class="line">        &#123;<span class="number">7</span>, <span class="string">&quot;Discrete Mathematics&quot;</span>&#125;,</span><br><span class="line">        &#123;<span class="number">26</span>, <span class="string">&quot;Data Structures and Algorithms&quot;</span>&#125;,</span><br><span class="line">        &#123;<span class="number">25</span>, <span class="string">&quot;Operating Systems&quot;</span>&#125;,</span><br><span class="line">        &#123;<span class="number">19</span>, <span class="string">&quot;C Programming Languages&quot;</span>&#125;,</span><br><span class="line">        &#123;<span class="number">17</span>, <span class="string">&quot;Computer Networks&quot;</span>&#125;,</span><br><span class="line">        &#123;<span class="number">1</span>, <span class="string">&quot;Database Management Systems&quot;</span>&#125;,</span><br><span class="line">        &#123;<span class="number">90</span>, <span class="string">&quot;Artificial Intelligence&quot;</span>&#125;,</span><br><span class="line">        &#123;<span class="number">3</span>, <span class="string">&quot;Linear Algebra&quot;</span>&#125;,</span><br><span class="line">        &#123;<span class="number">36</span>, <span class="string">&quot;Calculus&quot;</span>&#125;</span><br><span class="line">    &#125;;</span><br><span class="line">    PriorityQueue_t *<span class="built_in">queue</span> = initPriorityQueue(capacity);</span><br><span class="line">    Node_t *topNode = (Node_t *)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(Node_t));</span><br><span class="line">    <span class="built_in">memset</span>(topNode, <span class="number">0</span>, <span class="keyword">sizeof</span>(Node_t));</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; size; ++i) &#123;</span><br><span class="line">        push(<span class="built_in">queue</span>, &amp;(node[i]));</span><br><span class="line">    &#125;</span><br><span class="line">    printPriorityQueue(<span class="built_in">queue</span>);</span><br><span class="line"></span><br><span class="line">    peek(<span class="built_in">queue</span>, topNode);</span><br><span class="line">    <span class="keyword">if</span> (topNode-&gt;course &amp;&amp; topNode != <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Priority queue top course: %s\n&quot;</span>, topNode-&gt;course);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    pop(<span class="built_in">queue</span>, topNode);</span><br><span class="line">    <span class="keyword">if</span> (topNode-&gt;course &amp;&amp; topNode != <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Priority queue pop course: %s\n&quot;</span>, topNode-&gt;course);</span><br><span class="line">    &#125;</span><br><span class="line">    printPriorityQueue(<span class="built_in">queue</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; size; ++i) &#123;</span><br><span class="line">        pop(<span class="built_in">queue</span>, topNode);</span><br><span class="line">        <span class="keyword">if</span> (topNode-&gt;course &amp;&amp; topNode != <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">&quot;Priority queue pop course: %s\n&quot;</span>, topNode-&gt;course);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">free</span>(topNode);</span><br><span class="line">    destroyPriorityQueue(<span class="built_in">queue</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>程序的输出结果为：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Priority queue:</span><br><span class="line">    Artificial Intelligence: 90</span><br><span class="line">    Calculus: 36</span><br><span class="line">    Computer Networks: 17</span><br><span class="line">    Operating Systems: 25</span><br><span class="line">    Data Structures and Algorithms: 26</span><br><span class="line">    Discrete Mathematics: 7</span><br><span class="line">    Database Management Systems: 1</span><br><span class="line">    Computer Science: 2</span><br><span class="line">    Linear Algebra: 3</span><br><span class="line">    C Programming Languages: 19</span><br><span class="line">Priority queue top course: Artificial Intelligence</span><br><span class="line">Priority queue pop course: Artificial Intelligence</span><br><span class="line">Priority queue:</span><br><span class="line">    Calculus: 36</span><br><span class="line">    Data Structures and Algorithms: 26</span><br><span class="line">    Computer Networks: 17</span><br><span class="line">    Operating Systems: 25</span><br><span class="line">    C Programming Languages: 19</span><br><span class="line">    Discrete Mathematics: 7</span><br><span class="line">    Database Management Systems: 1</span><br><span class="line">    Computer Science: 2</span><br><span class="line">    Linear Algebra: 3</span><br><span class="line">Priority queue pop course: Calculus</span><br><span class="line">Priority queue pop course: Data Structures and Algorithms</span><br><span class="line">Priority queue pop course: Operating Systems</span><br><span class="line">Priority queue pop course: C Programming Languages</span><br><span class="line">Priority queue pop course: Computer Networks</span><br><span class="line">Priority queue pop course: Discrete Mathematics</span><br><span class="line">Priority queue pop course: Linear Algebra</span><br><span class="line">Priority queue pop course: Computer Science</span><br><span class="line">Priority queue pop course: Database Management Systems</span><br><span class="line">Heap is empty!</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Priority queue:</span><br><span class="line">    Artificial Intelligence: 90</span><br><span class="line">    Calculus: 36</span><br><span class="line">    Computer Networks: 17</span><br><span class="line">    Operating Systems: 25</span><br><span class="line">    Data Structures and Algorithms: 26</span><br><span class="line">    Discrete Mathematics: 7</span><br><span class="line">    Database Management Systems: 1</span><br><span class="line">    Computer Science: 2</span><br><span class="line">    Linear Algebra: 3</span><br><span class="line">    C Programming Languages: 19</span><br><span class="line">Priority queue top course: Artificial Intelligence</span><br><span class="line">Priority queue pop course: Artificial Intelligence</span><br><span class="line">Priority queue:</span><br><span class="line">    Calculus: 36</span><br><span class="line">    Data Structures and Algorithms: 26</span><br><span class="line">    Computer Networks: 17</span><br><span class="line">    Operating Systems: 25</span><br><span class="line">    C Programming Languages: 19</span><br><span class="line">    Discrete Mathematics: 7</span><br><span class="line">    Database Management Systems: 1</span><br><span class="line">    Computer Science: 2</span><br><span class="line">    Linear Algebra: 3</span><br><span class="line">Priority queue pop course: Calculus</span><br><span class="line">Priority queue pop course: Data Structures and Algorithms</span><br><span class="line">Priority queue pop course: Operating Systems</span><br><span class="line">Priority queue pop course: C Programming Languages</span><br><span class="line">Priority queue pop course: Computer Networks</span><br><span class="line">Priority queue pop course: Discrete Mathematics</span><br><span class="line">Priority queue pop course: Linear Algebra</span><br><span class="line">Priority queue pop course: Computer Science</span><br><span class="line">Priority queue pop course: Database Management Systems</span><br><span class="line">Queue is empty!</span><br></pre></td></tr></table></figure>
 
 <p>在这个代码中，你可能已经注意到函数 <code>peek</code> 和 <code>pop</code> 的返回值类型是 <code>void</code>，且增加了一个入参 <code>Node_t *</code>。这是因为，这里实现的堆优先队列中存储的是复杂的结构体，我们在获取堆顶数据或弹出堆顶数据时，需要保存数据的所有内容。完成这个目的可以考虑以下两种方式：</p>
 <ol>
@@ -2379,41 +2556,6 @@
       </categories>
       <tags>
         <tag>OSI模型</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>C 语言之 main 函数参数</title>
-    <url>/posts/230916171929.html</url>
-    <content><![CDATA[<h2 id="指令行操作"><a href="# 指令行操作" class="headerlink" title="指令行操作"></a> 指令行操作 </h2><p>C 语言支持从 CLI（指令行）传入参数给 main() 函数，多个命令行参数之间用空格分隔，但是如果参数本身带有空格，那么就使用双引号或单引号。</p>
-<p>C 语言的 main 函数是程序的入口函数，它可以有两种形式的参数：</p>
-<span id="more"></span>
-
-<ol>
-<li><p> 无参数形式：main 函数的原型可以是 <code>int main(void)</code>。这表示不接受任何参数，程序执行时不需要从命令行传递参数给 main 函数。</p>
-</li>
-<li><p> 带参数形式：main 函数的原型可以是 <code>int main(int argc, char *argv[])</code>。其中，<code>argc</code> 表示命令行参数的个数，而 <code>argv</code> 是一个字符串指针数组，每个元素都是一个命令行参数的字符串。</p>
-<ul>
-<li><code>argc</code> 标识传入的参数个数。如果没有提供任何参数，<code>argc</code> 将被设置为 1；否则，<code>argc</code> 将被设置为传入的参数个数加 1。</li>
-<li><code>argv[0]</code> 通常是程序的名称或路径的字符串。</li>
-<li><code>argv[1]</code> 到 <code>argv[argc - 1]</code> 是命令行传递给程序的参数，以空格分隔。</li>
-</ul>
-</li>
-</ol>
-<p> 值得注意的是，也可以使用 <code>char **argv</code> 来代替 <code>char *argv[]</code> 形参，两者具有相同的类型含义。因为数组变量名 <code>argv</code> 就是指向 <code>argv[]</code> 数组的第一个元素的指针，同时又因为第一个元素的数值就是一个指针，所以此时的数组变量名 <code>argv</code> 的本质就是一个指针的指针（双重指针）。</p>
-<p> 下面是一个例子，演示如何使用带参数的 main 函数来接收命令行参数：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span> &#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;number of params: %d\n&quot;</span>, argc);</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; argc; i++) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;param-%d: %s\n&quot;</span>, i, argv[i]);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p> 如果编译并运行这个程序，并在命令行中输入参数，例如 <code>./a.out arg1 arg2 3 arg4</code>，则输出如下：</p>
-<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">number of params: 5</span><br><span class="line">param-0: ./a.out</span><br><span class="line">param-1: arg1</span><br><span class="line">param-2: arg2</span><br><span class="line">param-3: 3</span><br><span class="line">param-4: arg4</span><br></pre></td></tr></table></figure>
-
-<p> 参考链接：<a href="https://is-cloud.blog.csdn.net/article/details/105347737">https://is-cloud.blog.csdn.net/article/details/105347737</a></p>
-]]></content>
-      <categories>
-        <category>学习笔记</category>
-        <category>C语言</category>
-      </categories>
-      <tags>
-        <tag>main函数参数</tag>
       </tags>
   </entry>
   <entry>
