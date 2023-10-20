@@ -24,7 +24,7 @@ abbrlink: 230924172528
 
 ### 启动步骤
 
-![计算机启动流程](/images/os-kernel/chapter2/os-startup.png)
+<img src="/images/os-kernel/chapter2/os-startup.png" alt="计算机启动流程" width="60%" height="60%">
 
 操作系统启动过程可以概括为以下几个步骤：
 1. 电源启动
@@ -36,7 +36,7 @@ abbrlink: 230924172528
 
 #### BIOS自检
 
-![计算机启动时内存和硬盘布局](/images/os-kernel/chapter2/os-startup-layout.png)
+<img src="/images/os-kernel/chapter2/os-startup-layout.png" alt="计算机启动时内存和硬盘布局" width="60%" height="60%">
 
 计算机启动时，BIOS从一个特定地址（CS:IP = 0xF000:FFF0）开始执行，这两个寄存器合在一起可以形成一个具体的物理内存地址。BIOS 就从这个内存地址开始执行 POST（加电自检）、寻找显卡和执行BIOS。
 
@@ -46,7 +46,7 @@ abbrlink: 230924172528
 
 #### 加载BootLoader
 
-![BIOS加载引导程序](/images/os-kernel/chapter2/os-load-bootloader.png)
+<img src="/images/os-kernel/chapter2/os-load-bootloader.png" alt="BIOS加载引导程序" width="60%" height="60%">
 
 **BIOS负责加载BootLoader**：BIOS会从预设的启动设备（如硬盘、光盘、USB等）中加载引导程序（BootLoader）到内存中。引导程序通常位于硬盘的特定扇区或光盘的启动区。
 
@@ -56,7 +56,7 @@ abbrlink: 230924172528
 
 BootLoader放在硬盘的第一个主引导扇区（512字节）。这样，BIOS从硬盘的第一个扇区寻找，一下便能找到BootLoader。
 
-![引导程序的内存地址空间](/images/os-kernel/chapter2/os-bootloader-address.png)
+<img src="/images/os-kernel/chapter2/os-bootloader-address.png" alt="引导程序的内存地址空间" width="60%" height="60%">
 
 **BIOS负责加载BootLoader**：将BootLoader从磁盘的引导扇区加载到0x7C00内存地址处。
 
@@ -101,7 +101,7 @@ BootLoader放在硬盘的第一个主引导扇区（512字节）。这样，BIOS
 
 ### 中断、异常和系统调用比较
 
-![中断、异常和系统调用比较](/images/os-kernel/chapter2/os-interrupt-exception-syscall-compare.png)
+<img src="/images/os-kernel/chapter2/os-interrupt-exception-syscall-compare.png" alt="中断、异常和系统调用比较" width="60%" height="60%">
 
 | 交互方式    | 来源                             | 处理时间 | 响应状态            |
 | ----------- | -------------------------------- | -------- | ------------------- |
@@ -161,7 +161,7 @@ BootLoader放在硬盘的第一个主引导扇区（512字节）。这样，BIOS
 
 系统调用来源于应用程序，需要操作系统提供服务，这些服务需要操作系统来执行，这个过程就需要一个接口：**系统调用接口**。应用程序访问主要是通过高层次的 API 接口，而不是直接进行系统调用。
 
-![系统调用示例](/images/os-kernel/chapter2/os-syscall.png)
+<img src="/images/os-kernel/chapter2/os-syscall.png" alt="系统调用示例" width="60%" height="60%">
 
 **三种最常用的 APIs**：
 - Win32 API：用于 Windows
@@ -217,5 +217,6 @@ BootLoader放在硬盘的第一个主引导扇区（512字节）。这样，BIOS
 2. 统一性：通过操作系统提供的接口，应用程序可以统一地访问不同的外设，而不需要关心具体的硬件细节。
 3. 方便性：操作系统提供了一些高级功能和服务，如文件系统、网络协议等，应用程序可以更方便地使用这些功能。
 
-> 参考1：https://github.com/OXygenMoon/OperatingSystemInDepth
-> 参考2：https://blog.csdn.net/weixin_53407527/category_11825873.html
+> 参考资料
+> 1：https://github.com/OXygenMoon/OperatingSystemInDepth
+> 2：https://blog.csdn.net/weixin_53407527/category_11825873.html
