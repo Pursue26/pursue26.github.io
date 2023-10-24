@@ -25,17 +25,24 @@
         var currentYear = currentDate.getFullYear();
         var currentMonth = currentDate.getMonth() + 1;
         var currentDay = currentDate.getDate();
-
         // var seconds = currentDate.getSeconds();
+
         var formattedDate = `${currentYear}-${currentMonth}-${currentDay}`;
         
         var hash = CryptoJS.SHA256(formattedDate).toString();
-        var random = parseInt(hash.slice(0, 8), 16) / 0xffffffff;
 
-        var n = Math.floor(random * filteredUrls.length);
+        var cacheKey = 'hexo-cache-random';
+        var randomNumber = localStorage.getItem(cacheKey);
 
-        // console.log(n);
-        location.href = filteredUrls[n % filteredUrls.length];
+        if (randomNumber === null) {
+            // var random = parseInt(hash.slice(0, 8), 16) / 0xffffffff;
+            // var randomNumber = Math.floor(random * filteredUrls.length);
+            randomNumber = parseInt(hash.slice(0, 8), 16) % filteredUrls.length;
+            localStorage.setItem(cacheKey, randomNumber);
+        }
+
+        // console.log(randomNumber);
+        location.href = filteredUrls[randomNumber % filteredUrls.length];
     }
     </script>
 </body>
