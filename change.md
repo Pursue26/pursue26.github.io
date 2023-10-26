@@ -28,16 +28,20 @@
         // var seconds = currentDate.getSeconds();
 
         var formattedDate = `${currentYear}-${currentMonth}-${currentDay}`;
-        
-        var hash = CryptoJS.SHA256(formattedDate).toString();
 
+        var cacheDate = 'hexo-cache-date';
         var cacheKey = 'hexo-cache-random';
+        var localCacheDate = localStorage.getItem(cacheDate);
         var randomNumber = localStorage.getItem(cacheKey);
 
-        if (randomNumber === null) {
+        if ((formattedDate != localCacheDate) || (randomNumber === null)) {
+            var hash = CryptoJS.SHA256(formattedDate).toString();
+
             // var random = parseInt(hash.slice(0, 8), 16) / 0xffffffff;
             // var randomNumber = Math.floor(random * filteredUrls.length);
             randomNumber = parseInt(hash.slice(0, 8), 16) % filteredUrls.length;
+
+            localStorage.setItem(cacheDate, formattedDate);
             localStorage.setItem(cacheKey, randomNumber);
         }
 
