@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha256-HtsXJanqjKTc8vVQjO4YMhiqFoXkfBsjBWcX91T1jr8=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pursue26.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.18.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":null},"fold":{"enable":true,"height":300},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="117 填充每个节点的下一个右侧节点指针 II：给定一个包含指针 next 成员的二叉树：填充它的每个 next 指针，让这个指针指向其下一个右侧节点。如果找不到下一个右侧节点，则将 next 指针设置为 NULL。初始状态下，所有 next 指针都被设置为 NULL。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LeetCode 刷题之 117 填充每个节点的下一个右侧节点指针 II">
+<meta property="og:url" content="https://pursue26.github.io/posts/231103121209.html">
+<meta property="og:site_name" content="aha&#39;s blog">
+<meta property="og:description" content="117 填充每个节点的下一个右侧节点指针 II：给定一个包含指针 next 成员的二叉树：填充它的每个 next 指针，让这个指针指向其下一个右侧节点。如果找不到下一个右侧节点，则将 next 指针设置为 NULL。初始状态下，所有 next 指针都被设置为 NULL。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-11-03T04:12:09.000Z">
+<meta property="article:modified_time" content="2023-11-04T06:47:05.334Z">
+<meta property="article:author" content="aha">
+<meta property="article:tag" content="LeetCode">
+<meta property="article:tag" content="链表">
+<meta property="article:tag" content="树遍历">
+<meta property="article:tag" content="层序遍历">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://pursue26.github.io/posts/231103121209.html">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://pursue26.github.io/posts/231103121209.html","path":"posts/231103121209.html","title":"LeetCode 刷题之 117 填充每个节点的下一个右侧节点指针 II"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>LeetCode 刷题之 117 填充每个节点的下一个右侧节点指针 II | aha's blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">aha's blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-dailyblog"><a href="/random.html" rel="section"><i class="fa fa-file fa-fw"></i>每日博客</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%98%9F%E5%88%97%20-%20%E5%B1%82%E5%BA%8F%E9%81%8D%E5%8E%86"><span class="nav-number">1.</span> <span class="nav-text">队列 + 层序遍历 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%A9%E7%94%A8%E5%B7%B2%E5%BB%BA%E7%AB%8B%E7%9A%84%E9%93%BE%E8%A1%A8%E6%9E%84%E5%BB%BA%E4%B8%8B%E4%B8%80%E5%B1%82%E9%93%BE%E8%A1%A8"><span class="nav-number">2.</span> <span class="nav-text">利用已建立的链表构建下一层链表 </span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">aha</p>
+  <div class="site-description" itemprop="description">经历一个过程然后成为更好的自己</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">46</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">54</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://pursue26.github.io/posts/231103121209.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="aha">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="aha's blog">
+      <meta itemprop="description" content="经历一个过程然后成为更好的自己">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="LeetCode 刷题之 117 填充每个节点的下一个右侧节点指针 II | aha's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          LeetCode 刷题之 117 填充每个节点的下一个右侧节点指针 II
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+  
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2023-11-03 12:12:09" itemprop="dateCreated datePublished" datetime="2023-11-03T12:12:09+08:00">2023-11-03</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2023-11-04 14:47:05" itemprop="dateModified" datetime="2023-11-04T14:47:05+08:00">2023-11-04</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/LeetCode/" itemprop="url" rel="index"><span itemprop="name">LeetCode</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/LeetCode/%E6%A0%91%E9%81%8D%E5%8E%86/" itemprop="url" rel="index"><span itemprop="name">树遍历</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>2.6k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>5 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/populating-next-right-pointers-in-each-node-ii/">117 填充每个节点的下一个右侧节点指针 II</a>：给定一个包含指针 <code>next</code> 成员的二叉树：填充它的每个 <code>next</code> 指针，让这个指针指向其下一个右侧节点。如果找不到下一个右侧节点，则将 <code>next</code> 指针设置为 <code>NULL</code>。初始状态下，所有 <code>next</code> 指针都被设置为 <code>NULL</code>。</p>
+<span id="more"></span>
+
+<p>树结构体：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">Node</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> val;</span><br><span class="line">    Node *left;</span><br><span class="line">    Node *right;</span><br><span class="line">    Node *next;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>示例图：<br><a target="_blank" rel="noopener" href="https://assets.leetcode.com/uploads/2019/02/15/117_sample.png"></a></p>
+<h2 id="队列 - 层序遍历"><a href="# 队列 - 层序遍历" class="headerlink" title="队列 + 层序遍历"></a>队列 + 层序遍历 </h2><p> 根据题目描述，「填充它的每个 <code>next</code> 指针，让这个指针指向（同层的）其下一个右侧节点」，我们很容易想到使用「层序遍历」解决这个问题。而层序遍历通常需要借助 FIFO 队列实现。</p>
+<p><strong>关于借助队列的树的层序遍历</strong>：首先要入队根节点；然后，记录队列中的节点个数 <code>size</code>；随后，弹出 <code>size</code> 个节点，在弹出的过程中入队弹出节点的左、右节点；最后，在这 <code>size</code> 个节点弹出后，队列中剩下的节点，就是刚刚入队的树的下一层节点。只要队列不为空，我们就反复进行上述操作，直到队列为空为止（二叉树的叶子层没有左、右节点，便不会再有节点入队，队列也就为空了）。</p>
+<p>时间复杂度：<code>O(n)</code>，一趟遍历，空间复杂度：<code>O(n)</code>，需要使用队列保存二叉树中的节点。</p>
+<blockquote>
+<p>关于队列，我们可以使用 <a href="https://pursue26.github.io/posts/231017105123.html"> 数据结构之队列（链表实现）</a>中实现的接口。但是，为了简单、清晰，我在这里直接使用数组模拟 FIFO 队列。</p>
+</blockquote>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">Node</span> <span class="title">TreeNode_t</span>;</span></span><br><span class="line"><span class="keyword">struct</span> Node* <span class="title function_">connect</span><span class="params">(<span class="keyword">struct</span> Node* root)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (root == <span class="literal">NULL</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">	TreeNode_t *<span class="built_in">queue</span>[<span class="number">6000</span>];</span><br><span class="line">    <span class="type">int</span> front = <span class="number">0</span>, rear = <span class="number">0</span>;  <span class="comment">// 队列的头尾指针</span></span><br><span class="line">    <span class="built_in">queue</span>[rear++] = root;  <span class="comment">// 树不为空, 首先入队根节点</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> (rear - front &gt; <span class="number">0</span>) &#123;  <span class="comment">// 队列不为空</span></span><br><span class="line">        <span class="type">int</span> size = rear - front;  <span class="comment">// 当前队列的数据大小</span></span><br><span class="line">        TreeNode_t *curNode = <span class="literal">NULL</span>, *preNode = <span class="literal">NULL</span>;  <span class="comment">// 当前节点和上一个节点</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">// 弹出这几个数据（某一层的所有节点）</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; size; ++i) &#123;</span><br><span class="line">            curNode = <span class="built_in">queue</span>[front++];  <span class="comment">// 首指针后移</span></span><br><span class="line">            <span class="comment">// 链接前后两个节点, 并更新上一个节点为当前节点</span></span><br><span class="line">            <span class="keyword">if</span> (preNode) &#123;</span><br><span class="line">                preNode-&gt;next = curNode;</span><br><span class="line">            &#125;</span><br><span class="line">            preNode = curNode;</span><br><span class="line">            </span><br><span class="line">            <span class="comment">// 入队左右子树的节点</span></span><br><span class="line">            <span class="keyword">if</span> (curNode-&gt;left) &#123;</span><br><span class="line">                <span class="built_in">queue</span>[rear++] = curNode-&gt;left;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (curNode-&gt;right) &#123;</span><br><span class="line">                <span class="built_in">queue</span>[rear++] = curNode-&gt;right;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 每层的最后一个节点指向空地址</span></span><br><span class="line">        curNode-&gt;next = <span class="literal">NULL</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> root;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="利用已建立的链表构建下一层链表"><a href="# 利用已建立的链表构建下一层链表" class="headerlink" title="利用已建立的链表构建下一层链表"></a>利用已建立的链表构建下一层链表 </h2><p> 根据题目描述，「填充它的每个 <code>next</code> 指针，让这个指针指向（同层的）其下一个右侧节点」。这样填充后，二叉树的每一层都将是一个单链表，链表的头节点是每层最左侧的树节点。这样，我们就可以根据链表中的节点，获得它的下一层的左、右孩子节点。</p>
+<p>因此，我们可以利用当前层的链表 <code>currLayer</code> 来构建下一层的链表 <code>nextLayer</code>：</p>
+<ul>
+<li>下一层的构建过程就是：不断的访问 <code>currLayer</code> 中的节点，通过它访问下一层的左、右孩子节点，将这些孩子链接起来，就是 <code>nextLayer</code>；</li>
+<li>构建的下一层的链表时，要记录下一层的头结点，以便更新当前层为下一层。<ul>
+<li>下一层的头结点，就是 <code>currLayer</code> 中的节点里，第一个有孩子节点（若有左、右孩子，左孩子优先）。</li>
+</ul>
+</li>
+</ul>
+<p>最后，当下一层为叶子结点层时，便不会有下一层链表，当前层链表会更新为 <code>NULL</code>，标志着每层的链表构建完成。</p>
+<p>时间复杂度：<code>O(n)</code>，一趟遍历，空间复杂度：<code>O(1)</code>。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> Node* <span class="title function_">connect</span><span class="params">(<span class="keyword">struct</span> Node* root)</span> &#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">Node</span> *<span class="title">currLayer</span> =</span> root;  <span class="comment">// 首层的链表为树的根节点</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 只要当前层不为空, 就可以试探下一层</span></span><br><span class="line">    <span class="keyword">while</span> (currLayer) &#123;</span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">Node</span> *<span class="title">node</span> =</span> currLayer;  <span class="comment">// 获取当前层的头节点, 用于遍历</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">Node</span> *<span class="title">nextLayer</span> =</span> <span class="literal">NULL</span>;  <span class="comment">// 记录下一层的头节点</span></span><br><span class="line">        <span class="type">bool</span> isFirst = <span class="literal">true</span>;</span><br><span class="line"></span><br><span class="line">        currLayer = <span class="literal">NULL</span>;  <span class="comment">// 置空当前层</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span> (node) &#123;  <span class="comment">// 遍历当前层构成的链表</span></span><br><span class="line">            <span class="class"><span class="keyword">struct</span> <span class="title">Node</span> *<span class="title">data</span>[2] =</span> &#123;node-&gt;left, node-&gt;right&#125;;</span><br><span class="line">            <span class="comment">// 遍历当前节点的左右节点</span></span><br><span class="line">            <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">2</span>; ++i) &#123;</span><br><span class="line">                <span class="keyword">if</span> (data[i]) &#123;</span><br><span class="line">                    <span class="comment">// 判断是否是下一层的第一个节点</span></span><br><span class="line">                    <span class="keyword">if</span> (isFirst) &#123;</span><br><span class="line">                        nextLayer = data[i];</span><br><span class="line">                        currLayer = nextLayer;  <span class="comment">// 更新当前层为下一层头节点, 用于下一轮最外层 while 循环</span></span><br><span class="line">                        isFirst = <span class="literal">false</span>;</span><br><span class="line">                    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                        nextLayer-&gt;next = data[i];  <span class="comment">// 链接下一层的节点</span></span><br><span class="line">                        nextLayer = nextLayer-&gt;next;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            node = node-&gt;next;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> root;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>评论区用户 @M9988：方法二确实比方法一巧妙。但是，作为面试准备的话，我更推崇练习方法一。因为方法一才是层序（BFS）遍历的通用模式。把这个 BFS 模板练熟以后，面试方可信手拈来（再在里面做附加逻辑）。方法二，技巧性强，可以提高，但是面试的话还是把场景套上模板的熟练能力。</p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/LeetCode/" rel="tag"># LeetCode</a>
+              <a href="/tags/%E9%93%BE%E8%A1%A8/" rel="tag"># 链表</a>
+              <a href="/tags/%E6%A0%91%E9%81%8D%E5%8E%86/" rel="tag"># 树遍历</a>
+              <a href="/tags/%E5%B1%82%E5%BA%8F%E9%81%8D%E5%8E%86/" rel="tag"># 层序遍历</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/231102165703.html" rel="prev" title="LeetCode 刷题之 142 环形链表 II">
+                  <i class="fa fa-angle-left"></i> LeetCode 刷题之 142 环形链表 II
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2023</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">aha</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">197k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">5:58</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+</div>
+  <div class="powered-by">
+    <!--由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动 -->
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script size="150" alpha="0.6" zIndex="-1" src="https://cdnjs.cloudflare.com/ajax/libs/ribbon.js/1.0.2/ribbon.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+
+</body>
+</html>
