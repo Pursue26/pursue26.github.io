@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha256-HtsXJanqjKTc8vVQjO4YMhiqFoXkfBsjBWcX91T1jr8=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pursue26.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.18.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":null},"fold":{"enable":true,"height":300},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="堆排序是一种基于二叉堆数据结构的排序算法。它的主要思想是将待排序的序列构建成一个大顶堆（或小顶堆），然后依次取出堆顶元素，将其与堆中最后一个元素交换，并调整堆，使得剩余元素仍满足堆的性质。重复这个过程，直到堆中只剩下一个待调整元素，即可得到一个有序序列。 上面说，大顶堆依次将堆顶（当前最大）元素与堆中最后一个元素交换。因此，基于大顶堆的堆排序后的结果是一个升序序列，基于小顶堆的堆排序后的结果是一个">
+<meta property="og:type" content="article">
+<meta property="og:title" content="数据结构算法之堆排序">
+<meta property="og:url" content="https://pursue26.github.io/posts/231107171607.html">
+<meta property="og:site_name" content="aha&#39;s blog">
+<meta property="og:description" content="堆排序是一种基于二叉堆数据结构的排序算法。它的主要思想是将待排序的序列构建成一个大顶堆（或小顶堆），然后依次取出堆顶元素，将其与堆中最后一个元素交换，并调整堆，使得剩余元素仍满足堆的性质。重复这个过程，直到堆中只剩下一个待调整元素，即可得到一个有序序列。 上面说，大顶堆依次将堆顶（当前最大）元素与堆中最后一个元素交换。因此，基于大顶堆的堆排序后的结果是一个升序序列，基于小顶堆的堆排序后的结果是一个">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-11-07T09:16:07.000Z">
+<meta property="article:modified_time" content="2023-11-08T02:49:53.257Z">
+<meta property="article:author" content="aha">
+<meta property="article:tag" content="堆">
+<meta property="article:tag" content="堆排序">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://pursue26.github.io/posts/231107171607.html">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://pursue26.github.io/posts/231107171607.html","path":"posts/231107171607.html","title":"数据结构算法之堆排序"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>数据结构算法之堆排序 | aha's blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">aha's blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-dailyblog"><a href="/random.html" rel="section"><i class="fa fa-file fa-fw"></i>每日博客</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A0%86%E6%8E%92%E5%BA%8F%E6%AD%A5%E9%AA%A4"><span class="nav-number">1.</span> <span class="nav-text">堆排序步骤 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A0%86%E6%8E%92%E5%BA%8F%E5%A4%8D%E6%9D%82%E5%BA%A6"><span class="nav-number">2.</span> <span class="nav-text">堆排序复杂度 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A0%86%E6%8E%92%E5%BA%8F%E5%AE%9E%E7%8E%B0"><span class="nav-number">3.</span> <span class="nav-text">堆排序实现 </span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%8E%E6%97%A0%E5%BA%8F%E5%BA%8F%E5%88%97%E6%9E%84%E5%BB%BA%E5%A0%86"><span class="nav-number">3.1.</span> <span class="nav-text"> 从无序序列构建堆 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B0%83%E6%95%B4%E5%A0%86"><span class="nav-number">3.2.</span> <span class="nav-text">调整堆 </span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A0%86%E6%8E%92%E5%BA%8F%E5%AE%8C%E6%95%B4%E4%BB%A3%E7%A0%81"><span class="nav-number">4.</span> <span class="nav-text">堆排序完整代码 </span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A0%86%E6%8E%92%E5%BA%8F%E4%BB%A3%E7%A0%81"><span class="nav-number">4.1.</span> <span class="nav-text"> 堆排序代码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A0%86%E6%8E%92%E5%BA%8F%E6%B5%8B%E8%AF%95%E4%BB%A3%E7%A0%81"><span class="nav-number">4.2.</span> <span class="nav-text">堆排序测试代码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B5%8B%E8%AF%95%E7%BB%93%E6%9E%9C"><span class="nav-number">4.3.</span> <span class="nav-text">测试结果 </span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">aha</p>
+  <div class="site-description" itemprop="description">经历一个过程然后成为更好的自己</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">48</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">23</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">56</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://pursue26.github.io/posts/231107171607.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="aha">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="aha's blog">
+      <meta itemprop="description" content="经历一个过程然后成为更好的自己">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="数据结构算法之堆排序 | aha's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          数据结构算法之堆排序
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+  
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2023-11-07 17:16:07" itemprop="dateCreated datePublished" datetime="2023-11-07T17:16:07+08:00">2023-11-07</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2023-11-08 10:49:53" itemprop="dateModified" datetime="2023-11-08T10:49:53+08:00">2023-11-08</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" itemprop="url" rel="index"><span itemprop="name">数据结构</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/%E5%A0%86/" itemprop="url" rel="index"><span itemprop="name">堆</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>3k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>5 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>堆排序是一种基于二叉堆数据结构的排序算法。它的主要思想是将待排序的序列构建成一个大顶堆（或小顶堆），然后 <strong> 依次取出堆顶元素，将其与堆中最后一个元素交换，并调整堆，使得剩余元素仍满足堆的性质</strong>。重复这个过程，直到堆中只剩下一个待调整元素，即可得到一个有序序列。</p>
+<p>上面说，大顶堆依次将堆顶（当前最大）元素与堆中最后一个元素交换。因此，基于大顶堆的堆排序后的结果是一个升序序列，基于小顶堆的堆排序后的结果是一个降序序列。</p>
+<span id="more"></span>
+
+<blockquote>
+<p>上面调整堆的堆化过程，是将「剩余的元素」重新构造成一个堆（通过交换的方式放在堆尾的元素不再参与堆化调整）。</p>
+</blockquote>
+<h2 id="堆排序步骤"><a href="# 堆排序步骤" class="headerlink" title="堆排序步骤"></a>堆排序步骤 </h2><p> 按文章开头的描述，堆排序的过程可以分为两个主要步骤：<strong>构建堆和调整堆</strong>。下面以大顶堆的堆排序来进行描述。</p>
+<ol>
+<li><p>构建堆：<br>首先，将待排序的序列构建成一个初始堆。可以 <strong> 从最后一个非叶子节点开始，依次向前遍历 </strong>，对每个节点进行调整，使得该节点的值大于其子节点的值。这个过程称为堆化，可以使用<strong> 下沉操作 </strong> 来实现。</p>
+</li>
+<li><p>调整堆：<br>将堆顶元素与堆中最后一个元素交换位置，<strong>并将堆的大小减一 </strong>。然后对堆顶元素进行<strong> 下沉操作</strong>，使得剩余元素仍满足堆的性质。重复这个过程，直到堆中只剩下一个元素，即可得到一个有序序列。</p>
+</li>
+</ol>
+<p>堆排序在实际应用中具有较高的效率和稳定性，尤其适用于大规模数据的排序。</p>
+<blockquote>
+<p>堆化的两个主要操作是下沉（弹出堆顶元素时使用）和上浮（往堆中添加新元素时使用）操作，可以参考 <a href="https://pursue26.github.io/posts/231018102559.html"> 数据结构之堆基础与堆结构（数组实现）</a>。</p>
+</blockquote>
+<h2 id="堆排序复杂度"><a href="# 堆排序复杂度" class="headerlink" title="堆排序复杂度"></a>堆排序复杂度 </h2><p> 堆排序的时间复杂度为 <code>O(nlogn)</code>，其中 <code>n</code> 是待排序序列的长度。由于堆排序只需要常数的辅助空间，因此它是一种原地排序算法，空间复杂度为 <code>O(1)</code>。但 <strong> 堆排序是不稳定的排序算法，即相同元素的顺序可能会发生改变</strong>。</p>
+<h2 id="堆排序实现"><a href="# 堆排序实现" class="headerlink" title="堆排序实现"></a>堆排序实现 </h2><h3 id="从无序序列构建堆"><a href="# 从无序序列构建堆" class="headerlink" title="从无序序列构建堆"></a> 从无序序列构建堆 </h3><p> 对于给定的长度为 $n$ 的无序序列进行堆排序的第一个过程是：构建堆——将无序序列构建成一个二叉堆数据结构。</p>
+<p>上面说「从最后一个非叶子节点开始，依次向前遍历」，最后一个非叶子节点的数组索引（从 $0$ 开始）为 $n/2 - 1$。</p>
+<p>为了完成从无序序列构建堆的这一过程。我们首先给出堆化中的下沉操作。<strong>假设，我们现在已经有一个满足堆属性的数组，当我们修改了数组某一个索引位置的值时，就需要重新对这个位置，以及之前的所有位置都进行堆化调整</strong>。</p>
+<p>例如，对于下面的大顶堆：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">    60</span><br><span class="line">   /  \</span><br><span class="line">  30  40</span><br><span class="line"> / \</span><br><span class="line">25 28</span><br></pre></td></tr></table></figure>
+
+<p>如果把索引 1 位置的值 30 修改为 70，那么索引 1 和 索引 0 都需要进行堆化调整。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">// 调整索引 1 位置</span><br><span class="line">        60</span><br><span class="line">       /  \</span><br><span class="line">      70  40</span><br><span class="line">     / \</span><br><span class="line">    25 28</span><br><span class="line"></span><br><span class="line">// 调整索引 0 位置</span><br><span class="line">        70</span><br><span class="line">       /  \</span><br><span class="line">      60  40</span><br><span class="line">     / \</span><br><span class="line">    25 28</span><br></pre></td></tr></table></figure>
+
+<p>如果把索引 1 位置的值 30 修改为 15，那么索引 1 和 索引 0 也都需要进行堆化调整。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">// 调整索引 1 位置</span><br><span class="line">        60</span><br><span class="line">       /  \</span><br><span class="line">      28  40</span><br><span class="line">     / \</span><br><span class="line">    25 15</span><br><span class="line"></span><br><span class="line">// 调整索引 0 位置（满足堆属性，随即退出）</span><br><span class="line">        60</span><br><span class="line">       /  \</span><br><span class="line">      28  40</span><br><span class="line">     / \</span><br><span class="line">    25 15</span><br></pre></td></tr></table></figure>
+
+<p>对于给定的长度为 <code>n</code> 的数组（满足堆属性），当修改了索引 <code>i</code> 位置的值时，堆化调整以索引 <code>i</code> 为根节点的子树，使这棵以索引 <code>i</code> 为根节点的树重新满足堆属性（但不再能保证整个数组满足堆属性，若需要整棵树都满足堆属性，还需要按顺序对以索引 <code>i-1</code> 到以索引 <code>0</code>为根的子树进行堆化调整）。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 下沉操作，使以索引 i 为根节点的子树满足堆属性</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">heapify</span><span class="params">(<span class="type">int</span> arr[], <span class="type">int</span> n, <span class="type">int</span> i)</span> &#123;</span><br><span class="line">    <span class="type">int</span> largest = i;  <span class="comment">// 初始化根节点为最大值</span></span><br><span class="line">    <span class="type">int</span> left = <span class="number">2</span> * i + <span class="number">1</span>;  <span class="comment">// 左子节点</span></span><br><span class="line">    <span class="type">int</span> right = <span class="number">2</span> * i + <span class="number">2</span>;  <span class="comment">// 右子节点</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 如果左子节点大于根节点，则更新最大值</span></span><br><span class="line">    <span class="keyword">if</span> (left &lt; n &amp;&amp; arr[left] &gt; arr[largest]) &#123;</span><br><span class="line">        largest = left;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 如果右子节点大于根节点，则更新最大值</span></span><br><span class="line">    <span class="keyword">if</span> (right &lt; n &amp;&amp; arr[right] &gt; arr[largest]) &#123;</span><br><span class="line">        largest = right;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 如果最大值不是根节点，则进行交换，并递归调整子堆</span></span><br><span class="line">    <span class="keyword">if</span> (largest != i) &#123;</span><br><span class="line">        <span class="type">int</span> temp = arr[i];</span><br><span class="line">        arr[i] = arr[largest];</span><br><span class="line">        arr[largest] = temp;</span><br><span class="line"></span><br><span class="line">        heapify(arr, n, largest);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>现在开始从最后一个非叶子节点，依次向前遍历进行下沉堆化。每遍历一个节点，都会使得以这个节点为根节点的树满足堆属性，那么当遍历完索引为 <code>0</code> 的位置后，整个数组将满足堆属性，构成一棵二叉堆。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 构建堆（从最后一个非叶子节点开始，依次向前遍历进行下沉堆化）</span></span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> i = n / <span class="number">2</span> - <span class="number">1</span>; i &gt;= <span class="number">0</span>; i--) &#123;</span><br><span class="line">    heapify(arr, n, i);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="调整堆"><a href="# 调整堆" class="headerlink" title="调整堆"></a>调整堆 </h3><p> 将堆顶元素与堆中最后一个元素交换位置，<strong>并将堆的大小减一 </strong>。然后对堆顶元素进行<strong> 下沉操作</strong>，使得剩余元素仍满足堆的性质。重复这个过程，直到堆中只剩下一个元素，即可得到一个有序序列。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 依次取出堆顶元素，并调整这个更小的堆</span></span><br><span class="line"><span class="keyword">for</span> (<span class="type">int</span> i = n - <span class="number">1</span>; i &gt;= <span class="number">0</span>; i--) &#123;</span><br><span class="line">    <span class="type">int</span> temp = arr[<span class="number">0</span>];</span><br><span class="line">    arr[<span class="number">0</span>] = arr[i];</span><br><span class="line">    arr[i] = temp;</span><br><span class="line">    heapify(arr, i, <span class="number">0</span>);  <span class="comment">// 将堆的大小减小为 i</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="堆排序完整代码"><a href="# 堆排序完整代码" class="headerlink" title="堆排序完整代码"></a>堆排序完整代码 </h2><h3 id="堆排序代码"><a href="# 堆排序代码" class="headerlink" title="堆排序代码"></a> 堆排序代码</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">heapify</span><span class="params">(<span class="type">int</span> arr[], <span class="type">int</span> n, <span class="type">int</span> i)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 堆排序</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">heapSort</span><span class="params">(<span class="type">int</span> arr[], <span class="type">int</span> n)</span> &#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = n / <span class="number">2</span> - <span class="number">1</span>; i &gt;= <span class="number">0</span>; i--) &#123;</span><br><span class="line">        heapify(arr, n, i);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = n - <span class="number">1</span>; i &gt;= <span class="number">0</span>; i--) &#123;</span><br><span class="line">        <span class="type">int</span> temp = arr[<span class="number">0</span>];</span><br><span class="line">        arr[<span class="number">0</span>] = arr[i];</span><br><span class="line">        arr[i] = temp;</span><br><span class="line">        heapify(arr, i, <span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="堆排序测试代码"><a href="# 堆排序测试代码" class="headerlink" title="堆排序测试代码"></a>堆排序测试代码</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">heapify</span><span class="params">(<span class="type">int</span> arr[], <span class="type">int</span> n, <span class="type">int</span> i)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">heapSort</span><span class="params">(<span class="type">int</span> arr[], <span class="type">int</span> n)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">printArray</span><span class="params">(<span class="type">int</span> arr[], <span class="type">int</span> n)</span> &#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%d &quot;</span>, arr[i]);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\n&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span> &#123;</span><br><span class="line">    <span class="type">int</span> arr[] = &#123;<span class="number">12</span>, <span class="number">11</span>, <span class="number">13</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>&#125;;</span><br><span class="line">    <span class="type">int</span> n = <span class="keyword">sizeof</span>(arr) / <span class="keyword">sizeof</span>(arr[<span class="number">0</span>]);</span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot; 原始数组：&quot;</span>);</span><br><span class="line">    printArray(arr, n);</span><br><span class="line"></span><br><span class="line">    heapSort(arr, n);</span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot; 排序后数组：&quot;</span>);</span><br><span class="line">    printArray(arr, n);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="测试结果"><a href="# 测试结果" class="headerlink" title="测试结果"></a>测试结果 </h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"> 原始数组：12 11 13 5 6 7</span><br><span class="line">排序后数组：5 6 7 11 12 13</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%A0%86/" rel="tag"># 堆</a>
+              <a href="/tags/%E5%A0%86%E6%8E%92%E5%BA%8F/" rel="tag"># 堆排序</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/231107094652.html" rel="prev" title="LeetCode 刷题之 1029 两地调度">
+                  <i class="fa fa-angle-left"></i> LeetCode 刷题之 1029 两地调度
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2023</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">aha</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">201k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">6:05</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+</div>
+  <div class="powered-by">
+    <!--由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动 -->
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script size="150" alpha="0.6" zIndex="-1" src="https://cdnjs.cloudflare.com/ajax/libs/ribbon.js/1.0.2/ribbon.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+
+</body>
+</html>
