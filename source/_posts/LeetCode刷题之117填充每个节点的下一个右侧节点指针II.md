@@ -27,7 +27,7 @@ struct Node {
 ```
 
 示例图：
-[](https://assets.leetcode.com/uploads/2019/02/15/117_sample.png)
+![](https://assets.leetcode.com/uploads/2019/02/15/117_sample.png)
 
 ## 队列+层序遍历
 
