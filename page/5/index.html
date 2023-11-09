@@ -148,18 +148,18 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">48</span>
+          <span class="site-state-item-count">50</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
           <a href="/categories/">
-        <span class="site-state-item-count">23</span>
+        <span class="site-state-item-count">24</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">56</span>
+        <span class="site-state-item-count">58</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -176,6 +176,244 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://pursue26.github.io/posts/230916094606.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="aha">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="aha's blog">
+      <meta itemprop="description" content="经历一个过程然后成为更好的自己">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | aha's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/posts/230916094606.html" class="post-title-link" itemprop="url">数据结构之拓扑排序</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+  
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2023-09-16 09:46:06" itemprop="dateCreated datePublished" datetime="2023-09-16T09:46:06+08:00">2023-09-16</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2023-09-25 19:32:10" itemprop="dateModified" datetime="2023-09-25T19:32:10+08:00">2023-09-25</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" itemprop="url" rel="index"><span itemprop="name">数据结构</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/%E6%8B%93%E6%89%91%E6%8E%92%E5%BA%8F/" itemprop="url" rel="index"><span itemprop="name">拓扑排序</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>6.8k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>12 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h2 id="什么是拓扑排序"><a href="#什么是拓扑排序" class="headerlink" title="什么是拓扑排序"></a>什么是拓扑排序</h2><p>引用百度百科的拓扑排序定义：</p>
+<blockquote>
+<p>对一个有向无环图（Directed Acyclic Graph, DAG）$G$ 进行拓扑排序，是将 $G$ 中所有顶点排成一个<strong>线性序列</strong>，使得图中任意一对顶点 $u$ 和 $v$，若边 $&lt;u,v&gt; \in E(G)$，则 $u$ <strong>在线性序列中出现在</strong> $v$ 之前。通常，这样的线性序列称为满足拓扑次序（Topological Order）的序列，简称<strong>拓扑序列</strong>。</p>
+</blockquote>
+<p>拓扑排序可以被理解为对一个有向无环图进行排序的操作。在这个排序中，图中的顶点被排列成一个线性序列，<strong>满足以下条件：对于图中的任意一对顶点 $u$ 和 $v$，如果存在一条边 $&lt;u,v&gt;$，那么在线性序列中，顶点 $u$ 出现在顶点 $v$ 之前</strong>。</p>
+<p>换句话说，拓扑排序可以将有向无环图中的顶点按照它们的依赖关系排序，使得所有的依赖关系都被满足。这对于处理任务的依赖关系非常有用，例如工程项目中的任务调度，编译器中的源代码依赖等。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/posts/230916094606.html#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://pursue26.github.io/posts/230915155105.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="aha">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="aha's blog">
+      <meta itemprop="description" content="经历一个过程然后成为更好的自己">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | aha's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/posts/230915155105.html" class="post-title-link" itemprop="url">Go 笔记之字符串和指针</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+  
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2023-09-15 15:51:05" itemprop="dateCreated datePublished" datetime="2023-09-15T15:51:05+08:00">2023-09-15</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2023-09-22 11:53:52" itemprop="dateModified" datetime="2023-09-22T11:53:52+08:00">2023-09-22</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">学习笔记</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/Golang/" itemprop="url" rel="index"><span itemprop="name">Golang</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>3k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>5 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h2 id="Go语言学习笔记-14：字符串"><a href="#Go语言学习笔记-14：字符串" class="headerlink" title="Go语言学习笔记-14：字符串"></a>Go语言学习笔记-14：字符串</h2><ol>
+<li><p>Go 语言中的字符串是一个<strong>字节切片</strong>。</p>
+</li>
+<li><p><code>%x</code> 格式限定符用于指定 16 进制编码，<code>%c</code> 格式限定符用于打印字符串的字符。</p>
+</li>
+<li><p>在 UTF-8 编码中，一个代码点（字符的编码）可能会占用超过一个字节的空间，所以使用 <code>%c</code> 格式打印时可能会出错，可以用 <code>rune</code> 解决。</p>
+</li>
+<li><p><code>rune</code> 是 Go 语言的内建类型，它也是 <code>int32</code> 的别称。在 Go 语言中，<code>rune</code> 表示一个代码点。代码点无论占用多少个字节，都可以用一个 <code>rune</code> 来表示。</p>
+</li>
+</ol>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/posts/230915155105.html#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -1197,13 +1435,13 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-line"></i>
     </span>
-    <span title="站点总字数">201k</span>
+    <span title="站点总字数">205k</span>
   </span>
   <span class="post-meta-item">
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">6:05</span>
+    <span title="站点阅读时长">6:13</span>
   </span>
 </div>
 <div class="busuanzi-count">
