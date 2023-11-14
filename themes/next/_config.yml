@@ -367,8 +367,8 @@ codeblock:
   theme:
     # light: default
     # dark: stackoverflow-dark
-    light: vs
-    dark: stackoverflow-dark
+    light: github
+    dark: github
   prism:
     light: prism
     dark: prism-dark
@@ -582,7 +582,7 @@ math:
 
 # Easily enable fast Ajax navigation on your website.
 # For more information: https://github.com/next-theme/pjax
-pjax: false
+pjax: true
 
 # FancyBox is a tool that offers a nice and elegant way to add zooming functionality for images.
 # For more information: https://fancyapps.com/fancybox/
@@ -933,5 +933,23 @@ images: images
 hyperlink_css:
   post_body_a:
     enable: true
-    normal_color: "#2A1EB1"
+    normal_color: "#3555BC" # "#2A1EB1"
     hover_color: "#FF0000"
+
+# Darkmode JS
+# For more information: https://github.com/rqh656418510/hexo-next-darkmode, https://github.com/sandoche/Darkmode.js
+darkmode_js:
+  enable: true
+  bottom: '64px' # default: '32px'
+  right: 'unset' # default: '32px'
+  left: '32px' # default: 'unset'
+  time: '0.5s' # default: '0.3s'
+  mixColor: 'transparent' # default: '#fff'
+  backgroundColor: 'transparent' # default: '#fff'
+  buttonColorDark: '#3F3F3F' # default: '#100f2c'
+  buttonColorLight: '#fff' # default: '#fff'
+  isActivated: true # default false
+  saveInCookies: true # default: true
+  label: '🌓' # default: ''
+  autoMatchOsTheme: true # default: true
+  libUrl: 'https://unpkg.com/darkmode-js@1.5.7/lib/darkmode-js.min.js'

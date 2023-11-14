@@ -98,3 +98,5 @@ module.exports = function(locals) {
 
 3. 支持多行公式：https://blog.csdn.net/weixin_44634312/article/details/120197899
 - 可在项目中搜索<修改>二字，快速查找修改位置
+
+4. 主题添加可切换的暗黑模式：https://www.techgrow.cn/posts/abf4aee1.html
