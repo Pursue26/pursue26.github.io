@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha256-HtsXJanqjKTc8vVQjO4YMhiqFoXkfBsjBWcX91T1jr8=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pursue26.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.18.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":null},"fold":{"enable":true,"height":300},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="Floyd-Warshall 算法，中文亦称弗洛伊德算法或佛洛依德算法，是一种利用动态规划的思想解决多源（任意两点间）最短路径的算法，可以正确处理有向图或负权的最短路径问题，同时也被用于计算有向图的传递闭包。 Floyd-Warshall 算法的时间复杂度为 $O(|V|^{3})$，空间复杂度为 $O(|V|^{2})$，其中 $V$ 是点集（来自维基百科的定义）。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="数据结构算法之 Floyd 多源最短路径">
+<meta property="og:url" content="https://pursue26.github.io/posts/231116150205.html">
+<meta property="og:site_name" content="aha&#39;s blog">
+<meta property="og:description" content="Floyd-Warshall 算法，中文亦称弗洛伊德算法或佛洛依德算法，是一种利用动态规划的思想解决多源（任意两点间）最短路径的算法，可以正确处理有向图或负权的最短路径问题，同时也被用于计算有向图的传递闭包。 Floyd-Warshall 算法的时间复杂度为 $O(|V|^{3})$，空间复杂度为 $O(|V|^{2})$，其中 $V$ 是点集（来自维基百科的定义）。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pursue26.github.io/images/algorithm/floyd-init.png">
+<meta property="og:image" content="https://pursue26.github.io/images/algorithm/floyd-update.png">
+<meta property="article:published_time" content="2023-11-16T07:02:05.000Z">
+<meta property="article:modified_time" content="2023-11-17T02:01:05.929Z">
+<meta property="article:author" content="aha">
+<meta property="article:tag" content="Floyd算法">
+<meta property="article:tag" content="多源最短路径">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pursue26.github.io/images/algorithm/floyd-init.png">
+
+
+<link rel="canonical" href="https://pursue26.github.io/posts/231116150205.html">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://pursue26.github.io/posts/231116150205.html","path":"posts/231116150205.html","title":"数据结构算法之 Floyd 多源最短路径"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>数据结构算法之 Floyd 多源最短路径 | aha's blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<style>.darkmode--activated{--body-bg-color:#282828;--content-bg-color:#333;--card-bg-color:#555;--text-color:#ccc;--blockquote-color:#bbb;--link-color:#ccc;--link-hover-color:#eee;--brand-color:#ddd;--brand-hover-color:#ddd;--table-row-odd-bg-color:#282828;--table-row-hover-bg-color:#363636;--menu-item-bg-color:#555;--btn-default-bg:#222;--btn-default-color:#ccc;--btn-default-border-color:#555;--btn-default-hover-bg:#666;--btn-default-hover-color:#ccc;--btn-default-hover-border-color:#666;--highlight-background:#282b2e;--highlight-foreground:#a9b7c6;--highlight-gutter-background:#34393d;--highlight-gutter-foreground:#9ca9b6}.darkmode--activated img{opacity:.75}.darkmode--activated img:hover{opacity:.9}.darkmode--activated code{color:#69dbdc;background:0 0}button.darkmode-toggle{z-index:9999}.darkmode-ignore,img{display:flex!important}.beian img{display:inline-block!important}</style></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">aha's blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-dailyblog"><a href="/random.html" rel="section"><i class="fa fa-file fa-fw"></i>每日博客</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Floyd%20%E5%9F%BA%E6%9C%AC%E6%80%9D%E6%83%B3"><span class="nav-number">1.</span> <span class="nav-text">Floyd 基本思想 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Floyd%20%E5%85%B7%E4%BD%93%E6%AD%A5%E9%AA%A4"><span class="nav-number">2.</span> <span class="nav-text">Floyd 具体步骤</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Floyd%20%E6%AD%A5%E9%AA%A4%E6%8F%8F%E8%BF%B0"><span class="nav-number">2.1.</span> <span class="nav-text">Floyd 步骤描述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Floyd%20%E5%A4%8D%E6%9D%82%E5%BA%A6"><span class="nav-number">2.2.</span> <span class="nav-text">Floyd 复杂度</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Floyd%20%E7%AE%97%E6%B3%95%E5%9B%BE%E8%A7%A3"><span class="nav-number">3.</span> <span class="nav-text">Floyd 算法图解 </span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%9D%E5%A7%8B%E5%8C%96%E8%B7%9D%E7%A6%BB%E7%9F%A9%E9%98%B5"><span class="nav-number">3.1.</span> <span class="nav-text"> 初始化距离矩阵 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9B%B4%E6%96%B0%E8%B7%9D%E7%A6%BB%E7%9F%A9%E9%98%B5"><span class="nav-number">3.2.</span> <span class="nav-text">更新距离矩阵 </span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Floyd%20%E7%AE%97%E6%B3%95%E5%AE%9E%E7%8E%B0"><span class="nav-number">4.</span> <span class="nav-text">Floyd 算法实现 </span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Floyd%20%E7%AE%97%E6%B3%95%E7%BC%96%E7%A0%81"><span class="nav-number">4.1.</span> <span class="nav-text">Floyd 算法编码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A8%8B%E5%BA%8F%E8%BF%90%E8%A1%8C%E7%BB%93%E6%9E%9C"><span class="nav-number">4.2.</span> <span class="nav-text">程序运行结果 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Floyd%20%E7%AE%97%E6%B3%95%E4%BC%98%E5%8C%96"><span class="nav-number">4.3.</span> <span class="nav-text">Floyd 算法优化 </span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">aha</p>
+  <div class="site-description" itemprop="description">经历一个过程然后成为更好的自己</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">54</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">25</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">65</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://pursue26.github.io/posts/231116150205.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="aha">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="aha's blog">
+      <meta itemprop="description" content="经历一个过程然后成为更好的自己">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="数据结构算法之 Floyd 多源最短路径 | aha's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          数据结构算法之 Floyd 多源最短路径
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+  
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2023-11-16 15:02:05" itemprop="dateCreated datePublished" datetime="2023-11-16T15:02:05+08:00">2023-11-16</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2023-11-17 10:01:05" itemprop="dateModified" datetime="2023-11-17T10:01:05+08:00">2023-11-17</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" itemprop="url" rel="index"><span itemprop="name">数据结构</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/%E5%9B%BE%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">图算法</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>3.4k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>6 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>Floyd-Warshall 算法，中文亦称弗洛伊德算法或佛洛依德算法，是一种利用动态规划的思想解决多源（任意两点间）最短路径的算法，可以正确处理有向图或负权的最短路径问题，同时也被用于计算有向图的传递闭包。 Floyd-Warshall 算法的时间复杂度为 $O(|V|^{3})$，空间复杂度为 $O(|V|^{2})$，其中 $V$ 是点集（来自维基百科的定义）。</p>
+<span id="more"></span>
+
+<blockquote>
+<ol>
+<li>「负权」指的是图中存在具有负权值的边，负权边表示从一个顶点到另一个顶点的距离是负值。Floyd-Warshall 算法可以正确处理包含负权边的图的最短路径问题。</li>
+<li>「闭包」是指图中的传递关系。在有向图中，如果存在一条路径从顶点 A 到顶点 B，那么就说顶点 A 可以到达顶点 B。传递闭包就是将所有可以通过路径到达的顶点对进行标记，形成一个闭包集合。Floyd-Warshall 算法可以用来计算有向图的传递闭包，即找出所有顶点对之间是否存在路径。</li>
+<li>「多源」指的是任意两点间的最短距离均可求出，「单源」指的是只能求一个顶点到其他点的最短距离，而不能求任意两点的最短距离。</li>
+</ol>
+</blockquote>
+<h2 id="Floyd 基本思想"><a href="#Floyd 基本思想" class="headerlink" title="Floyd 基本思想"></a>Floyd 基本思想 </h2><p>Floyd 算法的基本思想是通过<strong> 中转节点来逐步优化路径长度 </strong>。该算法维护一个二维矩阵<code>D</code>，其中<code>D[i][j]</code> 表示节点 <code>i</code> 到节点 <code>j</code> 的最短路径长度。算法的核心是通过遍历所有节点 <code>k</code>，将节点<code>k</code> 作为中转节点，更新矩阵 <code>D</code> 的值。</p>
+<h2 id="Floyd 具体步骤"><a href="#Floyd 具体步骤" class="headerlink" title="Floyd 具体步骤"></a>Floyd 具体步骤</h2><h3 id="Floyd 步骤描述"><a href="#Floyd 步骤描述" class="headerlink" title="Floyd 步骤描述"></a>Floyd 步骤描述</h3><p>Floyd 算法的具体步骤如下：</p>
+<ol>
+<li>初始化矩阵 <code>D</code>，使得<code>D[i][j]</code> 表示节点 <code>i</code> 到节点 <code>j</code> 的直接距离，如果 <code>i</code> 和<code>j</code>之间没有直接边相连，则 <code>D[i][j]</code> 为无穷大，如果 <code>i</code> 和<code>j</code>相同，则 <code>D[i][j]</code> 为<code>0</code>，否则为直接相连的边的权值。</li>
+<li>对于每个节点 <code>k</code>，遍历所有的节点<code>i</code> 和节点 <code>j</code>，如果<code>D[i][k] + D[k][j]</code> 的值小于 <code>D[i][j]</code>，则更新<code>D[i][j]</code> 为<code>D[i][k] + D[k][j]</code>。</li>
+<li>重复步骤 2，直到遍历完所有节点<code>k</code>。</li>
+<li>最终得到的矩阵 <code>D</code> 即为所有节点对之间的最短路径长度。</li>
+</ol>
+<p>步骤二利用的是动态规划的思想，其状态转移方程为：<code>D[i][j] = min(D[i][j], D[i][k] + D[k][j])</code>；步骤一中则给出了如何初始化矩阵 <code>D</code> 和<code>D[i][j]</code>的定义。</p>
+<h3 id="Floyd 复杂度"><a href="#Floyd 复杂度" class="headerlink" title="Floyd 复杂度"></a>Floyd 复杂度</h3><p>Floyd 算法的时间复杂度为 $O(|V|^{3})$，空间复杂度为 $O(|V|^{2})$，其中 $V$ 是点集。它的优点是可以处理带有负权边的图，并且可以同时求解任意两个节点之间的最短路径。然而，由于其时间复杂度较高，当节点数量较大时，可能会导致算法的运行时间较长。</p>
+<h2 id="Floyd 算法图解"><a href="#Floyd 算法图解" class="headerlink" title="Floyd 算法图解"></a>Floyd 算法图解 </h2><h3 id="初始化距离矩阵"><a href="# 初始化距离矩阵" class="headerlink" title="初始化距离矩阵"></a> 初始化距离矩阵 </h3><p><code>D[i][j]</code> 表示节点 <code>i</code> 到节点 <code>j</code> 的直接距离。初始化时，如果 <code>i</code> 和<code>j</code>之间没有直接边相连，则 <code>D[i][j]</code> 为无穷大，如果 <code>i</code> 和<code>j</code>相同，则 <code>D[i][j]</code> 为<code>0</code>，否则为直接相连的边的权值。</p>
+<p>例如，节点 A 和节点 B 直接相连，权值为 2，节点 B 和节点 C 没有直接相连，权值为无穷大。</p>
+<p><img src="/images/algorithm/floyd-init.png" alt="Floyd 距离矩阵初始化"></p>
+<h3 id="更新距离矩阵"><a href="# 更新距离矩阵" class="headerlink" title="更新距离矩阵"></a>更新距离矩阵 </h3><p> 对于每个节点 <code>k</code>，遍历所有的节点<code>i</code> 和节点 <code>j</code>，如果<code>D[i][k] + D[k][j]</code> 的值小于 <code>D[i][j]</code>，则更新<code>D[i][j]</code> 为<code>D[i][k] + D[k][j]</code>。</p>
+<p><img src="/images/algorithm/floyd-update.png" alt="Floyd 距离矩阵更新"></p>
+<p>例如，当遍历节点 A 时：</p>
+<ul>
+<li>A 和 B 直接相连、A 和 C 直接相连、B 和 C 没有直接相连，因此可以通过中转节点 A 更新节点 B 和节点 C 的距离为 2+3=5。</li>
+<li>A 和 C 直接相连、A 和 D 直接相连、C 和 D 也直接相连，因此也可以通过中转节点 A 更新节点 C 和节点 D 的距离，但是更新的值不小于 C 和 D 直接相连的值，所有不进行更新。</li>
+</ul>
+<h2 id="Floyd 算法实现"><a href="#Floyd 算法实现" class="headerlink" title="Floyd 算法实现"></a>Floyd 算法实现 </h2><h3 id="Floyd 算法编码"><a href="#Floyd 算法编码" class="headerlink" title="Floyd 算法编码"></a>Floyd 算法编码</h3><p> 假设任意两点的间的距离，存储在邻接矩阵 <code>graph</code> 中，如果两点之间不直接相连，则该位置的值为无穷大 <code>inf</code>，否则为相应的距离值。</p>
+<blockquote>
+<p>当然，也可以通过数组直接存储直接相连的边的信息，如 <code>[[nodeA, nodeB, distAB], ..., [nodeC, nodeZ, distCZ]]</code>。</p>
+</blockquote>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;limits.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> inf (INT_MAX)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> n (4)</span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">floydWarshall</span><span class="params">(<span class="type">int</span> graph[n][n])</span> &#123;</span><br><span class="line">    <span class="type">int</span> dist[n][n];</span><br><span class="line">    <span class="type">int</span> i, j, k;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 步骤一：初始化结果矩阵，使其等于输入图的邻接矩阵 </span></span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">        <span class="keyword">for</span> (j = <span class="number">0</span>; j &lt; n; j++) &#123;</span><br><span class="line">            dist[i][j] = graph[i][j];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 步骤二 &amp; 三：对每个节点 k 进行遍历，作为中转节点</span></span><br><span class="line">    <span class="keyword">for</span> (k = <span class="number">0</span>; k &lt; n; k++) &#123;</span><br><span class="line">        <span class="comment">// 遍历所有节点对(i, j)</span></span><br><span class="line">        <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">            <span class="keyword">for</span> (j = <span class="number">0</span>; j &lt; n; j++) &#123;</span><br><span class="line">                <span class="comment">// 加入这个判断，防止后面的加法运算溢出</span></span><br><span class="line">                <span class="keyword">if</span> (dist[i][k] == inf || dist[k][j] == inf) &#123;</span><br><span class="line">                    <span class="keyword">continue</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="comment">// 如果通过节点 k 可以缩短路径长度，则更新 dist[i][j] 的值</span></span><br><span class="line">                <span class="keyword">if</span> (dist[i][k] + dist[k][j] &lt; dist[i][j]) &#123;</span><br><span class="line">                    dist[i][j] = dist[i][k] + dist[k][j];</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 步骤四：打印最短路径矩阵</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot; 最短路径矩阵为：\n&quot;</span>);</span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">        <span class="keyword">for</span> (j = <span class="number">0</span>; j &lt; n; j++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (dist[i][j] == inf) &#123;</span><br><span class="line">                <span class="built_in">printf</span>(<span class="string">&quot;inf &quot;</span>);</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="built_in">printf</span>(<span class="string">&quot;%d &quot;</span>, dist[i][j]);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;\n&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span> &#123;</span><br><span class="line">    <span class="type">int</span> graph[n][n] = &#123;&#123;<span class="number">0</span>, <span class="number">5</span>, inf, <span class="number">10</span>&#125;,</span><br><span class="line">                       &#123;inf, <span class="number">0</span>, <span class="number">3</span>, inf&#125;,</span><br><span class="line">                       &#123;inf, inf, <span class="number">0</span>, <span class="number">1</span>&#125;,</span><br><span class="line">                       &#123;inf, inf, inf, <span class="number">0</span>&#125;&#125;;</span><br><span class="line">    </span><br><span class="line">    floydWarshall(graph);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>该代码实现了 Floyd 算法，最终输出的结果是最短路径矩阵，显示了所有节点对之间的最短路径长度。</p>
+<blockquote>
+<p>注意处理 <code>inf + inf</code> 和 <code>x + inf</code> 相加会造成的数据溢出。</p>
+</blockquote>
+<h3 id="程序运行结果"><a href="# 程序运行结果" class="headerlink" title="程序运行结果"></a>程序运行结果 </h3><p> 无向图 <code>graph</code> 中直接相连的节点：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[0]---5---[1]</span><br><span class="line"> |         |</span><br><span class="line"> 10        3</span><br><span class="line"> |         |</span><br><span class="line">[3]---1---[2]</span><br></pre></td></tr></table></figure>
+
+<p>运行结果：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">最短路径矩阵为：</span><br><span class="line">0 5 8 9</span><br><span class="line">inf 0 3 4</span><br><span class="line">inf inf 0 1</span><br><span class="line">inf inf inf 0</span><br></pre></td></tr></table></figure>
+
+<h3 id="Floyd 算法优化"><a href="#Floyd 算法优化" class="headerlink" title="Floyd 算法优化"></a>Floyd 算法优化 </h3><p> 对于无向图，节点对 <code>(i, j)</code> 和节点对 <code>(j, i)</code>具有相同的权值（距离）。当遍历每一个中转节点时，<code>D[i][j]</code>的值的更新，只跟三个位置有关，即 <code>i, j, k</code>；而此时 <code>k</code> 固定，在 <code>i, j</code> 的双重循环下，会产生重复操作，因此我们可以只遍历矩阵右上三角部分即可，即 <code>j</code> 从 <code>i + 1</code> 开始遍历。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (k = <span class="number">0</span>; k &lt; n; k++) &#123;</span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">        <span class="keyword">for</span> (j = i + <span class="number">1</span>; j &lt; n; j++) &#123;  <span class="comment">// 去掉重复的计算 </span></span><br><span class="line">            <span class="keyword">if</span> (dist[i][k] == inf || dist[k][j] == inf) &#123;</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (dist[i][k] + dist[k][j] &lt; dist[i][j]) &#123;</span><br><span class="line">                dist[i][j] = dist[i][k] + dist[k][j];</span><br><span class="line">                dist[j][i] = dist[i][j];  <span class="comment">// 一并更新反向节点(j, i) 的距离</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>Floyd 算法，俗称插点法，不就一个点 <code>k</code> 一个点 <code>k&#39;</code> 地插进去，作为中转节点，更新节点对之间的距离嘛</strong>！</p>
+<blockquote>
+<p>参考资料 &amp; 图源：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/bigsai/p/15213511.html">https://www.cnblogs.com/bigsai/p/15213511.html</a></p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Floyd%E7%AE%97%E6%B3%95/" rel="tag"># Floyd算法</a>
+              <a href="/tags/%E5%A4%9A%E6%BA%90%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84/" rel="tag"># 多源最短路径</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/231111172507.html" rel="prev" title="操作系统之 chapter4.1 非连续内存分配之分段与分页">
+                  <i class="fa fa-angle-left"></i> 操作系统之 chapter4.1 非连续内存分配之分段与分页
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/231117095232.html" rel="next" title="数据结构算法之 Dijkstra 单源最短路径（原理部分）">
+                  数据结构算法之 Dijkstra 单源最短路径（原理部分） <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2023</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">aha</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">219k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">6:39</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+</div>
+  <div class="powered-by">
+    <!--由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动 -->
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script size="150" alpha="0.6" zIndex="-1" src="https://cdnjs.cloudflare.com/ajax/libs/ribbon.js/1.0.2/ribbon.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/next-theme-pjax/0.6.0/pjax.min.js" integrity="sha256-vxLn1tSKWD4dqbMRyv940UYw4sXgMtYcK6reefzZrao=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script><script src="/js/pjax.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+  <script data-pjax async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+<script src="https://unpkg.com/darkmode-js@1.5.7/lib/darkmode-js.min.js"></script>
+
+<script>
+var options = {
+  bottom: '64px',
+  right: 'unset',
+  left: '32px',
+  time: '0.5s',
+  mixColor: 'transparent',
+  backgroundColor: 'transparent',
+  buttonColorDark: '#3F3F3F',
+  buttonColorLight: '#fff',
+  saveInCookies: true,
+  label: '🌓',
+  autoMatchOsTheme: true
+}
+const darkmode = new Darkmode(options);
+window.darkmode = darkmode;
+darkmode.showWidget();
+</script>
+
+</body>
+</html>
