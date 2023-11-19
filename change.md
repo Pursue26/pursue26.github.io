@@ -81,7 +81,6 @@ module.exports = function(locals) {
       else return b.date - a.date;  //都没有top标签，最新的文章在前面
   });
   
-
   const paginationDir = config.pagination_dir || 'page';
   const path = config.index_generator.path || '';
 
@@ -97,6 +96,23 @@ module.exports = function(locals) {
 ```
 
 3. 支持多行公式：https://blog.csdn.net/weixin_44634312/article/details/120197899
-- 可在项目中搜索<修改>二字，快速查找修改位置
+
+- 把hexo-renderer-marked换成了2018年的1.0.0版本，再修改escape
+```shell
+cd blog
+npm uninstall hexo-renderer-marked
+npm install hexo-renderer-marked@1.0.0
+```
+
+- 编辑node_modules/marked/lib/marked.js
+```js
+escape: /^\\([!"#$%&'()*+,\-./:;<=>?@\[\]\\^_`{|}~])/,
+// 第539行，改成
+escape: /^\\([!"#$&'()*+,\-./:;<=>?@\[\]^_`|~])/,
+
+inline._escapes = /\\([!"#$%&'()*+,\-./:;<=>?@\[\]\\^_`{|}~])/g;
+// 第564行，改成
+inline._escapes = /\\([!"#$&'()*+,\-./:;<=>?@\[\]^_`|~])/g;
+```
 
 4. 主题添加可切换的暗黑模式：https://www.techgrow.cn/posts/abf4aee1.html
