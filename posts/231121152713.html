@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha256-HtsXJanqjKTc8vVQjO4YMhiqFoXkfBsjBWcX91T1jr8=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pursue26.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.18.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":null},"fold":{"enable":true,"height":300},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="在文章数据结构算法之 Dijkstra 单源最短路径（原理部分）中，给出了 Dijkstra 算法求单源最短路径的图文步骤，本文将给出该算法的代码实现。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="数据结构算法之 Dijkstra 单源最短路径（实现部分）">
+<meta property="og:url" content="https://pursue26.github.io/posts/231121152713.html">
+<meta property="og:site_name" content="aha&#39;s blog">
+<meta property="og:description" content="在文章数据结构算法之 Dijkstra 单源最短路径（原理部分）中，给出了 Dijkstra 算法求单源最短路径的图文步骤，本文将给出该算法的代码实现。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pursue26.github.io/images/algorithm/dijkstra-n.png">
+<meta property="article:published_time" content="2023-11-21T07:27:13.000Z">
+<meta property="article:modified_time" content="2023-11-21T12:00:55.710Z">
+<meta property="article:author" content="aha">
+<meta property="article:tag" content="Dijkstra算法">
+<meta property="article:tag" content="单源最短路径">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pursue26.github.io/images/algorithm/dijkstra-n.png">
+
+
+<link rel="canonical" href="https://pursue26.github.io/posts/231121152713.html">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://pursue26.github.io/posts/231121152713.html","path":"posts/231121152713.html","title":"数据结构算法之 Dijkstra 单源最短路径（实现部分）"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>数据结构算法之 Dijkstra 单源最短路径（实现部分） | aha's blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<style>.darkmode--activated{--body-bg-color:#282828;--content-bg-color:#333;--card-bg-color:#555;--text-color:#ccc;--blockquote-color:#bbb;--link-color:#ccc;--link-hover-color:#eee;--brand-color:#ddd;--brand-hover-color:#ddd;--table-row-odd-bg-color:#282828;--table-row-hover-bg-color:#363636;--menu-item-bg-color:#555;--btn-default-bg:#222;--btn-default-color:#ccc;--btn-default-border-color:#555;--btn-default-hover-bg:#666;--btn-default-hover-color:#ccc;--btn-default-hover-border-color:#666;--highlight-background:#282b2e;--highlight-foreground:#a9b7c6;--highlight-gutter-background:#34393d;--highlight-gutter-foreground:#9ca9b6}.darkmode--activated img{opacity:.75}.darkmode--activated img:hover{opacity:.9}.darkmode--activated code{color:#69dbdc;background:0 0}button.darkmode-toggle{z-index:9999}.darkmode-ignore,img{display:flex!important}.beian img{display:inline-block!important}</style></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">aha's blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-dailyblog"><a href="/random.html" rel="section"><i class="fa fa-file fa-fw"></i>每日博客</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Dijkstra%20%E7%AE%97%E6%B3%95%E6%AD%A5%E9%AA%A4"><span class="nav-number">1.</span> <span class="nav-text">Dijkstra 算法步骤 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Dijkstra%20%E7%AE%97%E6%B3%95%E5%AE%9E%E7%8E%B0"><span class="nav-number">2.</span> <span class="nav-text">Dijkstra 算法实现 </span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9A%E4%B9%89%E5%9B%BE%E7%BB%93%E6%9E%84"><span class="nav-number">2.1.</span> <span class="nav-text"> 定义图结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9A%E4%B9%89%E8%BE%B9%E7%BB%93%E6%9E%84"><span class="nav-number">2.2.</span> <span class="nav-text">定义边结构 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96%E9%A1%B6%E7%82%B9%E7%9A%84%E7%B4%A2%E5%BC%95"><span class="nav-number">2.3.</span> <span class="nav-text">获取顶点的索引 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9E%84%E5%BB%BA%E5%9B%BE%E6%95%B0%E6%8D%AE"><span class="nav-number">2.4.</span> <span class="nav-text">构建图数据 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Dijkstra%20%E7%AE%97%E6%B3%95"><span class="nav-number">2.5.</span> <span class="nav-text">Dijkstra 算法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%89%93%E5%8D%B0%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84"><span class="nav-number">2.6.</span> <span class="nav-text">打印最短路径</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Dijkstra%20%E7%AE%97%E6%B3%95%E6%B5%8B%E8%AF%95"><span class="nav-number">3.</span> <span class="nav-text">Dijkstra 算法测试 </span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B5%8B%E8%AF%95%E4%BB%A3%E7%A0%81"><span class="nav-number">3.1.</span> <span class="nav-text"> 测试代码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B5%8B%E8%AF%95%E7%BB%93%E6%9E%9C"><span class="nav-number">3.2.</span> <span class="nav-text">测试结果 </span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">aha</p>
+  <div class="site-description" itemprop="description">经历一个过程然后成为更好的自己</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">57</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">25</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">67</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://pursue26.github.io/posts/231121152713.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="aha">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="aha's blog">
+      <meta itemprop="description" content="经历一个过程然后成为更好的自己">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="数据结构算法之 Dijkstra 单源最短路径（实现部分） | aha's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          数据结构算法之 Dijkstra 单源最短路径（实现部分）
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+  
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2023-11-21 15:27:13 / 修改时间：20:00:55" itemprop="dateCreated datePublished" datetime="2023-11-21T15:27:13+08:00">2023-11-21</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" itemprop="url" rel="index"><span itemprop="name">数据结构</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/%E5%9B%BE%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">图算法</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>5.7k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>10 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>在文章 <a href="https://pursue26.github.io/posts/231117095232.html"> 数据结构算法之 Dijkstra 单源最短路径（原理部分）</a>中，给出了 Dijkstra 算法求单源最短路径的图文步骤，本文将给出该算法的代码实现。</p>
+<span id="more"></span>
+
+<h2 id="Dijkstra 算法步骤"><a href="#Dijkstra 算法步骤" class="headerlink" title="Dijkstra 算法步骤"></a>Dijkstra 算法步骤 </h2><p> 回顾一下 <a href="https://pursue26.github.io/posts/231117095232.html"> 数据结构算法之 Dijkstra 单源最短路径（原理部分）</a>中给出的 Dijkstra 算法的具体步骤：</p>
+<ol>
+<li>创建一个距离数组<code>dist[]</code>，用于存储源节点到各个节点的最短路径长度。初始时，将源节点的距离设为 0，与源节点直接相连的节点的距离设为边的权重，其他节点的距离设为无穷大。</li>
+<li>创建一个标记数组<code>visited[]</code>，用于标记是否已经访问过该节点。初始时，将源节点标记为已访问，其他节点标记为未访问。</li>
+<li>以源节点为基准，遍历所有与其相邻的、未访问过的节点，计算「源节点」到这些相邻节点的距离，并从未访问的节点中选择距离「源节点」最近的节点，作为基准节点。</li>
+<li>以这个基准节点为中间节点，更新从源节点经过中间节点到达其它节点的距离到 <code>dist[]</code> 数组中，并将这个基准节点标记为已访问。<ul>
+<li>更新的方式是：如果「从新的中间节点」到「该节点」的距离小于原本到它的距离，则更新它的值（你要从这个节点走才更近了哦），并将这个中间节点作为它的前驱节点。</li>
+</ul>
+</li>
+<li>重复步骤 3 和步骤 4，直到所有节点都被访问过。</li>
+<li>最终，<code>dist[]</code>数组中存储的就是源节点到其他所有节点的最短路径长度。</li>
+</ol>
+<blockquote>
+<p>步骤三中的「相邻」节点包括直接与源节点相邻、通过已访问的节点间接与源节点相邻这两大类。换句话说，也就是 <code>dist[]</code> 数组中只要不是无穷大，就与源节点直接或间接相邻。</p>
+</blockquote>
+<h2 id="Dijkstra 算法实现"><a href="#Dijkstra 算法实现" class="headerlink" title="Dijkstra 算法实现"></a>Dijkstra 算法实现 </h2><h3 id="定义图结构"><a href="# 定义图结构" class="headerlink" title="定义图结构"></a> 定义图结构</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 邻接矩阵</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> _<span class="title">graph</span> &#123;</span></span><br><span class="line">    <span class="type">char</span> vexs[MAX];        <span class="comment">// 顶点集合</span></span><br><span class="line">    <span class="type">int</span> vexnum;            <span class="comment">// 顶点数</span></span><br><span class="line">    <span class="type">int</span> edgenum;           <span class="comment">// 边数</span></span><br><span class="line">    <span class="type">int</span> matrix[MAX][MAX];  <span class="comment">// 邻接矩阵</span></span><br><span class="line">&#125; Graph;</span><br></pre></td></tr></table></figure>
+
+<p><code>Graph</code> 是图的邻接矩阵对应的结构体：</p>
+<ul>
+<li><code>vexs</code> 用于保存顶点的集合，<code>vexnum</code> 是顶点数量，<code>edgenum</code> 是边数；</li>
+<li><code>matrix</code> 用于保存邻接点信息的二维数组，<code>matrix[i][j]</code> 表示顶点 <code>vexs[i]</code> 和顶点 <code>vexs[j]</code> 之间的边的权重，若 <code>matrix[i][j] = INF</code>，则表示这两个顶点之间没有边（不是邻接点）。</li>
+</ul>
+<h3 id="定义边结构"><a href="# 定义边结构" class="headerlink" title="定义边结构"></a>定义边结构 </h3><p> 实际中，一般给出的信息都是哪两个顶点之间有边，边的权重是多少，所有我们给出一个结构体用于存储边的数据。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 边的结构体</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> _<span class="title">edgeData</span> &#123;</span></span><br><span class="line">    <span class="type">char</span> start;  <span class="comment">// 边的起点</span></span><br><span class="line">    <span class="type">char</span> end;    <span class="comment">// 边的终点</span></span><br><span class="line">    <span class="type">int</span> weight;  <span class="comment">// 边的权重</span></span><br><span class="line">&#125; EData;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>在编码中，图结构体变量的数据将会从边结构体变量的数据中获取。</p>
+</blockquote>
+<h3 id="获取顶点的索引"><a href="# 获取顶点的索引" class="headerlink" title="获取顶点的索引"></a>获取顶点的索引 </h3><p> 这里的顶点是字符型（而非整数型），所以需要获取字符型顶点对应的索引——它在顶点集合中的位置。这样，才方便后续将邻接点存储在图结构的成员 <code>matrix</code> 中。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 获取顶点在顶点集合中的索引</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">getIndexOfVex</span><span class="params">(Graph *pGraph, <span class="type">char</span> vex)</span> &#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; pGraph-&gt;vexnum; i++) &#123;</span><br><span class="line">        <span class="keyword">if</span> (pGraph-&gt;vexs[i] == vex) &#123;</span><br><span class="line">            <span class="keyword">return</span> i;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="构建图数据"><a href="# 构建图数据" class="headerlink" title="构建图数据"></a>构建图数据 </h3><p> 就像上面说的，图结构体变量的数据将会从边结构体变量的数据中获取。所以，我们在这里实现了从给定的边数据来初始化图数据。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 构建图</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">createGraph</span><span class="params">(Graph *pGraph, <span class="type">char</span> vexs[], <span class="type">int</span> vexnum, EData edges[], <span class="type">int</span> edgenum)</span> &#123;</span><br><span class="line">    <span class="comment">// 初始化顶点数、边数、顶点集合</span></span><br><span class="line">    pGraph-&gt;vexnum = vexnum;</span><br><span class="line">    pGraph-&gt;edgenum = edgenum;</span><br><span class="line">    <span class="built_in">memcpy</span>(pGraph-&gt;vexs, vexs, vexnum * <span class="keyword">sizeof</span>(<span class="type">char</span>));</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 初始化邻接矩阵</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; pGraph-&gt;vexnum; i++) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">0</span>; j &lt; pGraph-&gt;vexnum; j++) &#123;</span><br><span class="line">            pGraph-&gt;matrix[i][j] = (i == j ? <span class="number">0</span> : INF);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 添加边数据到图中</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; pGraph-&gt;edgenum; i++) &#123;</span><br><span class="line">        <span class="comment">// 这里要保证顶点的索引有效</span></span><br><span class="line">        <span class="type">int</span> start = getIndexOfVex(pGraph, edges[i].start);</span><br><span class="line">        <span class="type">int</span> end = getIndexOfVex(pGraph, edges[i].end);</span><br><span class="line">        <span class="type">int</span> weight = edges[i].weight;</span><br><span class="line">        pGraph-&gt;matrix[start][end] = weight;</span><br><span class="line">        pGraph-&gt;matrix[end][start] = pGraph-&gt;matrix[start][end];  <span class="comment">// 无向图加这行，有向图不加这行</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>对于无向图，要多加一行代码 <code>pGraph-&gt;matrix[end][start] = pGraph-&gt;matrix[start][end]</code> 哦。</p>
+</blockquote>
+<h3 id="Dijkstra 算法"><a href="#Dijkstra 算法" class="headerlink" title="Dijkstra 算法"></a>Dijkstra 算法</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Dijkstra 算法，找到源顶点到各顶点的最短路径</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">dijkstra</span><span class="params">(Graph *pGraph, <span class="type">char</span> start, <span class="type">int</span> dist[], <span class="type">int</span> prev[])</span> &#123;</span><br><span class="line">    <span class="type">int</span> i, j, k;</span><br><span class="line">    <span class="type">int</span> visited[MAX]; <span class="comment">// 标记顶点是否已被访问</span></span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> startIdx = getIndexOfVex(pGraph, start);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 步骤一 &amp; 二：初始化访问数组、距离数组、路径数组</span></span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; pGraph-&gt;vexnum; i++) &#123;</span><br><span class="line">        visited[i] = <span class="number">0</span>; <span class="comment">// 顶点未被访问</span></span><br><span class="line">        dist[i] = pGraph-&gt;matrix[startIdx][i]; <span class="comment">// 初始化源顶点到各顶点的距离</span></span><br><span class="line">        prev[i] = (dist[i] != INF ? startIdx : <span class="number">-1</span>); <span class="comment">// 如果源顶点到该顶点有边，则设置前驱顶点为源顶点</span></span><br><span class="line">    &#125;</span><br><span class="line">    visited[startIdx] = <span class="number">1</span>; <span class="comment">// 源顶点已被访问</span></span><br><span class="line">    prev[startIdx] = <span class="number">-1</span>;  <span class="comment">// 源顶点没有前驱顶点</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 步骤五：遍历 N-1 次，每次找到一个顶点的最短路径</span></span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">1</span>; i &lt; pGraph-&gt;vexnum; i++) &#123;</span><br><span class="line">        <span class="type">int</span> min = INF;</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 步骤三：找到未被访问的顶点中距离最小的顶点 k</span></span><br><span class="line">        <span class="keyword">for</span> (j = <span class="number">0</span>; j &lt; pGraph-&gt;vexnum; j++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (!visited[j] &amp;&amp; dist[j] &lt; min) &#123;</span><br><span class="line">                min = dist[j];</span><br><span class="line">                k = j;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 步骤四：更新 dist 数组和 prev 数组</span></span><br><span class="line">        <span class="keyword">for</span> (j = <span class="number">0</span>; j &lt; pGraph-&gt;vexnum; j++) &#123;</span><br><span class="line">            <span class="type">int</span> distk2j = min + pGraph-&gt;matrix[k][j]; <span class="comment">// 溢出风险, 所以定义的 INF 为一半的最大值</span></span><br><span class="line">            <span class="comment">// 如果「从新的中间节点」到「该节点」的距离小于原本到它的距离，则更新它的值</span></span><br><span class="line">            <span class="keyword">if</span> (!visited[j] &amp;&amp; distk2j &lt; dist[j]) &#123;</span><br><span class="line">                dist[j] = distk2j;</span><br><span class="line">                prev[j] = k;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        visited[k] = <span class="number">1</span>; <span class="comment">// 将基准节点标记为已访问</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>一次遍历可以访问一个顶点，源节点在初始化时被访问；所以，遍历 N-1 次后，所有顶点就都被访问过了。</p>
+</blockquote>
+<h3 id="打印最短路径"><a href="# 打印最短路径" class="headerlink" title="打印最短路径"></a>打印最短路径</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 打印给定起点和终点的最短路径</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">printPath</span><span class="params">(Graph *pGraph, <span class="type">char</span> start, <span class="type">char</span> end, <span class="type">int</span> dist[], <span class="type">int</span> prev[])</span> &#123;</span><br><span class="line">    <span class="type">int</span> startIdx = getIndexOfVex(pGraph, start);</span><br><span class="line">    <span class="type">int</span> endIdx = getIndexOfVex(pGraph, end);</span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> i = endIdx, count = <span class="number">0</span>;</span><br><span class="line">    <span class="type">char</span> path[MAX];</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 逆序将路径顶点存入 path 数组</span></span><br><span class="line">    <span class="keyword">while</span> (i != startIdx) &#123;</span><br><span class="line">        path[count++] = pGraph-&gt;vexs[i];</span><br><span class="line">        i = prev[i];  <span class="comment">// 顶点 i 的前驱顶点</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 打印路径顶点</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%c -&gt; %c: %c&quot;</span>, pGraph-&gt;vexs[startIdx], pGraph-&gt;vexs[endIdx], pGraph-&gt;vexs[startIdx]);</span><br><span class="line">    <span class="keyword">for</span> (i = count - <span class="number">1</span>; i &gt;= <span class="number">0</span>; i--) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot; %c&quot;</span>, path[i]);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;, minDist: %d\n&quot;</span>, dist[endIdx]);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="Dijkstra 算法测试"><a href="#Dijkstra 算法测试" class="headerlink" title="Dijkstra 算法测试"></a>Dijkstra 算法测试 </h2><h3 id="测试代码"><a href="# 测试代码" class="headerlink" title="测试代码"></a> 测试代码</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> MAX (100)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> INF ((~(0x1 <span class="string">&lt;&lt; 31)) &gt;</span>&gt; 1) <span class="comment">// 最大值 0X7FFFFFFF 的一半</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> _<span class="title">graph</span> &#123;</span></span><br><span class="line">    <span class="type">char</span> vexs[MAX];        <span class="comment">// 顶点集合</span></span><br><span class="line">    <span class="type">int</span> vexnum;            <span class="comment">// 顶点数</span></span><br><span class="line">    <span class="type">int</span> edgenum;           <span class="comment">// 边数</span></span><br><span class="line">    <span class="type">int</span> matrix[MAX][MAX];  <span class="comment">// 邻接矩阵</span></span><br><span class="line">&#125; Graph;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> _<span class="title">edgeData</span> &#123;</span></span><br><span class="line">    <span class="type">char</span> start;  <span class="comment">// 边的起点</span></span><br><span class="line">    <span class="type">char</span> end;    <span class="comment">// 边的终点</span></span><br><span class="line">    <span class="type">int</span> weight;  <span class="comment">// 边的权重</span></span><br><span class="line">&#125; EData;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">getIndexOfVex</span><span class="params">(Graph *pGraph, <span class="type">char</span> vex)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">createGraph</span><span class="params">(Graph *pGraph, <span class="type">char</span> vexs[], <span class="type">int</span> vexnum, EData edges[], <span class="type">int</span> edgenum)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">dijkstra</span><span class="params">(Graph *pGraph, <span class="type">char</span> start, <span class="type">int</span> dist[], <span class="type">int</span> prev[])</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">printPath</span><span class="params">(Graph *pGraph, <span class="type">char</span> start, <span class="type">char</span> end, <span class="type">int</span> dist[], <span class="type">int</span> prev[])</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">char</span> vexs[] = &#123;<span class="string">&#x27;A&#x27;</span>, <span class="string">&#x27;B&#x27;</span>, <span class="string">&#x27;C&#x27;</span>, <span class="string">&#x27;D&#x27;</span>, <span class="string">&#x27;E&#x27;</span>, <span class="string">&#x27;F&#x27;</span>, <span class="string">&#x27;G&#x27;</span>&#125;;</span><br><span class="line">    <span class="type">int</span> vexnum = <span class="keyword">sizeof</span>(vexs) / <span class="keyword">sizeof</span>(vexs[<span class="number">0</span>]);</span><br><span class="line">    EData edges[] = &#123;</span><br><span class="line">        &#123;<span class="string">&#x27;A&#x27;</span>, <span class="string">&#x27;B&#x27;</span>, <span class="number">2</span>&#125;,</span><br><span class="line">        &#123;<span class="string">&#x27;A&#x27;</span>, <span class="string">&#x27;C&#x27;</span>, <span class="number">6</span>&#125;,</span><br><span class="line">        &#123;<span class="string">&#x27;B&#x27;</span>, <span class="string">&#x27;D&#x27;</span>, <span class="number">5</span>&#125;,</span><br><span class="line">        &#123;<span class="string">&#x27;C&#x27;</span>, <span class="string">&#x27;D&#x27;</span>, <span class="number">8</span>&#125;,</span><br><span class="line">        &#123;<span class="string">&#x27;D&#x27;</span>, <span class="string">&#x27;F&#x27;</span>, <span class="number">15</span>&#125;,</span><br><span class="line">        &#123;<span class="string">&#x27;D&#x27;</span>, <span class="string">&#x27;E&#x27;</span>, <span class="number">10</span>&#125;,</span><br><span class="line">        &#123;<span class="string">&#x27;E&#x27;</span>, <span class="string">&#x27;F&#x27;</span>, <span class="number">6</span>&#125;,</span><br><span class="line">        &#123;<span class="string">&#x27;F&#x27;</span>, <span class="string">&#x27;G&#x27;</span>, <span class="number">6</span>&#125;,</span><br><span class="line">        &#123;<span class="string">&#x27;E&#x27;</span>, <span class="string">&#x27;G&#x27;</span>, <span class="number">2</span>&#125;&#125;;</span><br><span class="line">    <span class="type">int</span> edgenum = <span class="keyword">sizeof</span>(edges) / <span class="keyword">sizeof</span>(edges[<span class="number">0</span>]);</span><br><span class="line">    Graph graph;</span><br><span class="line">    <span class="type">int</span> dist[MAX]; <span class="comment">// 存储最短路径长度</span></span><br><span class="line">    <span class="type">int</span> prev[MAX]; <span class="comment">// 存储前驱节点</span></span><br><span class="line"></span><br><span class="line">    createGraph(&amp;graph, vexs, vexnum, edges, edgenum);</span><br><span class="line">    dijkstra(&amp;graph, <span class="string">&#x27;A&#x27;</span>, dist, prev);</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; vexnum; i++) &#123;</span><br><span class="line">        printPath(&amp;graph, <span class="string">&#x27;A&#x27;</span>, vexs[i], dist, prev);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>一个数加上无穷大会溢出，所以定义的 INF 为最大值的一半，防止溢出风险。</p>
+</blockquote>
+<h3 id="测试结果"><a href="# 测试结果" class="headerlink" title="测试结果"></a>测试结果 </h3><p> 这是测试用例中构建的图：<br><img src="/images/algorithm/dijkstra-n.png" alt=""></p>
+<p>测试结果，打印从起点到终点的最短路径上的节点和最短距离：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">A -&gt; A: A, minDist: 0</span><br><span class="line">A -&gt; B: A B, minDist: 2</span><br><span class="line">A -&gt; C: A C, minDist: 6</span><br><span class="line">A -&gt; D: A B D, minDist: 7</span><br><span class="line">A -&gt; E: A B D E, minDist: 17</span><br><span class="line">A -&gt; F: A B D F, minDist: 22</span><br><span class="line">A -&gt; G: A B D E G, minDist: 19</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>参考资料：</p>
+<ol>
+<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/skywang12345/p/3711512.html">https://www.cnblogs.com/skywang12345/p/3711512.html</a></li>
+</ol>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Dijkstra%E7%AE%97%E6%B3%95/" rel="tag"># Dijkstra算法</a>
+              <a href="/tags/%E5%8D%95%E6%BA%90%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84/" rel="tag"># 单源最短路径</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/231119170537.html" rel="prev" title="操作系统之 chapter4.2 非连续内存分配之页表">
+                  <i class="fa fa-angle-left"></i> 操作系统之 chapter4.2 非连续内存分配之页表
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2023</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">aha</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">237k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">7:11</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+</div>
+  <div class="powered-by">
+    <!--由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动 -->
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script size="150" alpha="0.6" zIndex="-1" src="https://cdnjs.cloudflare.com/ajax/libs/ribbon.js/1.0.2/ribbon.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/next-theme-pjax/0.6.0/pjax.min.js" integrity="sha256-vxLn1tSKWD4dqbMRyv940UYw4sXgMtYcK6reefzZrao=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script><script src="/js/pjax.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+  <script data-pjax async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+<script src="https://unpkg.com/darkmode-js@1.5.7/lib/darkmode-js.min.js"></script>
+
+<script>
+var options = {
+  bottom: '64px',
+  right: 'unset',
+  left: '32px',
+  time: '0.5s',
+  mixColor: 'transparent',
+  backgroundColor: 'transparent',
+  buttonColorDark: '#3F3F3F',
+  buttonColorLight: '#fff',
+  saveInCookies: true,
+  label: '🌓',
+  autoMatchOsTheme: true
+}
+const darkmode = new Darkmode(options);
+window.darkmode = darkmode;
+darkmode.showWidget();
+</script>
+
+</body>
+</html>
