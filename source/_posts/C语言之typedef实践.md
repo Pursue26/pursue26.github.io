@@ -5,7 +5,7 @@ categories:
     - 学习笔记
     - C语言
 tags:
-    - 自定义类型
+    - typedef
 abbrlink: 230920172849
 ---
 

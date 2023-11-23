@@ -367,8 +367,8 @@ codeblock:
   theme:
     # light: default
     # dark: stackoverflow-dark
-    light: github
-    dark: github
+    light: stackoverflow-light
+    dark: github-dark
   prism:
     light: prism
     dark: prism-dark
