@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha256-HtsXJanqjKTc8vVQjO4YMhiqFoXkfBsjBWcX91T1jr8=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pursue26.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.18.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":null},"fold":{"enable":true,"height":300},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="在文章操作系统之 chapter5.1 虚拟内存管理之覆盖技术与交换技术中，介绍了内存管理的覆盖技术和交换技术；这篇文章将介绍虚拟内存管理技术（虚存技术），它结合了覆盖技术和交换技术中的优点。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="操作系统之 chapter5.2 内存管理之虚存技术">
+<meta property="og:url" content="https://pursue26.github.io/posts/231127193658.html">
+<meta property="og:site_name" content="aha&#39;s blog">
+<meta property="og:description" content="在文章操作系统之 chapter5.1 虚拟内存管理之覆盖技术与交换技术中，介绍了内存管理的覆盖技术和交换技术；这篇文章将介绍虚拟内存管理技术（虚存技术），它结合了覆盖技术和交换技术中的优点。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pursue26.github.io/images/os-kernel/chapter5/memory-management.png">
+<meta property="og:image" content="https://pursue26.github.io/images/os-kernel/chapter5/missing-page-interrupt.png">
+<meta property="article:published_time" content="2023-11-27T11:36:58.000Z">
+<meta property="article:modified_time" content="2023-11-27T12:23:07.613Z">
+<meta property="article:author" content="aha">
+<meta property="article:tag" content="操作系统">
+<meta property="article:tag" content="内存管理">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pursue26.github.io/images/os-kernel/chapter5/memory-management.png">
+
+
+<link rel="canonical" href="https://pursue26.github.io/posts/231127193658.html">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://pursue26.github.io/posts/231127193658.html","path":"posts/231127193658.html","title":"操作系统之 chapter5.2 内存管理之虚存技术"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>操作系统之 chapter5.2 内存管理之虚存技术 | aha's blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<style>.darkmode--activated{--body-bg-color:#282828;--content-bg-color:#333;--card-bg-color:#555;--text-color:#ccc;--blockquote-color:#bbb;--link-color:#ccc;--link-hover-color:#eee;--brand-color:#ddd;--brand-hover-color:#ddd;--table-row-odd-bg-color:#282828;--table-row-hover-bg-color:#363636;--menu-item-bg-color:#555;--btn-default-bg:#222;--btn-default-color:#ccc;--btn-default-border-color:#555;--btn-default-hover-bg:#666;--btn-default-hover-color:#ccc;--btn-default-hover-border-color:#666;--highlight-background:#282b2e;--highlight-foreground:#a9b7c6;--highlight-gutter-background:#34393d;--highlight-gutter-foreground:#9ca9b6}.darkmode--activated img{opacity:.75}.darkmode--activated img:hover{opacity:.9}.darkmode--activated code{color:#69dbdc;background:0 0}button.darkmode-toggle{z-index:9999}.darkmode-ignore,img{display:flex!important}.beian img{display:inline-block!important}</style></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">aha's blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-dailyblog"><a href="/random.html" rel="section"><i class="fa fa-file fa-fw"></i>每日博客</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E6%8A%80%E6%9C%AF"><span class="nav-number">1.</span> <span class="nav-text">虚拟内存管理技术 </span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9B%AE%E6%A0%87"><span class="nav-number">1.1.</span> <span class="nav-text">目标</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A8%8B%E5%BA%8F%E5%B1%80%E9%83%A8%E6%80%A7%E5%8E%9F%E7%90%86"><span class="nav-number">1.2.</span> <span class="nav-text">程序局部性原理 </span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%8F%E5%85%B8%E5%AE%9E%E4%BE%8B"><span class="nav-number">1.2.1.</span> <span class="nav-text">经典实例 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E4%BE%8B%E8%80%97%E6%97%B6%E6%B5%8B%E8%AF%95"><span class="nav-number">1.2.2.</span> <span class="nav-text">实例耗时测试</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="nav-number">1.3.</span> <span class="nav-text">基本概念 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E7%89%B9%E5%BE%81"><span class="nav-number">1.4.</span> <span class="nav-text">基本特征</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A1%B5%E5%BC%8F%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86"><span class="nav-number">1.5.</span> <span class="nav-text">页式内存管理 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%99%9A%E6%8B%9F%E9%A1%B5%E5%BC%8F%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86"><span class="nav-number">1.6.</span> <span class="nav-text">虚拟页式内存管理 </span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0"><span class="nav-number">1.6.1.</span> <span class="nav-text"> 实现 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E6%80%9D%E8%B7%AF"><span class="nav-number">1.6.2.</span> <span class="nav-text">基本思路</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A1%B5%E8%A1%A8%E8%A1%A8%E9%A1%B9"><span class="nav-number">1.6.3.</span> <span class="nav-text">页表表项 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%BA%E9%A1%B5%E4%B8%AD%E6%96%AD"><span class="nav-number">1.6.4.</span> <span class="nav-text">缺页中断 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%90%8E%E5%A4%87%E5%AD%98%E5%82%A8%EF%BC%88backing-store%EF%BC%89"><span class="nav-number">1.6.5.</span> <span class="nav-text">后备存储（backing store）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E6%80%A7%E8%83%BD%E5%88%86%E6%9E%90"><span class="nav-number">1.6.6.</span> <span class="nav-text">虚拟内存性能分析 </span></a></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">aha</p>
+  <div class="site-description" itemprop="description">经历一个过程然后成为更好的自己</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">62</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">28</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">71</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://pursue26.github.io/posts/231127193658.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="aha">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="aha's blog">
+      <meta itemprop="description" content="经历一个过程然后成为更好的自己">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="操作系统之 chapter5.2 内存管理之虚存技术 | aha's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          操作系统之 chapter5.2 内存管理之虚存技术
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+  
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2023-11-27 19:36:58 / 修改时间：20:23:07" itemprop="dateCreated datePublished" datetime="2023-11-27T19:36:58+08:00">2023-11-27</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" itemprop="url" rel="index"><span itemprop="name">操作系统</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>4.2k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>8 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>在文章 <a href="https://pursue26.github.io/posts/231123184526.html"> 操作系统之 chapter5.1 虚拟内存管理之覆盖技术与交换技术 </a> 中，介绍了内存管理的覆盖技术和交换技术；这篇文章将介绍虚拟内存管理技术（虚存技术），它结合了覆盖技术和交换技术中的优点。</p>
+<span id="more"></span>
+
+<h1 id="虚拟内存管理技术"><a href="# 虚拟内存管理技术" class="headerlink" title="虚拟内存管理技术"></a>虚拟内存管理技术 </h1><p> 如果想要在有限容量的内存中，以 <strong> 更小的页粒度为单位 </strong> 装入更多、更大的程序，可以采用自动的虚拟存储技术。</p>
+<h2 id="目标"><a href="# 目标" class="headerlink" title="目标"></a>目标</h2><ul>
+<li><p>像覆盖技术那样，不是把程序的所有内容都放在内存中，因而能够运行比当前的空闲内存空间还要大的程序。但做的更好，由操作系统自动来完成，无需程序员的干涉。</p>
+</li>
+<li><p>像交换技术那样，能够实现进程在内存与外存之间的交换，因而获得更多的空闲内存空间。但做的更好，只对进程的部分内容在内存和外存之间进行交换。</p>
+</li>
+</ul>
+<img src="/images/os-kernel/chapter5/memory-management.png" alt="操作系统内存管理" width="60%" height="60%">
+
+<h2 id="程序局部性原理"><a href="# 程序局部性原理" class="headerlink" title="程序局部性原理"></a>程序局部性原理 </h2><p> 程序的局部性原理（principle of locality）：指程序在执行过程中的一个较短时期，所执行的指令地址和指令的操作数地址，分别局限于一定的区域。</p>
+<ul>
+<li>时间局部性：一条指令的一次执行和下次执行、一个数据的一次访问和下次访问都集中在一个较短时期内；</li>
+<li>空间局部性：当前指令和邻近的几条指令、当前访问的数据和邻近的几个数据都集中在一个较小区域内。</li>
+</ul>
+<p>程序的局部性原理表明，从理论上来说，虚拟存储技术是能够实现的。而且在实现了以后应该是能够取得一个满意的效果。</p>
+<h3 id="经典实例"><a href="# 经典实例" class="headerlink" title="经典实例"></a>经典实例 </h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> 题目描述：</span></span><br><span class="line"><span class="comment">页面大小为 4KB，分配给每个进程的物理页面是 1。 </span></span><br><span class="line"><span class="comment">在一个进程中，定义了如下的二维数组 int arr[1024][1024]，该数组按行存放在内存，每一行放在一个页面中。</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">考虑一下程序的编写方法对缺页率的影响？</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 程序编写方法 1：（发生了 1024*1024 次缺页中断）</span></span><br><span class="line"><span class="keyword">for</span> (j = <span class="number">0</span>; j &lt; <span class="number">1024</span>; j++) &#123;</span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; <span class="number">1024</span>; i++) &#123;</span><br><span class="line">        arr[i][j] = <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">    </span><br><span class="line"></span><br><span class="line"><span class="comment">// 程序编写方法 2：（发生了 1024 次缺页中断）</span></span><br><span class="line"><span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; <span class="number">1024</span>; i++) &#123;</span><br><span class="line">    <span class="keyword">for</span> (j = <span class="number">0</span>; j &lt; <span class="number">1024</span>; j++) &#123;</span><br><span class="line">        arr[i][j] = <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>因为数组是「按行」存放在一块连续的内存中的，上面的二维数组每行有 1024 个元素（类型为 <code>int</code> 型），所以该数组的一行数据，占用 4K 字节，正好为一个物理页面的空间。</p>
+<ul>
+<li>方法一是按列访问的，即访问完第 0 列，再访问第 1 列，每列的不同行处在不同的物理页面中，因此会发生 $1024^{2}$ 次缺页中断；</li>
+<li>方法二是按行访问的，即访问完第 0 行，再访问第 1 行，访问的每行都是在同一个物理页面中，因此只会发生 $1024$ 次缺页中断。</li>
+</ul>
+<h3 id="实例耗时测试"><a href="# 实例耗时测试" class="headerlink" title="实例耗时测试"></a>实例耗时测试</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;time.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span> &#123;</span><br><span class="line">    <span class="type">int</span> arr[<span class="number">1024</span>][<span class="number">1024</span>];</span><br><span class="line">    <span class="type">clock_t</span> start, end;</span><br><span class="line">    <span class="type">double</span> cpu_time_used;</span><br><span class="line"></span><br><span class="line">    start = clock();</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">0</span>; j &lt; <span class="number">1024</span>; j++) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">1024</span>; i++) &#123;</span><br><span class="line">            arr[i][j] = <span class="number">0</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    end = clock();</span><br><span class="line">    cpu_time_used = ((<span class="type">double</span>)(end - start)) / CLOCKS_PER_SEC;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot; 代码执行耗时：%f 秒 \n&quot;</span>, cpu_time_used);</span><br><span class="line"></span><br><span class="line">    start = clock();</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">1024</span>; i++) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">0</span>; j &lt; <span class="number">1024</span>; j++) &#123;</span><br><span class="line">            arr[i][j] = <span class="number">0</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    end = clock();</span><br><span class="line">    cpu_time_used = ((<span class="type">double</span>)(end - start)) / CLOCKS_PER_SEC;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot; 代码执行耗时：%f 秒 \n&quot;</span>, cpu_time_used);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>连续运行三次的结果：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost xxx]# ./a.out</span><br><span class="line">代码执行耗时：0.008293 秒 </span><br><span class="line"> 代码执行耗时：0.002611 秒 </span><br><span class="line">[root@localhost xxx]# ./a.out</span><br><span class="line"> 代码执行耗时：0.008260 秒 </span><br><span class="line"> 代码执行耗时：0.002613 秒 </span><br><span class="line">[root@localhost xxx]# ./a.out</span><br><span class="line"> 代码执行耗时：0.008252 秒 </span><br><span class="line"> 代码执行耗时：0.002575 秒</span><br></pre></td></tr></table></figure>
+
+<h2 id="基本概念"><a href="# 基本概念" class="headerlink" title="基本概念"></a>基本概念 </h2><p> 可以在页式或段式内存管理的基础上实现虚拟内存管理技术。</p>
+<ul>
+<li>在装入程序时，不必将其全部装入内存，而只需将当前需要执行的部分页面（或段）装入到内存中，就可以让程序开始执行；</li>
+<li>一方面，在程序执行过程中，如果需执行的指令或访问的数据尚未在内存中（称为缺页或缺段），则由 CPU 通知操作系统将相应的页面（或段）调入到内存，然后继续执行程序；</li>
+<li>另一方面，操作系统将内存中暂时不使用的页面（或段）调出保存在外存上，从而腾出更多空闲内存空间，存放将要装入的程序以及将要调入的页面（或段）。</li>
+</ul>
+<h2 id="基本特征"><a href="# 基本特征" class="headerlink" title="基本特征"></a>基本特征</h2><ul>
+<li><strong>大的用户空间</strong>：通过把物理内存和外存相结合，提供给用户的虚拟内存空间通常大于实际的物理内存，即实现了这两者的分离。<ul>
+<li>如 32 位的虚拟地址理论上可以访问 4GB，而可能计算机上仅有 256M 的物理内存，但硬盘容量大于 4GB。</li>
+</ul>
+</li>
+<li><strong>部分交换</strong>：与交换技术相比较，虚拟存储的调入和调出是对部分虚拟地址空间进行的（交换粒度更小，效率更高）。</li>
+<li><strong>不连续性</strong>：物理内存分配的不连续性，虚拟地址空间使用的不连续性。</li>
+</ul>
+<h2 id="页式内存管理"><a href="# 页式内存管理" class="headerlink" title="页式内存管理"></a>页式内存管理 </h2><p> 页表：完成逻辑页到物理页帧的映射。首先，根据页号查找页表对应的索引项；然后，查看该表项对应的 resident bit 的状态，1 表示映射关系存在，确定页帧号；最后，页帧号加上原来的页内偏移，即可获得物理地址。</p>
+<blockquote>
+<p>resident bit 的值为 0 表示虚拟地址对应的逻辑页当前不在内存中，而是在外存（磁盘）中存储。</p>
+</blockquote>
+<h2 id="虚拟页式内存管理"><a href="# 虚拟页式内存管理" class="headerlink" title="虚拟页式内存管理"></a>虚拟页式内存管理 </h2><h3 id="实现"><a href="# 实现" class="headerlink" title="实现"></a> 实现 </h3><p> 大部分虚拟存储系统都采用虚拟页式存储管理技术，即在页式存储管理的基础上，增加「请求调页」和「页面置换」两个功能。</p>
+<h3 id="基本思路"><a href="# 基本思路" class="headerlink" title="基本思路"></a>基本思路</h3><ul>
+<li>当一个用户程序要调入内存运行时，不是将该程序的所有页面都装入内存，而是只装入部分的页面，就可启动程序运行；</li>
+<li>在程序运行过程中，如果发现要运行的程序或要访问的数据不在内存中，CPU 将发出缺页的中断请求，操作系统将处理这个中断——将外存中相应的页面调入内存，使得该程序能够继续运行。</li>
+</ul>
+<blockquote>
+<p>页面置换功能实现的好坏决定了整体的效率，后面专门讲这些设计有效的置换算法。</p>
+</blockquote>
+<h3 id="页表表项"><a href="# 页表表项" class="headerlink" title="页表表项"></a>页表表项 </h3><p> 为了实现「请求调页」和「页面置换」功能，我们需要在页表表项中增加一些位 <code>bit</code> 来辅助实现。</p>
+<p>页表表项示意图：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">逻辑页号 | 访问位 | 修改位 |   保护位   | 驻留位 | 物理页帧号</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>驻留位：表示该页是在内存中还是在外存中。<ul>
+<li>值为 1 表示该页位于内存中，该页表表项有效，物理页帧可以被使用；</li>
+<li>值为 0 表示当前页在外存中，访问该页表表项将导致缺页异常。</li>
+</ul>
+</li>
+<li>保护位：表示允许对该页做何种类型的访问，如只读，可读写，可执行等。</li>
+<li>修改位：表示此页在内存中是否被修改过。<ul>
+<li>当系统回收该物理页面时，根据此位来决定是否把物理页面的内容写回外存。</li>
+</ul>
+</li>
+<li>访问位：如果该页被访问过（包括读写操作），则设置此位。<ul>
+<li>用于页面置换算法。</li>
+</ul>
+</li>
+</ul>
+<h3 id="缺页中断"><a href="# 缺页中断" class="headerlink" title="缺页中断"></a>缺页中断 </h3><p> 缺页中断处理过程：</p>
+<ol start="0">
+<li>产生缺页中断；</li>
+<li>如果在内存中有空闲的物理页面，则分配一物理页帧 <code>f</code>，然后转第 4 步；否则转到第 2 步；</li>
+<li>采用某种页面置换算法，选择一个将被替换的物理页帧 <code>f</code>，它所对应的逻辑页为 <code>q</code>。如果该页在内存期间被修改过，则需要把它写回外存；</li>
+<li>对 <code>q</code> 所对应的页表项修改，把驻留位置为 <code>0</code>；</li>
+<li>将需要访问的页 <code>p</code> 装入到物理页面 <code>f</code> 当中；</li>
+<li>修改 <code>p</code> 所对应的页表项的内容，把驻留位置为 <code>1</code>，把物理页帧号置为 <code>f</code>；</li>
+<li>重新运行被中断的指令。</li>
+</ol>
+<p>缺页中断操作系统处理流程：<br><img src="/images/os-kernel/chapter5/missing-page-interrupt.png" alt="缺页中断操作系统处理" width="60%" height="60%"></p>
+<h3 id="后备存储（backing-store）"><a href="# 后备存储（backing-store）" class="headerlink" title="后备存储（backing store）"></a>后备存储（backing store）</h3><p>系统在何处保存未被映射到物理内存中的页呢？</p>
+<ul>
+<li>能够简单地识别在二级存储器中的页</li>
+<li>交换空间（磁盘或者文件）：特殊格式，用于存储未被映射的页面</li>
+</ul>
+<p>后背存储（二级存储）：一个虚拟地址空间的页面，可以被映射到一个文件（在二级存储中）的某个位置，以便在需要时重新加载到主存储器中。</p>
+<p>在操作系统中，不同段可以被映射到不同的文件：</p>
+<ul>
+<li>代码段：映射到可执行二进制文件；</li>
+<li>动态加载的共享库程序段：映射到动态调用的库文件；</li>
+<li>其他段：可能被映射到交换文件（swap file）</li>
+</ul>
+<blockquote>
+<p>操作系统中一般会有主存储器（也称为一级存储器或内存）和辅助存储器（如硬盘、SSD 等）两种类型的存储设备。主存储器用于存储当前正在运行的进程和其所需的数据，而辅助存储器用于存储暂时不需要的进程或数据，辅助存储器也称为后背存储或二级存储。</p>
+</blockquote>
+<h3 id="虚拟内存性能分析"><a href="# 虚拟内存性能分析" class="headerlink" title="虚拟内存性能分析"></a>虚拟内存性能分析 </h3><p> 为了便于理解分页的开销，使用有效存储器访问时间（effective memory access time, EAT）来衡量。</p>
+<p>EAT = 访存时间 * 页表命中几率 + page fault 处理时间 * page fault 几率</p>
+<p>实例：</p>
+<ul>
+<li>访问物理内存时间：10 ns</li>
+<li>磁盘访问时间：5 ms</li>
+<li>参数 p = page fault 几率</li>
+<li>参数 q = dirty page 几率</li>
+</ul>
+<p>则 $EAT = 10 \times (1-p) + 5 \times 10^{6} \times p \times (1+q)$</p>
+<p>其中，$1 + q$ 的 $1$ 表示发生 dirty page 后需要将页面写回外存的耗时。</p>
+<blockquote>
+<p>dirty page 是指在计算机系统中的内存中的一个页面，其中的数据已经被修改，与磁盘上的对应页面的数据不同步。当进程对内存中的页面进行写操作时，该页面会被标记为“脏页”，表示该页面的数据已经被修改但尚未写回到磁盘。在后续的页面调度或内存回写操作中，操作系统会将脏页的数据写回到磁盘，以确保内存中的数据与磁盘上的数据保持一致性。这样可以防止数据丢失或不一致的情况发生。</p>
+</blockquote>
+<blockquote>
+<p>参考资料<br>1：<a target="_blank" rel="noopener" href="https://github.com/OXygenMoon/OperatingSystemInDepth">https://github.com/OXygenMoon/OperatingSystemInDepth</a><br>2：<a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_53407527/article/details/124983180">https://blog.csdn.net/weixin_53407527/article/details/124983180</a></p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" rel="tag"># 操作系统</a>
+              <a href="/tags/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/" rel="tag"># 内存管理</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/231127185207.html" rel="prev" title="数据结构之单调栈">
+                  <i class="fa fa-angle-left"></i> 数据结构之单调栈
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2023</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">aha</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">253k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">7:40</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+</div>
+  <div class="powered-by">
+    <!--由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动 -->
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script size="150" alpha="0.6" zIndex="-1" src="https://cdnjs.cloudflare.com/ajax/libs/ribbon.js/1.0.2/ribbon.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/next-theme-pjax/0.6.0/pjax.min.js" integrity="sha256-vxLn1tSKWD4dqbMRyv940UYw4sXgMtYcK6reefzZrao=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script><script src="/js/pjax.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+  <script data-pjax async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+<script src="https://unpkg.com/darkmode-js@1.5.7/lib/darkmode-js.min.js"></script>
+
+<script>
+var options = {
+  bottom: '64px',
+  right: 'unset',
+  left: '32px',
+  time: '0.5s',
+  mixColor: 'transparent',
+  backgroundColor: 'transparent',
+  buttonColorDark: '#3F3F3F',
+  buttonColorLight: '#fff',
+  saveInCookies: true,
+  label: '🌓',
+  autoMatchOsTheme: true
+}
+const darkmode = new Darkmode(options);
+window.darkmode = darkmode;
+darkmode.showWidget();
+</script>
+
+</body>
+</html>
