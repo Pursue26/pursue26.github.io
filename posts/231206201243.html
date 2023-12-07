@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha256-HtsXJanqjKTc8vVQjO4YMhiqFoXkfBsjBWcX91T1jr8=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pursue26.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.18.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":null},"fold":{"enable":true,"height":300},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="2477 达到首都的最少油耗：给你一棵 n 个节点的树（一个无向、连通、无环图），每个节点表示一个城市，编号从 0 到 n - 1 ，且恰好有 n - 1 条路，0 是首都。给你一个二维整数数组 roads ，其中 roads[i] &#x3D; [a_i, b_i] ，表示城市 a_i 和 b_i 之间有一条双向路。  每个城市有一辆车（均有 seats 个座位），且每个城市需要一名代表去首都参加会议。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LeetCode 刷题之 2477 达到首都的最少油耗">
+<meta property="og:url" content="https://pursue26.github.io/posts/231206201243.html">
+<meta property="og:site_name" content="aha&#39;s blog">
+<meta property="og:description" content="2477 达到首都的最少油耗：给你一棵 n 个节点的树（一个无向、连通、无环图），每个节点表示一个城市，编号从 0 到 n - 1 ，且恰好有 n - 1 条路，0 是首都。给你一个二维整数数组 roads ，其中 roads[i] &#x3D; [a_i, b_i] ，表示城市 a_i 和 b_i 之间有一条双向路。  每个城市有一辆车（均有 seats 个座位），且每个城市需要一名代表去首都参加会议。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-12-06T12:12:43.000Z">
+<meta property="article:modified_time" content="2023-12-07T02:33:41.609Z">
+<meta property="article:author" content="aha">
+<meta property="article:tag" content="LeetCode">
+<meta property="article:tag" content="递归">
+<meta property="article:tag" content="深度优先搜索">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://pursue26.github.io/posts/231206201243.html">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://pursue26.github.io/posts/231206201243.html","path":"posts/231206201243.html","title":"LeetCode 刷题之 2477 达到首都的最少油耗"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>LeetCode 刷题之 2477 达到首都的最少油耗 | aha's blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<style>.darkmode--activated{--body-bg-color:#282828;--content-bg-color:#333;--card-bg-color:#555;--text-color:#ccc;--blockquote-color:#bbb;--link-color:#ccc;--link-hover-color:#eee;--brand-color:#ddd;--brand-hover-color:#ddd;--table-row-odd-bg-color:#282828;--table-row-hover-bg-color:#363636;--menu-item-bg-color:#555;--btn-default-bg:#222;--btn-default-color:#ccc;--btn-default-border-color:#555;--btn-default-hover-bg:#666;--btn-default-hover-color:#ccc;--btn-default-hover-border-color:#666;--highlight-background:#282b2e;--highlight-foreground:#a9b7c6;--highlight-gutter-background:#34393d;--highlight-gutter-foreground:#9ca9b6}.darkmode--activated img{opacity:.75}.darkmode--activated img:hover{opacity:.9}.darkmode--activated code{color:#69dbdc;background:0 0}button.darkmode-toggle{z-index:9999}.darkmode-ignore,img{display:flex!important}.beian img{display:inline-block!important}</style></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">aha's blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-dailyblog"><a href="/random.html" rel="section"><i class="fa fa-file fa-fw"></i>每日博客</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BD%A2%E8%B1%A1%E5%8C%96%E6%95%B0%E7%BB%84"><span class="nav-number">1.</span> <span class="nav-text">形象化数组 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%97%AE%E9%A2%98%E8%BD%AC%E6%8D%A2%E4%B8%8E%E8%A7%A3%E9%A2%98%E6%80%9D%E8%B7%AF"><span class="nav-number">2.</span> <span class="nav-text">问题转换与解题思路 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E8%BD%AC%E6%8D%A2%E4%B8%8E%E5%AD%98%E5%82%A8"><span class="nav-number">3.</span> <span class="nav-text">数据转换与存储 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B4%AA%E5%BF%83%20-%20%E6%B7%B1%E5%BA%A6%E4%BC%98%E5%85%88%E6%90%9C%E7%B4%A2"><span class="nav-number">4.</span> <span class="nav-text">贪心 + 深度优先搜索 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81%E5%88%86%E6%9E%90"><span class="nav-number">5.</span> <span class="nav-text">代码分析 </span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%90%91%E4%B8%8A%E5%8F%96%E6%95%B4"><span class="nav-number">5.1.</span> <span class="nav-text"> 向上取整</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%82%BB%E5%B1%85%E8%8A%82%E7%82%B9"><span class="nav-number">5.2.</span> <span class="nav-text">邻居节点 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#DFS%20%E7%90%86%E8%A7%A3"><span class="nav-number">5.3.</span> <span class="nav-text">DFS 理解 </span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">aha</p>
+  <div class="site-description" itemprop="description">经历一个过程然后成为更好的自己</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">67</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">32</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">78</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://pursue26.github.io/posts/231206201243.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="aha">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="aha's blog">
+      <meta itemprop="description" content="经历一个过程然后成为更好的自己">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="LeetCode 刷题之 2477 达到首都的最少油耗 | aha's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          LeetCode 刷题之 2477 达到首都的最少油耗
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+  
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2023-12-06 20:12:43" itemprop="dateCreated datePublished" datetime="2023-12-06T20:12:43+08:00">2023-12-06</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2023-12-07 10:33:41" itemprop="dateModified" datetime="2023-12-07T10:33:41+08:00">2023-12-07</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/LeetCode/" itemprop="url" rel="index"><span itemprop="name">LeetCode</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/LeetCode/%E6%B7%B1%E5%BA%A6%E4%BC%98%E5%85%88%E6%90%9C%E7%B4%A2/" itemprop="url" rel="index"><span itemprop="name">深度优先搜索</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>4.3k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>8 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/minimum-fuel-cost-to-report-to-the-capital/">2477 达到首都的最少油耗</a>：给你一棵 <code>n</code> 个节点的树（一个无向、连通、无环图），每个节点表示一个城市，编号从 <code>0</code> 到 <code>n - 1</code> ，且恰好有 <code>n - 1</code> 条路，<code>0</code> 是首都。给你一个二维整数数组 <code>roads</code> ，其中 <code>roads[i] = [a_i, b_i]</code> ，表示城市 <code>a_i</code> 和 <code>b_i</code> 之间有一条双向路。</p>
+<ul>
+<li>每个城市有一辆车（均有 <code>seats</code> 个座位），且每个城市需要一名代表去首都参加会议。</li>
+<li>代表可以选择乘坐自己所在城市的车辆，也可以选择乘坐其他城市的车辆。</li>
+<li>相邻城市之间的车辆油耗是一升。</li>
+</ul>
+<p>你需要计算所有代表到达首都所需的最少汽油量。</p>
+<span id="more"></span>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">输入：roads = [[3,1],[3,2],[1,0],[0,4],[0,5],[4,6]], seats = 2</span><br><span class="line">输出：7</span><br><span class="line">解释：</span><br><span class="line">- 代表 2 到达城市 3 ，消耗 1 升汽油。</span><br><span class="line">- 代表 2 和代表 3 一起到达城市 1 ，消耗 1 升汽油。</span><br><span class="line">- 代表 2 和代表 3 一起到达首都，消耗 1 升汽油。</span><br><span class="line">- 代表 1 直接到达首都，消耗 1 升汽油。</span><br><span class="line">- 代表 5 直接到达首都，消耗 1 升汽油。</span><br><span class="line">- 代表 6 到达城市 4 ，消耗 1 升汽油。</span><br><span class="line">- 代表 4 和代表 6 一起到达首都，消耗 1 升汽油。</span><br><span class="line">最少消耗 7 升汽油。</span><br></pre></td></tr></table></figure>
+
+<h2 id="形象化数组"><a href="# 形象化数组" class="headerlink" title="形象化数组"></a>形象化数组 </h2><p> 将数组转换为树的形状：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">       0</span><br><span class="line">     / | \</span><br><span class="line">    1  4  5</span><br><span class="line">   /   |</span><br><span class="line">  3    6</span><br><span class="line"> /</span><br><span class="line">2</span><br></pre></td></tr></table></figure>
+
+<h2 id="问题转换与解题思路"><a href="# 问题转换与解题思路" class="headerlink" title="问题转换与解题思路"></a>问题转换与解题思路 </h2><p> 题目等价于给出了一棵以节点 <code>0</code> 为根节点的多叉树，初始时树上的每一个节点都有一个人和一辆车，现在所有人都需要通过「车子」向节点 <code>0</code> 移动。</p>
+<p>我们可以 <strong> 贪心地 </strong> 从每个叶子节点派车出发，只要车上还有空座位，就把该节点的人拉上车，并向根节点移动。要是车上没有座位了，那么就增派一辆车，也向根节点移动。这样就能保证所有人都到达首都，且油耗最少。</p>
+<p>对于上面的示例路径 <code>2-&gt;3-&gt;1-&gt;0</code>，按上面的思路，有：</p>
+<ul>
+<li>三个人需要去首都，在节点 <code>2</code> 派出一辆车，在节点 <code>1</code> 增派了一辆车，一共需要两辆车，消耗 4 升汽油。</li>
+</ul>
+<p>通过观察分析，我们可以发现：</p>
+<ul>
+<li><code>x</code> 个人通过某一段公路到达「该段路的终点」，该段路 <strong> 需要消耗的油量（需要的车辆数）为「人数 / 座位数」向上取整</strong>。如：<ul>
+<li>节点 <code>2</code> 一起移动到节点 <code>3</code>，需要的汽油总量为 <code>ceil(1, 2) = 1</code>；</li>
+<li>节点 <code>2,3</code> 一起移动到节点 <code>1</code>，需要的汽油总量为 <code>ceil(2, 2) = 1</code>；</li>
+<li>节点 <code>2,3,1</code> 一起移动到节点 <code>0</code>，需要的汽油总量为 <code>ceil(3, 2) = 2</code>。</li>
+</ul>
+</li>
+<li><strong>一条子树总共需要的油量为每一段路需要的油量（需要的车辆数）之和</strong>。</li>
+</ul>
+<p>那么，我们可以通过从根节点 <code>0</code> 往下进行 <strong> 深度优先搜索 </strong>，根据<strong> 路上累计的人数 </strong> 计算统计每一条边上消耗的汽油（需要的车辆数），把所有边上消耗的汽油相加即为最终答案。</p>
+<h2 id="数据转换与存储"><a href="# 数据转换与存储" class="headerlink" title="数据转换与存储"></a>数据转换与存储 </h2><p> 题目使用了一个二维数组存储图数据，而我们需要的是每一个节点的邻居节点。所以首先需要将二维数组中的数据转换到邻接矩阵中，存储每个节点的邻居节点，而邻居节点的数量是不固定的。</p>
+<p>对于 Python 语言，我们可以使用二维列表完成每个邻居节点的存储：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">n = roadsSize + <span class="number">1</span></span><br><span class="line">graph = [[] <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="built_in">range</span>(n)]</span><br><span class="line"><span class="keyword">for</span> edge <span class="keyword">in</span> roads:</span><br><span class="line">    x, y = edge[<span class="number">0</span>], edge[<span class="number">1</span>]</span><br><span class="line">    graph[x].append(y)</span><br><span class="line">    graph[y].append(x)</span><br></pre></td></tr></table></figure>
+
+<p>对于 C 语言，我们需要定义一个二维结构体列表，列表中的每一个位置是一个链表，存储它的所有邻居节点（具体看后面的代码实现）。</p>
+<blockquote>
+<p>一个节点的所有邻居节点就是它在树中的父节点和子节点的集合，有些节点可能既有父节点又有子节点，而有些节点只有父节点。</p>
+</blockquote>
+<h2 id="贪心 - 深度优先搜索"><a href="# 贪心 - 深度优先搜索" class="headerlink" title="贪心 + 深度优先搜索"></a>贪心 + 深度优先搜索 </h2><p> 通过从根节点 <code>0</code> 往下进行 <strong> 深度优先搜索 </strong>，根据<strong> 路上累计的人数 </strong> 计算统计每一条边上消耗的汽油（需要的车辆数），把所有边上消耗的汽油相加即为最终答案。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 单链表结构</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> _<span class="title">linked</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> val;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> _<span class="title">linked</span> *<span class="title">next</span>;</span></span><br><span class="line">&#125; ListNode;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 创建一个链表节点</span></span><br><span class="line">ListNode *<span class="title function_">createListNode</span><span class="params">(<span class="type">int</span> val)</span> &#123;</span><br><span class="line">    ListNode *node = (ListNode *)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(ListNode));</span><br><span class="line">    node-&gt;val = val;</span><br><span class="line">    node-&gt;next = <span class="literal">NULL</span>;</span><br><span class="line">    <span class="keyword">return</span> node;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 释放链表空间</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">freeList</span><span class="params">(ListNode *<span class="built_in">list</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">while</span> (<span class="built_in">list</span>) &#123;</span><br><span class="line">        ListNode *cur = <span class="built_in">list</span>;</span><br><span class="line">        <span class="built_in">list</span> = <span class="built_in">list</span>-&gt;next;</span><br><span class="line">        <span class="built_in">free</span>(cur);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 打印链表内容</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">printList</span><span class="params">(ListNode *<span class="built_in">list</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">while</span> (<span class="built_in">list</span>) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%d &quot;</span>, <span class="built_in">list</span>-&gt;val);</span><br><span class="line">        <span class="built_in">list</span> = <span class="built_in">list</span>-&gt;next;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\n&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 向上取整</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">myCeil</span><span class="params">(<span class="type">int</span> a, <span class="type">int</span> b)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> (a + b - <span class="number">1</span>) / b;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">long</span> <span class="type">long</span> <span class="title function_">minimumFuelCost</span><span class="params">(<span class="type">int</span>** roads, <span class="type">int</span> roadsSize, <span class="type">int</span>* roadsColSize, <span class="type">int</span> seats)</span> &#123;</span><br><span class="line">    <span class="type">int</span> n = roadsSize + <span class="number">1</span>; <span class="comment">// n 个节点有 n-1 条路，n-1=roadsSize</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 定义一个二维列表，存储每个节点的邻居节点（在树中看，邻居就是它的子节点和父节点）</span></span><br><span class="line">    ListNode **graph = (ListNode **)<span class="built_in">malloc</span>(n * <span class="keyword">sizeof</span>(ListNode *));</span><br><span class="line">    <span class="built_in">memset</span>(graph, <span class="literal">NULL</span>, n * <span class="keyword">sizeof</span>(ListNode *));</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; roadsSize; i++) &#123;</span><br><span class="line">        <span class="type">int</span> x = roads[i][<span class="number">0</span>], y = roads[i][<span class="number">1</span>];</span><br><span class="line"></span><br><span class="line">        <span class="comment">// y 的邻居节点是 x，将 x 追加到节点 y 对应的列表中</span></span><br><span class="line">        ListNode *nodeX = createListNode(x);</span><br><span class="line">        nodeX-&gt;next = graph[y];</span><br><span class="line">        graph[y] = nodeX;</span><br><span class="line"></span><br><span class="line">        ListNode *nodeY = createListNode(y);</span><br><span class="line">        nodeY-&gt;next = graph[x];</span><br><span class="line">        graph[x] = nodeY;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 到这里，每个节点的邻居节点就有了（邻居在列表中的顺序无关紧要）</span></span><br><span class="line">    <span class="comment">// for (int i = 0; i &lt; n; i++) &#123;</span></span><br><span class="line">    <span class="comment">//     printf(&quot;node %d can be reached: &quot;, i);</span></span><br><span class="line">    <span class="comment">//     printList(graph[i]);</span></span><br><span class="line">    <span class="comment">// &#125;</span></span><br><span class="line"></span><br><span class="line">    <span class="type">long</span> <span class="type">long</span> res = <span class="number">0</span>;</span><br><span class="line">    dfs(<span class="number">0</span>, <span class="number">-1</span>, seats, &amp;res, graph); <span class="comment">// 从多叉树的根节点出发，向下遍历每棵子树</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">        freeList(graph[i]);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">free</span>(graph);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> res;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">dfs</span><span class="params">(<span class="type">int</span> cur, <span class="type">int</span> father, <span class="type">int</span> seats, <span class="type">long</span> <span class="type">long</span> *res, <span class="type">const</span> ListNode **graph)</span> &#123;</span><br><span class="line">    <span class="type">int</span> peopleSum = <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 遍历当前节点的邻居节点（包含父节点和子节点）</span></span><br><span class="line">    <span class="keyword">for</span> (ListNode *node = graph[cur]; node; node = node-&gt;next) &#123;</span><br><span class="line">        <span class="type">int</span> val = node-&gt;val;</span><br><span class="line">        <span class="comment">// 递归地遍历当前节点的子节点，不递归当前节点的父节点</span></span><br><span class="line">        <span class="keyword">if</span> (val != father) &#123;</span><br><span class="line">            <span class="comment">// 累计以当前节点为根的子节点人数</span></span><br><span class="line">            peopleSum += dfs(val, cur, seats, res, graph);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (cur != <span class="number">0</span>) &#123; <span class="comment">// 不是根节点时，计算耗油</span></span><br><span class="line">        *res += myCeil(peopleSum, seats);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> peopleSum;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="代码分析"><a href="# 代码分析" class="headerlink" title="代码分析"></a>代码分析 </h2><h3 id="向上取整"><a href="# 向上取整" class="headerlink" title="向上取整"></a> 向上取整</h3><p><code>a</code> 与 <code>b</code> 相除的向上取整公式：<code>(a + b - 1) / b</code>。因为 <code>a/b</code> 的余数最大为 <code>b-1</code>，我们多加一个 <code>b-1</code> 会使得：</p>
+<ul>
+<li>当原来余数为 <code>0</code> 时，新公式计算出来的商的部分还是原来的值；</li>
+<li>当原来余数不为 <code>0</code> 时，多加的那部分 <code>b-1</code> 结合原来不为 <code>0</code> 的余数，会使得商的值加一。</li>
+</ul>
+<p>这样，便达到一个向上取整的效果。</p>
+<h3 id="邻居节点"><a href="# 邻居节点" class="headerlink" title="邻居节点"></a>邻居节点 </h3><p> 每个节点的邻居节点打印（以上面的示例为例）：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">node 0 can be reached: 5 4 1 </span><br><span class="line">node 1 can be reached: 0 3 </span><br><span class="line">node 2 can be reached: 3 </span><br><span class="line">node 3 can be reached: 2 1 </span><br><span class="line">node 4 can be reached: 6 0 </span><br><span class="line">node 5 can be reached: 0 </span><br><span class="line">node 6 can be reached: 4 </span><br></pre></td></tr></table></figure>
+
+<h3 id="DFS 理解"><a href="#DFS 理解" class="headerlink" title="DFS 理解"></a>DFS 理解 </h3><p> 在小破站上看到一个评论：</p>
+<blockquote>
+<p>处理递归，核心就是千万不要想子问题的过程，你的脑子才能处理几层？马上就绕迷糊了。重要的是，要想子问题的结果，思路就清晰了。</p>
+<blockquote>
+<p>是的，只要代码的边界条件和非边界条件的逻辑写对了，其它的事情交给数学归纳法就好了。也就是说，写对了这两个逻辑，你的代码自动就是正确的了，没必要想递归是怎么一层一层走的。</p>
+</blockquote>
+</blockquote>
+<p><strong>基于上面的评论，这道题中的 DFS 需要做的是（个人理解）</strong>：</p>
+<ol>
+<li>从多叉树的根节点出发，向下遍历每棵子树（也就是递归地遍历当前节点的子节点，不递归当前节点的父节点）；</li>
+<li>也就是说，当遍历的节点的邻居节点是父节点时，不再递归，会得到一个返回值 <code>1</code>；</li>
+<li>当遍历的节点的邻居节点是子节点时，递归地遍历它的子节点，累计子树的大小（累计返回值）；</li>
+<li>计算完子树大小后，计算到达该子树的根节点时的油耗，累加到最终结果中。</li>
+</ol>
+<p>例如，对于上面的序号 2，当遍历节点 <code>2</code> 时，递归函数是 <code>dfs(2, 3, ...)</code>，节点 <code>2</code> 中存储的节点是 <code>3</code>，也就是它的父节点，且它没有其它节点了。所以，<code>for</code> 循环结束，不再递归，累计油耗到答案，并返回人数 <code>1</code>。这个返回值后面要累计给 <code>dfs(3, 1, ...)</code> 的返回值 <code>1</code>，即当前的 <code>peopleSum</code> 值就是 <code>dfs(2, 3, ...) + dfs(3, 1, ...) = 2</code>，从节点 <code>3</code> 到它的父节点 <code>1</code> 需要油耗 <code>ceil(2, 2) = 1</code>。</p>
+<p><strong>为什么不需要计算根节点 <code>0</code> 的耗油 </strong>？<br> 根节点 <code>0</code> 不需要累计油耗到答案，是因为累计的是每个节点到其父节点的公路上的油耗，根节点没有它的父节点，即没有公路，也就不需要油耗了。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/LeetCode/" rel="tag"># LeetCode</a>
+              <a href="/tags/%E9%80%92%E5%BD%92/" rel="tag"># 递归</a>
+              <a href="/tags/%E6%B7%B1%E5%BA%A6%E4%BC%98%E5%85%88%E6%90%9C%E7%B4%A2/" rel="tag"># 深度优先搜索</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/231202180319.html" rel="prev" title="确定性网络之 CSQF">
+                  <i class="fa fa-angle-left"></i> 确定性网络之 CSQF
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/231207184239.html" rel="next" title="操作系统之 chapter6.2 全局页面置换算法">
+                  操作系统之 chapter6.2 全局页面置换算法 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2023</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">aha</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">286k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">8:41</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+</div>
+  <div class="powered-by">
+    <!--由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动 -->
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script size="150" alpha="0.6" zIndex="-1" src="https://cdnjs.cloudflare.com/ajax/libs/ribbon.js/1.0.2/ribbon.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/next-theme-pjax/0.6.0/pjax.min.js" integrity="sha256-vxLn1tSKWD4dqbMRyv940UYw4sXgMtYcK6reefzZrao=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script><script src="/js/pjax.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+  <script data-pjax async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+<script src="https://unpkg.com/darkmode-js@1.5.7/lib/darkmode-js.min.js"></script>
+
+<script>
+var options = {
+  bottom: '64px',
+  right: 'unset',
+  left: '32px',
+  time: '0.5s',
+  mixColor: 'transparent',
+  backgroundColor: 'transparent',
+  buttonColorDark: '#3F3F3F',
+  buttonColorLight: '#fff',
+  saveInCookies: true,
+  label: '🌓',
+  autoMatchOsTheme: true
+}
+const darkmode = new Darkmode(options);
+window.darkmode = darkmode;
+darkmode.showWidget();
+</script>
+
+</body>
+</html>

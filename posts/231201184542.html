@@ -19,15 +19,15 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"pursue26.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.18.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":null},"fold":{"enable":true,"height":300},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
 
-    <meta name="description" content="LRU 缓存：请你设计并实现一个满足 LRU（Least Recently Used）缓存约束的数据结构。">
+    <meta name="description" content="LRU 缓存：请你设计并实现一个满足 LRU（Least Recently Used）缓存约束的数据结构。 实现 LRUCache 类：  LRUCache(int capacity) 以正整数作为容量 capacity 初始化 LRU 缓存。 int get(int key) 如果关键字 key 存在于缓存中，则返回关键字的值，否则返回 -1。 void put(int key, int val">
 <meta property="og:type" content="article">
-<meta property="og:title" content="LeetCode 刷题之 146LRU 缓存">
+<meta property="og:title" content="LeetCode 刷题之 146 LRU 缓存">
 <meta property="og:url" content="https://pursue26.github.io/posts/231201184542.html">
 <meta property="og:site_name" content="aha&#39;s blog">
-<meta property="og:description" content="LRU 缓存：请你设计并实现一个满足 LRU（Least Recently Used）缓存约束的数据结构。">
+<meta property="og:description" content="LRU 缓存：请你设计并实现一个满足 LRU（Least Recently Used）缓存约束的数据结构。 实现 LRUCache 类：  LRUCache(int capacity) 以正整数作为容量 capacity 初始化 LRU 缓存。 int get(int key) 如果关键字 key 存在于缓存中，则返回关键字的值，否则返回 -1。 void put(int key, int val">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2023-12-01T10:45:42.000Z">
-<meta property="article:modified_time" content="2023-12-02T09:27:57.226Z">
+<meta property="article:modified_time" content="2023-12-07T03:39:21.519Z">
 <meta property="article:author" content="aha">
 <meta property="article:tag" content="哈希表">
 <meta property="article:tag" content="LeetCode">
@@ -40,10 +40,10 @@
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://pursue26.github.io/posts/231201184542.html","path":"posts/231201184542.html","title":"LeetCode 刷题之 146LRU 缓存"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://pursue26.github.io/posts/231201184542.html","path":"posts/231201184542.html","title":"LeetCode 刷题之 146 LRU 缓存"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>LeetCode 刷题之 146LRU 缓存 | aha's blog</title>
+<title>LeetCode 刷题之 146 LRU 缓存 | aha's blog</title>
   
 
 
@@ -155,18 +155,18 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">65</span>
+          <span class="site-state-item-count">67</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
           <a href="/categories/">
-        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-count">32</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">76</span>
+        <span class="site-state-item-count">78</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -206,12 +206,12 @@
     </span>
 
     <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="LeetCode 刷题之 146LRU 缓存 | aha's blog">
+      <meta itemprop="name" content="LeetCode 刷题之 146 LRU 缓存 | aha's blog">
       <meta itemprop="description" content="">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          LeetCode 刷题之 146LRU 缓存
+          LeetCode 刷题之 146 LRU 缓存
         </h1>
 
         <div class="post-meta-container">
@@ -230,7 +230,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2023-12-02 17:27:57" itemprop="dateModified" datetime="2023-12-02T17:27:57+08:00">2023-12-02</time>
+      <time title="修改时间：2023-12-07 11:39:21" itemprop="dateModified" datetime="2023-12-07T11:39:21+08:00">2023-12-07</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -278,8 +278,6 @@
     
     
     <div class="post-body" itemprop="articleBody"><p><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/lru-cache/">LRU 缓存</a>：请你设计并实现一个满足 LRU（Least Recently Used）缓存约束的数据结构。</p>
-<span id="more"></span>
-
 <p>实现 <code>LRUCache</code> 类：</p>
 <ul>
 <li><code>LRUCache(int capacity)</code> 以正整数作为容量 <code>capacity</code> 初始化 LRU 缓存。</li>
@@ -287,6 +285,8 @@
 <li><code>void put(int key, int value)</code> 如果关键字 <code>key</code> 已经存在，则变更其数据值 <code>value</code> ；如果不存在，则向缓存中插入该组 <code>key-value</code> 。如果插入操作导致关键字数量超过 <code>capacity</code> ，则应该逐出最久未使用的关键字。</li>
 </ul>
 <p>函数 <code>get</code> 和 <code>put</code> 必须以 <code>O(1)</code> 的平均时间复杂度运行。</p>
+<span id="more"></span>
+
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">输入 </span><br><span class="line">[&quot;LRUCache&quot;, &quot;put&quot;, &quot;put&quot;, &quot;get&quot;, &quot;put&quot;, &quot;get&quot;, &quot;put&quot;, &quot;get&quot;, &quot;get&quot;, &quot;get&quot;]</span><br><span class="line">[[2], [1, 1], [2, 2], [1], [3, 3], [2], [4, 4], [1], [3], [4]]</span><br><span class="line"> 输出 </span><br><span class="line">[null, null, null, 1, null, -1, null, -1, 3, 4]</span><br><span class="line"></span><br><span class="line"> 解释</span><br><span class="line">LRUCache lRUCache = new LRUCache(2);</span><br><span class="line">lRUCache.put(1, 1); // 缓存是 &#123;1=1&#125;</span><br><span class="line">lRUCache.put(2, 2); // 缓存是 &#123;1=1, 2=2&#125;</span><br><span class="line">lRUCache.get(1);    // 返回 1</span><br><span class="line">lRUCache.put(3, 3); // 该操作会使得关键字 2 作废，缓存是 &#123;1=1, 3=3&#125;</span><br><span class="line">lRUCache.get(2);    // 返回 -1 (未找到)</span><br><span class="line">lRUCache.put(4, 4); // 该操作会使得关键字 1 作废，缓存是 &#123;4=4, 3=3&#125;</span><br><span class="line">lRUCache.get(1);    // 返回 -1 (未找到)</span><br><span class="line">lRUCache.get(3);    // 返回 3</span><br><span class="line">lRUCache.get(4);    // 返回 4</span><br></pre></td></tr></table></figure>
 
 <h2 id="题目分析"><a href="# 题目分析" class="headerlink" title="题目分析"></a>题目分析 </h2><p> 最近最久使用页面置换算法（Least Recently Used, LRU）是操作系统中局部页面置换算法中性能较好的一种算法，当一个缺页中断发生时，它选择 <strong> 最近最久未使用 </strong> 的那个页面淘汰。</p>
@@ -385,13 +385,13 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-line"></i>
     </span>
-    <span title="站点总字数">278k</span>
+    <span title="站点总字数">286k</span>
   </span>
   <span class="post-meta-item">
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">8:25</span>
+    <span title="站点阅读时长">8:41</span>
   </span>
 </div>
 <div class="busuanzi-count">
