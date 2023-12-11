@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha256-HtsXJanqjKTc8vVQjO4YMhiqFoXkfBsjBWcX91T1jr8=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pursue26.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.18.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":null},"fold":{"enable":true,"height":300},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="进程是一个具有一定独立功能的程序在一个数据集合上的一次动态执行过程。 本文是进程与线程的第二部分，主要介绍进程的状态，包括进程的生命周期管理、进程状态变化模型和进程挂起模型，以及操作系统如何管理进程的状态队列。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="操作系统之 chapter7.2 进程状态">
+<meta property="og:url" content="https://pursue26.github.io/posts/231210211306.html">
+<meta property="og:site_name" content="aha&#39;s blog">
+<meta property="og:description" content="进程是一个具有一定独立功能的程序在一个数据集合上的一次动态执行过程。 本文是进程与线程的第二部分，主要介绍进程的状态，包括进程的生命周期管理、进程状态变化模型和进程挂起模型，以及操作系统如何管理进程的状态队列。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pursue26.github.io/images/os-kernel/chapter7/process-state.png">
+<meta property="og:image" content="https://pursue26.github.io/images/os-kernel/chapter7/process-state-transfer-with-suspend.png">
+<meta property="article:published_time" content="2023-12-10T13:13:06.000Z">
+<meta property="article:modified_time" content="2023-12-11T09:56:04.588Z">
+<meta property="article:author" content="aha">
+<meta property="article:tag" content="操作系统">
+<meta property="article:tag" content="进程与线程">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pursue26.github.io/images/os-kernel/chapter7/process-state.png">
+
+
+<link rel="canonical" href="https://pursue26.github.io/posts/231210211306.html">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://pursue26.github.io/posts/231210211306.html","path":"posts/231210211306.html","title":"操作系统之 chapter7.2 进程状态"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>操作系统之 chapter7.2 进程状态 | aha's blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<style>.darkmode--activated{--body-bg-color:#282828;--content-bg-color:#333;--card-bg-color:#555;--text-color:#ccc;--blockquote-color:#bbb;--link-color:#ccc;--link-hover-color:#eee;--brand-color:#ddd;--brand-hover-color:#ddd;--table-row-odd-bg-color:#282828;--table-row-hover-bg-color:#363636;--menu-item-bg-color:#555;--btn-default-bg:#222;--btn-default-color:#ccc;--btn-default-border-color:#555;--btn-default-hover-bg:#666;--btn-default-hover-color:#ccc;--btn-default-hover-border-color:#666;--highlight-background:#282b2e;--highlight-foreground:#a9b7c6;--highlight-gutter-background:#34393d;--highlight-gutter-foreground:#9ca9b6}.darkmode--activated img{opacity:.75}.darkmode--activated img:hover{opacity:.9}.darkmode--activated code{color:#69dbdc;background:0 0}button.darkmode-toggle{z-index:9999}.darkmode-ignore,img{display:flex!important}.beian img{display:inline-block!important}</style></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">aha's blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-dailyblog"><a href="/random.html" rel="section"><i class="fa fa-file fa-fw"></i>每日博客</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%BF%9B%E7%A8%8B%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E7%AE%A1%E7%90%86"><span class="nav-number">1.</span> <span class="nav-text">进程的生命周期管理 </span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%9B%E7%A8%8B%E5%88%9B%E5%BB%BA"><span class="nav-number">1.1.</span> <span class="nav-text">进程创建 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%9B%E7%A8%8B%E5%B0%B1%E7%BB%AA"><span class="nav-number">1.2.</span> <span class="nav-text">进程就绪 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%9B%E7%A8%8B%E8%BF%90%E8%A1%8C"><span class="nav-number">1.3.</span> <span class="nav-text">进程运行 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%9B%E7%A8%8B%E7%AD%89%E5%BE%85%EF%BC%88%E9%98%BB%E5%A1%9E%EF%BC%89"><span class="nav-number">1.4.</span> <span class="nav-text">进程等待（阻塞）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%9B%E7%A8%8B%E5%94%A4%E9%86%92"><span class="nav-number">1.5.</span> <span class="nav-text">进程唤醒 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%9B%E7%A8%8B%E7%BB%93%E6%9D%9F"><span class="nav-number">1.6.</span> <span class="nav-text">进程结束 </span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%BF%9B%E7%A8%8B%E7%8A%B6%E6%80%81%E5%8F%98%E5%8C%96%E6%A8%A1%E5%9E%8B"><span class="nav-number">2.</span> <span class="nav-text">进程状态变化模型 </span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E7%A7%8D%E5%9F%BA%E6%9C%AC%E7%8A%B6%E6%80%81"><span class="nav-number">2.1.</span> <span class="nav-text"> 三种基本状态 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B6%E5%AE%83%E5%9F%BA%E6%9C%AC%E7%8A%B6%E6%80%81"><span class="nav-number">2.2.</span> <span class="nav-text">其它基本状态 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%9B%E7%A8%8B%E7%8A%B6%E6%80%81%E5%8F%98%E5%8C%96"><span class="nav-number">2.3.</span> <span class="nav-text">进程状态变化</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%BF%9B%E7%A8%8B%E6%8C%82%E8%B5%B7%E6%A8%A1%E5%9E%8B"><span class="nav-number">3.</span> <span class="nav-text">进程挂起模型 </span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%9B%E7%A8%8B%E6%8C%82%E8%B5%B7"><span class="nav-number">3.1.</span> <span class="nav-text"> 进程挂起 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%A4%E7%A7%8D%E6%8C%82%E8%B5%B7%E7%8A%B6%E6%80%81"><span class="nav-number">3.2.</span> <span class="nav-text">两种挂起状态</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8E%E6%8C%82%E8%B5%B7%E7%9B%B8%E5%85%B3%E7%9A%84%E7%8A%B6%E6%80%81%E8%BD%AC%E6%8D%A2"><span class="nav-number">3.3.</span> <span class="nav-text">与挂起相关的状态转换 </span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%9B%E7%A8%8B%E5%A4%84%E4%BA%8E%E5%86%85%E5%AD%98%E6%97%B6%E7%9A%84%E6%8C%82%E8%B5%B7"><span class="nav-number">3.3.1.</span> <span class="nav-text">进程处于内存时的挂起 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%9B%E7%A8%8B%E5%A4%84%E4%BA%8E%E5%A4%96%E5%AD%98%E6%97%B6%E7%9A%84%E6%8C%82%E8%B5%B7"><span class="nav-number">3.3.2.</span> <span class="nav-text">进程处于外存时的挂起 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%A3%E6%8C%82%EF%BC%88%E6%BF%80%E6%B4%BB%EF%BC%89"><span class="nav-number">3.3.3.</span> <span class="nav-text">解挂（激活）</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%8A%B6%E6%80%81%E9%98%9F%E5%88%97"><span class="nav-number">4.</span> <span class="nav-text">状态队列 </span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">aha</p>
+  <div class="site-description" itemprop="description">经历一个过程然后成为更好的自己</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">71</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">43</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">85</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://pursue26.github.io/posts/231210211306.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="aha">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="aha's blog">
+      <meta itemprop="description" content="经历一个过程然后成为更好的自己">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="操作系统之 chapter7.2 进程状态 | aha's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          操作系统之 chapter7.2 进程状态
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+  
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2023-12-10 21:13:06" itemprop="dateCreated datePublished" datetime="2023-12-10T21:13:06+08:00">2023-12-10</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2023-12-11 17:56:04" itemprop="dateModified" datetime="2023-12-11T17:56:04+08:00">2023-12-11</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" itemprop="url" rel="index"><span itemprop="name">操作系统</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E8%BF%9B%E7%A8%8B%E4%B8%8E%E7%BA%BF%E7%A8%8B/" itemprop="url" rel="index"><span itemprop="name">进程与线程</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>3.2k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>6 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>进程是一个具有一定独立功能的 <strong> 程序 </strong> 在一个 <strong> 数据集合 </strong> 上的 <strong> 一次动态执行 </strong> 过程。</p>
+<p>本文是进程与线程的第二部分，主要介绍进程的状态，包括进程的生命周期管理、进程状态变化模型和进程挂起模型，以及操作系统如何管理进程的状态队列。</p>
+<span id="more"></span>
+
+<h1 id="进程的生命周期管理"><a href="# 进程的生命周期管理" class="headerlink" title="进程的生命周期管理"></a>进程的生命周期管理 </h1><p> 一个进程的生命周期包括：进程的创建、就绪、运行、等待（阻塞）、终止。</p>
+<h2 id="进程创建"><a href="# 进程创建" class="headerlink" title="进程创建"></a>进程创建 </h2><p> 引起进程创建的 3 个主要事件：</p>
+<ul>
+<li>系统初始化（创建出计算机的首个进程）；</li>
+<li>用户请求创建一个新进程；</li>
+<li>正在运行的进程执行了创建进程的系统调用。</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">P_create</span><br></pre></td></tr></table></figure>
+
+<h2 id="进程就绪"><a href="# 进程就绪" class="headerlink" title="进程就绪"></a>进程就绪 </h2><p> 一个进程被创建完成后，便会进入就绪状态，等待操作系统的调度执行。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">P_create -&gt; P_ready</span><br></pre></td></tr></table></figure>
+
+<h2 id="进程运行"><a href="# 进程运行" class="headerlink" title="进程运行"></a>进程运行 </h2><p> 内核选择一个 <strong> 就绪 </strong> 的进程，让它占用 CPU 并执行。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">P_create -&gt; P_ready -&gt; P_running</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>计算机有那么多进程呢，操作系统如何选择进程？又为何选择这个进程？这由后续要讲解的调度算法控制！</p>
+</blockquote>
+<h2 id="进程等待（阻塞）"><a href="# 进程等待（阻塞）" class="headerlink" title="进程等待（阻塞）"></a>进程等待（阻塞）</h2><p>在以下情况下，进程等待（阻塞）：</p>
+<ul>
+<li>请求并等待系统服务，无法马上完成；</li>
+<li>启动某种操作，无法马上完成；</li>
+<li>需要的数据没有到达。</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">P_create -&gt; P_ready -&gt; P_running</span><br><span class="line">                           ↓</span><br><span class="line">                       P_waiting</span><br></pre></td></tr></table></figure>
+
+<p><strong>进程只能自己阻塞自己</strong>，因为只有进程自身才能知道何时需要等待某种事件的发生。</p>
+<h2 id="进程唤醒"><a href="# 进程唤醒" class="headerlink" title="进程唤醒"></a>进程唤醒 </h2><p> 唤醒进程的原因：</p>
+<ul>
+<li>被阻塞进程需要的资源可被满足；</li>
+<li>被阻塞进程等待的事件到达；</li>
+<li>将该进程的 PCB 插入到就绪队列。</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">P_create -&gt; P_ready -&gt; P_running</span><br><span class="line">               ↑           ↓</span><br><span class="line">               &lt;------ P_waiting</span><br></pre></td></tr></table></figure>
+
+<p>被唤醒的进程将进入就绪状态，<strong>进程只能被别的进程或操作系统唤醒</strong>。</p>
+<h2 id="进程结束"><a href="# 进程结束" class="headerlink" title="进程结束"></a>进程结束 </h2><p> 在以下四种情况下，进程结束：</p>
+<ul>
+<li>正常退出（自愿的）；</li>
+<li>错误退出（自愿的）；</li>
+<li>致命错误（强制性的）；</li>
+<li>被其他进程所杀死（强制性的）。</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">P_create -&gt; P_ready -&gt; P_running -&gt; Exit</span><br><span class="line">               ↑           ↓</span><br><span class="line">               &lt;------ P_waiting</span><br></pre></td></tr></table></figure>
+
+<h1 id="进程状态变化模型"><a href="# 进程状态变化模型" class="headerlink" title="进程状态变化模型"></a>进程状态变化模型 </h1><h2 id="三种基本状态"><a href="# 三种基本状态" class="headerlink" title="三种基本状态"></a> 三种基本状态 </h2><p> 进程的三种基本状态（进程在生命结束前处于三种基本状态之一）：</p>
+<ul>
+<li>运行状态（Running）：当一个进程正在 CPU 上运行时。</li>
+<li>就绪状态（Ready）：一个进程获得了除 CPU 之外的一切所需资源，一旦得到 CPU 便可运行。</li>
+<li>等待（阻塞）状态（Waiting/Blocked）：一个进程正在等待某一事件而暂停运行时。如等待某资源、等待输入 / 输出完成。</li>
+</ul>
+<blockquote>
+<p>不同操作系统设置的进程状态数目可能不同。</p>
+</blockquote>
+<h2 id="其它基本状态"><a href="# 其它基本状态" class="headerlink" title="其它基本状态"></a>其它基本状态 </h2><p> 进程其它的基本状态：</p>
+<ul>
+<li>创建状态（New）：一个进程正在被创建，还没被转到就绪状态之前的状态；</li>
+<li>结束状态（Exit）： 一个进程正在从系统中消失时的状态。</li>
+</ul>
+<h2 id="进程状态变化"><a href="# 进程状态变化" class="headerlink" title="进程状态变化"></a>进程状态变化</h2><img src="/images/os-kernel/chapter7/process-state.png" alt="进程状态变化图" width="60%" height="60%">
+
+<p>进程可能的状态变化如下：</p>
+<ul>
+<li><code>NULL -&gt; New</code>：一个新进程被产生出来执行一个程序。</li>
+<li><code>New -&gt; Ready</code>：当进程创建并并初始化完成后，一切就绪准备运行时，变为就绪状态。<ul>
+<li>该变化过程是否会持续很久？很快。</li>
+</ul>
+</li>
+<li><code>Ready -&gt; Running</code>：处于就绪态的进程被进程调度程序选中后，就分配到 CPU 上来运行。</li>
+<li><code>Running -&gt; Exit</code>：当进程表示它已经完成或者发生异常，当前运行的进程会由操作系统作结束处理。</li>
+<li><code>Running -&gt; Ready</code>：处于运行状态的进程在其运行过程中，<strong>由于分配它的 CPU 时间片用完而让出 CPU，或者当一个高优先级的进程就绪时，操作系统可能会抢占当前正在运行的低优先级进程，并将其切换到就绪态，以便优先执行高优先级进程</strong>。</li>
+<li><code>Running -&gt; Blocked</code>：当进程请求某个事件且必须等待时。<ul>
+<li>例如，等待一个计时器的到达、读 / 写文件比较慢等。</li>
+</ul>
+</li>
+<li><code>Blocked -&gt; Ready</code>：当进程等待到某个事件到来时，它从阻塞状态变到就绪状态。</li>
+</ul>
+<h1 id="进程挂起模型"><a href="# 进程挂起模型" class="headerlink" title="进程挂起模型"></a>进程挂起模型 </h1><h2 id="进程挂起"><a href="# 进程挂起" class="headerlink" title="进程挂起"></a> 进程挂起 </h2><p> 进程挂起（suspend）是指操作系统进程管理将前台的进程暂停并转入后台的动作。将进程挂起可以让用户在前台执行其他的进程。挂起的进程通常释放除 CPU 以外已经占有的系统资源，如内存等。在需要时用户可以恢复进程的运行，将被挂起的进程从后台转入前台，并从暂停处开始继续运行。（Wikipedia）</p>
+<p>进程挂起：为了合理且充分地利用系统资源。</p>
+<p>进程在挂起状态时，意味着进程 <strong> 没有占用内存空间</strong>，处在挂起状态的进程映像在磁盘上（把进程放到磁盘上）。</p>
+<h2 id="两种挂起状态"><a href="# 两种挂起状态" class="headerlink" title="两种挂起状态"></a>两种挂起状态</h2><ul>
+<li><strong>阻塞挂起状态</strong>：进程在外存，并等待某事件的出现。</li>
+<li><strong>就绪挂起状态</strong>：进程在外村，但只要进入内存，即可运行。</li>
+</ul>
+<h2 id="与挂起相关的状态转换"><a href="# 与挂起相关的状态转换" class="headerlink" title="与挂起相关的状态转换"></a>与挂起相关的状态转换 </h2><p> 带有挂起状态的进程状态转移模型：</p>
+<img src="/images/os-kernel/chapter7/process-state-transfer-with-suspend.png" alt="带有挂起状态的进程状态转移模型" width="80%" height="80%">
+
+<p>可以将挂起状态间的转化分为两类，<strong>一类是进程处于内存中时发生的挂起，另一类是进程处于外存时的挂起</strong>。</p>
+<h3 id="进程处于内存时的挂起"><a href="# 进程处于内存时的挂起" class="headerlink" title="进程处于内存时的挂起"></a>进程处于内存时的挂起 </h3><p><strong> 阻塞 -&gt; 阻塞挂起</strong>：</p>
+<ul>
+<li>条件：当没有进程处于就绪状态（即没有可以立即执行的进程）或者就绪进程需要更多的内存资源时，系统会进行阻塞挂起的转换。</li>
+<li>目的：为了让其他进程先执行，以便提交新进程或者为就绪进程提供所需的内存资源。换句话说，系统会将当前的进程暂时停止执行，以满足其他进程的需求，直到满足某种条件后再重新唤醒该进程。</li>
+</ul>
+<p><strong>就绪 -&gt; 就绪挂起</strong>：</p>
+<ul>
+<li>条件：当有高优先级阻塞（系统认为会很快就绪的）进程和低优先级就绪进程时，系统会选择挂起低优先级就绪进程。</li>
+<li>目的：让优先级更高的进程得到更多的资源运行。</li>
+</ul>
+<blockquote>
+<p>通常，<strong>操作系统更倾向于挂起阻塞态进程而不是就绪态进程 </strong>，因为就绪态进程可以立即执行，而阻塞态进程占用了内存空间但不能立即执行。<br> 但是，如果释放内存以得到足够空间的 <strong> 唯一方法 </strong> 是挂起一个就绪态进程的话，那么这种转换也是必需的；并且，如果操作系统确信高优先级的阻塞态进程很快就会就绪，那么它可能选择挂起一个低优先级的就绪态进程，而不是一个高优先级的阻塞态进程。</p>
+</blockquote>
+<p><strong>运行 -&gt; 就绪挂起</strong>：</p>
+<ul>
+<li>条件：对抢先式分时系统（即可抢占 CPU 资源），当有高优先级阻塞挂起进程因事件出现而进入就绪挂起时，系统可能会把运行进程转到就绪挂起状态。</li>
+<li>目的：让优先级更高的进程得到更多的资源运行。</li>
+</ul>
+<h3 id="进程处于外存时的挂起"><a href="# 进程处于外存时的挂起" class="headerlink" title="进程处于外存时的挂起"></a>进程处于外存时的挂起 </h3><p><strong> 阻塞挂起 -&gt; 就绪挂起</strong>：</p>
+<p>条件：当有阻塞挂起因相关事件出现时，系统会把阻塞挂起进程转换为就绪挂起进程。</p>
+<h3 id="解挂（激活）"><a href="# 解挂（激活）" class="headerlink" title="解挂（激活）"></a>解挂（激活）</h3><p>既然有将内存中的进程挂起到外存的，那么也会有解挂重新激活进程的操作：即将一个进程从外存转到内存。</p>
+<p><strong>就绪挂起 -&gt; 就绪态</strong>：</p>
+<p>条件：内存中没有就绪进程，或挂起的就绪进程优先级高于内存中的就绪进程时，会进行这种转换。但一般情况下也会发生这种转换，不一定是上述两种条件。</p>
+<p><strong>阻塞挂起 -&gt; 阻塞态</strong>：</p>
+<p>条件：当一个进程释放足够内存时，系统会把一个高优先级阻塞挂起（系统认为会很快出现所等待的事件）进程转换为阻塞进程。</p>
+<h1 id="状态队列"><a href="# 状态队列" class="headerlink" title="状态队列"></a>状态队列 </h1><p> 状态队列（State Queue）是操作系统中用于管理进程状态的数据结构，用于存储不同状态的进程。</p>
+<p><strong>状态队列</strong>：</p>
+<ul>
+<li>由操作系统来维护 <strong> 一组 </strong> 队列，用来表示系统当中所有进程的当前状态；</li>
+<li>不同的状态分别用不同的队列来表示，如就绪队列、各种类型的阻塞队列；</li>
+<li>每个进程的 PCB 都根据它的状态加入到相应的队列当中，当一个进程的状态发生变化时，它的 PCB 从一个状态队列中脱离出来，加入到另外一个状态队列中。</li>
+</ul>
+<p><strong>OS 如何通过 PCB 和定义的进程状态来管理和调度进程的</strong>？</p>
+<ol>
+<li>将进程根据其状态放入对应的队列中。</li>
+<li>根据调度算法从就绪队列中选择一个进程进行执行。</li>
+<li>将选中的进程的 PCB 信息加载到 CPU 寄存器中，设置进程状态为运行态。</li>
+<li>执行选中的进程，根据需要进行上下文切换。</li>
+<li>如果进程遇到事件（如等待 I/O 完成），将进程状态设置为阻塞态，记录事件信息到 PCB 中。</li>
+<li>当事件发生后，将进程状态设置为就绪态，将其放回就绪队列中等待调度。</li>
+<li>重复步骤 2 至步骤 6，实现多任务的并发执行和合理的进程调度。</li>
+</ol>
+<blockquote>
+<p>上述过程由 GPT 生成，仅供参考。</p>
+</blockquote>
+<blockquote>
+<p>参考资料：<br>1：<a target="_blank" rel="noopener" href="https://github.com/OXygenMoon/OperatingSystemInDepth">https://github.com/OXygenMoon/OperatingSystemInDepth</a><br>2：<a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_53407527/article/details/125027431">https://blog.csdn.net/weixin_53407527/article/details/125027431</a></p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" rel="tag"># 操作系统</a>
+              <a href="/tags/%E8%BF%9B%E7%A8%8B%E4%B8%8E%E7%BA%BF%E7%A8%8B/" rel="tag"># 进程与线程</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/231210181853.html" rel="prev" title="计算机中的寄存器">
+                  <i class="fa fa-angle-left"></i> 计算机中的寄存器
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/231211184652.html" rel="next" title="LeetCode 刷题之 1631 最小体力消耗路径">
+                  LeetCode 刷题之 1631 最小体力消耗路径 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2023</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">aha</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">299k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">9:05</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+</div>
+  <div class="powered-by">
+    <!--由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动 -->
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script size="150" alpha="0.6" zIndex="-1" src="https://cdnjs.cloudflare.com/ajax/libs/ribbon.js/1.0.2/ribbon.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/next-theme-pjax/0.6.0/pjax.min.js" integrity="sha256-vxLn1tSKWD4dqbMRyv940UYw4sXgMtYcK6reefzZrao=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script><script src="/js/pjax.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+  <script data-pjax async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+<script src="https://unpkg.com/darkmode-js@1.5.7/lib/darkmode-js.min.js"></script>
+
+<script>
+var options = {
+  bottom: '64px',
+  right: 'unset',
+  left: '32px',
+  time: '0.5s',
+  mixColor: 'transparent',
+  backgroundColor: 'transparent',
+  buttonColorDark: '#3F3F3F',
+  buttonColorLight: '#fff',
+  saveInCookies: true,
+  label: '🌓',
+  autoMatchOsTheme: true
+}
+const darkmode = new Darkmode(options);
+window.darkmode = darkmode;
+darkmode.showWidget();
+</script>
+
+</body>
+</html>

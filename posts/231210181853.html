@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha256-HtsXJanqjKTc8vVQjO4YMhiqFoXkfBsjBWcX91T1jr8=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pursue26.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.18.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":null},"fold":{"enable":true,"height":300},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="在计算机中，寄存器是一种小型而快速的存储器件，用于存储处理器需要快速访问的数据。它们是计算机体系结构中的关键组成部分，对于计算机的性能和功能至关重要。  计算机体系结构：CPU + 内存 + 外设。其中，CPU 内部包括控制器、寄存器、cache 和 MMU 等。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="计算机中的寄存器">
+<meta property="og:url" content="https://pursue26.github.io/posts/231210181853.html">
+<meta property="og:site_name" content="aha&#39;s blog">
+<meta property="og:description" content="在计算机中，寄存器是一种小型而快速的存储器件，用于存储处理器需要快速访问的数据。它们是计算机体系结构中的关键组成部分，对于计算机的性能和功能至关重要。  计算机体系结构：CPU + 内存 + 外设。其中，CPU 内部包括控制器、寄存器、cache 和 MMU 等。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-12-10T10:18:53.000Z">
+<meta property="article:modified_time" content="2023-12-11T10:48:00.105Z">
+<meta property="article:author" content="aha">
+<meta property="article:tag" content="寄存器">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://pursue26.github.io/posts/231210181853.html">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://pursue26.github.io/posts/231210181853.html","path":"posts/231210181853.html","title":"计算机中的寄存器"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>计算机中的寄存器 | aha's blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<style>.darkmode--activated{--body-bg-color:#282828;--content-bg-color:#333;--card-bg-color:#555;--text-color:#ccc;--blockquote-color:#bbb;--link-color:#ccc;--link-hover-color:#eee;--brand-color:#ddd;--brand-hover-color:#ddd;--table-row-odd-bg-color:#282828;--table-row-hover-bg-color:#363636;--menu-item-bg-color:#555;--btn-default-bg:#222;--btn-default-color:#ccc;--btn-default-border-color:#555;--btn-default-hover-bg:#666;--btn-default-hover-color:#ccc;--btn-default-hover-border-color:#666;--highlight-background:#282b2e;--highlight-foreground:#a9b7c6;--highlight-gutter-background:#34393d;--highlight-gutter-foreground:#9ca9b6}.darkmode--activated img{opacity:.75}.darkmode--activated img:hover{opacity:.9}.darkmode--activated code{color:#69dbdc;background:0 0}button.darkmode-toggle{z-index:9999}.darkmode-ignore,img{display:flex!important}.beian img{display:inline-block!important}</style></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">aha's blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-dailyblog"><a href="/random.html" rel="section"><i class="fa fa-file fa-fw"></i>每日博客</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E5%AF%84%E5%AD%98%E5%99%A8%EF%BC%9F"><span class="nav-number">1.</span> <span class="nav-text">什么是寄存器？</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AF%84%E5%AD%98%E5%99%A8%E7%9A%84%E4%BD%9C%E7%94%A8"><span class="nav-number">2.</span> <span class="nav-text">寄存器的作用 </span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8F%90%E9%AB%98%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%9A%84%E6%80%A7%E8%83%BD"><span class="nav-number">2.1.</span> <span class="nav-text">提高计算机的性能 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%98%E5%82%A8%E5%A4%84%E7%90%86%E5%99%A8%E9%9C%80%E8%A6%81%E5%BF%AB%E9%80%9F%E8%AE%BF%E9%97%AE%E7%9A%84%E6%95%B0%E6%8D%AE"><span class="nav-number">2.2.</span> <span class="nav-text">存储处理器需要快速访问的数据 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%98%E5%82%A8%E5%87%BD%E6%95%B0%E8%B0%83%E7%94%A8%E6%97%B6%E7%9A%84%E5%8F%82%E6%95%B0%E5%92%8C%E8%BF%94%E5%9B%9E%E5%80%BC"><span class="nav-number">2.3.</span> <span class="nav-text">存储函数调用时的参数和返回值 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%98%E5%82%A8%E4%B8%AD%E9%97%B4%E8%AE%A1%E7%AE%97%E7%BB%93%E6%9E%9C"><span class="nav-number">2.4.</span> <span class="nav-text">存储中间计算结果 </span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AF%84%E5%AD%98%E5%99%A8%E7%9A%84%E7%A7%8D%E7%B1%BB"><span class="nav-number">3.</span> <span class="nav-text">寄存器的种类 </span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A8%8B%E5%BA%8F%E8%AE%A1%E6%95%B0%E5%99%A8%EF%BC%88PC%EF%BC%89"><span class="nav-number">3.1.</span> <span class="nav-text"> 程序计数器（PC）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8C%87%E4%BB%A4%E5%AF%84%E5%AD%98%E5%99%A8%EF%BC%88IR%EF%BC%89"><span class="nav-number">3.2.</span> <span class="nav-text">指令寄存器（IR）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%8A%B6%E6%80%81%E5%AF%84%E5%AD%98%E5%99%A8%EF%BC%88SR%EF%BC%89"><span class="nav-number">3.3.</span> <span class="nav-text">状态寄存器（SR）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%80%9A%E7%94%A8%E5%AF%84%E5%AD%98%E5%99%A8"><span class="nav-number">3.4.</span> <span class="nav-text">通用寄存器 </span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B4%AF%E5%8A%A0%E5%99%A8%EF%BC%88ACC%EF%BC%89"><span class="nav-number">3.4.1.</span> <span class="nav-text">累加器（ACC）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E5%AF%84%E5%AD%98%E5%99%A8%EF%BC%88DR%EF%BC%89"><span class="nav-number">3.4.2.</span> <span class="nav-text">数据寄存器（DR）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9C%B0%E5%9D%80%E5%AF%84%E5%AD%98%E5%99%A8%EF%BC%88AR%EF%BC%89"><span class="nav-number">3.5.</span> <span class="nav-text">地址寄存器（AR）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A0%86%E6%A0%88%E6%8C%87%E9%92%88%E5%AF%84%E5%AD%98%E5%99%A8%EF%BC%88SP%EF%BC%89"><span class="nav-number">3.6.</span> <span class="nav-text">堆栈指针寄存器（SP）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E5%9D%80%E5%AF%84%E5%AD%98%E5%99%A8%EF%BC%88BR%EF%BC%89"><span class="nav-number">3.7.</span> <span class="nav-text">基址寄存器（BR）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%81%8F%E7%A7%BB%E5%AF%84%E5%AD%98%E5%99%A8%EF%BC%88OR%EF%BC%89"><span class="nav-number">3.8.</span> <span class="nav-text">偏移寄存器（OR）</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AF%84%E5%AD%98%E5%99%A8%E5%88%86%E7%B1%BB%E6%80%BB%E7%BB%93"><span class="nav-number">4.</span> <span class="nav-text">寄存器分类总结</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">aha</p>
+  <div class="site-description" itemprop="description">经历一个过程然后成为更好的自己</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">71</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">43</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">85</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://pursue26.github.io/posts/231210181853.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="aha">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="aha's blog">
+      <meta itemprop="description" content="经历一个过程然后成为更好的自己">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="计算机中的寄存器 | aha's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          计算机中的寄存器
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+  
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2023-12-10 18:18:53" itemprop="dateCreated datePublished" datetime="2023-12-10T18:18:53+08:00">2023-12-10</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2023-12-11 18:48:00" itemprop="dateModified" datetime="2023-12-11T18:48:00+08:00">2023-12-11</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/" itemprop="url" rel="index"><span itemprop="name">计算机基础</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>1.8k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>3 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>在计算机中，寄存器是一种 <strong> 小型而快速的存储器件 </strong>，用于存储处理器需要<strong> 快速访问 </strong> 的数据。它们是计算机体系结构中的关键组成部分，对于计算机的性能和功能至关重要。</p>
+<blockquote>
+<p>计算机体系结构：CPU + 内存 + 外设。其中，CPU 内部包括控制器、寄存器、cache 和 MMU 等。</p>
+</blockquote>
+<span id="more"></span>
+
+<h1 id="什么是寄存器？"><a href="# 什么是寄存器？" class="headerlink" title="什么是寄存器？"></a>什么是寄存器？</h1><p>在计算机中，寄存器是一种 <strong> 小型而快速的存储器件 </strong>，用于存储处理器需要<strong> 快速访问 </strong> 的数据。它们是计算机体系结构中的一部分，<strong>通常被集成在处理器芯片中</strong>。寄存器是计算机中最快的存储器件之一，它们的访问速度比主存储器和辅助存储器要快得多。</p>
+<p><strong>寄存器通常被用于存储处理器需要快速访问的数据</strong>，如程序计数器、指令寄存器、状态寄存器、通用寄存器等。它们还可以用于存储函数调用时的参数和返回值，以及存储中间计算结果等。</p>
+<h1 id="寄存器的作用"><a href="# 寄存器的作用" class="headerlink" title="寄存器的作用"></a>寄存器的作用 </h1><p> 寄存器在计算机中有许多重要的作用。以下是其中的一些：</p>
+<h2 id="提高计算机的性能"><a href="# 提高计算机的性能" class="headerlink" title="提高计算机的性能"></a>提高计算机的性能 </h2><p> 寄存器是计算机中最快的存储器件之一，它们的访问速度比主存储器和辅助存储器要快得多。因此，<strong>将需要快速访问的数据存储在寄存器中可以大大提高计算机的性能</strong>。</p>
+<h2 id="存储处理器需要快速访问的数据"><a href="# 存储处理器需要快速访问的数据" class="headerlink" title="存储处理器需要快速访问的数据"></a>存储处理器需要快速访问的数据 </h2><p> 处理器需要快速访问的数据通常存储在寄存器中，如程序计数器、指令寄存器、状态寄存器、通用寄存器等。这些数据对于处理器的运行至关重要，因此它们需要快速访问。</p>
+<h2 id="存储函数调用时的参数和返回值"><a href="# 存储函数调用时的参数和返回值" class="headerlink" title="存储函数调用时的参数和返回值"></a>存储函数调用时的参数和返回值 </h2><p> 在<strong>函数调用时，参数和返回值通常存储在寄存器中 </strong>。这是因为寄存器的访问速度比主存储器要快得多，可以<strong> 提高函数调用的效率</strong>。</p>
+<h2 id="存储中间计算结果"><a href="# 存储中间计算结果" class="headerlink" title="存储中间计算结果"></a>存储中间计算结果 </h2><p> 在计算机中，一些中间计算结果需要被存储下来以便后续使用。这些中间计算结果通常存储在寄存器中，因为寄存器的访问速度比主存储器要快得多。</p>
+<h1 id="寄存器的种类"><a href="# 寄存器的种类" class="headerlink" title="寄存器的种类"></a>寄存器的种类 </h1><h2 id="程序计数器（PC）"><a href="# 程序计数器（PC）" class="headerlink" title="程序计数器（PC）"></a> 程序计数器（PC）</h2><p>程序计数器是一种特殊的寄存器，用于存储下一条要执行的指令的内存地址。当处理器执行程序时，它会不断地从程序计数器中读取指令并执行它们。</p>
+<h2 id="指令寄存器（IR）"><a href="# 指令寄存器（IR）" class="headerlink" title="指令寄存器（IR）"></a>指令寄存器（IR）</h2><p>指令寄存器是一种特殊的寄存器，用于存储当前正在执行的指令。<strong>处理器从指令寄存器中读取指令并执行它们</strong>。</p>
+<blockquote>
+<p>（个人理解）程序计数器和指令寄存器共同完成对下一条指令的执行。首先，CPU 通过程序计数器获取下一条将要执行的指令的内存地址；然后，CPU 通过这个内存地址，从内存中读取指令数据，并将其二进制表示存储在指令寄存器中；最后，控制器解析并执行指令寄存器中的指令。</p>
+</blockquote>
+<h2 id="状态寄存器（SR）"><a href="# 状态寄存器（SR）" class="headerlink" title="状态寄存器（SR）"></a>状态寄存器（SR）</h2><p>状态寄存器是一种特殊的寄存器，用于存储处理器的状态信息。状态寄存器中的不同「位」表示了处理器的不同状态，如进位标志、零标志、负数标志等。</p>
+<h2 id="通用寄存器"><a href="# 通用寄存器" class="headerlink" title="通用寄存器"></a>通用寄存器 </h2><p> 通用寄存器是一种通用的寄存器，<strong>用于存储处理器需要快速访问的数据</strong>。它们可以用于存储函数调用时的参数和返回值，以及存储中间计算结果等。</p>
+<h3 id="累加器（ACC）"><a href="# 累加器（ACC）" class="headerlink" title="累加器（ACC）"></a>累加器（ACC）</h3><p>累加器是一种比较特殊的通用寄存器，用于存储算术和逻辑操作的结果。</p>
+<h3 id="数据寄存器（DR）"><a href="# 数据寄存器（DR）" class="headerlink" title="数据寄存器（DR）"></a>数据寄存器（DR）</h3><p>数据寄存器是一种通用寄存器，用于存储计算机中的数据。它可以用于暂时存储从内存中读取的数据，或者存储需要写入内存的数据。</p>
+<h2 id="地址寄存器（AR）"><a href="# 地址寄存器（AR）" class="headerlink" title="地址寄存器（AR）"></a>地址寄存器（AR）</h2><p>地址寄存器是一种特殊的寄存器，用于存储内存地址。它通常用于指示将要读取或写入数据的内存位置。</p>
+<h2 id="堆栈指针寄存器（SP）"><a href="# 堆栈指针寄存器（SP）" class="headerlink" title="堆栈指针寄存器（SP）"></a>堆栈指针寄存器（SP）</h2><p>堆栈指针寄存器是一种特殊的寄存器，用于指示栈顶的位置。栈是一种常用的数据结构，用于存储临时数据、函数调用的参数和返回地址等。</p>
+<h2 id="基址寄存器（BR）"><a href="# 基址寄存器（BR）" class="headerlink" title="基址寄存器（BR）"></a>基址寄存器（BR）</h2><p>基址寄存器是一种特殊的寄存器，用于存储数据段的基地址。它通常与偏移寄存器配合使用，用于计算实际内存地址。</p>
+<h2 id="偏移寄存器（OR）"><a href="# 偏移寄存器（OR）" class="headerlink" title="偏移寄存器（OR）"></a>偏移寄存器（OR）</h2><p>偏移寄存器是一种特殊的寄存器，用于存储相对于基址的偏移量。它通常与基址寄存器配合使用，用于计算实际内存地址。</p>
+<blockquote>
+<p>通用寄存器和特殊寄存器的区别：通用寄存器用于存储数据和中间结果，具有灵活的使用方式；而特殊寄存器具有特定的用途，功能固定，不能直接访问或修改其内容。</p>
+</blockquote>
+<h1 id="寄存器分类总结"><a href="# 寄存器分类总结" class="headerlink" title="寄存器分类总结"></a>寄存器分类总结</h1><table>
+<thead>
+<tr>
+<th>寄存器名</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>程序计数器（PC）</td>
+<td>存储下一条要执行的指令的内存地址</td>
+</tr>
+<tr>
+<td>指令寄存器（IR）</td>
+<td>存储当前正在执行的指令</td>
+</tr>
+<tr>
+<td>状态寄存器（SR）</td>
+<td>存储计算机的运行状态和控制信息</td>
+</tr>
+<tr>
+<td>累加器（ACC）</td>
+<td>存储算术和逻辑操作的结果</td>
+</tr>
+<tr>
+<td>数据寄存器（DR）</td>
+<td>存储计算机中的数据</td>
+</tr>
+<tr>
+<td>地址寄存器（AR）</td>
+<td>存储内存地址</td>
+</tr>
+<tr>
+<td>堆栈指针寄存器（SP）</td>
+<td>指示栈顶位置</td>
+</tr>
+<tr>
+<td>基址寄存器（BR）</td>
+<td>存储数据段的基地址</td>
+</tr>
+<tr>
+<td>偏移寄存器（OR）</td>
+<td>存储相对于基址的偏移量</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>参考资料：<a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_73567058/article/details/130185612">https://blog.csdn.net/weixin_73567058/article/details/130185612</a></p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%AF%84%E5%AD%98%E5%99%A8/" rel="tag"># 寄存器</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/231207204958.html" rel="prev" title="操作系统之 chapter7.1 进程描述">
+                  <i class="fa fa-angle-left"></i> 操作系统之 chapter7.1 进程描述
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/231210211306.html" rel="next" title="操作系统之 chapter7.2 进程状态">
+                  操作系统之 chapter7.2 进程状态 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2023</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">aha</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">299k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">9:05</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+</div>
+  <div class="powered-by">
+    <!--由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动 -->
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script size="150" alpha="0.6" zIndex="-1" src="https://cdnjs.cloudflare.com/ajax/libs/ribbon.js/1.0.2/ribbon.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/next-theme-pjax/0.6.0/pjax.min.js" integrity="sha256-vxLn1tSKWD4dqbMRyv940UYw4sXgMtYcK6reefzZrao=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script><script src="/js/pjax.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+  <script data-pjax async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+<script src="https://unpkg.com/darkmode-js@1.5.7/lib/darkmode-js.min.js"></script>
+
+<script>
+var options = {
+  bottom: '64px',
+  right: 'unset',
+  left: '32px',
+  time: '0.5s',
+  mixColor: 'transparent',
+  backgroundColor: 'transparent',
+  buttonColorDark: '#3F3F3F',
+  buttonColorLight: '#fff',
+  saveInCookies: true,
+  label: '🌓',
+  autoMatchOsTheme: true
+}
+const darkmode = new Darkmode(options);
+window.darkmode = darkmode;
+darkmode.showWidget();
+</script>
+
+</body>
+</html>

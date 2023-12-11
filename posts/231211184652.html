@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha256-HtsXJanqjKTc8vVQjO4YMhiqFoXkfBsjBWcX91T1jr8=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pursue26.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.18.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":null},"fold":{"enable":true,"height":300},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="1631 最小体力消耗路径：你准备参加一场远足活动。给你一个二维 rows x cols 的地图 heights ，其中 heights[row][col] 表示格子 (row, col) 的高度。一开始你在最左上角的格子 (0, 0)，且你希望去最右下角的格子 (rows-1, cols-1) （注意下标从 0 开始编号）。你每次可以往上、下、左、右四个方向之一移动，你想要找到耗费体力最小的一条">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LeetCode 刷题之 1631 最小体力消耗路径">
+<meta property="og:url" content="https://pursue26.github.io/posts/231211184652.html">
+<meta property="og:site_name" content="aha&#39;s blog">
+<meta property="og:description" content="1631 最小体力消耗路径：你准备参加一场远足活动。给你一个二维 rows x cols 的地图 heights ，其中 heights[row][col] 表示格子 (row, col) 的高度。一开始你在最左上角的格子 (0, 0)，且你希望去最右下角的格子 (rows-1, cols-1) （注意下标从 0 开始编号）。你每次可以往上、下、左、右四个方向之一移动，你想要找到耗费体力最小的一条">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-12-11T10:46:52.000Z">
+<meta property="article:modified_time" content="2023-12-11T12:09:51.155Z">
+<meta property="article:author" content="aha">
+<meta property="article:tag" content="LeetCode">
+<meta property="article:tag" content="并查集">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://pursue26.github.io/posts/231211184652.html">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://pursue26.github.io/posts/231211184652.html","path":"posts/231211184652.html","title":"LeetCode 刷题之 1631 最小体力消耗路径"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>LeetCode 刷题之 1631 最小体力消耗路径 | aha's blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<style>.darkmode--activated{--body-bg-color:#282828;--content-bg-color:#333;--card-bg-color:#555;--text-color:#ccc;--blockquote-color:#bbb;--link-color:#ccc;--link-hover-color:#eee;--brand-color:#ddd;--brand-hover-color:#ddd;--table-row-odd-bg-color:#282828;--table-row-hover-bg-color:#363636;--menu-item-bg-color:#555;--btn-default-bg:#222;--btn-default-color:#ccc;--btn-default-border-color:#555;--btn-default-hover-bg:#666;--btn-default-hover-color:#ccc;--btn-default-hover-border-color:#666;--highlight-background:#282b2e;--highlight-foreground:#a9b7c6;--highlight-gutter-background:#34393d;--highlight-gutter-foreground:#9ca9b6}.darkmode--activated img{opacity:.75}.darkmode--activated img:hover{opacity:.9}.darkmode--activated code{color:#69dbdc;background:0 0}button.darkmode-toggle{z-index:9999}.darkmode-ignore,img{display:flex!important}.beian img{display:inline-block!important}</style></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">aha's blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-dailyblog"><a href="/random.html" rel="section"><i class="fa fa-file fa-fw"></i>每日博客</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%9D%E8%80%83"><span class="nav-number">1.</span> <span class="nav-text">思考 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%97%AE%E9%A2%98%E8%BD%AC%E6%8D%A2"><span class="nav-number">2.</span> <span class="nav-text">问题转换 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B9%B6%E6%9F%A5%E9%9B%86%E8%A7%A3%E6%B3%95"><span class="nav-number">3.</span> <span class="nav-text">并查集解法 </span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">aha</p>
+  <div class="site-description" itemprop="description">经历一个过程然后成为更好的自己</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">71</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">43</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">85</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://pursue26.github.io/posts/231211184652.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="aha">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="aha's blog">
+      <meta itemprop="description" content="经历一个过程然后成为更好的自己">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="LeetCode 刷题之 1631 最小体力消耗路径 | aha's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          LeetCode 刷题之 1631 最小体力消耗路径
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+  
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2023-12-11 18:46:52 / 修改时间：20:09:51" itemprop="dateCreated datePublished" datetime="2023-12-11T18:46:52+08:00">2023-12-11</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/LeetCode/" itemprop="url" rel="index"><span itemprop="name">LeetCode</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/LeetCode/%E5%B9%B6%E6%9F%A5%E9%9B%86/" itemprop="url" rel="index"><span itemprop="name">并查集</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>4.1k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>8 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/path-with-minimum-effort/description/">1631 最小体力消耗路径</a>：你准备参加一场远足活动。给你一个二维 <code>rows x cols</code> 的地图 <code>heights</code> ，其中 <code>heights[row][col]</code> 表示格子 <code>(row, col)</code> 的高度。一开始你在最左上角的格子 <code>(0, 0)</code>，且你希望去最右下角的格子 <code>(rows-1, cols-1)</code> （注意下标从 <code>0</code> 开始编号）。你每次可以往上、下、左、右四个方向之一移动，你想要找到耗费体力最小的一条路径。</p>
+<p>一条路径耗费的体力值是 <strong> 路径上相邻格子之间高度差的绝对值的最大值 </strong> 决定的。请你返回从左上角走到右下角的最小体力消耗值。</p>
+<span id="more"></span>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">输入：heights = [</span><br><span class="line">    [1,2,1,1,1],</span><br><span class="line">    [1,2,1,2,1],</span><br><span class="line">    [1,2,1,2,1],</span><br><span class="line">    [1,2,1,2,1],</span><br><span class="line">    [1,1,1,2,1]</span><br><span class="line">]</span><br><span class="line">输出：0</span><br><span class="line">解释：按着值为 1 的格子走，不需要消耗任何体力。</span><br></pre></td></tr></table></figure>
+
+<h2 id="思考"><a href="# 思考" class="headerlink" title="思考"></a>思考 </h2><p> 这个题，跟以往常见的移动规则不太一样。<strong>常见的是只能向下、向右移动，而此题可以向四个方向移动</strong>。如果是只能向下、向右移动，那么可以用动态规划解决，其状态转移方程为：</p>
+<p>$$<br>dp[i][j] = min(max(dp[i - 1][j], abs(h[i][j] - h[i - 1][j])), max(dp[i][j - 1], abs(h[i][j] - h[i][j - 1])));<br>$$</p>
+<p>其中，$dp[i][j]$ 表示移动到格子 $(i, j)$ 时消耗的最小体力，它可以从上方的格子到达该格子、也可以从左侧的格子到达该格子。所以 $dp[i][j]$ 会选择两者中体力消耗较少的那个格子作为经过点。</p>
+<p>只能向下、向右移动的动态规划解法如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">minimumEffortPathRightDown</span><span class="params">(<span class="type">int</span>** heights, <span class="type">int</span> heightsSize, <span class="type">int</span>* heightsColSize)</span> &#123;</span><br><span class="line">    <span class="type">int</span> m = heightsSize, n = *heightsColSize;</span><br><span class="line">    <span class="type">int</span> dp[m][n];</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; m; i++) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">0</span>; j &lt; n; j++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (i == <span class="number">0</span> &amp;&amp; j &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                dp[i][j] = fmax(dp[i][j - <span class="number">1</span>], <span class="built_in">fabs</span>(heights[i][j] - heights[i][j - <span class="number">1</span>]));</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (j == <span class="number">0</span> &amp;&amp; i &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                dp[i][j] = fmax(dp[i - <span class="number">1</span>][j], <span class="built_in">fabs</span>(heights[i][j] - heights[i - <span class="number">1</span>][j]));</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (i &gt; <span class="number">0</span> &amp;&amp; j &gt; <span class="number">0</span>)&#123;</span><br><span class="line">                dp[i][j] = fmin(fmax(dp[i - <span class="number">1</span>][j], <span class="built_in">fabs</span>(heights[i][j] - heights[i - <span class="number">1</span>][j])), fmax(dp[i][j - <span class="number">1</span>], <span class="built_in">fabs</span>(heights[i][j] - heights[i][j - <span class="number">1</span>])));</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                dp[<span class="number">0</span>][<span class="number">0</span>] = <span class="number">0</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> dp[m - <span class="number">1</span>][n - <span class="number">1</span>];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="问题转换"><a href="# 问题转换" class="headerlink" title="问题转换"></a>问题转换 </h2><p> 我们可以将本题抽象成如下的一个 <strong> 图论模型</strong>：</p>
+<ul>
+<li><p>我们将地图中的 <strong> 每一个格子看成图中的一个节点</strong>；</p>
+</li>
+<li><p>我么将两个相邻（左右相邻或者上下相邻）的 <strong> 两个格子对应的节点之间连接一条无向边</strong>，边的权值为这两个格子的高度差的绝对值；</p>
+</li>
+<li><p>我们需要找到一条从左上角到右下角的「最短路径」，其中一条路径的长度定义为其经过的 <strong> 所有边权的最大值</strong>。</p>
+</li>
+</ul>
+<p>一般地，<strong>「图」中的所有节点的编号都是不一样的</strong>。所以我们需要将二维的坐标点，转换成唯一的编号。这可以按 $id = rows * m + cols$ 来表示。比如，对于 $m = 4, n = 3$，从 $(3, 2)$ 向上移动到 $(2, 2)$ 就是从节点 $14$ 移动到节点 $10$。</p>
+<h2 id="并查集解法"><a href="# 并查集解法" class="headerlink" title="并查集解法"></a>并查集解法 </h2><p> 我们可以将地图中的 <code>mn</code> 个格子（节点）放入并查集中，初始时，所有节点各为一个集合。随着「路径的形成」，路径上的节点将会汇集在不同的集合中（不加干预的话，最终所有的点会汇聚成一个集合）。</p>
+<p>因此，<strong>如果左上角和右下角所对应的节点，被合并到同一个集合内，就可以说明形成了一条从左上角到右下角路径</strong>，路径被连通。</p>
+<p>但是，我们要找的是一条从左上角到右下角的「最短路径」。所以，我们 <strong> 可以按边权从小到大的顺序，将这条边的两个点合并到集合中</strong>。一旦出现左上角和右下角在同一个集合中，那便是从左上角到右下角的「最短路径」（这次移动的高度差就是首尾连通路径上的最大高度差，但同时也是所有可能的首尾连通路径上的最小高度差）。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> from; <span class="comment">// 从哪个坐标</span></span><br><span class="line">    <span class="type">int</span> to; <span class="comment">// 移动到哪个坐标</span></span><br><span class="line">    <span class="type">int</span> h; <span class="comment">// 移动的高度差的绝对值</span></span><br><span class="line">&#125; Edge;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">init</span><span class="params">(<span class="type">int</span> parent[], <span class="type">int</span> rank[], <span class="type">int</span> size)</span> &#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; size; ++i) &#123;</span><br><span class="line">        parent[i] = i;</span><br><span class="line">        rank[i] = <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">findSet</span><span class="params">(<span class="type">int</span> parent[], <span class="type">int</span> x)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (parent[x] == x) &#123;</span><br><span class="line">        <span class="keyword">return</span> x;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// 路径压缩</span></span><br><span class="line">        parent[x] = findSet(parent, parent[x]);</span><br><span class="line">        <span class="keyword">return</span> parent[x];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">unionSet</span><span class="params">(<span class="type">int</span> parent[], <span class="type">int</span> rank[], <span class="type">int</span> x, <span class="type">int</span> y)</span> &#123;</span><br><span class="line">    <span class="type">int</span> rootX = findSet(parent, x);</span><br><span class="line">    <span class="type">int</span> rootY = findSet(parent, y);</span><br><span class="line">    <span class="comment">// 属于不同集合</span></span><br><span class="line">    <span class="keyword">if</span> (rootX != rootY) &#123;</span><br><span class="line">        <span class="comment">// 将深度较小的树连到另一棵树</span></span><br><span class="line">        <span class="keyword">if</span> (rank[rootX] &lt; rank[rootY]) &#123;</span><br><span class="line">            parent[rootX] = rootY;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (rank[rootX] &gt; rank[rootY]) &#123;</span><br><span class="line">            parent[rootY] = rootX;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">// 将前者所在的树的根节点连接到后者所在的树的根节点上</span></span><br><span class="line">            <span class="comment">// 被连接的树的高度将会加一, 对应的 rank 值加一</span></span><br><span class="line">            parent[rootX] = rootY;</span><br><span class="line">            rank[rootY]++;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">isSameSet</span><span class="params">(<span class="type">int</span> parent[], <span class="type">int</span> x, <span class="type">int</span> y)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> findSet(parent, x) == findSet(parent, y);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">cmp</span><span class="params">(<span class="type">const</span> <span class="type">void</span> *pa, <span class="type">const</span> <span class="type">void</span> *pb)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> ((Edge *)pa)-&gt;h - ((Edge *)pb)-&gt;h;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">minimumEffortPath</span><span class="params">(<span class="type">int</span>** heights, <span class="type">int</span> heightsSize, <span class="type">int</span>* heightsColSize)</span>&#123;</span><br><span class="line">    <span class="type">int</span> m = heightsSize, n = *heightsColSize;</span><br><span class="line">    <span class="keyword">if</span> (m * n &lt;= <span class="number">1</span>) &#123;<span class="keyword">return</span> <span class="number">0</span>;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 在矩阵中向右、向下移动，移动可以产生这么多线段（最后一行和最后一列不能移动）</span></span><br><span class="line">    Edge edgeInfo[m * n * <span class="number">2</span>]; <span class="comment">// 实际为 m * n * 2 - m - n;</span></span><br><span class="line">    <span class="type">int</span> edgeSize = <span class="number">0</span>, id = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; m; i++) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">0</span>; j &lt; n; j ++) &#123;</span><br><span class="line">            id = i * n + j; <span class="comment">// 将二维坐标按行转换为一维坐标点</span></span><br><span class="line">            <span class="keyword">if</span> (i &lt; m - <span class="number">1</span>) &#123; <span class="comment">// 向右（对于目的点到源点就是向左）</span></span><br><span class="line">                edgeInfo[edgeSize].from = id;</span><br><span class="line">                edgeInfo[edgeSize].to = id + n;</span><br><span class="line">                edgeInfo[edgeSize].h = <span class="built_in">fabs</span>(heights[i][j] - heights[i + <span class="number">1</span>][j]);</span><br><span class="line">                edgeSize++;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (j &lt; n - <span class="number">1</span>) &#123; <span class="comment">// 向下（对于目的点到源点就是向上）</span></span><br><span class="line">                edgeInfo[edgeSize].from = id;</span><br><span class="line">                edgeInfo[edgeSize].to = id + <span class="number">1</span>;</span><br><span class="line">                edgeInfo[edgeSize].h = <span class="built_in">fabs</span>(heights[i][j] - heights[i][j + <span class="number">1</span>]);</span><br><span class="line">                edgeSize++;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    qsort(edgeInfo, edgeSize, <span class="keyword">sizeof</span>(Edge), cmp); <span class="comment">// 按高度差的绝对值排序</span></span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> ufSize = m * n; <span class="comment">// 用实际的 edgeSize 会有问题（考虑仅一次移动时，有两个坐标点）</span></span><br><span class="line">    <span class="type">int</span> parent[ufSize], rank[ufSize];</span><br><span class="line">    init(&amp;parent, &amp;rank, ufSize);</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; edgeSize; i++) &#123; <span class="comment">// 现在按高度顺序遍历每一次移动</span></span><br><span class="line">        unionSet(&amp;parent, &amp;rank, edgeInfo[i].from, edgeInfo[i].to); <span class="comment">// 合并该次移动</span></span><br><span class="line">        <span class="comment">// 经过数次移动后，如果左上角和右下角的点在同一个集合中，那么首尾已经连通，即为答案</span></span><br><span class="line">        <span class="comment">// 因为，这次移动的高度差就是首尾连通路径上的最大高度差，但同时也是所有可能的首尾连通路径上的最小高度差</span></span><br><span class="line">        <span class="keyword">if</span> (isSameSet(&amp;parent, <span class="number">0</span>, m * n - <span class="number">1</span>)) &#123;</span><br><span class="line">            <span class="keyword">return</span> edgeInfo[i].h;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> ~(<span class="number">0x1</span>U &lt;&lt; <span class="number">31</span>); <span class="comment">// 无效返回</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>本题有多种解法，如二分查找、并查集、dijkstra 算法，有时间再补充。</p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/LeetCode/" rel="tag"># LeetCode</a>
+              <a href="/tags/%E5%B9%B6%E6%9F%A5%E9%9B%86/" rel="tag"># 并查集</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/231210211306.html" rel="prev" title="操作系统之 chapter7.2 进程状态">
+                  <i class="fa fa-angle-left"></i> 操作系统之 chapter7.2 进程状态
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2023</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">aha</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">299k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">9:05</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+</div>
+  <div class="powered-by">
+    <!--由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动 -->
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script size="150" alpha="0.6" zIndex="-1" src="https://cdnjs.cloudflare.com/ajax/libs/ribbon.js/1.0.2/ribbon.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/next-theme-pjax/0.6.0/pjax.min.js" integrity="sha256-vxLn1tSKWD4dqbMRyv940UYw4sXgMtYcK6reefzZrao=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script><script src="/js/pjax.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+  <script data-pjax async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+<script src="https://unpkg.com/darkmode-js@1.5.7/lib/darkmode-js.min.js"></script>
+
+<script>
+var options = {
+  bottom: '64px',
+  right: 'unset',
+  left: '32px',
+  time: '0.5s',
+  mixColor: 'transparent',
+  backgroundColor: 'transparent',
+  buttonColorDark: '#3F3F3F',
+  buttonColorLight: '#fff',
+  saveInCookies: true,
+  label: '🌓',
+  autoMatchOsTheme: true
+}
+const darkmode = new Darkmode(options);
+window.darkmode = darkmode;
+darkmode.showWidget();
+</script>
+
+</body>
+</html>
