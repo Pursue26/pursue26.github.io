@@ -34,7 +34,7 @@
 <meta property="og:image" content="https://pursue26.github.io/images/os-kernel/chapter6/enhanced-clock-algorithm-demo.png">
 <meta property="og:image" content="https://pursue26.github.io/images/os-kernel/chapter6/lfu-algorithm-demo.png">
 <meta property="article:published_time" content="2023-11-29T10:26:31.000Z">
-<meta property="article:modified_time" content="2023-12-11T09:57:01.037Z">
+<meta property="article:modified_time" content="2023-12-13T11:00:33.091Z">
 <meta property="article:author" content="aha">
 <meta property="article:tag" content="页面置换算法">
 <meta property="article:tag" content="操作系统">
@@ -162,18 +162,18 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">71</span>
+          <span class="site-state-item-count">72</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
           <a href="/categories/">
-        <span class="site-state-item-count">44</span>
+        <span class="site-state-item-count">43</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">86</span>
+        <span class="site-state-item-count">87</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -237,7 +237,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2023-12-11 17:57:01" itemprop="dateModified" datetime="2023-12-11T17:57:01+08:00">2023-12-11</time>
+      <time title="修改时间：2023-12-13 19:00:33" itemprop="dateModified" datetime="2023-12-13T19:00:33+08:00">2023-12-13</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -302,7 +302,7 @@
 <p>模拟一个页面置换的行为，并记录产生页缺失的数量。若有更少的缺失，则有更好的性能。</p>
 <h1 id="局部页面置换算法"><a href="# 局部页面置换算法" class="headerlink" title="局部页面置换算法"></a>局部页面置换算法 </h1><h2 id="最优页面置换算法（OPT）"><a href="# 最优页面置换算法（OPT）" class="headerlink" title="最优页面置换算法（OPT）"></a> 最优页面置换算法（OPT）</h2><p>基本思路：当一个缺页中断发生时，对于保存在内存当中的每一个逻辑页面，计算在它的下一次访问之前，还需等待多长时间，从中选择等待时间最长的那个，作为被置换的页面。</p>
 <p>缺点：这是一种理想情况，在实际系统中是 <strong> 无法实现 </strong> 的，因为操作系统无法知道每一个页面要等待多长时间以后才会再次被访问。</p>
-<p>OPT 算法页面置换示例：<br><img src="/images/os-kernel/chapter6/opt-algorithm-demo.png" alt="最优页面置换算法" width="60%" height="60%"></p>
+<p>OPT 算法页面置换示例：<br><img src="../images/os-kernel/chapter6/opt-algorithm-demo.png" alt="最优页面置换算法" width="60%" height="60%"></p>
 <p>如上图，在 <code>time=0</code> 的初始时刻，内存中有四个物理页 <code>a,b,c,d</code>。在访问到 <code>time=5</code> 时，程序需要访问物理页 <code>e</code>，但它在内存中不存在；从图中可以看到，接下来要访问的物理页分别是 <code>b,a,b,c,d</code>，物理页 <code>d</code> 是将来最长时间才被访问的物理页。所以，在访问物理页 <code>e</code> 时，<strong>最优解 </strong> 是将物理页 <code>d</code> 置换出去。但操作系统无法预知未来，所以这个算法无法实际应用。</p>
 <blockquote>
 <p>OPT 算法可用作其他算法的性能评价的依据（在一个模拟器上运行某个程序，并记录每一次的页面访问情况，在第二遍运行时即可使用最优算法）。</p>
@@ -312,10 +312,10 @@
 <p>如果访问一个页面时，没有产生缺页中断，这时链表会有何动作？<br>会遍历链表，找出对应的逻辑页面，将它从链表内部删除，并添加在链表尾部（让该页面刷新为驻留时间最短的页面）。</p>
 </blockquote>
 <p>缺点：涉及到链表遍历，性能较差，置换出的页面有可能是经常要访问的页面，并且有 Belady 现象。FIFO 算法很少单独使用。</p>
-<p>FIFO 算法页面置换示例（初始时，假设链表首部为页面 <code>a</code>，尾部为页面 <code>d</code>）：<br><img src="/images/os-kernel/chapter6/fifo-algorithm-demo.png" alt="先进先出页面置换算法" width="60%" height="60%"></p>
+<p>FIFO 算法页面置换示例（初始时，假设链表首部为页面 <code>a</code>，尾部为页面 <code>d</code>）：<br><img src="../images/os-kernel/chapter6/fifo-algorithm-demo.png" alt="先进先出页面置换算法" width="60%" height="60%"></p>
 <h2 id="最近最久使用页面置换算法（LRU）"><a href="# 最近最久使用页面置换算法（LRU）" class="headerlink" title="最近最久使用页面置换算法（LRU）"></a>最近最久使用页面置换算法（LRU）</h2><p>基本思路：最近最久使用页面置换算法（Least Recently Used, LRU），当一个缺页中断发生时，选择 <strong> 最近最久未使用 </strong> 的那个页面淘汰。</p>
 <p>LRU 算法是对 OPT 算法的 <strong> 一个近似</strong>，其依据是程序的局部性原理，即在最近一小段时间（最近几条指令）内，如果某些页面被频繁地访问，那么在将来的一小段时间内，它们还可能会再一次被频繁地访问。反过来说，如果过去某些页面长时间未被访问，那么在将来它们可能会继续得不到访问。</p>
-<p>LRU 算法页面置换示例：<br><img src="/images/os-kernel/chapter6/lru-algorithm-demo.png" alt="最近最久使用页面置换算法" width="60%" height="60%"></p>
+<p>LRU 算法页面置换示例：<br><img src="../images/os-kernel/chapter6/lru-algorithm-demo.png" alt="最近最久使用页面置换算法" width="60%" height="60%"></p>
 <blockquote>
 <p>LRU 算法需要记录各个页面使用时间的先后顺序，开销比较大。</p>
 </blockquote>
@@ -353,9 +353,9 @@
 </li>
 <li>如此下去，直到找到被淘汰的页面，然后把指针移动到下一格。</li>
 </ul>
-<p>Clock 算法页面置换示意图（used bit 即 access bit）：<br><img src="/images/os-kernel/chapter6/clock-algorithm.png" alt="时钟页面置换算法" width="60%" height="60%"></p>
+<p>Clock 算法页面置换示意图（used bit 即 access bit）：<br><img src="../images/os-kernel/chapter6/clock-algorithm.png" alt="时钟页面置换算法" width="60%" height="60%"></p>
 <p>在上图中，维持一个保存在内存中环形页面链表。初始时，假设 resident bit 都为 1，也就是虚拟页对应的物理页面存在；图中指针顺时针移动，下次将被替换的页面为 Page 1。</p>
-<p>Clock 算法页面置换示例：<br><img src="/images/os-kernel/chapter6/clock-algorithm-demo.png" alt="时钟页面置换算法" width="60%" height="60%"></p>
+<p>Clock 算法页面置换示例：<br><img src="../images/os-kernel/chapter6/clock-algorithm-demo.png" alt="时钟页面置换算法" width="60%" height="60%"></p>
 <blockquote>
 <p>上图的置换流程可以参考上面的文字和伪代码。</p>
 </blockquote>
@@ -405,7 +405,7 @@
 <blockquote>
 <p>两次机会时，优先重置 access bit 位。</p>
 </blockquote>
-<p>改进型 Clock 算法页面置换示例：<br><img src="/images/os-kernel/chapter6/enhanced-clock-algorithm-demo.png" alt="改进型时钟页面置换算法" width="60%" height="60%"></p>
+<p>改进型 Clock 算法页面置换示例：<br><img src="../images/os-kernel/chapter6/enhanced-clock-algorithm-demo.png" alt="改进型时钟页面置换算法" width="60%" height="60%"></p>
 <p>在上图中，当 <code>time=4</code> 时刻结束时，内存的 4 个页面均被访问，但是仅有页面 <code>a</code> 和页面 <code>b</code> 被写过，在 <code>time=5</code> 时，根据上述优先级规则，页面 <code>a</code> 和页面 <code>b</code> 有两次机会，页面 <code>c</code> 和页面 <code>d</code> 有一次机会，最后指针会指向页面 <code>c</code> 进行置换，然后指针往下移动一格。</p>
 <blockquote>
 <p>弹幕中看到大家的两个问题，这个给机会的过程，会将 dirty bit 从 1 重置为 0，那么：<br>1）被写过的页面，是什么时候写回外存中去的？是每次从 1 重置为 0 后，就随即写回外存，还是最后被置时才会写回外存（如果是这种，其它重置为 0 的页面，还怎么知道它有没有被写过）？<br>2）这里的 access bit 和 dirty bit 的修改是否是直接修改的页表中对应的位？</p>
@@ -413,7 +413,7 @@
 <h2 id="最不常用页面置换算法（LFU）"><a href="# 最不常用页面置换算法（LFU）" class="headerlink" title="最不常用页面置换算法（LFU）"></a>最不常用页面置换算法（LFU）</h2><p>基本思路：最不常用页面置换算法（Least Frequently used, LFU），当一个缺页中断发生时，选择 <strong> 访问次数最少 </strong> 的那个页面，并淘汰。</p>
 <p>实现方法：对每一个页面设置一个访问计数器，每当一个页面被访问时，该页面的访问计数器加 1。 当发生缺页中断时，淘汰计数值最小的那个页面。</p>
 <p>LRU 和 LFU 的对比：LRU 考察的是 <strong> 多久未访问 </strong>，时间越短越好（不会被置换出去）；而 LFU 考察的是<strong> 访问的次数或频度</strong>，访问次数越多越好。</p>
-<p>LFU 算法页面置换示例：<br><img src="/images/os-kernel/chapter6/lfu-algorithm-demo.png" alt="最不常用页面置换算法" width="60%" height="60%"></p>
+<p>LFU 算法页面置换示例：<br><img src="../images/os-kernel/chapter6/lfu-algorithm-demo.png" alt="最不常用页面置换算法" width="60%" height="60%"></p>
 <blockquote>
 <p>问题：<br>一个页面在进程开始时使用得很多，但以后就不使用了，LFU 统计的是整体的访问次数，所以此时这个页面还会被保留在内存中。<br>实现也费时费力，需要对每一个页面加一个计数器。</p>
 <p>解决方法：<br>定期把次数寄存器右移一位。它最主要的问题是只考虑频率而没考虑时间，我们可以隔一段时间砍掉一半的次数，进而改善这个问题。</p>
@@ -555,13 +555,13 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-line"></i>
     </span>
-    <span title="站点总字数">299k</span>
+    <span title="站点总字数">303k</span>
   </span>
   <span class="post-meta-item">
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">9:05</span>
+    <span title="站点阅读时长">9:11</span>
   </span>
 </div>
 <div class="busuanzi-count">

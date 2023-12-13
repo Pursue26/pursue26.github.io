@@ -32,7 +32,7 @@
 <meta property="og:image" content="https://pursue26.github.io/images/data-structure/BST-in-order-traversing.png">
 <meta property="og:image" content="https://pursue26.github.io/images/data-structure/BST-delete-node.png">
 <meta property="article:published_time" content="2023-10-20T09:43:58.000Z">
-<meta property="article:modified_time" content="2023-12-02T09:27:57.246Z">
+<meta property="article:modified_time" content="2023-12-13T11:00:46.108Z">
 <meta property="article:author" content="aha">
 <meta property="article:tag" content="二叉搜索树">
 <meta property="article:tag" content="BST">
@@ -159,18 +159,18 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">71</span>
+          <span class="site-state-item-count">72</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
           <a href="/categories/">
-        <span class="site-state-item-count">44</span>
+        <span class="site-state-item-count">43</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">86</span>
+        <span class="site-state-item-count">87</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -234,7 +234,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2023-12-02 17:27:57" itemprop="dateModified" datetime="2023-12-02T17:27:57+08:00">2023-12-02</time>
+      <time title="修改时间：2023-12-13 19:00:46" itemprop="dateModified" datetime="2023-12-13T19:00:46+08:00">2023-12-13</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -291,9 +291,9 @@
 <span id="more"></span>
 
 <h2 id="二叉搜索树操作"><a href="# 二叉搜索树操作" class="headerlink" title="二叉搜索树操作"></a>二叉搜索树操作 </h2><p> 二叉搜索树是什么样子的呢？百闻不如一见，直接上图：</p>
-<p><img src="/images/data-structure/BST-Tree1.png" alt=""></p>
+<p><img src="../images/data-structure/BST-Tree1.png" alt=""></p>
 <h2 id="插入一个节点"><a href="# 插入一个节点" class="headerlink" title="插入一个节点"></a>插入一个节点 </h2><p> 如果我们插入一个节点，它的值为 9，我们应该插在哪里呢？看图~</p>
-<p><img src="/images/data-structure/BST-Tree2.png" alt=""></p>
+<p><img src="../images/data-structure/BST-Tree2.png" alt=""></p>
 <p>我们插入值 9 的过程大概是这样的：</p>
 <ol>
 <li>9 &gt; 根节点 7 吗？大于，则转向看右子树；</li>
@@ -301,7 +301,7 @@
 <li>左子树为空，则将 9 插入在这里。</li>
 </ol>
 <p>看看，这是不是跟有序数组的二分查找算法的思想一样呢，根据值的大小关系，决定下次搜索的区域（但 BST 的判断不一定每次都会排除 50% 的区域，这要看 BST 是否足够「平衡」）！</p>
-<h2 id="搜索一个节点"><a href="# 搜索一个节点" class="headerlink" title="搜索一个节点"></a>搜索一个节点</h2><p><img src="/images/data-structure/BST-Searching.png" alt=""></p>
+<h2 id="搜索一个节点"><a href="# 搜索一个节点" class="headerlink" title="搜索一个节点"></a>搜索一个节点</h2><p><img src="../images/data-structure/BST-Searching.png" alt=""></p>
 <p>搜索一个节点的过程跟上面插入一个节点的过程类似：</p>
 <ol>
 <li>5 == 根节点 7 吗？不等于；大于吗？小于，则转向左子树搜索；</li>
@@ -317,9 +317,9 @@
 </ul>
 <p>结合二叉搜索树的特点：左子树上所有结点的值均小于它的根结点的值 &amp; 右子树上所有结点的值均大于它的根结点的值。设想一下，如果我们先获取左子树的值，再获取根节点的值，最后再获取右子树的值，并将它们按获取顺序保存到数组中，那么这个数组是不是按升序排序的数组呢？</p>
 <p>没错，<strong>二叉搜索树的中序遍历的结果是一个按升序排序的有序数组</strong>，所以二叉搜索树又称二叉排序树。</p>
-<p>二叉搜索树的中序遍历过程图。<br><img src="/images/data-structure/BST-in-order-traversing.png" alt=""></p>
+<p>二叉搜索树的中序遍历过程图。<br><img src="../images/data-structure/BST-in-order-traversing.png" alt=""></p>
 <h2 id="删除一个节点"><a href="# 删除一个节点" class="headerlink" title="删除一个节点"></a>删除一个节点 </h2><p> 删除节点也很容易，根据二叉搜索树的特点，我们删除一个节点后，只需要将这个节点的左子树的最大值（或者是右子树的最小值）拿过来，放到这个被删除的节点这里即可。这样，删除一个节点后，这棵树依然是一棵二叉搜索树。</p>
-<p><img src="/images/data-structure/BST-delete-node.png" alt=""></p>
+<p><img src="../images/data-structure/BST-delete-node.png" alt=""></p>
 <p>上图的 BST 删除一个节点中，Fig. 1 -&gt; Fig. 2 使用了左子树的最大值，Fig. 1 -&gt; Fig. 3 使用了右子树的最小值。</p>
 <h2 id="二叉搜索树接口实现"><a href="# 二叉搜索树接口实现" class="headerlink" title="二叉搜索树接口实现"></a>二叉搜索树接口实现 </h2><h3 id="定义 -BST- 结构"><a href="# 定义 -BST- 结构" class="headerlink" title="定义 BST 结构"></a> 定义 BST 结构</h3><p>BST 结构定义与普通二叉树结构定义没有区别。</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">treeNode</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> val;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">treeNode</span> *<span class="title">left</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">treeNode</span> *<span class="title">right</span>;</span></span><br><span class="line">&#125; TreeNode_t;</span><br></pre></td></tr></table></figure>
@@ -502,13 +502,13 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-line"></i>
     </span>
-    <span title="站点总字数">299k</span>
+    <span title="站点总字数">303k</span>
   </span>
   <span class="post-meta-item">
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">9:05</span>
+    <span title="站点阅读时长">9:11</span>
   </span>
 </div>
 <div class="busuanzi-count">

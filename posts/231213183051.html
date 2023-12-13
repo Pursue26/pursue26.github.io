@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha256-HtsXJanqjKTc8vVQjO4YMhiqFoXkfBsjBWcX91T1jr8=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pursue26.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.18.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":null},"fold":{"enable":true,"height":300},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="正则表达式（Regular Expression）是表示搜索模式的字符串，常缩写成 Regex 或 Regexp。它常用于匹配、查找和替换文本中的字词。此外，我们可以测试文本是否符合我们设置的规则。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="正则表达式基础">
+<meta property="og:url" content="https://pursue26.github.io/posts/231213183051.html">
+<meta property="og:site_name" content="aha&#39;s blog">
+<meta property="og:description" content="正则表达式（Regular Expression）是表示搜索模式的字符串，常缩写成 Regex 或 Regexp。它常用于匹配、查找和替换文本中的字词。此外，我们可以测试文本是否符合我们设置的规则。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pursue26.github.io/images/computer-basics/regex-example1.png">
+<meta property="article:published_time" content="2023-12-13T10:30:51.000Z">
+<meta property="article:modified_time" content="2023-12-13T11:03:13.319Z">
+<meta property="article:author" content="aha">
+<meta property="article:tag" content="正则表达式">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pursue26.github.io/images/computer-basics/regex-example1.png">
+
+
+<link rel="canonical" href="https://pursue26.github.io/posts/231213183051.html">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://pursue26.github.io/posts/231213183051.html","path":"posts/231213183051.html","title":"正则表达式基础"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>正则表达式基础 | aha's blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<style>.darkmode--activated{--body-bg-color:#282828;--content-bg-color:#333;--card-bg-color:#555;--text-color:#ccc;--blockquote-color:#bbb;--link-color:#ccc;--link-hover-color:#eee;--brand-color:#ddd;--brand-hover-color:#ddd;--table-row-odd-bg-color:#282828;--table-row-hover-bg-color:#363636;--menu-item-bg-color:#555;--btn-default-bg:#222;--btn-default-color:#ccc;--btn-default-border-color:#555;--btn-default-hover-bg:#666;--btn-default-hover-color:#ccc;--btn-default-hover-border-color:#666;--highlight-background:#282b2e;--highlight-foreground:#a9b7c6;--highlight-gutter-background:#34393d;--highlight-gutter-foreground:#9ca9b6}.darkmode--activated img{opacity:.75}.darkmode--activated img:hover{opacity:.9}.darkmode--activated code{color:#69dbdc;background:0 0}button.darkmode-toggle{z-index:9999}.darkmode-ignore,img{display:flex!important}.beian img{display:inline-block!important}</style></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">aha's blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-dailyblog"><a href="/random.html" rel="section"><i class="fa fa-file fa-fw"></i>每日博客</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%94%9A%E7%82%B9"><span class="nav-number">1.</span> <span class="nav-text">锚点</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%EF%BC%88%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%88%96%E8%A1%8C%E7%9A%84%E5%BC%80%E5%A4%B4%EF%BC%89"><span class="nav-number">1.1.</span> <span class="nav-text">^（字符串或行的开头）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%EF%BC%88%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%88%96%E8%A1%8C%E7%9A%84%E6%9C%AB%E5%B0%BE%EF%BC%89"><span class="nav-number">1.2.</span> <span class="nav-text">$（字符串或行的末尾）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#b%EF%BC%88%E5%8D%95%E8%AF%8D%E8%BE%B9%E7%95%8C%EF%BC%89"><span class="nav-number">1.3.</span> <span class="nav-text">\b（单词边界）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#B%EF%BC%88%E9%9D%9E%E5%8D%95%E8%AF%8D%E8%BE%B9%E7%95%8C%EF%BC%89"><span class="nav-number">1.4.</span> <span class="nav-text">\B（非单词边界）</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AD%97%E7%AC%A6%E7%B1%BB"><span class="nav-number">2.</span> <span class="nav-text">字符类</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#abc-%EF%BC%88%E5%AD%97%E7%AC%A6%E9%9B%86%EF%BC%89"><span class="nav-number">2.1.</span> <span class="nav-text">[abc]（字符集）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#abc-%EF%BC%88%E5%90%A6%E5%AE%9A%E5%AD%97%E7%AC%A6%E9%9B%86%EF%BC%89"><span class="nav-number">2.2.</span> <span class="nav-text">[^abc]（否定字符集）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#a-z-%EF%BC%88%E8%8C%83%E5%9B%B4%EF%BC%89"><span class="nav-number">2.3.</span> <span class="nav-text">[a-z]（范围）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%EF%BC%88%E7%82%B9%EF%BC%89"><span class="nav-number">2.4.</span> <span class="nav-text">.（点）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#w%EF%BC%88%E5%8D%95%E8%AF%8D%EF%BC%89"><span class="nav-number">2.5.</span> <span class="nav-text">\w（单词）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#W%EF%BC%88%E9%9D%9E%E5%8D%95%E8%AF%8D%EF%BC%89"><span class="nav-number">2.6.</span> <span class="nav-text">\W（非单词）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#d%EF%BC%88%E6%95%B0%E5%AD%97%EF%BC%89"><span class="nav-number">2.7.</span> <span class="nav-text">\d（数字）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#D%EF%BC%88%E9%9D%9E%E6%95%B0%E5%AD%97%EF%BC%89"><span class="nav-number">2.8.</span> <span class="nav-text">\D（非数字）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#s%EF%BC%88%E7%A9%BA%E7%99%BD%E7%AC%A6%EF%BC%89"><span class="nav-number">2.9.</span> <span class="nav-text">\s（空白符）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#S%EF%BC%88%E9%9D%9E%E7%A9%BA%E7%99%BD%E7%AC%A6%EF%BC%89"><span class="nav-number">2.10.</span> <span class="nav-text">\S（非空白符）</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%A0%87%E5%BF%97"><span class="nav-number">3.</span> <span class="nav-text">标志 </span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#g%EF%BC%88%E5%85%A8%E5%B1%80%E5%8C%B9%E9%85%8D%EF%BC%89"><span class="nav-number">3.1.</span> <span class="nav-text">g（全局匹配）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#i%EF%BC%88%E5%BF%BD%E7%95%A5%E5%A4%A7%E5%B0%8F%E5%86%99%EF%BC%89"><span class="nav-number">3.2.</span> <span class="nav-text">i（忽略大小写）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#m%EF%BC%88%E5%A4%9A%E8%A1%8C%EF%BC%89"><span class="nav-number">3.3.</span> <span class="nav-text">m（多行）</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%87%8F%E8%AF%8D%E4%B8%8E%E5%88%86%E6%94%AF"><span class="nav-number">4.</span> <span class="nav-text">量词与分支</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%EF%BC%88%E8%87%B3%E5%B0%91%E5%8C%B9%E9%85%8D%E9%9B%B6%E4%B8%AA%EF%BC%89"><span class="nav-number">4.1.</span> <span class="nav-text">*（至少匹配零个）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%EF%BC%88%E8%87%B3%E5%B0%91%E5%8C%B9%E9%85%8D%E4%B8%80%E4%B8%AA%EF%BC%89"><span class="nav-number">4.2.</span> <span class="nav-text">+（至少匹配一个）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-3-%EF%BC%88%E6%8C%87%E5%AE%9A%E8%8C%83%E5%9B%B4%E5%8C%B9%E9%85%8D%EF%BC%89"><span class="nav-number">4.3.</span> <span class="nav-text">{1,3}（指定范围匹配）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%EF%BC%88%E8%87%B3%E5%B0%91%E5%8C%B9%E9%85%8D%E6%AC%A1%E6%95%B0%EF%BC%89"><span class="nav-number">4.4.</span> <span class="nav-text">{1,}（至少匹配次数）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%EF%BC%88%E6%8C%87%E5%AE%9A%E5%AD%97%E7%AC%A6%E5%8F%AF%E9%80%89%EF%BC%89"><span class="nav-number">4.5.</span> <span class="nav-text">?（指定字符可选）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%EF%BC%88%E6%88%96%E5%88%86%E6%94%AF%EF%BC%89"><span class="nav-number">4.6.</span> <span class="nav-text">|（或分支）</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BB%84%E5%92%8C%E5%BC%95%E7%94%A8"><span class="nav-number">5.</span> <span class="nav-text">组和引用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%EF%BC%88%E6%8D%95%E8%8E%B7%E5%88%86%E7%BB%84%EF%BC%89"><span class="nav-number">5.1.</span> <span class="nav-text">()（捕获分组）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1%EF%BC%88%E5%BC%95%E7%94%A8%EF%BC%89"><span class="nav-number">5.2.</span> <span class="nav-text">\1（引用）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%EF%BC%88%E9%9D%9E%E6%8D%95%E8%8E%B7%E7%BB%84%EF%BC%89"><span class="nav-number">5.3.</span> <span class="nav-text">(?:)（非捕获组）</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%9B%B6%E5%AE%BD%E6%96%AD%E8%A8%80"><span class="nav-number">6.</span> <span class="nav-text">零宽断言</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%EF%BC%88%E6%96%AD%E8%A8%80%E5%90%8E%E9%9D%A2%E6%BB%A1%E8%B6%B3%E7%BB%99%E5%AE%9A%E6%A8%A1%E5%BC%8F%EF%BC%89"><span class="nav-number">6.1.</span> <span class="nav-text">(?&#x3D;)（断言后面满足给定模式）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%EF%BC%88%E6%96%AD%E8%A8%80%E5%90%8E%E9%9D%A2%E4%B8%8D%E6%BB%A1%E8%B6%B3%E7%BB%99%E5%AE%9A%E6%A8%A1%E5%BC%8F%EF%BC%89"><span class="nav-number">6.2.</span> <span class="nav-text">?!（断言后面不满足给定模式）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#lt-%EF%BC%88%E6%96%AD%E8%A8%80%E5%89%8D%E9%9D%A2%E6%BB%A1%E8%B6%B3%E7%BB%99%E5%AE%9A%E6%A8%A1%E5%BC%8F%EF%BC%89"><span class="nav-number">6.3.</span> <span class="nav-text">?&lt;&#x3D;（断言前面满足给定模式）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#lt-%EF%BC%88%E6%96%AD%E8%A8%80%E5%89%8D%E9%9D%A2%E4%B8%8D%E6%BB%A1%E8%B6%B3%E7%BB%99%E5%AE%9A%E6%A8%A1%E5%BC%8F%EF%BC%89"><span class="nav-number">6.4.</span> <span class="nav-text">?&lt;!（断言前面不满足给定模式）</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%EF%BC%9A%E6%A0%BC%E5%BC%8F%E5%8C%96%E5%AE%9A%E4%B9%89"><span class="nav-number">7.</span> <span class="nav-text">示例：格式化定义 </span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">aha</p>
+  <div class="site-description" itemprop="description">经历一个过程然后成为更好的自己</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">72</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">43</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">87</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://pursue26.github.io/posts/231213183051.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="aha">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="aha's blog">
+      <meta itemprop="description" content="经历一个过程然后成为更好的自己">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="正则表达式基础 | aha's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          正则表达式基础
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+  
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2023-12-13 18:30:51 / 修改时间：19:03:13" itemprop="dateCreated datePublished" datetime="2023-12-13T18:30:51+08:00">2023-12-13</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/" itemprop="url" rel="index"><span itemprop="name">计算机基础</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>3.8k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>7 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>正则表达式（Regular Expression）是表示搜索模式的字符串，常缩写成 Regex 或 Regexp。它常用于匹配、查找和替换文本中的字词。此外，我们可以测试文本是否符合我们设置的规则。</p>
+<span id="more"></span>
+
+<blockquote>
+<p>本文建议在深色主题模式下阅读。</p>
+</blockquote>
+<h1 id="锚点"><a href="# 锚点" class="headerlink" title="锚点"></a>锚点</h1><h2 id="（字符串或行的开头）"><a href="#（字符串或行的开头）" class="headerlink" title="^（字符串或行的开头）"></a><code>^</code>（字符串或行的开头）</h2><p><code>^</code>：匹配字符串或行的开头。</p>
+<p>示例一：</p>
+<ul>
+<li>文本：<code><span style="background-color: green;"><b>an</b></span> answer or a question</code></li>
+<li>正则：<code>/^\w+/g</code></li>
+<li>解释：匹配字符串开头的单词（单词定义为包括字母、数字、下划线）。</li>
+</ul>
+<h2 id="（字符串或行的末尾）"><a href="#（字符串或行的末尾）" class="headerlink" title="$（字符串或行的末尾）"></a><code>$</code>（字符串或行的末尾）</h2><p><code>$</code>：匹配字符串或行的末尾。</p>
+<p>示例一：</p>
+<ul>
+<li>文本：<code>an answer or a <span style="background-color: green;"><b>question</b></span></code></li>
+<li>正则：<code>/\w+$/g</code></li>
+<li>解释：匹配字符串末尾的单词。</li>
+</ul>
+<h2 id="b（单词边界）"><a href="#b（单词边界）" class="headerlink" title="\b（单词边界）"></a><code>\b</code>（单词边界）</h2><p><code>\b</code>：匹配单词的开头或末尾。</p>
+<p>示例一：</p>
+<ul>
+<li>文本：<code>two ques<span style="background-color: green;"><b>tions</b></span> or three ques<span style="background-color: green;"><b>tions</b></span></code></li>
+<li>正则：<code>/tions\b/g</code></li>
+</ul>
+<p>示例二：</p>
+<ul>
+<li>文本：<code>two <span style="background-color: green;"><b>qu</b></span>estions or three <span style="background-color: green;"><b>qu</b></span>estions</code></li>
+<li>正则：<code>/\bqu/g</code></li>
+</ul>
+<p>示例三：</p>
+<ul>
+<li>文本：<code>two questions or three questions</code></li>
+<li>正则：<code>/\bes/g</code></li>
+</ul>
+<h2 id="B（非单词边界）"><a href="#B（非单词边界）" class="headerlink" title="\B（非单词边界）"></a><code>\B</code>（非单词边界）</h2><p><code>\B</code>：匹配不在单词开头或末尾的位置。</p>
+<p>示例一：</p>
+<ul>
+<li>文本：<code>an a<span style="background-color: green;"><b>n</b></span>swer or a question</code></li>
+<li>正则：<code>/n\B/g</code></li>
+<li>解释：匹配不是单词结尾的 <code>n</code>。</li>
+</ul>
+<p>示例二：</p>
+<ul>
+<li>文本：<code>a<span style="background-color: green;"><b>n</b></span> a<span style="background-color: green;"><b>n</b></span>swer or a questio<span style="background-color: green;"><b>n</b></span></code></li>
+<li>正则：<code>/\Bn/g</code></li>
+<li>解释：匹配不是单词开头的 <code>n</code>。</li>
+</ul>
+<h1 id="字符类"><a href="# 字符类" class="headerlink" title="字符类"></a>字符类</h1><h2 id="abc-（字符集）"><a href="#abc-（字符集）" class="headerlink" title="[abc]（字符集）"></a><code>[abc]</code>（字符集）</h2><p><code>[abc]</code>：匹配集合中的任意字符。</p>
+<p>示例一：</p>
+<ul>
+<li>文本：<code>car <span style="background-color: green;"><b>ber</b></span> bir <span style="background-color: green;"><b>bor</b></span> bd bood boedr bur</code></li>
+<li>正则：<code>/b[oe]r/g</code></li>
+<li>解释：匹配开头是 <code>b</code>、结尾是 <code>r</code>、中间 <strong> 一个 </strong> 字符是 <code>o</code> 或 <code>e</code> 的字符串。</li>
+</ul>
+<h2 id="abc-（否定字符集）"><a href="#abc-（否定字符集）" class="headerlink" title="[^abc]（否定字符集）"></a><code>[^abc]</code>（否定字符集）</h2><p><code>[abc]</code>：匹配不在集合中的任意字符。</p>
+<p>示例一：</p>
+<ul>
+<li>文本：<code>car ber <span style="background-color: green;"><b>bir</b></span> bor bd bood boedr <span style="background-color: green;"><b>bur</b></span></code></li>
+<li>正则：<code>/b[^oe]r/g</code></li>
+<li>解释：匹配开头是 <code>b</code>、结尾是 <code>r</code>、中间 <strong> 一个 </strong> 字符不是 <code>o</code> 或 <code>e</code> 的字符串。</li>
+</ul>
+<h2 id="a-z-（范围）"><a href="#a-z-（范围）" class="headerlink" title="[a-z]（范围）"></a><code>[a-z]</code>（范围）</h2><p><code>[a-z]</code>：匹配两个字符之间的任意字符，包括它们本身。</p>
+<p>示例一：</p>
+<ul>
+<li>文本：<code>a<span style="background-color: green;"><b>bcde</b></span>f <span style="background-color: green;"><b>b</b></span> <span style="background-color: green;"><b>ec</b></span> <span style="background-color: green;"><b>e</b></span>m<span style="background-color: green;"><b>c</b></span></code></li>
+<li>正则：<code>/[b-e]/g</code></li>
+</ul>
+<h2 id="（点）"><a href="#（点）" class="headerlink" title=".（点）"></a><code>.</code>（点）</h2><p><code>.</code>：匹配处换行符外的任意字符。</p>
+<p>示例一：</p>
+<ul>
+<li>文本：<code><span style="background-color: green;"><b>hi012_-!?</b></span></code></li>
+<li>正则：<code>/./g</code></li>
+</ul>
+<h2 id="w（单词）"><a href="#w（单词）" class="headerlink" title="\w（单词）"></a><code>\w</code>（单词）</h2><p><code>\w</code>：匹配字母、数字或下划线字符。</p>
+<p>示例一：</p>
+<ul>
+<li>文本：<code><span style="background-color: green;"><b>hi</b></span> <span style="background-color: green;"><b>01</b></span>?<span style="background-color: green;"><b>2</b></span> <span style="background-color: green;"><b>_</b></span>-!?</code></li>
+<li>正则：<code>/\w/g</code></li>
+</ul>
+<h2 id="W（非单词）"><a href="#W（非单词）" class="headerlink" title="\W（非单词）"></a><code>\W</code>（非单词）</h2><p><code>\w</code>：匹配除字母、数字和下划线之外的任意字符。</p>
+<p>示例一：</p>
+<ul>
+<li>文本：<code>hELLo<span style="background-color: green;"><b> </b></span>01<span style="background-color: green;"><b>?</b></span>?<span style="background-color: green;"><b>2</b></span><span style="background-color: green;"><b> </b></span>_<span style="background-color: green;"><b>-!?</b></span></code></li>
+<li>正则：<code>/\W/g</code></li>
+</ul>
+<h2 id="d（数字）"><a href="#d（数字）" class="headerlink" title="\d（数字）"></a><code>\d</code>（数字）</h2><p><code>\d</code>：匹配所有数字字符。</p>
+<p>示例一：</p>
+<ul>
+<li>文本：<code>+<span style="background-color: green;"><b>144</b></span>-(<span style="background-color: green;"><b>22</b></span>)-<span style="background-color: green;"><b>13</b></span>=<span style="background-color: green;"><b>0</b></span>x<span style="background-color: green;"><b>6</b></span>D</code></li>
+<li>正则：<code>/\d/g</code></li>
+</ul>
+<h2 id="D（非数字）"><a href="#D（非数字）" class="headerlink" title="\D（非数字）"></a><code>\D</code>（非数字）</h2><p><code>\d</code>：匹配除数字外的任意字符。</p>
+<p>示例一：</p>
+<ul>
+<li>文本：<code><span style="background-color: green;"><b>+</b></span>144<span style="background-color: green;"><b>-</b></span><span style="background-color: green;"><b>(</b></span>22<span style="background-color: green;"><b>)-</b></span>13<span style="background-color: green;"><b>=</b></span>0<span style="background-color: green;"><b>x</b></span>6<span style="background-color: green;"><b>D</b></span></code></li>
+<li>正则：<code>/\D/g</code></li>
+</ul>
+<h2 id="s（空白符）"><a href="#s（空白符）" class="headerlink" title="\s（空白符）"></a><code>\s</code>（空白符）</h2><p><code>\s</code>：匹配所有空白字符。</p>
+<p>示例一：</p>
+<ul>
+<li>文本：<code>one<span style="background-color: green;"><b> </b></span>two<span style="background-color: green;"><b> </b></span>.</code></li>
+<li>正则：<code>/\s/g</code></li>
+</ul>
+<h2 id="S（非空白符）"><a href="#S（非空白符）" class="headerlink" title="\S（非空白符）"></a><code>\S</code>（非空白符）</h2><p><code>\s</code>：匹配除空白字符以外的任意字符。</p>
+<p>示例一：</p>
+<ul>
+<li>文本：<code><span style="background-color: green;"><b>one</b></span> <span style="background-color: green;"><b>two</b></span> <span style="background-color: green;"><b>.</b></span></code></li>
+<li>正则：<code>/\S/g</code></li>
+</ul>
+<h1 id="标志"><a href="# 标志" class="headerlink" title="标志"></a>标志 </h1><h2 id="g（全局匹配）"><a href="#g（全局匹配）" class="headerlink" title="g（全局匹配）"></a><code>g</code>（全局匹配）</h2><p><code>g</code>：确保表达式不会在检索到第一个匹配项时停止，即<strong> 单行 </strong> 全局匹配。</p>
+<p>示例一：</p>
+<ul>
+<li>文本：<code><span style="background-color: green;"><b>cat</b></span> dog&<span style="background-color: green;"><b>cat</b></span></code></li>
+<li>正则：<code>/cat/g</code></li>
+</ul>
+<p>示例二：</p>
+<ul>
+<li>文本：<code><span style="background-color: green;"><b>cat</b></span> dog&cat</code></li>
+<li>正则：<code>/cat/</code></li>
+<li>解释：无全局标志下，则当检索到第一个匹配项时则停止。</li>
+</ul>
+<h2 id="i（忽略大小写）"><a href="#i（忽略大小写）" class="headerlink" title="i（忽略大小写）"></a><code>i</code>（忽略大小写）</h2><p><code>i</code>：使表达式忽略大小写。</p>
+<p>示例一：</p>
+<ul>
+<li>文本：<code><span style="background-color: green;"><b>CaT</b></span> dog&<span style="background-color: green;"><b>cat</b></span></code></li>
+<li>正则：<code>/cat/gi</code></li>
+</ul>
+<h2 id="m（多行）"><a href="#m（多行）" class="headerlink" title="m（多行）"></a><code>m</code>（多行）</h2><p><code>m</code>：如果不启用，<code>^</code> 和 <code>$</code> 只匹配首行字符串的开始和结束，而不会单独匹配每一行。</p>
+<p>示例一：</p>
+<ul>
+<li><p>文本：</p>
+  <p><code>
+  <span style="background-color: green;"><b>a</b></span> black cat
+
+<p>  a white cat<br>  </code></p></p>
+</li>
+<li><p>正则：<code>/^a/g</code></p>
+</li>
+<li><p>解释：全局匹配 <strong> 首行 </strong> 字符串开头是 <code>a</code> 的字符（不能匹配每行字符串开头是 <code>a</code> 的字符）。</p>
+</li>
+</ul>
+<p>示例二：</p>
+<ul>
+<li><p>文本：</p>
+  <p><code>
+  a black c<span style="background-color: green;"><b>at</b></span>
+
+<p>  a white cat<br>  </code></p></p>
+</li>
+<li><p>正则：<code>/at$/g</code></p>
+</li>
+<li><p>解释：全局匹配 <strong> 首行 </strong> 字符串结尾是 <code>at</code> 的字符（不能匹配每行字符串结尾是 <code>at</code> 的字符）。</p>
+</li>
+</ul>
+<p>示例三：</p>
+<ul>
+<li><p>文本：</p>
+  <p><code>
+  <span style="background-color: green;"><b>a</b></span> black cat
+
+<p>  <span style="background-color: green;"><b>a</b></span> white cat<br>  </code></p></p>
+</li>
+<li><p>正则：<code>/^a/gm</code></p>
+</li>
+<li><p>解释：全局匹配整个字符串 <strong> 每行 </strong> 开头是 <code>a</code> 的字符。</p>
+</li>
+</ul>
+<p>示例四：</p>
+<ul>
+<li><p>文本：</p>
+  <p><code>
+  a black c<span style="background-color: green;"><b>at</b></span>
+
+<p>  a white c<span style="background-color: green;"><b>at</b></span><br>  </code></p></p>
+</li>
+<li><p>正则：<code>/at$/gm</code></p>
+</li>
+<li><p>解释：全局匹配整个字符串 <strong> 每行 </strong> 结尾是 <code>at</code> 的字符。</p>
+</li>
+</ul>
+<h1 id="量词与分支"><a href="# 量词与分支" class="headerlink" title="量词与分支"></a>量词与分支</h1><h2 id="（至少匹配零个）"><a href="#（至少匹配零个）" class="headerlink" title="*（至少匹配零个）"></a><code>*</code>（至少匹配零个）</h2><p><code>*</code>：表达式匹配零个或多个。</p>
+<p>示例一：</p>
+<ul>
+<li>文本：<code><span style="background-color: green;"><b>bp</b></span> <span style="background-color: green;"><b>bep</b></span> <span style="background-color: green;"><b>beep</b></span></code></li>
+<li>正则：<code>/be*p/g</code></li>
+</ul>
+<h2 id="（至少匹配一个）"><a href="#（至少匹配一个）" class="headerlink" title="+（至少匹配一个）"></a><code>+</code>（至少匹配一个）</h2><p><code>+</code>：表达式匹配一个或多个。</p>
+<p>示例一：</p>
+<ul>
+<li>文本：<code>bp <span style="background-color: green;"><b>bep</b></span> <span style="background-color: green;"><b>beep</b></span></code></li>
+<li>正则：<code>/be+p/g</code></li>
+</ul>
+<h2 id="1-3-（指定范围匹配）"><a href="#1-3-（指定范围匹配）" class="headerlink" title="{1,3}（指定范围匹配）"></a><code>&#123;1,3&#125;</code>（指定范围匹配）</h2><p><code>&#123;1,3&#125;</code>：表达式匹配指定范围的位数，区间为左闭右闭。</p>
+<p>示例一：</p>
+<ul>
+<li>文本：<code>bp <span style="background-color: green;"><b>bep</b></span> <span style="background-color: green;"><b>beep</b></span></code></li>
+<li>正则：<code>/be&#123;1,2&#125;p/g</code></li>
+</ul>
+<h2 id="1-（至少匹配次数）"><a href="#1-（至少匹配次数）" class="headerlink" title="{1,}（至少匹配次数）"></a><code>&#123;1,&#125;</code>（至少匹配次数）</h2><p><code>&#123;1,&#125;</code>：表达式至少匹配的位数。</p>
+<p>示例一：</p>
+<ul>
+<li>文本：<code>bp <span style="background-color: green;"><b>bep</b></span> <span style="background-color: green;"><b>beep</b></span> <span style="background-color: green;"><b>beeep</b></span></code></li>
+<li>正则：<code>/be&#123;1,&#125;p/g</code></li>
+</ul>
+<h2 id="（指定字符可选）"><a href="#（指定字符可选）" class="headerlink" title="?（指定字符可选）"></a><code>?</code>（指定字符可选）</h2><p><code>?</code>：使表达式可选。</p>
+<p>示例一：</p>
+<ul>
+<li>文本：<code><span style="background-color: green;"><b>color</b></span> <span style="background-color: green;"><b>colour</b></span></code></li>
+<li>正则：<code>/colou?r/g</code></li>
+<li>解释：单个字符可选。</li>
+</ul>
+<p>示例二：</p>
+<ul>
+<li>文本：<code><span style="background-color: green;"><b>color</b></span> colour <span style="background-color: green;"><b>cor</b></span></code></li>
+<li>正则：<code>/co(lo)?r/g</code></li>
+<li>解释：多个字符可选。</li>
+</ul>
+<h2 id="（或分支）"><a href="#（或分支）" class="headerlink" title="|（或分支）"></a><code>|</code>（或分支）</h2><p><code>|</code>：类似于「或」，用于匹配多种符合条件的表达式之一。</p>
+<p>示例一：</p>
+<ul>
+<li>文本：<code>fat, <span style="background-color: green;"><b>cat</b></span>, <span style="background-color: green;"><b>rat</b></span></code></li>
+<li>正则：<code>/(c|r)at/g</code> 或者 <code>/[cr]at/g</code></li>
+</ul>
+<h1 id="组和引用"><a href="# 组和引用" class="headerlink" title="组和引用"></a>组和引用</h1><h2 id="（捕获分组）"><a href="#（捕获分组）" class="headerlink" title="()（捕获分组）"></a><code>()</code>（捕获分组）</h2><p><code>()</code>：使表达式分组。</p>
+<p>示例一：</p>
+<ul>
+<li>文本：<code><span style="background-color: green;"><b>hahaha</b></span>, h, <span style="background-color: green;"><b>ha</b></span></code></li>
+<li>正则：<code>/(ha)+/g</code></li>
+</ul>
+<h2 id="1（引用）"><a href="#1（引用）" class="headerlink" title="\1（引用）"></a><code>\1</code>（引用）</h2><p><code>\1</code>：引用表达式的分组，数字表示为第几个分组。</p>
+<p>示例一：</p>
+<ul>
+<li>文本：<code><span style="background-color: green;"><b>hah</b></span>, haa, <span style="background-color: green;"><b>dad</b></span>, <span style="background-color: green;"><b>dad</b></span>a</code></li>
+<li>正则：<code>/(\w)a\1/g</code></li>
+<li>解释：捕获分组 <code>(\w)</code> 匹配一个字母字符（包括大小写字母、数字和下划线），第二个字符为 <code>a</code>，反向引用 <code>\1</code> 表示引用第一个捕获组中匹配到的内容。该正则匹配字符 <code>a</code> 左右两个字符相等的字符串。</li>
+</ul>
+<p>示例二：</p>
+<ul>
+<li>文本：<code><span style="background-color: green;"><b>hah</b></span>, haa, <span style="background-color: green;"><b>dad</b></span>, <span style="background-color: green;"><b>woawo</b></span>, <span style="background-color: green;"><b>dad</b></span>a</code></li>
+<li>正则：<code>/(\w+)a\1/g</code></li>
+<li>解释：捕获分组 <code>(\w+)</code> 至少匹配一个字母字符，第二个字符为 <code>a</code>，反向引用 <code>\1</code> 表示引用第一个捕获组中匹配到的内容。</li>
+</ul>
+<p>示例三：</p>
+<ul>
+<li>文本：<code>hah, haa, dad, <span style="background-color: green;"><b>wobwob</b></span>, <span style="background-color: green;"><b>dada</b></span></code></li>
+<li>正则：<code>/(\w+)([ab])\1\2/g</code></li>
+</ul>
+<h2 id="（非捕获组）"><a href="#（非捕获组）" class="headerlink" title="(?:)（非捕获组）"></a><code>(?:)</code>（非捕获组）</h2><p><code>(?:)</code>：创建无法引用的非捕获分组。它不是捕获分组，所以不能使用 <code>\1</code> 这种反向引用操作。</p>
+<p>示例一：</p>
+<ul>
+<li>文本：<code><span style="background-color: green;"><b>hahaha</b></span>, <span style="background-color: green;"><b>ha</b></span>h, <span style="background-color: green;"><b>ha</b></span>a<span style="background-color: green;"><b>ha</b></span></code></li>
+<li>正则：<code>/(?:ha)+/g</code></li>
+<li>解释：匹配至少出现一次 <code>ha</code> 的字符串。</li>
+</ul>
+<h1 id="零宽断言"><a href="# 零宽断言" class="headerlink" title="零宽断言"></a>零宽断言</h1><h2 id="（断言后面满足给定模式）"><a href="#（断言后面满足给定模式）" class="headerlink" title="(?=)（断言后面满足给定模式）"></a><code>(?=)</code>（断言后面满足给定模式）</h2><p><code>(?=)</code>：正向先行断言，就是断言后面的字符是否满足断言指定的模式，满足则匹配成功。</p>
+<p>示例一：</p>
+<ul>
+<li>文本：<code>1st, <span style="background-color: green;"><b>2</b></span>nd, 3pc, <span style="background-color: green;"><b>4</b></span>nd</code></li>
+<li>正则：<code>/\d(?=nd)/g</code></li>
+<li>解释：匹配满足一个数字后面紧跟 <code>nd</code> 的那个数字。在 <code>1st</code> 中有数字 <code>1</code>，但是在正向先行断言时，检查到的第一个字符为 <code>s</code>，与断言中的 <code>n</code> 不匹配，这时会停止匹配。</li>
+</ul>
+<blockquote>
+<p>正向先行断言记忆：看后面的字符是不是（<code>?</code>）等于（<code>=</code>）断言中的模式，等于则匹配成功。</p>
+</blockquote>
+<h2 id="（断言后面不满足给定模式）"><a href="#（断言后面不满足给定模式）" class="headerlink" title="?!（断言后面不满足给定模式）"></a><code>?!</code>（断言后面不满足给定模式）</h2><p><code>(?!)</code>：负向先行断言，就是断言后面的字符是否满足断言指定的模式，不满足则匹配成功。</p>
+<p>示例一：</p>
+<ul>
+<li>文本：<code><span style="background-color: green;"><b>1</b></span>st, 2nd, <span style="background-color: green;"><b>3</b></span>pc, <span style="background-color: green;"><b>4</b></span>ne</code></li>
+<li>正则：<code>/\d(?!nd)/g</code></li>
+<li>解释：匹配满足一个数字后面紧跟着的不是 <code>nd</code> 的那个数字。</li>
+</ul>
+<blockquote>
+<p>负向先行断言记忆：看后面的字符是不是（<code>?</code>）不等于（<code>!</code>）断言中的模式，不等于则匹配成功。</p>
+</blockquote>
+<h2 id="lt-（断言前面满足给定模式）"><a href="#lt-（断言前面满足给定模式）" class="headerlink" title="?&lt;=（断言前面满足给定模式）"></a><code>?&lt;=</code>（断言前面满足给定模式）</h2><p><code>(?&lt;=)</code>：正向后行断言，就是断言前面的字符是否满足断言指定的模式，满足则匹配成功。</p>
+<p>示例一：</p>
+<ul>
+<li>文本：<code>#1, $2, %<span style="background-color: green;"><b>3</b></span></code></li>
+<li>正则：<code>/(?&lt;=%)\d/g</code></li>
+<li>解释：匹配满足一个数字前面紧跟 <code>%</code> 的那个数字。</li>
+</ul>
+<blockquote>
+<p>正向后行断言记忆：看前面（<code>&lt;</code>）的字符是不是（<code>?</code>）等于（<code>=</code>）断言中的模式，等于则匹配成功。</p>
+</blockquote>
+<h2 id="lt-（断言前面不满足给定模式）"><a href="#lt-（断言前面不满足给定模式）" class="headerlink" title="?&lt;!（断言前面不满足给定模式）"></a><code>?&lt;!</code>（断言前面不满足给定模式）</h2><p><code>(?&lt;!)</code>：负向后行断言，就是断言前面的字符是否满足断言指定的模式，不满足则匹配成功。</p>
+<p>示例一：</p>
+<ul>
+<li>文本：<code>#<span style="background-color: green;"><b>1</b></span>, $<span style="background-color: green;"><b>2</b></span>, %3</code></li>
+<li>正则：<code>/(?&lt;!%)\d/g</code></li>
+<li>解释：匹配满足一个数字前面紧跟着的不是 <code>%</code> 的那个数字。</li>
+</ul>
+<blockquote>
+<p>负向后行断言记忆：看前面（<code>&lt;</code>）的字符是不是（<code>?</code>）不等于（<code>!</code>）断言中的模式，不等于则匹配成功。</p>
+</blockquote>
+<h1 id="示例：格式化定义"><a href="# 示例：格式化定义" class="headerlink" title="示例：格式化定义"></a>示例：格式化定义 </h1><p> 有时候我们写的代码会有些不规范，比如指针变量可以写成 <code>int* a;</code> 或者 <code>int * a;</code>，普通变量可以写成 <code>int   a;</code>。</p>
+<p>如何写一个正则表达式，来匹配所有不规范的，并格式化它呢？</p>
+<p>要规范化的代码：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">job</span>&#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">job</span>*  <span class="title">prev</span>;</span>  <span class="comment">/* pointer to previous job   */</span></span><br><span class="line">    <span class="type">void</span>   (*function)(<span class="type">void</span>* arg);  <span class="comment">/* function pointer          */</span></span><br><span class="line">    <span class="type">void</span>*  arg;  <span class="comment">/* function&#x27;s argument       */</span></span><br><span class="line">    <span class="type">void</span> ** arg2;</span><br><span class="line">    <span class="type">void</span> *a;</span><br><span class="line">&#125; job;</span><br></pre></td></tr></table></figure>
+
+<p>正则表达式：<code>/(?&lt;=\w)\s*(?&lt;!\/)\**\s+/gm</code></p>
+<p>这个正则表达式的含义是：</p>
+<ul>
+<li><p><code>(?&lt;=\w)</code>：断言前面是一个单词字符。</p>
+</li>
+<li><p><code>\s*</code>：匹配零个或多个空白字符。</p>
+</li>
+<li><p><code>(?&lt;!\/)</code>：断言前面不是斜杠字符。</p>
+</li>
+<li><p><code>\**</code>：匹配零个或多个星号字符。</p>
+</li>
+<li><p><code>\s+</code>：匹配一个或多个空白字符。</p>
+</li>
+</ul>
+<p>综合起来，这个正则表达式的作用是匹配在单词字符后面，按顺序地：可以有或没有空格、可以有或没有星号（不能是斜杠后面的星号）、至少一个空格。</p>
+<p>结果图：</p>
+<p><img src="../images/computer-basics/regex-example1.png" alt=""></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F/" rel="tag"># 正则表达式</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/231211184652.html" rel="prev" title="LeetCode 刷题之 1631 最小体力消耗路径">
+                  <i class="fa fa-angle-left"></i> LeetCode 刷题之 1631 最小体力消耗路径
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2023</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">aha</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">303k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">9:11</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+</div>
+  <div class="powered-by">
+    <!--由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动 -->
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script size="150" alpha="0.6" zIndex="-1" src="https://cdnjs.cloudflare.com/ajax/libs/ribbon.js/1.0.2/ribbon.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/next-theme-pjax/0.6.0/pjax.min.js" integrity="sha256-vxLn1tSKWD4dqbMRyv940UYw4sXgMtYcK6reefzZrao=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script><script src="/js/pjax.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+  <script data-pjax async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+<script src="https://unpkg.com/darkmode-js@1.5.7/lib/darkmode-js.min.js"></script>
+
+<script>
+var options = {
+  bottom: '64px',
+  right: 'unset',
+  left: '32px',
+  time: '0.5s',
+  mixColor: 'transparent',
+  backgroundColor: 'transparent',
+  buttonColorDark: '#3F3F3F',
+  buttonColorLight: '#fff',
+  saveInCookies: true,
+  label: '🌓',
+  autoMatchOsTheme: true
+}
+const darkmode = new Darkmode(options);
+window.darkmode = darkmode;
+darkmode.showWidget();
+</script>
+
+</body>
+</html>

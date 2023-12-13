@@ -32,7 +32,7 @@
 <meta property="og:image" content="https://pursue26.github.io/images/os-kernel/chapter4/segmentation-scheme.png">
 <meta property="og:image" content="https://pursue26.github.io/images/os-kernel/chapter4/page-addressing-scheme.png">
 <meta property="article:published_time" content="2023-11-11T09:25:07.000Z">
-<meta property="article:modified_time" content="2023-12-11T09:57:07.100Z">
+<meta property="article:modified_time" content="2023-12-13T11:00:26.157Z">
 <meta property="article:author" content="aha">
 <meta property="article:tag" content="操作系统">
 <meta property="article:tag" content="非连续内存分配">
@@ -161,18 +161,18 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">71</span>
+          <span class="site-state-item-count">72</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
           <a href="/categories/">
-        <span class="site-state-item-count">44</span>
+        <span class="site-state-item-count">43</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">86</span>
+        <span class="site-state-item-count">87</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -236,7 +236,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2023-12-11 17:57:07" itemprop="dateModified" datetime="2023-12-11T17:57:07+08:00">2023-12-11</time>
+      <time title="修改时间：2023-12-13 19:00:26" itemprop="dateModified" datetime="2023-12-13T19:00:26+08:00">2023-12-13</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -311,7 +311,7 @@
 </li>
 </ul>
 <h2 id="非连续内存分配"><a href="# 非连续内存分配" class="headerlink" title="非连续内存分配"></a>非连续内存分配 </h2><h3 id="分段（segmentation）"><a href="# 分段（segmentation）" class="headerlink" title="分段（segmentation）"></a> 分段（segmentation）</h3><h4 id="分段"><a href="# 分段" class="headerlink" title="分段"></a>分段 </h4><p> 分段（segmentation）是一种非连续内存分配技术，用于操作系统中 <strong> 管理进程的内存空间</strong>。在分段技术中，进程的内存空间被划分为多个段，每个段具有不同的大小和功能。</p>
-<img src="/images/os-kernel/chapter4/process-memory-segmentation.png" alt="进程内存空间划分" width="50%" height="50%">
+<img src="../images/os-kernel/chapter4/process-memory-segmentation.png" alt="进程内存空间划分" width="50%" height="50%">
 
 <p>「段」：在程序执行时，会存在来自不同文件的函数和不同的数据字段。这些函数可能分布在程序的不同文件中，而数据字段则可以包括堆、栈、.bss、.data 等不同类型。</p>
 <ul>
@@ -321,9 +321,9 @@
 <li>.data 用于存储已初始化的静态变量</li>
 </ul>
 <p>「分段」：更好的实现内存的分离和共享。</p>
-<p>程序的分段地址空间如下图所示：<br><img src="/images/os-kernel/chapter4/process-segmentation-space.png" alt="程序的分段地址空间" width="60%" height="60%"></p>
+<p>程序的分段地址空间如下图所示：<br><img src="../images/os-kernel/chapter4/process-segmentation-space.png" alt="程序的分段地址空间" width="60%" height="60%"></p>
 <p>把左边运行程序的逻辑地址空间看成一个连续的一维线性数组，通过段机制的映射关系，把不同的内存块（如：代码、数据、堆、栈）分别映射到不同的内存中的段，可以看到映射到物理地址空间后，位置不一样，变得不连续了。</p>
-<p>分段的逻辑视图，连续的逻辑地址空间被分配到物理空间中的不连续内存空间中：<br><img src="/images/os-kernel/chapter4/segmentation-logical-view.png" alt="分段的逻辑视图" width="60%" height="60%"></p>
+<p>分段的逻辑视图，连续的逻辑地址空间被分配到物理空间中的不连续内存空间中：<br><img src="../images/os-kernel/chapter4/segmentation-logical-view.png" alt="分段的逻辑视图" width="60%" height="60%"></p>
 <h4 id="段表"><a href="# 段表" class="headerlink" title="段表"></a>段表 </h4><p> 段表是一种数据结构，用于 <strong> 存储和管理分段技术下的进程内存空间</strong>。它通常是一个数组或链表，每个元素表示一个段的相关信息。一个段对应着一个内存块。</p>
 <p>下面是一个简化的段表数据结构示例：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">SegmentEntry</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> segmentID;      <span class="comment">// 段 ID</span></span><br><span class="line">    <span class="type">int</span> baseAddress;    <span class="comment">// 段基址</span></span><br><span class="line">    <span class="type">int</span> limit;          <span class="comment">// 段界限</span></span><br><span class="line">    <span class="type">int</span> permissions;    <span class="comment">// 段访问权限</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
@@ -337,7 +337,7 @@
 </ul>
 <p>段表根据进程的需要进行动态更新，以反映内存中段的分配和释放情况。通过段表，操作系统可以轻松地查找和管理进程的各个段，实现内存隔离和安全性。</p>
 <h4 id="分段寻址方案"><a href="# 分段寻址方案" class="headerlink" title="分段寻址方案"></a>分段寻址方案 </h4><p> 逻辑地址空间连续，但是物理地址空间不连续，使用映射机制进行关联。</p>
-<img src="/images/os-kernel/chapter4/segmentation-scheme.png" alt="硬件分段实现方案" width="60%" height="60%">
+<img src="../images/os-kernel/chapter4/segmentation-scheme.png" alt="硬件分段实现方案" width="60%" height="60%">
 
 <p>程序访问物理内存地址需要：一个二维的二元组 <code>(segmentID, addrOffset)</code>，即 <code>(段号, 段内偏移地址)</code>。</p>
 <p>操作系统会维护一张段表，以 <code>segmentID</code> 为索引，存储着 <code>(baseAddress, limit)</code> 信息。</p>
@@ -389,7 +389,7 @@
 </blockquote>
 <h4 id="页寻址方案"><a href="# 页寻址方案" class="headerlink" title="页寻址方案"></a>页寻址方案 </h4><p> 页寻址要解决的就是，如何通过逻辑地址访问到对应的物理内存空间的数据。</p>
 <p>当进程需要访问一个逻辑地址时，操作系统将逻辑地址分成两个部分：页号（page number）和页内偏移（page offset）。页号用于索引页表（page table），页表记录了每个页号对应的物理页帧号。通过找到页表中对应的物理页帧号，再加上页内偏移，就可以得到实际的物理地址，从而进行物理内存访问。</p>
-<img src="/images/os-kernel/chapter4/page-addressing-scheme.png" alt="页寻址方案" width="60%" height="60%">
+<img src="../images/os-kernel/chapter4/page-addressing-scheme.png" alt="页寻址方案" width="60%" height="60%">
 
 <blockquote>
 <p>页寻址过程：逻辑地址 -&gt; 页号 -&gt; 查找页表 -&gt; 物理页帧号 -&gt; 利用页内偏移 -&gt; 实际物理地址 -&gt; 物理内存访问。</p>
@@ -463,13 +463,13 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-line"></i>
     </span>
-    <span title="站点总字数">299k</span>
+    <span title="站点总字数">303k</span>
   </span>
   <span class="post-meta-item">
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">9:05</span>
+    <span title="站点阅读时长">9:11</span>
   </span>
 </div>
 <div class="busuanzi-count">
