@@ -19,19 +19,21 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"pursue26.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.18.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":null},"fold":{"enable":true,"height":300},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
 
-    <meta name="description" content="本文介绍进程的调度算法，包括进程调度的相关背景、调度准则、调度算法等。">
+    <meta name="description" content="本文介绍进程的调度算法，包括进程调度的相关背景、调度准则，以及各种调度算法。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="操作系统之 chapter8 调度">
 <meta property="og:url" content="https://pursue26.github.io/posts/231228193143.html">
 <meta property="og:site_name" content="aha&#39;s blog">
-<meta property="og:description" content="本文介绍进程的调度算法，包括进程调度的相关背景、调度准则、调度算法等。">
+<meta property="og:description" content="本文介绍进程的调度算法，包括进程调度的相关背景、调度准则，以及各种调度算法。">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://pursue26.github.io/images/os-kernel/chapter8/cpu-vs-io-model.png">
 <meta property="og:image" content="https://pursue26.github.io/images/os-kernel/chapter8/fcfs-algorithm.png">
 <meta property="og:image" content="https://pursue26.github.io/images/os-kernel/chapter8/spn-algorithm.png">
 <meta property="og:image" content="https://pursue26.github.io/images/os-kernel/chapter8/spn-turnaround.png">
+<meta property="og:image" content="https://pursue26.github.io/images/os-kernel/chapter8/rr-algorithm.png">
+<meta property="og:image" content="https://pursue26.github.io/images/os-kernel/chapter8/mfq-algorithm.png">
 <meta property="article:published_time" content="2023-12-28T11:31:43.000Z">
-<meta property="article:modified_time" content="2023-12-28T11:32:15.028Z">
+<meta property="article:modified_time" content="2023-12-29T07:01:26.813Z">
 <meta property="article:author" content="aha">
 <meta property="article:tag" content="操作系统">
 <meta property="article:tag" content="调度算法">
@@ -146,7 +148,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%83%8C%E6%99%AF"><span class="nav-number">1.</span> <span class="nav-text">背景 </span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8A%E4%B8%8B%E6%96%87%E5%88%87%E6%8D%A2"><span class="nav-number">1.1.</span> <span class="nav-text"> 上下文切换</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CPU%20%E8%B0%83%E5%BA%A6"><span class="nav-number">1.2.</span> <span class="nav-text">CPU 调度</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%86%85%E6%A0%B8%E8%BF%90%E8%A1%8C%E8%B0%83%E5%BA%A6%E7%A8%8B%E5%BA%8F%E7%9A%84%E6%9D%A1%E4%BB%B6"><span class="nav-number">1.3.</span> <span class="nav-text">内核运行调度程序的条件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8D%E5%8F%AF%E6%8A%A2%E5%8D%A0%E7%B3%BB%E7%BB%9F"><span class="nav-number">1.4.</span> <span class="nav-text">不可抢占系统</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%AF%E4%BB%A5%E6%8A%A2%E5%8D%A0%E7%B3%BB%E7%BB%9F"><span class="nav-number">1.5.</span> <span class="nav-text">可以抢占系统</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%B0%83%E5%BA%A6%E5%8E%9F%E5%88%99"><span class="nav-number">2.</span> <span class="nav-text">调度原则 </span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B0%83%E5%BA%A6%E7%AD%96%E7%95%A5"><span class="nav-number">2.1.</span> <span class="nav-text"> 调度策略</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A8%8B%E5%BA%8F%E6%89%A7%E8%A1%8C%E6%A8%A1%E5%9E%8B"><span class="nav-number">2.2.</span> <span class="nav-text">程序执行模型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%84%E4%BB%B7%E6%8C%87%E6%A0%87"><span class="nav-number">2.3.</span> <span class="nav-text">评价指标</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%84%E4%BB%B7%E6%8C%87%E6%A0%87%E4%B8%8D%E5%8F%AF%E5%85%BC%E5%BE%97"><span class="nav-number">2.4.</span> <span class="nav-text">评价指标不可兼得 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B0%86%E3%80%8C%E5%85%AC%E5%B9%B3%E3%80%8D%E4%BD%9C%E4%B8%BA%E9%87%8D%E8%A6%81%E6%8C%87%E6%A0%87"><span class="nav-number">2.5.</span> <span class="nav-text">将「公平」作为重要指标</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%B0%83%E5%BA%A6%E7%AE%97%E6%B3%95"><span class="nav-number">3.</span> <span class="nav-text">调度算法 </span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%88%E6%9D%A5%E5%85%88%E6%9C%8D%E5%8A%A1%E7%AE%97%E6%B3%95%EF%BC%88FCFS%EF%BC%89"><span class="nav-number">3.1.</span> <span class="nav-text"> 先来先服务算法（FCFS）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AE%97%E6%B3%95%E7%89%B9%E7%82%B9"><span class="nav-number">3.1.1.</span> <span class="nav-text">算法特点 </span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9F%AD%E8%BF%9B%E7%A8%8B%E4%BC%98%E5%85%88%E7%AE%97%E6%B3%95%EF%BC%88SPN-SJF-SRT%EF%BC%89"><span class="nav-number">3.2.</span> <span class="nav-text">短进程优先算法（SPN(SJF) &#x2F; SRT）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%80%E4%BC%98%E5%B9%B3%E5%9D%87%E5%91%A8%E8%BD%AC%E6%97%B6%E9%97%B4"><span class="nav-number">3.2.1.</span> <span class="nav-text">最优平均周转时间 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AE%97%E6%B3%95%E7%89%B9%E7%82%B9%20-1"><span class="nav-number">3.2.2.</span> <span class="nav-text">算法特点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%9B%E7%A8%8B%E6%89%A7%E8%A1%8C%E6%97%B6%E9%97%B4%E9%A2%84%E4%BC%B0"><span class="nav-number">3.2.3.</span> <span class="nav-text">进程执行时间预估 </span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%80%E9%AB%98%E5%93%8D%E5%BA%94%E6%AF%94%E4%BC%98%E5%85%88%E7%AE%97%E6%B3%95%EF%BC%88HRRN%EF%BC%89"><span class="nav-number">3.3.</span> <span class="nav-text">最高响应比优先算法（HRRN）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AE%97%E6%B3%95%E7%89%B9%E7%82%B9%20-2"><span class="nav-number">3.3.1.</span> <span class="nav-text">算法特点</span></a></li></ol></li></ol></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%83%8C%E6%99%AF"><span class="nav-number">1.</span> <span class="nav-text">背景 </span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8A%E4%B8%8B%E6%96%87%E5%88%87%E6%8D%A2"><span class="nav-number">1.1.</span> <span class="nav-text"> 上下文切换</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CPU%20%E8%B0%83%E5%BA%A6"><span class="nav-number">1.2.</span> <span class="nav-text">CPU 调度</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%86%85%E6%A0%B8%E8%BF%90%E8%A1%8C%E8%B0%83%E5%BA%A6%E7%A8%8B%E5%BA%8F%E7%9A%84%E6%9D%A1%E4%BB%B6"><span class="nav-number">1.3.</span> <span class="nav-text">内核运行调度程序的条件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8D%E5%8F%AF%E6%8A%A2%E5%8D%A0%E7%B3%BB%E7%BB%9F"><span class="nav-number">1.4.</span> <span class="nav-text">不可抢占系统</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%AF%E4%BB%A5%E6%8A%A2%E5%8D%A0%E7%B3%BB%E7%BB%9F"><span class="nav-number">1.5.</span> <span class="nav-text">可以抢占系统</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%B0%83%E5%BA%A6%E5%8E%9F%E5%88%99"><span class="nav-number">2.</span> <span class="nav-text">调度原则 </span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B0%83%E5%BA%A6%E7%AD%96%E7%95%A5"><span class="nav-number">2.1.</span> <span class="nav-text"> 调度策略</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A8%8B%E5%BA%8F%E6%89%A7%E8%A1%8C%E6%A8%A1%E5%9E%8B"><span class="nav-number">2.2.</span> <span class="nav-text">程序执行模型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%84%E4%BB%B7%E6%8C%87%E6%A0%87"><span class="nav-number">2.3.</span> <span class="nav-text">评价指标</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%84%E4%BB%B7%E6%8C%87%E6%A0%87%E4%B8%8D%E5%8F%AF%E5%85%BC%E5%BE%97"><span class="nav-number">2.4.</span> <span class="nav-text">评价指标不可兼得 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B0%86%E3%80%8C%E5%85%AC%E5%B9%B3%E3%80%8D%E4%BD%9C%E4%B8%BA%E9%87%8D%E8%A6%81%E6%8C%87%E6%A0%87"><span class="nav-number">2.5.</span> <span class="nav-text">将「公平」作为重要指标</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%B0%83%E5%BA%A6%E7%AE%97%E6%B3%95"><span class="nav-number">3.</span> <span class="nav-text">调度算法 </span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%88%E6%9D%A5%E5%85%88%E6%9C%8D%E5%8A%A1%E7%AE%97%E6%B3%95%EF%BC%88FCFS%EF%BC%89"><span class="nav-number">3.1.</span> <span class="nav-text"> 先来先服务算法（FCFS）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AE%97%E6%B3%95%E7%89%B9%E7%82%B9"><span class="nav-number">3.1.1.</span> <span class="nav-text">算法特点 </span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9F%AD%E8%BF%9B%E7%A8%8B%E4%BC%98%E5%85%88%E7%AE%97%E6%B3%95%EF%BC%88SPN-SRT%EF%BC%89"><span class="nav-number">3.2.</span> <span class="nav-text">短进程优先算法（SPN&#x2F;SRT）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%80%E4%BC%98%E5%B9%B3%E5%9D%87%E5%91%A8%E8%BD%AC%E6%97%B6%E9%97%B4"><span class="nav-number">3.2.1.</span> <span class="nav-text">最优平均周转时间 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AE%97%E6%B3%95%E7%89%B9%E7%82%B9%20-1"><span class="nav-number">3.2.2.</span> <span class="nav-text">算法特点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%9B%E7%A8%8B%E6%89%A7%E8%A1%8C%E6%97%B6%E9%97%B4%E9%A2%84%E4%BC%B0"><span class="nav-number">3.2.3.</span> <span class="nav-text">进程执行时间预估 </span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%80%E9%AB%98%E5%93%8D%E5%BA%94%E6%AF%94%E4%BC%98%E5%85%88%E7%AE%97%E6%B3%95%EF%BC%88HRRN%EF%BC%89"><span class="nav-number">3.3.</span> <span class="nav-text">最高响应比优先算法（HRRN）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AE%97%E6%B3%95%E7%89%B9%E7%82%B9%20-2"><span class="nav-number">3.3.1.</span> <span class="nav-text">算法特点</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%97%B6%E9%97%B4%E7%89%87%E8%BD%AE%E8%AF%A2%E7%AE%97%E6%B3%95%EF%BC%88RR%EF%BC%89"><span class="nav-number">3.4.</span> <span class="nav-text">时间片轮询算法（RR）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BD%AE%E8%AF%A2%E7%AE%97%E6%B3%95%E7%A4%BA%E4%BE%8B"><span class="nav-number">3.4.1.</span> <span class="nav-text">轮询算法示例 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AE%97%E6%B3%95%E7%89%B9%E7%82%B9%20-3"><span class="nav-number">3.4.2.</span> <span class="nav-text">算法特点</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%9A%E7%BA%A7%E9%98%9F%E5%88%97%EF%BC%88MQ%EF%BC%89"><span class="nav-number">3.5.</span> <span class="nav-text">多级队列（MQ）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AE%97%E6%B3%95%E7%89%B9%E7%82%B9%20-4"><span class="nav-number">3.5.1.</span> <span class="nav-text">算法特点</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%9A%E7%BA%A7%E5%8F%8D%E9%A6%88%E9%98%9F%E5%88%97%EF%BC%88MFQ%EF%BC%89"><span class="nav-number">3.6.</span> <span class="nav-text">多级反馈队列（MFQ）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AE%97%E6%B3%95%E7%89%B9%E7%82%B9%20-5"><span class="nav-number">3.6.1.</span> <span class="nav-text">算法特点 </span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%B0%83%E5%BA%A6%E7%AE%97%E6%B3%95%E6%80%BB%E7%BB%93"><span class="nav-number">4.</span> <span class="nav-text">调度算法总结</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -226,9 +228,15 @@
         <i class="far fa-calendar"></i>
       </span>
       <span class="post-meta-item-text">发表于</span>
-      
 
-      <time title="创建时间：2023-12-28 19:31:43 / 修改时间：19:32:15" itemprop="dateCreated datePublished" datetime="2023-12-28T19:31:43+08:00">2023-12-28</time>
+      <time title="创建时间：2023-12-28 19:31:43" itemprop="dateCreated datePublished" datetime="2023-12-28T19:31:43+08:00">2023-12-28</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2023-12-29 15:01:26" itemprop="dateModified" datetime="2023-12-29T15:01:26+08:00">2023-12-29</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -258,14 +266,14 @@
         <i class="far fa-file-word"></i>
       </span>
       <span class="post-meta-item-text">本文字数：</span>
-      <span>2.6k</span>
+      <span>4.3k</span>
     </span>
     <span class="post-meta-item" title="阅读时长">
       <span class="post-meta-item-icon">
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">阅读时长 &asymp;</span>
-      <span>5 分钟</span>
+      <span>8 分钟</span>
     </span>
 </div>
 
@@ -275,7 +283,7 @@
     
     
     
-    <div class="post-body" itemprop="articleBody"><p>本文介绍进程的调度算法，包括进程调度的相关背景、调度准则、调度算法等。</p>
+    <div class="post-body" itemprop="articleBody"><p>本文介绍进程的调度算法，包括进程调度的相关背景、调度准则，以及各种调度算法。</p>
 <span id="more"></span>
 
 <h1 id="背景"><a href="# 背景" class="headerlink" title="背景"></a>背景 </h1><h2 id="上下文切换"><a href="# 上下文切换" class="headerlink" title="上下文切换"></a> 上下文切换</h2><ul>
@@ -387,7 +395,7 @@
 <li>花费时间少的任务可能排在花费时间长的任务后面；</li>
 <li>可能导致 I/O 和 CPU 之间的重叠处理（一起闲、一起忙）：CPU 密集型进程会导致 I/O 设备闲置时，I/O 密集型进程也在等待。</li>
 </ul>
-<h2 id="短进程优先算法（SPN-SJF-SRT）"><a href="# 短进程优先算法（SPN-SJF-SRT）" class="headerlink" title="短进程优先算法（SPN(SJF) / SRT）"></a>短进程优先算法（SPN(SJF) / SRT）</h2><p>在 FCFS 算法中，如果把短进程排到前面，周转时间会下降。因此，提出短进程优先调度算法。</p>
+<h2 id="短进程优先算法（SPN-SRT）"><a href="# 短进程优先算法（SPN-SRT）" class="headerlink" title="短进程优先算法（SPN/SRT）"></a>短进程优先算法（SPN/SRT）</h2><p>在 FCFS 算法中可以观察到，如果把短进程排到前面，周转时间会下降。因此，短进程优先调度算法被提出。</p>
 <ul>
 <li>短进程优先算法：Shortest Process Next, SPN</li>
 <li>短作业优先算法：Shortest Job First, SJF</li>
@@ -400,22 +408,22 @@
 <img src="../images/os-kernel/chapter8/spn-algorithm.png" alt="短进程优先算法" width="80%" height="80%">
 
 <p>如上图，就绪队列中的四个进程 <code>w, x, y, z</code> 的完成时间分别是 <code>9, 12, 34, 62</code>，因此进程 <code>w</code> 在队列头、进程 <code>z</code> 在队列尾。</p>
-<p>在抢占式 SRT 调度算法中，如果发现某个进程比当前进程 <code>w</code> 的剩余时间片还短，则 <strong> 抢占 CPU 并运行该进程</strong>；而在 SPN 调度算法中，不可抢占，会将该进程放到就绪队列最前面。</p>
+<blockquote>
+<p>在抢占式 SRT 调度算法中，如果发现某个进程比当前进程的剩余时间片还短，则 <strong> 抢占 CPU 并运行该进程</strong>。在 SPN 调度算法中，不可抢占，会将该进程放到就绪队列最前面。</p>
+</blockquote>
 <h3 id="最优平均周转时间"><a href="# 最优平均周转时间" class="headerlink" title="最优平均周转时间"></a>最优平均周转时间 </h3><p> 短进程优先算法具有最优平均周转时间。</p>
 <img src="../images/os-kernel/chapter8/spn-turnaround.png" alt="SPN 最优平均周转时间" width="80%" height="80%">
 
-<p>如上图，如果按进程的完成时间从短到长来调度，则具有最优的平均周转时间。其它情况，如将 <code>P3</code> 安排在 <code>P5</code> 后运行，则不具有最优的平均周转时间。</p>
+<p>如上图，如果按进程的完成时间从短到长来调度，可以证明其具有最优的平均周转时间。其它情况下，如将 <code>P3</code> 安排在 <code>P5</code> 后运行，则不具有最优的平均周转时间。</p>
 <h3 id="算法特点 -1"><a href="# 算法特点 -1" class="headerlink" title="算法特点"></a>算法特点</h3><p>SPN (SJF) 调度算法的问题：</p>
 <ul>
-<li><p><strong>可能会导致饥饿</strong>：当有连续的短任务流时，长任务可能会被短任务持续占用 CPU，导致长任务等待时间增加，可能出现饥饿现象。</p>
-</li>
-<li><p><strong>需要预测下一个 CPU 突发持续时间（进程在一次调度中连续占用 CPU 的时间长度）</strong>：</p>
-<ul>
-<li>简单的解决: 询问用户。但如果用户欺骗呢？就杀死进程！那如果用户不知道怎么办？</li>
+<li><strong>可能会导致饥饿</strong>：当有连续的短任务流时，长任务可能会被短任务持续占用 CPU，导致长任务等待时间增加，可能出现饥饿现象。</li>
+<li><strong>需要预测下一个 CPU 突发持续时间（进程在一次调度中连续占用 CPU 的时间长度）</strong>。<ul>
+<li>简单的解决：询问用户。但如果用户欺骗呢？就杀死进程！那如果用户不知道怎么办？</li>
 </ul>
 </li>
 </ul>
-<h3 id="进程执行时间预估"><a href="# 进程执行时间预估" class="headerlink" title="进程执行时间预估"></a>进程执行时间预估 </h3><p><strong> 用历史 </strong> 的执行时间 $t_{n}$ 和预估时间 $\tau_{n}$ <strong>来估计未来 </strong> 的执行时间 $\tau_{n+1}$。其中，$t_{n}$ 为第 $n$ 次 <strong> 实际的 </strong>CPU 突发的持续时间，$\tau_{n}$ 为第 $n+1$ 次<strong> 预估的</strong>CPU 突发的持续时间。</p>
+<h3 id="进程执行时间预估"><a href="# 进程执行时间预估" class="headerlink" title="进程执行时间预估"></a>进程执行时间预估 </h3><p><strong> 用历史 </strong> 的执行时间 $t_{n}$ 和预估时间 $\tau_{n}$ <strong>来估计未来 </strong> 的执行时间 $\tau_{n+1}$。其中，$t_{n}$ 为第 $n$ 次 <strong> 实际的 </strong>CPU 突发的持续时间，$\tau_{n}$ 为第 $n$ 次<strong> 预估的</strong>CPU 突发的持续时间。</p>
 <p>$$<br>\tau_{n+1} = \alpha t_{n} + (1 - \alpha)\tau_{n}, \quad \alpha \in [0, 1]<br>$$</p>
 <h2 id="最高响应比优先算法（HRRN）"><a href="# 最高响应比优先算法（HRRN）" class="headerlink" title="最高响应比优先算法（HRRN）"></a>最高响应比优先算法（HRRN）</h2><p>最高响应比优先算法（Highest Response Ratio Next, HRRN）为非抢占式调度算法。</p>
 <p><strong>调度策略：选择就绪就绪队列中响应比最高的进程</strong>。其中，响应比 $R = \frac{w + s}{s} = 1 + \frac{w}{s}$，$w$ 表示等待时间（waiting time），$s$ 表示服务执行时间（service time）。</p>
@@ -427,6 +435,147 @@
 <li>防止长任务被无限期推迟。</li>
 <li><strong>依然需要预估服务执行时间</strong>。</li>
 </ul>
+<h2 id="时间片轮询算法（RR）"><a href="# 时间片轮询算法（RR）" class="headerlink" title="时间片轮询算法（RR）"></a>时间片轮询算法（RR）</h2><p>时间片轮询算法（Round Robin, RR）将为每个进程被分配一个固定的时间片，<strong>当一个进程的时间片用完后，它会被剥夺 CPU，并放到就绪队列的末尾，等待下一次调度</strong>。</p>
+<p>这种方式使得每个进程能够公平地分享 CPU 时间，避免了长时间的饥饿现象。同时，时间片轮转算法也 <strong> 具有抢占性</strong>，因为当一个进程的时间片用完时，它可以被剥夺 CPU，并让其他进程获得执行的机会。</p>
+<p>时间片轮询算法 <strong> 调度策略：使用时间片和抢占来轮流执行就绪队列中的任务</strong>。一个进程的时间片用完后，按 FCFS 算法切换到下一个就绪进程。</p>
+<img src="../images/os-kernel/chapter8/rr-algorithm.png" alt="时间片轮询算法" width="80%" height="80%">
+
+<h3 id="轮询算法示例"><a href="# 轮询算法示例" class="headerlink" title="轮询算法示例"></a>轮询算法示例 </h3><p> 假设有如下进程：</p>
+<table>
+<thead>
+<tr>
+<th align="center">进程</th>
+<th align="center">执行时间</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">P1</td>
+<td align="center">53</td>
+</tr>
+<tr>
+<td align="center">P2</td>
+<td align="center">8</td>
+</tr>
+<tr>
+<td align="center">P3</td>
+<td align="center">68</td>
+</tr>
+<tr>
+<td align="center">P4</td>
+<td align="center">24</td>
+</tr>
+</tbody></table>
+<p>假设为进程分配的时间片为 20，进程没有 I/O 等待，那么进程调度的甘特图为：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">        | P1  | P2 | P3  | P4  | P1  | P3  | P4 | P1 | P3  | P3 |</span><br><span class="line">    ----|-----|----|-----|-----|-----|-----|----|----|-----|----|---&gt;</span><br><span class="line">time    0    20   28    48    68    88    108  112  125   145  153</span><br><span class="line">gap       20    8    20    20    20    20    4    13   20    8</span><br></pre></td></tr></table></figure>
+
+<p>每个进程的等待时间为：<br>$$<br>\begin{cases}<br>P1 = (68-20) + (112-88) = 72 \\<br>P2 = (20-0) = 20 \\<br>P3 = (28-0) + (88-48) + (125-108) = 85 \\<br>P4 = (48-0) + (108-68) = 88<br>\end{cases}<br>$$</p>
+<p>平均等待时间为：<br>$$<br>P_{avg} = (72+20+85+88)/4 = 66.25<br>$$</p>
+<blockquote>
+<p>一般 FCFS 算法比 RR 算法的平均等待时间更短——这是因为 FCFS 中没有频繁的上下文切换（一个进程执行完毕后，才会切换一次上下文，执行下一个进程）。但是，FCFS 达不到像 RR 那样及时响应每一个进程。</p>
+</blockquote>
+<h3 id="算法特点 -3"><a href="# 算法特点 -3" class="headerlink" title="算法特点"></a>算法特点</h3><ul>
+<li>RR 花销：额外的上下文切换（以保证每个进程都有机会被执行）。</li>
+<li>若时间片分配太大：<ul>
+<li>进程等待时间过长；</li>
+<li>极限情况下会退化成 FCFS 算法。</li>
+</ul>
+</li>
+<li>若时间片分配太小：<ul>
+<li>反应迅速；</li>
+<li>吞吐量因大量的上下文切换开销而受到影响。</li>
+</ul>
+</li>
+</ul>
+<p>目标：</p>
+<ul>
+<li>选择一个合适的时间片大小</li>
+<li>经验规则：维持上下文切换的开销在 1% 以内（占程序运行），是可以接受的。</li>
+</ul>
+<h2 id="多级队列（MQ）"><a href="# 多级队列（MQ）" class="headerlink" title="多级队列（MQ）"></a>多级队列（MQ）</h2><p>多级队列（Multilevel Queues, MQ）<strong>将进程放在多个就绪队列，每个队列具有不同的优先级</strong>。</p>
+<p>就绪队列被划分成多个独立的队列：</p>
+<ul>
+<li>比如，前台（交互）、后台（批处理）</li>
+</ul>
+<p>每个队列拥有自己的调度策略：</p>
+<ul>
+<li>比如，前台（RR）、后台（FCFS）</li>
+</ul>
+<p>调度必须在不同的队列间进行：</p>
+<ul>
+<li>以固定优先级方式调度：先处理前台队列，再处理后台队列。<ul>
+<li>可能造成饥饿。</li>
+</ul>
+</li>
+<li>以时间片轮询方式调度：每个队列都得到一个确定的能够调度其进程的 CPU 总时间。<ul>
+<li>比如，80% 给使用 RR 的前台，20% 给使用 FCFS 的后台。</li>
+</ul>
+</li>
+</ul>
+<h3 id="算法特点 -4"><a href="# 算法特点 -4" class="headerlink" title="算法特点"></a>算法特点</h3><ul>
+<li>保证公平性的同时，尽量减少进程的等待时间。</li>
+<li>高优先级队列中的进程可以立即执行。</li>
+<li>低优先级队列中的进程可以获得更多的时间片来执行，从而增加了它们完成的机会。</li>
+<li>可以根据进程的行为动态地调整优先级。</li>
+</ul>
+<h2 id="多级反馈队列（MFQ）"><a href="# 多级反馈队列（MFQ）" class="headerlink" title="多级反馈队列（MFQ）"></a>多级反馈队列（MFQ）</h2><p>在多级队列中，各个队列之间是没有交互的。进一步改进，<strong>进程可在不同队列间移动的多级队列算法 </strong>，即多级反馈队列（Multilevel Feedback Queues, MFQ）算法，它<strong> 可以根据情况（反馈）调整进程的优先级、队列</strong>。</p>
+<ol>
+<li>初始时，所有进程都被放入最高优先级的队列中。</li>
+<li>当一个进程获得执行时，它被分配一个时间片来执行，如果在时间片用完之前进程没有完成，<strong>它将被移到下一个较低优先级的队列中</strong>。</li>
+<li>如果一个进程在一个较低优先级队列中 <strong> 等待了一段时间仍然没有执行，它可以被提升到更高优先级的队列中</strong>。</li>
+</ol>
+<img src="../images/os-kernel/chapter8/mfq-algorithm.png" alt="多级反馈队列算法" width="80%" height="80%">
+
+<h3 id="算法特点 -5"><a href="# 算法特点 -5" class="headerlink" title="算法特点"></a>算法特点 </h3><p> 优点：</p>
+<ul>
+<li>CPU 密集型任务的优先级下降很快；</li>
+<li>I/O 密集型任务停留在高优先级（这是因为这种进程存在 I/O 等待，分配给它的时间片用不完，不会被降级）。</li>
+</ul>
+<h1 id="调度算法总结"><a href="# 调度算法总结" class="headerlink" title="调度算法总结"></a>调度算法总结</h1><table>
+<thead>
+<tr>
+<th>调度算法</th>
+<th>特点</th>
+<th>是否可抢占</th>
+<th>是否饥饿</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>先来先服务（FCFS）</td>
+<td>不公平，平均等待时间较长</td>
+<td>否</td>
+<td>是</td>
+</tr>
+<tr>
+<td>短进程优先（SPN / SRT）</td>
+<td>不公平，平均等待时间较短，需要预估进程执行时间</td>
+<td>否</td>
+<td>是</td>
+</tr>
+<tr>
+<td>最高响应比优先（HRRN）</td>
+<td>不公平，考虑等待时间和执行时间的比例，防止长任务被无限期推迟</td>
+<td>否</td>
+<td>是</td>
+</tr>
+<tr>
+<td>时间片轮循（RR）</td>
+<td>公平，但是平均等待时间较长</td>
+<td>是</td>
+<td>否</td>
+</tr>
+<tr>
+<td>多级反馈队列（MFQ）</td>
+<td>结合多种算法，根据进程需求动态调整优先级</td>
+<td>是</td>
+<td>否</td>
+</tr>
+<tr>
+<td>公平共享调度（FSS）</td>
+<td>公平是第一要素</td>
+<td>是</td>
+<td>否</td>
+</tr>
+</tbody></table>
 <blockquote>
 <p>参考资料：<br>1：<a target="_blank" rel="noopener" href="https://github.com/OXygenMoon/OperatingSystemInDepth">https://github.com/OXygenMoon/OperatingSystemInDepth</a><br>2：<a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_53407527/article/details/125097356">https://blog.csdn.net/weixin_53407527/article/details/125097356</a></p>
 </blockquote>
@@ -483,13 +632,13 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-line"></i>
     </span>
-    <span title="站点总字数">349k</span>
+    <span title="站点总字数">351k</span>
   </span>
   <span class="post-meta-item">
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">10:35</span>
+    <span title="站点阅读时长">10:38</span>
   </span>
 </div>
 <div class="busuanzi-count">
