@@ -12,7 +12,7 @@
 
 <link rel="stylesheet" href="/css/main.css">
 
-<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Noto+Serif+SC:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha256-HtsXJanqjKTc8vVQjO4YMhiqFoXkfBsjBWcX91T1jr8=" crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
@@ -27,7 +27,7 @@
 <meta property="og:description" content="typedef 关键字用于自定义数据类型的一个别名，或者称之为「定义了一种新的数据类型」。它可以有效简化定义一个复杂数据类型的代码实现。">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2023-09-18T09:42:23.000Z">
-<meta property="article:modified_time" content="2023-12-02T09:27:57.220Z">
+<meta property="article:modified_time" content="2024-01-05T05:46:34.391Z">
 <meta property="article:author" content="aha">
 <meta property="article:tag" content="typedef">
 <meta property="article:tag" content="右左原则">
@@ -153,18 +153,18 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">81</span>
+          <span class="site-state-item-count">82</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
           <a href="/categories/">
-        <span class="site-state-item-count">46</span>
+        <span class="site-state-item-count">47</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">100</span>
+        <span class="site-state-item-count">102</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -228,7 +228,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2023-12-02 17:27:57" itemprop="dateModified" datetime="2023-12-02T17:27:57+08:00">2023-12-02</time>
+      <time title="修改时间：2024-01-05 13:46:34" itemprop="dateModified" datetime="2024-01-05T13:46:34+08:00">2024-01-05</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -315,17 +315,17 @@
 <li><p>定义结构体变量：其中有具体的数据，也为变量分配内存单元。</p>
 </li>
 </ul>
-<h2 id="定义与平台无关的类型"><a href="# 定义与平台无关的类型" class="headerlink" title="定义与平台无关的类型"></a>定义与平台无关的类型 </h2><p> 例如，定义一个叫 REAL 的浮点类型，在目标平台一上，让它表示最高精度的类型为：</p>
+<h2 id="定义与平台无关的类型"><a href="# 定义与平台无关的类型" class="headerlink" title="定义与平台无关的类型"></a>定义与平台无关的类型 </h2><p> 例如，定义一个叫 <code>REAL</code> 的浮点类型，在目标平台上，让它表示最高精度类型：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="type">long</span> <span class="type">double</span> REAL;</span><br></pre></td></tr></table></figure>
 
-<p>在不支持 <code>long double</code> 的平台二上，改为：</p>
+<p>在不支持 <code>long double</code> 的平台上，改为：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="type">double</span> REAL;</span><br></pre></td></tr></table></figure>
 
-<p>在连 <code>double</code> 都不支持的平台三上，改为：</p>
+<p>在连 <code>double</code> 都不支持的平台上，改为：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="type">float</span> REAL;</span><br></pre></td></tr></table></figure>
 
-<p>也就是说，当跨平台时，只要修改 <code>typedef</code> 本身就行，不用对其他源码做任何修改。标准库就广泛使用了这个技巧，比如 <code>size_t</code>。</p>
-<p>另外，因为 <code>typedef</code> 是定义了一种类型的新别名，不是简单的字符串替换，所以它比宏来得稳健（虽然有时候用宏也可以完成以上的用途）。</p>
+<p>也就是说，当跨平台时，只要修改 <code>typedef</code> 定义本身就行，不用对其他源码做任何修改。标准库就广泛使用了这个技巧，比如 <code>size_t</code>。</p>
+<p>另外，因为 <code>typedef</code> 是定义了一种类型的别名，而不是简单的字符串替换，所以它比宏来得稳健（虽然有时候用宏也可以完成以上的用途）。</p>
 <h2 id="右左原则"><a href="# 右左原则" class="headerlink" title="右左原则"></a>右左原则 </h2><p> 理解、简化复杂声明可用的「右左法则」：从变量名看起，先往右，再往左，碰到一个圆括号就调转阅读的方向；括号内分析完就跳出括号，还是按先右后左的顺序，如此循环，直到整个声明分析完。</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> (*func)(<span class="type">void</span> *p);</span><br></pre></td></tr></table></figure>
 
@@ -353,23 +353,23 @@
 <h3 id="示例一：函数指针数组"><a href="# 示例一：函数指针数组" class="headerlink" title="示例一：函数指针数组"></a>示例一：函数指针数组 </h3><p> 我们知道，<code>int *arr[5]</code> 表示 <code>arr</code> 是一个包含 5 个元素的数组，由于 <code>arr</code> 左边是一个 <code>*</code>，所以数组中的每个元素都是一个指针，是一个 <code>int</code> 类型的指针。</p>
 <p>原声明：<code>int *(*a[5])(int, char*)</code>，变量名为 <code>a</code>。</p>
 <p>这个声明中，<code>a</code> 也是一个数组，由于 <code>a</code> 左边是一个 <code>*</code>，所以数组中的元素也是指针，是什么指针呢？是一个返回类型为 <code>int*</code>、参数为<code>(int, char*)</code> 的函数指针。</p>
-<p>所以，我们可以定义一个新的函数类型，它接受两个参数，一个是 <code>int</code> 类型，另一个是 <code>char*</code> 类型，返回一个 <code>int</code> 类型的指针，即 <code>typedef int *(*pFun)(int, char*)</code></p>
+<p>所以，我们可以定义一个新的函数类型，它接受两个参数：一个是 <code>int</code> 类型，另一个是 <code>char*</code> 类型，返回一个 <code>int</code> 类型的指针，即 <code>typedef int *(*pFunc)(int, char*)</code></p>
 <p>那么，原声明就变成了：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pFun a[<span class="number">5</span>];</span><br></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pFunc a[<span class="number">5</span>];</span><br></pre></td></tr></table></figure>
 
 <p>这里，变量 <code>a</code> 是一个数组，数组中的每个元素都是一个函数指针，这个函数指针的返回类型为<code>int*</code>、参数为<code>(int, char*)</code>。</p>
 <h3 id="示例二：函数指针数组"><a href="# 示例二：函数指针数组" class="headerlink" title="示例二：函数指针数组"></a>示例二：函数指针数组 </h3><p> 原声明：<code>void (*b[10]) (void (*)())</code>，变量名为 <code>b</code>。</p>
 <p>这个声明也是一个函数指针数组，只不过不像示例一中的函数的入参是 <code>(int, char*)</code>，这个示例中函数的入参是另外一个函数指针 <code>void (*)()</code>，它指向的函数没有入参，返回值类型是 <code>void</code>。</p>
 <p>为了简化声明，我们可以：</p>
 <ol>
-<li>先替换右边部分括号里的，即 <code>typedef void (*pFunParam)()</code>，其中 <code>pFunParam</code> 为别名一，定义了一个没有入参，返回值为 <code>void</code> 的函数指针；</li>
-<li>再替换左边的变量 <code>b</code>，即 <code>typedef void (*pFunx)(pFunParam)</code>，<code>pFunx</code> 为别名二，定义了一个入参为 <code>pFunParam</code>，返回值为 <code>void</code> 的函数指针。</li>
+<li>先替换右边部分括号里的，即 <code>typedef void (*pFuncParam)()</code>，其中 <code>pFuncParam</code> 为别名一，定义了一个没有入参、返回值为 <code>void</code> 的函数指针；</li>
+<li>再替换左边的变量 <code>b</code>，即 <code>typedef void (*pFunc)(pFuncParam)</code>，<code>pFunc</code> 为别名二，定义了一个入参为 <code>pFuncParam</code>、返回值为 <code>void</code> 的函数指针。</li>
 </ol>
 <p>那么，原声明就变成了：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pFunx b[<span class="number">10</span>];</span><br></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pFunc b[<span class="number">10</span>];</span><br></pre></td></tr></table></figure>
 
-<p>这里，变量 <code>b</code> 是一个数组，数组中的每个元素都是一个函数指针，这个函数指针的「返回类型为<code>void</code>、参数为一个指向返回类型为<code>void</code>、没有入参的函数指针」。</p>
-<h3 id="示例三：数组指针"><a href="# 示例三：数组指针" class="headerlink" title="示例三：数组指针"></a>示例三：数组指针 </h3><p> 示例三，原声明：<code>double (*e)[9]</code>，变量名为 <code>e</code>，这是一个指针，它指向一个有 9 个元素的数组，元素类型为 <code>double</code>。这可以简化为 <code>typedef double (*pArr)[9]</code></p>
+<p>这里，变量 <code>b</code> 是一个数组，数组中的每个元素都是一个函数指针，这个函数指针的返回类型为<code>void</code>，参数为一个指向返回类型为<code>void</code>、没有入参的函数指针。</p>
+<h3 id="示例三：数组指针"><a href="# 示例三：数组指针" class="headerlink" title="示例三：数组指针"></a>示例三：数组指针 </h3><p> 原声明：<code>double (*e)[9]</code>，变量名为 <code>e</code>。这是一个指针，它指向一个有 9 个元素的数组，元素类型为 <code>double</code>。这可以简化为 <code>typedef double (*pArr)[9]</code></p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pArr e;</span><br></pre></td></tr></table></figure>
 
 <p>这里，变量 <code>e</code> 是一个指针，它指向一个长度为 9 的数组，数组的元素类型是 <code>double</code>。</p>
@@ -378,11 +378,11 @@
 </blockquote>
 <h2 id="函数指针和数组指针示例"><a href="# 函数指针和数组指针示例" class="headerlink" title="函数指针和数组指针示例"></a>函数指针和数组指针示例 </h2><h3 id="函数指针"><a href="# 函数指针" class="headerlink" title="函数指针"></a> 函数指针 </h3><p> 函数指针是指向函数的指针变量，它可以存储函数的地址。通过函数指针可以在程序运行时动态地调用不同的函数。函数指针的声明方式为：<code>data_type (*pointer_var_name)(param_list)</code>。</p>
 <p>以下是一个函数指针的示例：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="title function_">int</span> <span class="params">(*pFun)</span><span class="params">(<span class="type">int</span>, <span class="type">int</span>)</span>; <span class="comment">// 定义一个函数指针类型</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">add</span><span class="params">(<span class="type">int</span> a, <span class="type">int</span> b)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> a + b;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">subtract</span><span class="params">(<span class="type">int</span> a, <span class="type">int</span> b)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> a - b;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    pFun ptr = add; <span class="comment">// 指向 add 函数</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;2 + 3 = %d\n&quot;</span>, ptr(<span class="number">2</span>, <span class="number">3</span>)); <span class="comment">// 调用 add 函数</span></span><br><span class="line"></span><br><span class="line">    ptr = subtract; <span class="comment">// 指向 subtract 函数</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;5 - 2 = %d\n&quot;</span>, ptr(<span class="number">5</span>, <span class="number">2</span>)); <span class="comment">// 调用 subtract 函数</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="title function_">int</span> <span class="params">(*pFunc)</span><span class="params">(<span class="type">int</span>, <span class="type">int</span>)</span>; <span class="comment">// 定义一个函数指针类型</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">add</span><span class="params">(<span class="type">int</span> a, <span class="type">int</span> b)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> a + b;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">subtract</span><span class="params">(<span class="type">int</span> a, <span class="type">int</span> b)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> a - b;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    pFunc ptr = add; <span class="comment">// 指向 add 函数</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;2 + 3 = %d\n&quot;</span>, ptr(<span class="number">2</span>, <span class="number">3</span>)); <span class="comment">// 调用 add 函数</span></span><br><span class="line"></span><br><span class="line">    ptr = subtract; <span class="comment">// 指向 subtract 函数</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;5 - 2 = %d\n&quot;</span>, ptr(<span class="number">5</span>, <span class="number">2</span>)); <span class="comment">// 调用 subtract 函数</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <h3 id="数组指针"><a href="# 数组指针" class="headerlink" title="数组指针"></a>数组指针 </h3><p> 数组指针是指向数组的指针变量，它可以存储数组的地址。通过数组指针可以访问数组的元素。数组指针的声明方式为：<code>data_type (*pointer_var_name)[array_length]</code>。</p>
 <p>以下是一个数组指针的示例：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="title function_">int</span> <span class="params">(*pArr)</span>[5]; <span class="comment">// 定义一个数组指针类型</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">int</span> arr[<span class="number">5</span>] = &#123;<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>&#125;;</span><br><span class="line">    pArr ptr = &amp;arr; <span class="comment">// 指向 arr 数组</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5</span>; i++) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%d &quot;</span>, (*ptr)[i]); <span class="comment">// 通过数组指针访问数组元素</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\n&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="title function_">int</span> <span class="params">(*pArr)</span>[5]; <span class="comment">// 定义一个数组指针类型</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">int</span> arr[<span class="number">5</span>] = &#123;<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>&#125;;</span><br><span class="line">    pArr ptr = &amp;arr; <span class="comment">// 指向 arr 数组</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5</span>; i++) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%d, %d\n&quot;</span>, (*ptr)[i], *((<span class="type">int</span> *)ptr + i)); <span class="comment">// 通过数组指针访问数组元素</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>这里 <code>(*ptr)</code> 为什么要解引用？</p>
 <p>这是因为，数组变量名 <code>arr</code> 表示的就是数组的首地址，而在 <code>pArr ptr = &amp;arr</code> 中，<code>ptr</code> 表示指向数组首地址的地址（存储数组首地址的地址空间），所以要解引用来获取数组的首地址，才能访问数组中的数据。</p>
@@ -441,13 +441,13 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-line"></i>
     </span>
-    <span title="站点总字数">361k</span>
+    <span title="站点总字数">364k</span>
   </span>
   <span class="post-meta-item">
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">10:55</span>
+    <span title="站点阅读时长">11:02</span>
   </span>
 </div>
 <div class="busuanzi-count">

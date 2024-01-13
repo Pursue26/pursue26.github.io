@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha256-HtsXJanqjKTc8vVQjO4YMhiqFoXkfBsjBWcX91T1jr8=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pursue26.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.18.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":null},"fold":{"enable":true,"height":300},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="锁（Lock）可以实现对临界区的互斥访问，但多道程序设计仅考虑互斥问题是不够的。除了互斥，还需要考虑同步，以及在临界区内允许多个进程（或线程）进入临界区执行的情况。为了实现这些目标，需要借助更高层的同步互斥的语义，并利用硬件实现的原子操作来实现。 本文介绍信号量（Semaphore），包括二元信号量和一般（计数）信号量。信号量可以实现多个进程（或线程）之间的互斥和同步操作，并允许多个进程（或线程）">
+<meta property="og:type" content="article">
+<meta property="og:title" content="操作系统之 chapter10.1 信号量与管程">
+<meta property="og:url" content="https://pursue26.github.io/posts/240113115605.html">
+<meta property="og:site_name" content="aha&#39;s blog">
+<meta property="og:description" content="锁（Lock）可以实现对临界区的互斥访问，但多道程序设计仅考虑互斥问题是不够的。除了互斥，还需要考虑同步，以及在临界区内允许多个进程（或线程）进入临界区执行的情况。为了实现这些目标，需要借助更高层的同步互斥的语义，并利用硬件实现的原子操作来实现。 本文介绍信号量（Semaphore），包括二元信号量和一般（计数）信号量。信号量可以实现多个进程（或线程）之间的互斥和同步操作，并允许多个进程（或线程）">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pursue26.github.io/images/os-kernel/chapter10/lock.png">
+<meta property="og:image" content="https://pursue26.github.io/images/os-kernel/chapter10/semaphore-vivid.gif">
+<meta property="article:published_time" content="2024-01-13T03:56:05.000Z">
+<meta property="article:modified_time" content="2024-01-13T07:38:54.377Z">
+<meta property="article:author" content="aha">
+<meta property="article:tag" content="操作系统">
+<meta property="article:tag" content="信号量">
+<meta property="article:tag" content="管程">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pursue26.github.io/images/os-kernel/chapter10/lock.png">
+
+
+<link rel="canonical" href="https://pursue26.github.io/posts/240113115605.html">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://pursue26.github.io/posts/240113115605.html","path":"posts/240113115605.html","title":"操作系统之 chapter10.1 信号量与管程"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>操作系统之 chapter10.1 信号量与管程 | aha's blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<style>.darkmode--activated{--body-bg-color:#282828;--content-bg-color:#333;--card-bg-color:#555;--text-color:#ccc;--blockquote-color:#bbb;--link-color:#ccc;--link-hover-color:#eee;--brand-color:#ddd;--brand-hover-color:#ddd;--table-row-odd-bg-color:#282828;--table-row-hover-bg-color:#363636;--menu-item-bg-color:#555;--btn-default-bg:#222;--btn-default-color:#ccc;--btn-default-border-color:#555;--btn-default-hover-bg:#666;--btn-default-hover-color:#ccc;--btn-default-hover-border-color:#666;--highlight-background:#282b2e;--highlight-foreground:#a9b7c6;--highlight-gutter-background:#34393d;--highlight-gutter-foreground:#9ca9b6}.darkmode--activated img{opacity:.75}.darkmode--activated img:hover{opacity:.9}.darkmode--activated code{color:#69dbdc;background:0 0}button.darkmode-toggle{z-index:9999}.darkmode-ignore,img{display:flex!important}.beian img{display:inline-block!important}</style></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">aha's blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-dailyblog"><a href="/random.html" rel="section"><i class="fa fa-file fa-fw"></i>每日博客</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BF%A1%E5%8F%B7%E9%87%8F%EF%BC%88Semaphore%EF%BC%89"><span class="nav-number">1.</span> <span class="nav-text">信号量（Semaphore）</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%A1%E5%8F%B7%E9%87%8F%E6%93%8D%E4%BD%9C"><span class="nav-number">1.1.</span> <span class="nav-text">信号量操作 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%A1%E5%8F%B7%E9%87%8F%E7%89%B9%E5%BE%81"><span class="nav-number">1.2.</span> <span class="nav-text">信号量特征</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%A1%E5%8F%B7%E9%87%8F%E4%B8%A4%E7%A7%8D%E7%B1%BB%E5%9E%8B"><span class="nav-number">1.3.</span> <span class="nav-text">信号量两种类型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%A1%E5%8F%B7%E9%87%8F%E4%B8%A4%E7%A7%8D%E7%94%A8%E9%80%94"><span class="nav-number">1.4.</span> <span class="nav-text">信号量两种用途</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BF%A1%E5%8F%B7%E9%87%8F%E4%BD%BF%E7%94%A8"><span class="nav-number">2.</span> <span class="nav-text">信号量使用 </span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%94%A8%E4%BA%8C%E8%BF%9B%E5%88%B6%E4%BF%A1%E5%8F%B7%E9%87%8F%E5%AE%9E%E7%8E%B0%E4%BA%92%E6%96%A5"><span class="nav-number">2.1.</span> <span class="nav-text"> 用二进制信号量实现互斥</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%94%A8%E4%BA%8C%E8%BF%9B%E5%88%B6%E4%BF%A1%E5%8F%B7%E9%87%8F%E5%AE%9E%E7%8E%B0%E8%B0%83%E5%BA%A6%E7%BA%A6%E6%9D%9F%EF%BC%88%E5%90%8C%E6%AD%A5%EF%BC%89"><span class="nav-number">2.2.</span> <span class="nav-text">用二进制信号量实现调度约束（同步）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%94%9F%E4%BA%A7%E8%80%85%20-%20%E6%B6%88%E8%B4%B9%E8%80%85%E9%97%AE%E9%A2%98%EF%BC%88%E7%BA%BF%E7%A8%8B%E5%90%8C%E6%AD%A5%EF%BC%89"><span class="nav-number">2.3.</span> <span class="nav-text">生产者 - 消费者问题（线程同步）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%97%AE%E9%A2%98%E6%8F%8F%E8%BF%B0%E4%B8%8E%E5%88%86%E6%9E%90"><span class="nav-number">2.3.1.</span> <span class="nav-text">问题描述与分析 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0%E5%85%B3%E9%94%AE%E4%B8%8E%E5%AE%9E%E7%8E%B0%E6%96%B9%E5%BC%8F"><span class="nav-number">2.3.2.</span> <span class="nav-text">实现关键与实现方式 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0%E4%BB%A3%E7%A0%81"><span class="nav-number">2.3.3.</span> <span class="nav-text">实现代码</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BF%A1%E5%8F%B7%E9%87%8F%E5%AE%9E%E7%8E%B0"><span class="nav-number">3.</span> <span class="nav-text">信号量实现 </span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">aha</p>
+  <div class="site-description" itemprop="description">经历一个过程然后成为更好的自己</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">82</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">47</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">102</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://pursue26.github.io/posts/240113115605.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="aha">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="aha's blog">
+      <meta itemprop="description" content="经历一个过程然后成为更好的自己">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="操作系统之 chapter10.1 信号量与管程 | aha's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          操作系统之 chapter10.1 信号量与管程
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+  
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2024-01-13 11:56:05 / 修改时间：15:38:54" itemprop="dateCreated datePublished" datetime="2024-01-13T11:56:05+08:00">2024-01-13</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" itemprop="url" rel="index"><span itemprop="name">操作系统</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E4%BF%A1%E5%8F%B7%E9%87%8F/" itemprop="url" rel="index"><span itemprop="name">信号量</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>3.3k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>6 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>锁（Lock）可以实现对临界区的互斥访问，但多道程序设计仅考虑互斥问题是不够的。除了互斥，还需要考虑同步，以及在临界区内允许多个进程（或线程）进入临界区执行的情况。为了实现这些目标，需要借助更高层的同步互斥的语义，并利用硬件实现的原子操作来实现。</p>
+<p>本文介绍信号量（Semaphore），包括二元信号量和一般（计数）信号量。信号量可以实现多个进程（或线程）之间的互斥和同步操作，并允许多个进程（或线程）进入临界区执行。</p>
+<span id="more"></span>
+
+<img src="../images/os-kernel/chapter10/lock.png" alt="多程序理念" width="80%" height="80%">
+
+<h1 id="信号量（Semaphore）"><a href="# 信号量（Semaphore）" class="headerlink" title="信号量（Semaphore）"></a>信号量（Semaphore）</h1><h2 id="信号量操作"><a href="# 信号量操作" class="headerlink" title="信号量操作"></a>信号量操作 </h2><p> 信号量（Semaphore）是一种抽象数据结构，用于实现多个进程（或线程）之间的同步和互斥操作的机制。它是一个整型变量（<code>sem</code>），可以用来控制对共享资源的访问。</p>
+<p>一个整型变量（<code>sem</code>），具有 2 个原子操作：</p>
+<ul>
+<li><code>P()</code> 操作：<code>sem</code> 减 1，如果 <code>sem &lt; 0</code>，等待，否则继续；</li>
+<li><code>V()</code> 操作：<code>sem</code> 加 1，如果 <code>sem &lt;= 0</code>，唤醒一个等待的进程 P。</li>
+</ul>
+<p>信号量类似铁路，初始化 2 个资源控制信号灯，进入临界区的进程执行 <code>P()</code> 操作，当临界区已经有 2 个进程时，信号量不足，变为红灯。当再来的进程想要进入临界区时，只能等待，直到某一个进程离开了临界区，变为绿灯，此时进程执行 <code>V()</code> 操作，并将等待的进程唤醒，进入临界区。</p>
+<img src="../images/os-kernel/chapter10/semaphore-vivid.gif" alt="信号量比喻" width="80%" height="80%">
+
+<blockquote>
+<p>信号量由 dijkstra 在 20 世纪 60 年代提出。<code>P()</code>操作是荷兰语中的 Proberen，意为“尝试”或“试图获取资源”；<code>V()</code>操作是荷兰语中的 Verhogen，意为“增加”或“释放资源”。</p>
+</blockquote>
+<h2 id="信号量特征"><a href="# 信号量特征" class="headerlink" title="信号量特征"></a>信号量特征</h2><ul>
+<li>信号量是整数；</li>
+<li>信号量是被保护的变量：初始化完成后，唯一改变一个信号量的值的办法是通过 <code>P(), V()</code> 操作（操作必须是原子）；</li>
+<li><code>P()</code> 操作能够阻塞、<code>V()</code> 操作不会阻塞；</li>
+<li>我们假定信号量是公平的：<ul>
+<li>如果 <code>V()</code> 被无限频繁调用（在同一个信号量上），那么没有线程会被阻塞在 <code>P()</code> 操作上；</li>
+<li>在实践中，FIFO 经常被使用，也就是先被阻塞的线程，先出。</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>自旋锁（Spinlock）能否是 FIFO 类型？不能，锁已被其他线程占用时，该线程会一直自旋（忙等待）直到锁被释放。</p>
+</blockquote>
+<h2 id="信号量两种类型"><a href="# 信号量两种类型" class="headerlink" title="信号量两种类型"></a>信号量两种类型</h2><ul>
+<li>二进制信号量：值可以是 0 或 1；</li>
+<li>一般 / 计数信号量：值可取任意非负值。</li>
+</ul>
+<details>
+  <summary>可以通过使用一个类型的信号量来实现另一个类型的信号量（两者相互实现）。</summary>
+
+<ol>
+<li><p>使用二进制信号量实现计数信号量：<br>可以使用一个二进制信号量作为互斥锁（类似于互斥量），用于控制对计数信号量的访问。每当线程要进行计数操作时，需要先获取互斥锁，然后进行计数操作，最后释放互斥锁。这样可以确保每次只有一个线程可以访问计数信号量，保证计数的正确性和一致性。</p>
+</li>
+<li><p>使用计数信号量实现二进制信号量：<br>可以使用一个计数信号量来实现二进制信号量。计数信号量的初始值为 1，表示资源可用。当线程需要访问二进制信号量时，需要先尝试获取计数信号量。如果计数信号量的值为 1，表示资源可用，线程可以继续执行。如果计数信号量的值为 0，表示资源不可用，线程需要等待。当资源被释放时，线程释放计数信号量，将其值设置为 1，表示资源可用。</p>
+</li>
+</ol>
+</details>
+
+<h2 id="信号量两种用途"><a href="# 信号量两种用途" class="headerlink" title="信号量两种用途"></a>信号量两种用途</h2><ul>
+<li>互斥；</li>
+<li>条件同步（如调度约束：一个线程等待另一个线程的事情发生）。</li>
+</ul>
+<h1 id="信号量使用"><a href="# 信号量使用" class="headerlink" title="信号量使用"></a>信号量使用 </h1><h2 id="用二进制信号量实现互斥"><a href="# 用二进制信号量实现互斥" class="headerlink" title="用二进制信号量实现互斥"></a> 用二进制信号量实现互斥</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">mutex = <span class="keyword">new</span> <span class="built_in">Semaphore</span>(<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">mutex-&gt;<span class="built_in">P</span>();</span><br><span class="line"></span><br><span class="line"><span class="comment">/* Critical Section; */</span></span><br><span class="line"></span><br><span class="line">mutex-&gt;<span class="built_in">V</span>();</span><br></pre></td></tr></table></figure>
+
+<p>必须成对使用 <code>P(), V()</code> 操作：</p>
+<ul>
+<li><code>P()</code> 操作保证互斥访问临界资源；</li>
+<li><code>V()</code> 操作在使用后释放临界资源；</li>
+<li><code>P(), V()</code> 操作不能次序错误、重复或遗漏。</li>
+</ul>
+<h2 id="用二进制信号量实现调度约束（同步）"><a href="# 用二进制信号量实现调度约束（同步）" class="headerlink" title="用二进制信号量实现调度约束（同步）"></a>用二进制信号量实现调度约束（同步）</h2><p><code>P()</code> 等待，<code>V()</code> 发出信号后，两个线程实现同步：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">condition = <span class="keyword">new</span> <span class="built_in">Semaphore</span>(<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">/* thread A */</span></span><br><span class="line"><span class="comment">// ...</span></span><br><span class="line">condition-&gt;<span class="built_in">P</span>();</span><br><span class="line"><span class="comment">// （阻塞等待，直到其它线程执行了 `V()` 操作）...</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* thread B */</span></span><br><span class="line"><span class="comment">// ...</span></span><br><span class="line">condition-&gt;<span class="built_in">V</span>();</span><br><span class="line"><span class="comment">// ...</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="生产者 - 消费者问题（线程同步）"><a href="# 生产者 - 消费者问题（线程同步）" class="headerlink" title="生产者 - 消费者问题（线程同步）"></a>生产者 - 消费者问题（线程同步）</h2><h3 id="问题描述与分析"><a href="# 问题描述与分析" class="headerlink" title="问题描述与分析"></a>问题描述与分析 </h3><p> 生产者 - 消费者问题 <strong> 是一个线程同步的问题</strong>，其中一个线程等待另一个线程完成某个任务。这个问题通常用于模拟生产者和消费者的情景。</p>
+<p>例如，在有界缓冲区的生产者 - 消费者问题中：</p>
+<ul>
+<li>一个或多个生产者生成数据并将其放入缓冲区；</li>
+<li>单个消费者每次从缓冲区中取出数据；</li>
+<li>在任何给定的时刻，<strong>只有一个 </strong> 生产者或消费者能够访问该缓冲区。</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"> ----------      --------      ----------</span><br><span class="line">| Producer | -&gt; | Buffer | -&gt; | Consumer |</span><br><span class="line"> ----------      --------      ----------</span><br></pre></td></tr></table></figure>
+
+<p>在这种情况下，缓冲区有一个固定的大小，生产者在缓冲区已满时需要等待，而消费者在缓冲区为空时需要等待。</p>
+<p>互斥（锁机制）是不够解决这个问题的，因为 <strong> 生产者和消费者需要在某些条件下等待对方的操作完成 </strong>。因此，需要使用其他<strong> 同步机制 </strong> 来协调生产者和消费者的操作。</p>
+<h3 id="实现关键与实现方式"><a href="# 实现关键与实现方式" class="headerlink" title="实现关键与实现方式"></a>实现关键与实现方式 </h3><p> 实现生产者 - 消费者问题的关键点（正确定要求）：</p>
+<ul>
+<li>在任何一个时刻，只能有一个线程操作缓冲区（互斥约束）；</li>
+<li>当缓冲区为空时，消费者必须等待生产者（调度，同步约束）；</li>
+<li>当缓冲区为满时，生产者必须等待消费者（调度，同步约束）。</li>
+</ul>
+<p>实现方式：上述每个约束使用一个单独的信号量：</p>
+<ul>
+<li>二进制信号量 <code>mutex</code>，初始化为 1，实现互斥访问；</li>
+<li>一般信号量 <code>emptySem</code>，初始化为 n，实现缓冲区空时的同步约束；</li>
+<li>一般信号量 <code>fullSem</code>，初始化为 0，实现缓冲区满时的同步约束。</li>
+</ul>
+<h3 id="实现代码"><a href="# 实现代码" class="headerlink" title="实现代码"></a>实现代码</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">BoundedBuffer</span> &#123;</span><br><span class="line">    mutex = <span class="keyword">new</span> <span class="built_in">Semaphore</span>(<span class="number">1</span>);</span><br><span class="line">    fullSem = <span class="keyword">new</span> <span class="built_in">Semaphore</span>(<span class="number">0</span>);  <span class="comment">// 初始化时，满的程度为空，每次添加数据后，满的程度提升</span></span><br><span class="line">    emptySem = <span class="keyword">new</span> <span class="built_in">Semaphore</span>(n); <span class="comment">// 初始化时，空的程度为满，每次添加数据后，空的程度降低</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 生产者 添加数据</span></span><br><span class="line">BoundedBuffer::<span class="built_in">Deposit</span>(c) &#123;</span><br><span class="line">    emptySem-&gt;<span class="built_in">P</span>(); <span class="comment">// 生产前，空信号量减一</span></span><br><span class="line">    mutex-&gt;<span class="built_in">P</span>();</span><br><span class="line">    <span class="comment">// Add `c` to the buffer;</span></span><br><span class="line">    mutex-&gt;<span class="built_in">V</span>();</span><br><span class="line">    fullSem-&gt;<span class="built_in">V</span>(); <span class="comment">// 生产后，满信号量加一</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 消费者 取出数据</span></span><br><span class="line">BoundedBuffer::<span class="built_in">Remove</span>(c) &#123;</span><br><span class="line">    fullSem-&gt;<span class="built_in">P</span>(); <span class="comment">// 消费前，满信号量减一</span></span><br><span class="line">    mutex-&gt;<span class="built_in">P</span>();</span><br><span class="line">    <span class="comment">// Remove `c` from buffer; </span></span><br><span class="line">    mutex-&gt;<span class="built_in">V</span>();</span><br><span class="line">    emptySem-&gt;<span class="built_in">V</span>(); <span class="comment">// 消费后，空信号量加一</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上述代码中，当生产者添加了 n 个数据后，缓冲区满。此时再想添加数据时，<code>emptySem</code> 会小于 0，需要等待。同样地，当消费者取出了一些数据后，缓冲区空。此时再想取出数据时，<code>fullSem</code> 会小于 0，需要等待。缓冲区不满、也不空时，可以互斥的添加或取出数据，无需等待。</p>
+<h1 id="信号量实现"><a href="# 信号量实现" class="headerlink" title="信号量实现"></a>信号量实现 </h1><p> 使用硬件原语：</p>
+<ul>
+<li>禁用中断</li>
+<li>原子指令（Test-And-Set）</li>
+</ul>
+<p>类似锁：如禁用中断</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Semaphore</span> &#123;</span><br><span class="line">    <span class="type">int</span> sem;</span><br><span class="line">    WaitQueue q;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Semaphore::<span class="built_in">P</span>() &#123;</span><br><span class="line">    --sem;</span><br><span class="line">    <span class="keyword">if</span> (sem &lt; <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="comment">// Add this thread `t` to queue `q`;</span></span><br><span class="line">        <span class="built_in">block</span>(t);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Semaphore::<span class="built_in">V</span>() &#123;</span><br><span class="line">    ++sem;</span><br><span class="line">    <span class="keyword">if</span> (sem &lt;= <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="comment">// Remove a thread `t` from queue `q`;</span></span><br><span class="line">        <span class="built_in">wakeup</span>(t);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>参考资料：<br>1：<a target="_blank" rel="noopener" href="https://github.com/OXygenMoon/OperatingSystemInDepth">https://github.com/OXygenMoon/OperatingSystemInDepth</a><br>2：<a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_53407527/article/details/125207305">https://blog.csdn.net/weixin_53407527/article/details/125207305</a></p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" rel="tag"># 操作系统</a>
+              <a href="/tags/%E4%BF%A1%E5%8F%B7%E9%87%8F/" rel="tag"># 信号量</a>
+              <a href="/tags/%E7%AE%A1%E7%A8%8B/" rel="tag"># 管程</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/240104202828.html" rel="prev" title="操作系统之 chapter9 同步与互斥">
+                  <i class="fa fa-angle-left"></i> 操作系统之 chapter9 同步与互斥
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">aha</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">364k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">11:02</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+</div>
+  <div class="powered-by">
+    <!--由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动 -->
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/next-theme-pjax/0.6.0/pjax.min.js" integrity="sha256-vxLn1tSKWD4dqbMRyv940UYw4sXgMtYcK6reefzZrao=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script><script src="/js/pjax.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+  <script data-pjax async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+<script src="https://unpkg.com/darkmode-js@1.5.7/lib/darkmode-js.min.js"></script>
+
+<script>
+var options = {
+  bottom: '64px',
+  right: 'unset',
+  left: '32px',
+  time: '0.5s',
+  mixColor: 'transparent',
+  backgroundColor: 'transparent',
+  buttonColorDark: '#3F3F3F',
+  buttonColorLight: '#fff',
+  saveInCookies: true,
+  label: '🌓',
+  autoMatchOsTheme: true
+}
+const darkmode = new Darkmode(options);
+window.darkmode = darkmode;
+darkmode.showWidget();
+</script>
+
+</body>
+</html>
