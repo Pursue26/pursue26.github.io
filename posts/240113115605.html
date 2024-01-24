@@ -28,8 +28,11 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://pursue26.github.io/images/os-kernel/chapter10/lock.png">
 <meta property="og:image" content="https://pursue26.github.io/images/os-kernel/chapter10/semaphore-vivid.gif">
+<meta property="og:image" content="https://pursue26.github.io/images/os-kernel/chapter10/monitor-arch.png">
+<meta property="og:image" content="https://pursue26.github.io/images/os-kernel/chapter10/hansen-vs-hoare.png">
+<meta property="og:image" content="https://pursue26.github.io/images/os-kernel/chapter10/concurrent-summary.png">
 <meta property="article:published_time" content="2024-01-13T03:56:05.000Z">
-<meta property="article:modified_time" content="2024-01-13T07:38:54.377Z">
+<meta property="article:modified_time" content="2024-01-24T12:28:17.106Z">
 <meta property="article:author" content="aha">
 <meta property="article:tag" content="操作系统">
 <meta property="article:tag" content="信号量">
@@ -144,7 +147,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BF%A1%E5%8F%B7%E9%87%8F%EF%BC%88Semaphore%EF%BC%89"><span class="nav-number">1.</span> <span class="nav-text">信号量（Semaphore）</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%A1%E5%8F%B7%E9%87%8F%E6%93%8D%E4%BD%9C"><span class="nav-number">1.1.</span> <span class="nav-text">信号量操作 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%A1%E5%8F%B7%E9%87%8F%E7%89%B9%E5%BE%81"><span class="nav-number">1.2.</span> <span class="nav-text">信号量特征</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%A1%E5%8F%B7%E9%87%8F%E4%B8%A4%E7%A7%8D%E7%B1%BB%E5%9E%8B"><span class="nav-number">1.3.</span> <span class="nav-text">信号量两种类型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%A1%E5%8F%B7%E9%87%8F%E4%B8%A4%E7%A7%8D%E7%94%A8%E9%80%94"><span class="nav-number">1.4.</span> <span class="nav-text">信号量两种用途</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BF%A1%E5%8F%B7%E9%87%8F%E4%BD%BF%E7%94%A8"><span class="nav-number">2.</span> <span class="nav-text">信号量使用 </span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%94%A8%E4%BA%8C%E8%BF%9B%E5%88%B6%E4%BF%A1%E5%8F%B7%E9%87%8F%E5%AE%9E%E7%8E%B0%E4%BA%92%E6%96%A5"><span class="nav-number">2.1.</span> <span class="nav-text"> 用二进制信号量实现互斥</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%94%A8%E4%BA%8C%E8%BF%9B%E5%88%B6%E4%BF%A1%E5%8F%B7%E9%87%8F%E5%AE%9E%E7%8E%B0%E8%B0%83%E5%BA%A6%E7%BA%A6%E6%9D%9F%EF%BC%88%E5%90%8C%E6%AD%A5%EF%BC%89"><span class="nav-number">2.2.</span> <span class="nav-text">用二进制信号量实现调度约束（同步）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%94%9F%E4%BA%A7%E8%80%85%20-%20%E6%B6%88%E8%B4%B9%E8%80%85%E9%97%AE%E9%A2%98%EF%BC%88%E7%BA%BF%E7%A8%8B%E5%90%8C%E6%AD%A5%EF%BC%89"><span class="nav-number">2.3.</span> <span class="nav-text">生产者 - 消费者问题（线程同步）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%97%AE%E9%A2%98%E6%8F%8F%E8%BF%B0%E4%B8%8E%E5%88%86%E6%9E%90"><span class="nav-number">2.3.1.</span> <span class="nav-text">问题描述与分析 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0%E5%85%B3%E9%94%AE%E4%B8%8E%E5%AE%9E%E7%8E%B0%E6%96%B9%E5%BC%8F"><span class="nav-number">2.3.2.</span> <span class="nav-text">实现关键与实现方式 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0%E4%BB%A3%E7%A0%81"><span class="nav-number">2.3.3.</span> <span class="nav-text">实现代码</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BF%A1%E5%8F%B7%E9%87%8F%E5%AE%9E%E7%8E%B0"><span class="nav-number">3.</span> <span class="nav-text">信号量实现 </span></a></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BF%A1%E5%8F%B7%E9%87%8F%EF%BC%88Semaphore%EF%BC%89"><span class="nav-number">1.</span> <span class="nav-text">信号量（Semaphore）</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%A1%E5%8F%B7%E9%87%8F%E6%93%8D%E4%BD%9C"><span class="nav-number">1.1.</span> <span class="nav-text">信号量操作 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%A1%E5%8F%B7%E9%87%8F%E7%89%B9%E5%BE%81"><span class="nav-number">1.2.</span> <span class="nav-text">信号量特征</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%A1%E5%8F%B7%E9%87%8F%E4%B8%A4%E7%A7%8D%E7%B1%BB%E5%9E%8B"><span class="nav-number">1.3.</span> <span class="nav-text">信号量两种类型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%A1%E5%8F%B7%E9%87%8F%E4%B8%A4%E7%A7%8D%E7%94%A8%E9%80%94"><span class="nav-number">1.4.</span> <span class="nav-text">信号量两种用途</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BF%A1%E5%8F%B7%E9%87%8F%E4%BD%BF%E7%94%A8"><span class="nav-number">2.</span> <span class="nav-text">信号量使用 </span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%94%A8%E4%BA%8C%E8%BF%9B%E5%88%B6%E4%BF%A1%E5%8F%B7%E9%87%8F%E5%AE%9E%E7%8E%B0%E4%BA%92%E6%96%A5"><span class="nav-number">2.1.</span> <span class="nav-text"> 用二进制信号量实现互斥</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%94%A8%E4%BA%8C%E8%BF%9B%E5%88%B6%E4%BF%A1%E5%8F%B7%E9%87%8F%E5%AE%9E%E7%8E%B0%E8%B0%83%E5%BA%A6%E7%BA%A6%E6%9D%9F%EF%BC%88%E5%90%8C%E6%AD%A5%EF%BC%89"><span class="nav-number">2.2.</span> <span class="nav-text">用二进制信号量实现调度约束（同步）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%94%9F%E4%BA%A7%E8%80%85%20-%20%E6%B6%88%E8%B4%B9%E8%80%85%E9%97%AE%E9%A2%98%EF%BC%88%E7%BA%BF%E7%A8%8B%E5%90%8C%E6%AD%A5%EF%BC%89"><span class="nav-number">2.3.</span> <span class="nav-text">生产者 - 消费者问题（线程同步）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%97%AE%E9%A2%98%E6%8F%8F%E8%BF%B0%E4%B8%8E%E5%88%86%E6%9E%90"><span class="nav-number">2.3.1.</span> <span class="nav-text">问题描述与分析 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0%E5%85%B3%E9%94%AE%E4%B8%8E%E5%AE%9E%E7%8E%B0%E6%96%B9%E5%BC%8F"><span class="nav-number">2.3.2.</span> <span class="nav-text">实现关键与实现方式 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0%E4%BB%A3%E7%A0%81"><span class="nav-number">2.3.3.</span> <span class="nav-text">实现代码</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BF%A1%E5%8F%B7%E9%87%8F%E5%AE%9E%E7%8E%B0"><span class="nav-number">3.</span> <span class="nav-text">信号量实现 </span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%A1%E7%A8%8B%EF%BC%88monitor%EF%BC%89%E4%B8%8E%E6%9D%A1%E4%BB%B6%E5%8F%98%E9%87%8F"><span class="nav-number">4.</span> <span class="nav-text">管程（monitor）与条件变量 </span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%A1%E7%A8%8B%E5%AE%9A%E4%B9%89"><span class="nav-number">4.1.</span> <span class="nav-text"> 管程定义 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%A1%E7%A8%8B%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0"><span class="nav-number">4.2.</span> <span class="nav-text">管程设计与实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%A1%E7%A8%8B%E8%A7%A3%E5%86%B3%E7%94%9F%E4%BA%A7%E8%80%85%20-%20%E6%B6%88%E8%B4%B9%E8%80%85%E9%97%AE%E9%A2%98"><span class="nav-number">4.3.</span> <span class="nav-text">管程解决生产者 - 消费者问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%A1%E7%A8%8B%E6%9D%A1%E4%BB%B6%E5%8F%98%E9%87%8F%E7%9A%84%E9%87%8A%E6%94%BE%E5%A4%84%E7%90%86%E6%96%B9%E5%BC%8F"><span class="nav-number">4.4.</span> <span class="nav-text">管程条件变量的释放处理方式 </span></a></li></ol></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -224,9 +227,15 @@
         <i class="far fa-calendar"></i>
       </span>
       <span class="post-meta-item-text">发表于</span>
-      
 
-      <time title="创建时间：2024-01-13 11:56:05 / 修改时间：15:38:54" itemprop="dateCreated datePublished" datetime="2024-01-13T11:56:05+08:00">2024-01-13</time>
+      <time title="创建时间：2024-01-13 11:56:05" itemprop="dateCreated datePublished" datetime="2024-01-13T11:56:05+08:00">2024-01-13</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-01-24 20:28:17" itemprop="dateModified" datetime="2024-01-24T20:28:17+08:00">2024-01-24</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -256,14 +265,14 @@
         <i class="far fa-file-word"></i>
       </span>
       <span class="post-meta-item-text">本文字数：</span>
-      <span>3.3k</span>
+      <span>6.7k</span>
     </span>
     <span class="post-meta-item" title="阅读时长">
       <span class="post-meta-item-icon">
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">阅读时长 &asymp;</span>
-      <span>6 分钟</span>
+      <span>12 分钟</span>
     </span>
 </div>
 
@@ -274,10 +283,10 @@
     
     
     <div class="post-body" itemprop="articleBody"><p>锁（Lock）可以实现对临界区的互斥访问，但多道程序设计仅考虑互斥问题是不够的。除了互斥，还需要考虑同步，以及在临界区内允许多个进程（或线程）进入临界区执行的情况。为了实现这些目标，需要借助更高层的同步互斥的语义，并利用硬件实现的原子操作来实现。</p>
-<p>本文介绍信号量（Semaphore），包括二元信号量和一般（计数）信号量。信号量可以实现多个进程（或线程）之间的互斥和同步操作，并允许多个进程（或线程）进入临界区执行。</p>
+<p>本文介绍信号量（Semaphore），包括二元信号量和一般（计数）信号量。信号量可以实现多个进程（或线程）之间的互斥和同步操作，并允许多个进程（或线程）进入临界区执行。同时，介绍了一种更高级的抽象——管程（Monitor），它可以缓解信号量机制在编写并发程序上的复杂性、简化并发编程。管程是一种程序结构，包含了一组共享变量和操作集合，用于控制对共享资源的访问。</p>
 <span id="more"></span>
 
-<img src="../images/os-kernel/chapter10/lock.png" alt="多程序理念" width="80%" height="80%">
+<img src="../images/os-kernel/chapter10/lock.png" alt="多程序理念" width="70%" height="70%">
 
 <h1 id="信号量（Semaphore）"><a href="# 信号量（Semaphore）" class="headerlink" title="信号量（Semaphore）"></a>信号量（Semaphore）</h1><h2 id="信号量操作"><a href="# 信号量操作" class="headerlink" title="信号量操作"></a>信号量操作 </h2><p> 信号量（Semaphore）是一种抽象数据结构，用于实现多个进程（或线程）之间的同步和互斥操作的机制。它是一个整型变量（<code>sem</code>），可以用来控制对共享资源的访问。</p>
 <p>一个整型变量（<code>sem</code>），具有 2 个原子操作：</p>
@@ -368,6 +377,78 @@
 <p>类似锁：如禁用中断</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Semaphore</span> &#123;</span><br><span class="line">    <span class="type">int</span> sem;</span><br><span class="line">    WaitQueue q;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Semaphore::<span class="built_in">P</span>() &#123;</span><br><span class="line">    --sem;</span><br><span class="line">    <span class="keyword">if</span> (sem &lt; <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="comment">// Add this thread `t` to queue `q`;</span></span><br><span class="line">        <span class="built_in">block</span>(t);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Semaphore::<span class="built_in">V</span>() &#123;</span><br><span class="line">    ++sem;</span><br><span class="line">    <span class="keyword">if</span> (sem &lt;= <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="comment">// Remove a thread `t` from queue `q`;</span></span><br><span class="line">        <span class="built_in">wakeup</span>(t);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
+<h1 id="管程（monitor）与条件变量"><a href="# 管程（monitor）与条件变量" class="headerlink" title="管程（monitor）与条件变量"></a>管程（monitor）与条件变量 </h1><h2 id="管程定义"><a href="# 管程定义" class="headerlink" title="管程定义"></a> 管程定义 </h2><p> 管程（monitor）是一种程序结构，结构内的多个子程序形成的多个工作线程互斥访问共享资源——这些共享资源一般是硬件或一群变量。管程实现了 <strong> 在一个时间点，最多只有一个线程在执行管程的某个子程序</strong>。与那些通过修改数据结构实现互斥访问的并发程序设计相比，管程实现很大程度上简化了程序设计。（来自 Wikipedia 的定义）</p>
+<p>管程的目的是：将互斥和条件同步的 <strong> 关注点分离 </strong> 开来。</p>
+<ul>
+<li>互斥指的是确保在同一时间只有一个进程可以访问共享资源，而条件同步指的是进程之间通过条件变量进行等待和唤醒的机制。</li>
+</ul>
+<blockquote>
+<p>关注点分离（Separation of Concerns, SoC）是将计算机程序分隔为不同部分的设计原则，每一部分会有各自的关注焦点。</p>
+</blockquote>
+<p>管程主要包含的两个组件：</p>
+<ul>
+<li>一个锁：用于指定临界区，实现对共享资源的互斥访问；</li>
+<li>零或多个条件变量：等待 / 通知信号量，用于管程并发访问共享数据。</li>
+</ul>
+<p>实现管程的一般方法包括 <strong> 收集相关共享数据和定义方法来访问这些共享数据</strong>：</p>
+<ul>
+<li>共享数据通常包括需要互斥访问的临界区和条件变量等。</li>
+<li>方法定义了对共享数据的操作，用于实现互斥访问和条件等待 / 通知的功能。</li>
+</ul>
+<p>通过将共享数据和操作封装在一个对象或模块中，可以有效地实现对并发访问的同步控制。</p>
+<blockquote>
+<p>概括之，管程包含一系列共享变量，以及针对这些变量的一系列操作函数（方法），这些变量和函数被封装在一个对象或模块中，便形成了管程的程序结构。</p>
+</blockquote>
+<h2 id="管程设计与实现"><a href="# 管程设计与实现" class="headerlink" title="管程设计与实现"></a>管程设计与实现</h2><img src="../images/os-kernel/chapter10/monitor-arch.png" alt="管程结构" width="70%" height="70%">
+
+<p>如上图所示，多个线程都想进入管程访问共享资源，这就需要一个 entry queue 等待队列，等待获取管程的锁。当某个线程取得锁后，可以进入管程的临界区，并执行管程管理的一些列操作（如函数 <code>Wait(x)</code> 和 <code>Signal(x)</code>）。但当在执行某一个操作时，函数可能对共享变量的需求得不到满足，<strong>这时线程会先释放锁 </strong>，并将自身挂到相应的条件变量关联的等待队列上，直到条件变量得到满足后，<strong> 重新获得锁</strong>，并执行相应的操作。</p>
+<p>为了完成上述动作，需要实现如下操作：</p>
+<p>锁 Lock：</p>
+<ul>
+<li><code>Lock::Acquire()</code>：等待…直到锁可用，然后抢占锁；</li>
+<li><code>Lock::Release()</code>：释放锁，唤醒等待者（若有）。</li>
+</ul>
+<p>条件变量 Condition variable：</p>
+<ul>
+<li>允许线程在等待状态下进入临界区，而且可以在某个时刻原子释放锁并进入睡眠。</li>
+<li><code>Wait()</code> 操作用于释放锁、进入睡眠并重新获得锁。</li>
+<li><code>Signal()</code>操作用于唤醒等待者（或者使用 <code>broadcast()</code> 操作唤醒所有等待者）。</li>
+</ul>
+<blockquote>
+<p>条件变量“允许线程在等待状态下（让其他线程）进入临界区”的意思是，当线程需要等待某个条件满足时，它可以调用条件变量的 <code>Wait()</code> 操作来暂时释放锁并进入等待状态。在等待期间，<strong>其他线程 </strong> 可以获得锁并访问临界区。当条件满足时，等待的线程会被唤醒，并重新获得锁，然后可以进入临界区执行相应的操作。</p>
+<p>这样做的好处是，在等待状态下，线程不会占用系统资源，同时其他线程有机会进入临界区执行任务，提高了系统的并发性能。当条件满足时，被唤醒的线程可以安全地继续执行，而不会出现竞争条件和数据不一致的问题。</p>
+</blockquote>
+<p><strong>条件变量的实现</strong>：</p>
+<ul>
+<li>需要维护每个条件队列；</li>
+<li>需要实现线程的条件等待 <code>Wait()</code> 和通知<code>Signal()</code>。</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Condition</span> &#123;</span><br><span class="line">    <span class="type">int</span> numWaiting = <span class="number">0</span>;</span><br><span class="line">    WaitQueue q;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Condition::<span class="built_in">Wait</span>(lock) &#123;</span><br><span class="line">    numWaiting++;</span><br><span class="line">    <span class="comment">// Add this thread `t` to `q`;</span></span><br><span class="line">    <span class="built_in">release</span>(lock);</span><br><span class="line">    <span class="built_in">schedule</span>(); <span class="comment">// 运行态 -&gt; 等待态 need mutex</span></span><br><span class="line">    <span class="built_in">require</span>(lock);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Condition::<span class="built_in">Signal</span>() &#123;</span><br><span class="line">    <span class="keyword">if</span> (numWaiting &gt; <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="comment">// Remove a thread `t` from `q`;</span></span><br><span class="line">        <span class="built_in">wakeup</span>(t); <span class="comment">// 等待态 -&gt; 就绪态 need mutex</span></span><br><span class="line">        numWaiting--;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>上面的 <code>Wait(lock)</code> 函数，为什么是先释放锁、再获取锁呢？</strong></p>
+<p>当在执行某一个操作时，函数可能对共享变量的需求得不到满足，<strong>这时线程会先释放锁，以便其它线程可以获取锁并执行</strong>。如果不释放锁，那所有线程都将无法获取锁，而持有锁的线程也无法满足条件继续执行并释放锁，最终会造成系统崩溃。</p>
+<h2 id="管程解决生产者 - 消费者问题"><a href="# 管程解决生产者 - 消费者问题" class="headerlink" title="管程解决生产者 - 消费者问题"></a>管程解决生产者 - 消费者问题</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">BoundedBuffer</span> &#123;</span><br><span class="line">    ...</span><br><span class="line">    Lock lock;</span><br><span class="line">    <span class="type">int</span> count = <span class="number">0</span>; <span class="comment">// buffer 为空</span></span><br><span class="line">    Condition notFull, notEmpty;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">BoundedBuffer::<span class="built_in">Deposit</span>(c) &#123;</span><br><span class="line">    lock-&gt;<span class="built_in">Acquire</span>(); <span class="comment">// 管程的定义：只有一个线程能够进入管程，所以将锁放在函数的最开始和最末尾，而不像信号量那样紧贴着临界区</span></span><br><span class="line">    <span class="keyword">while</span> (count == n) &#123;</span><br><span class="line">        notFull.<span class="built_in">Wait</span>(&amp;lock); <span class="comment">// 内部释放刚刚获取的锁</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// Add `c` to the buffer;</span></span><br><span class="line">    count++;</span><br><span class="line">    notEmpty.<span class="built_in">Signal</span>();</span><br><span class="line">    lock-&gt;<span class="built_in">Release</span>();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">BoundedBuffer::<span class="built_in">Remove</span>(c) &#123;</span><br><span class="line">    lock-&gt;<span class="built_in">Acquire</span>();</span><br><span class="line">    <span class="keyword">while</span> (count == <span class="number">0</span>) &#123;</span><br><span class="line">        notEmpty.<span class="built_in">Wait</span>(&amp;lock);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// Remove `c` from buffer;</span></span><br><span class="line">    count--;</span><br><span class="line">    notFull.<span class="built_in">Signal</span>();</span><br><span class="line">    lock-&gt;<span class="built_in">Release</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p><code>Deposit(c)</code> 和 <code>Remove(c)</code> 中的 <code>while</code> 可以改成 <code>if</code> 吗？</p>
+</blockquote>
+<h2 id="管程条件变量的释放处理方式"><a href="# 管程条件变量的释放处理方式" class="headerlink" title="管程条件变量的释放处理方式"></a>管程条件变量的释放处理方式 </h2><p> 把上面的 <code>Deposit(c)</code> 和 <code>Remove(c)</code> 分别看做下图中的线程 T1 和 T2，管程条件变量的释放后的处理方式有两种：Hoare-style 和 Hoare-style。</p>
+<img src="../images/os-kernel/chapter10/hansen-vs-hoare.png" alt="管程条件变量的释放处理方式" width="80%" height="80%">
+
+<p>Hansen-style 的<code>Deposit(c)</code>：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">Hansen_style::<span class="built_in">Deposit</span>(c) &#123;</span><br><span class="line">    lock-&gt;<span class="built_in">Acquire</span>();</span><br><span class="line">    <span class="keyword">while</span> (count == n) &#123; <span class="comment">// using `while` for Hansen-style</span></span><br><span class="line">        notFull.<span class="built_in">Wait</span>(&amp;lock);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// Add thing...</span></span><br><span class="line">    count++;</span><br><span class="line">    notEmpty.<span class="built_in">Signal</span>();</span><br><span class="line">    lock-&gt;<span class="built_in">Release</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Hansen-style 管程：条件变量的释放仅仅是一个提示、还需要 <strong> 重新检查 </strong> 条件，所以用 <code>while</code> 反复检查。</p>
+<p>Hoare-style 的<code>Deposit(c)</code>：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">Hoare_style::<span class="built_in">Deposit</span>(c) &#123;</span><br><span class="line">    lock-&gt;<span class="built_in">Acquire</span>();</span><br><span class="line">    <span class="keyword">if</span> (count == n) &#123; <span class="comment">// using `if` for Hoare-style</span></span><br><span class="line">        notFull.<span class="built_in">Wait</span>(&amp;lock);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// Add thing...</span></span><br><span class="line">    count++;</span><br><span class="line">    notEmpty.<span class="built_in">Signal</span>();</span><br><span class="line">    lock-&gt;<span class="built_in">Release</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Hoare-style 管程：条件变量释放的同时表示放弃管程访问、释放后条件变量的状态可用，所以用 <code>if</code>。</p>
+<ul>
+<li>Hansen-style 管程：高效。</li>
+<li>Hoare-style 管程：低效。</li>
+</ul>
+<p>在 Hansen-style 管程中，使用 <code>while</code> 循环来防止虚假唤醒（spurious wakeups）。虚假唤醒指的是当一个线程被唤醒时，条件可能并没有满足，但唤醒仍然发生。因此，使用 <code>while</code> 循环来检查条件是否满足，如果条件不满足，则线程继续等待。<br>在 Hoare-style 管程中，使用 <code>if</code> 语句来等待条件满足。Hoare-style 管程假设条件变量的等待队列中只有满足条件的线程，因此使用 <code>if</code> 语句即可。虽然在 Hoare-style 管程中也可能发生虚假唤醒，但它并不对此进行特别处理。（由 GPT 生成）</p>
+<p>现在，这张图多了两种种并发编程的实现，即信号量和「锁 + 条件变量」的管程：<br><img src="../images/os-kernel/chapter10/concurrent-summary.png" alt="多程序理念" width="80%" height="80%"></p>
 <blockquote>
 <p>参考资料：<br>1：<a target="_blank" rel="noopener" href="https://github.com/OXygenMoon/OperatingSystemInDepth">https://github.com/OXygenMoon/OperatingSystemInDepth</a><br>2：<a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_53407527/article/details/125207305">https://blog.csdn.net/weixin_53407527/article/details/125207305</a></p>
 </blockquote>
@@ -424,13 +505,13 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-line"></i>
     </span>
-    <span title="站点总字数">364k</span>
+    <span title="站点总字数">368k</span>
   </span>
   <span class="post-meta-item">
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">11:02</span>
+    <span title="站点阅读时长">11:09</span>
   </span>
 </div>
 <div class="busuanzi-count">
