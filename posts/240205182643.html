@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha256-HtsXJanqjKTc8vVQjO4YMhiqFoXkfBsjBWcX91T1jr8=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pursue26.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.18.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":null},"fold":{"enable":true,"height":300},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="本文介绍经典同步问题，包括读者-写者问题（涉及读者优先、写者优先的信号量方式实现与管程方式实现），以及哲学家就餐问题。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="操作系统之 chapter10.2 经典同步问题">
+<meta property="og:url" content="https://pursue26.github.io/posts/240205182643.html">
+<meta property="og:site_name" content="aha&#39;s blog">
+<meta property="og:description" content="本文介绍经典同步问题，包括读者-写者问题（涉及读者优先、写者优先的信号量方式实现与管程方式实现），以及哲学家就餐问题。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pursue26.github.io/images/os-kernel/chapter10/writer-priority-monitor.png">
+<meta property="og:image" content="https://pursue26.github.io/images/os-kernel/chapter10/writer-priority-reader-thread.png">
+<meta property="og:image" content="https://pursue26.github.io/images/os-kernel/chapter10/writer-priority-writer-thread.png">
+<meta property="article:published_time" content="2024-02-05T10:26:43.000Z">
+<meta property="article:modified_time" content="2024-02-05T12:59:01.114Z">
+<meta property="article:author" content="aha">
+<meta property="article:tag" content="操作系统">
+<meta property="article:tag" content="经典同步问题">
+<meta property="article:tag" content="读者写者问题">
+<meta property="article:tag" content="哲学家就餐问题">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pursue26.github.io/images/os-kernel/chapter10/writer-priority-monitor.png">
+
+
+<link rel="canonical" href="https://pursue26.github.io/posts/240205182643.html">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://pursue26.github.io/posts/240205182643.html","path":"posts/240205182643.html","title":"操作系统之 chapter10.2 经典同步问题"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>操作系统之 chapter10.2 经典同步问题 | aha's blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<style>.darkmode--activated{--body-bg-color:#282828;--content-bg-color:#333;--card-bg-color:#555;--text-color:#ccc;--blockquote-color:#bbb;--link-color:#ccc;--link-hover-color:#eee;--brand-color:#ddd;--brand-hover-color:#ddd;--table-row-odd-bg-color:#282828;--table-row-hover-bg-color:#363636;--menu-item-bg-color:#555;--btn-default-bg:#222;--btn-default-color:#ccc;--btn-default-border-color:#555;--btn-default-hover-bg:#666;--btn-default-hover-color:#ccc;--btn-default-hover-border-color:#666;--highlight-background:#282b2e;--highlight-foreground:#a9b7c6;--highlight-gutter-background:#34393d;--highlight-gutter-foreground:#9ca9b6}.darkmode--activated img{opacity:.75}.darkmode--activated img:hover{opacity:.9}.darkmode--activated code{color:#69dbdc;background:0 0}button.darkmode-toggle{z-index:9999}.darkmode-ignore,img{display:flex!important}.beian img{display:inline-block!important}</style></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">aha's blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-dailyblog"><a href="/random.html" rel="section"><i class="fa fa-file fa-fw"></i>每日博客</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%AF%BB%E8%80%85%20-%20%E5%86%99%E8%80%85%E9%97%AE%E9%A2%98"><span class="nav-number">1.</span> <span class="nav-text">读者 - 写者问题 </span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%A1%E5%8F%B7%E9%87%8F%E6%96%B9%E5%BC%8F%E5%AE%9E%E7%8E%B0%E8%AF%BB%E8%80%85%E4%BC%98%E5%85%88"><span class="nav-number">1.1.</span> <span class="nav-text">信号量方式实现读者优先 </span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%95%E4%B8%BA%E8%AF%BB%E8%80%85%E4%BC%98%E5%85%88"><span class="nav-number">1.1.1.</span> <span class="nav-text"> 何为读者优先 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B1%E4%BA%AB%E5%8F%98%E9%87%8F%E5%AE%9A%E4%B9%89"><span class="nav-number">1.1.2.</span> <span class="nav-text">共享变量定义 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%86%99%E8%80%85%E7%BA%BF%E7%A8%8B%E5%A4%84%E7%90%86"><span class="nav-number">1.1.3.</span> <span class="nav-text">写者线程处理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%BB%E8%80%85%E7%BA%BF%E7%A8%8B%E5%A4%84%E7%90%86"><span class="nav-number">1.1.4.</span> <span class="nav-text">读者线程处理</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%A1%E7%A8%8B%E6%96%B9%E5%BC%8F%E5%AE%9E%E7%8E%B0%E5%86%99%E8%80%85%E4%BC%98%E5%85%88"><span class="nav-number">1.2.</span> <span class="nav-text">管程方式实现写者优先 </span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%95%E4%B8%BA%E5%86%99%E8%80%85%E4%BC%98%E5%85%88"><span class="nav-number">1.2.1.</span> <span class="nav-text"> 何为写者优先 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BC%AA%E4%BB%A3%E7%A0%81"><span class="nav-number">1.2.2.</span> <span class="nav-text">伪代码 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AE%A1%E7%A8%8B%E6%96%B9%E5%BC%8F%E5%AE%9E%E7%8E%B0"><span class="nav-number">1.2.3.</span> <span class="nav-text">管程方式实现 </span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%85%B1%E4%BA%AB%E5%8F%98%E9%87%8F%E5%AE%9A%E4%B9%89%20-1"><span class="nav-number">1.2.3.1.</span> <span class="nav-text"> 共享变量定义</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%AF%BB%E8%80%85%E7%BA%BF%E7%A8%8B%E5%AE%9E%E7%8E%B0"><span class="nav-number">1.2.3.2.</span> <span class="nav-text">读者线程实现</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%86%99%E8%80%85%E7%BA%BF%E7%A8%8B%E5%AE%9E%E7%8E%B0"><span class="nav-number">1.2.3.3.</span> <span class="nav-text">写者线程实现</span></a></li></ol></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">aha</p>
+  <div class="site-description" itemprop="description">经历一个过程然后成为更好的自己</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">84</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">49</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">108</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://pursue26.github.io/posts/240205182643.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="aha">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="aha's blog">
+      <meta itemprop="description" content="经历一个过程然后成为更好的自己">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="操作系统之 chapter10.2 经典同步问题 | aha's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          操作系统之 chapter10.2 经典同步问题
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+  
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2024-02-05 18:26:43 / 修改时间：20:59:01" itemprop="dateCreated datePublished" datetime="2024-02-05T18:26:43+08:00">2024-02-05</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" itemprop="url" rel="index"><span itemprop="name">操作系统</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E7%BB%8F%E5%85%B8%E5%90%8C%E6%AD%A5%E9%97%AE%E9%A2%98/" itemprop="url" rel="index"><span itemprop="name">经典同步问题</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>3.8k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>7 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>本文介绍经典同步问题，包括读者 - 写者问题（涉及读者优先、写者优先的信号量方式实现与管程方式实现），以及哲学家就餐问题。</p>
+<span id="more"></span>
+
+<h1 id="读者 - 写者问题"><a href="# 读者 - 写者问题" class="headerlink" title="读者 - 写者问题"></a>读者 - 写者问题 </h1><p> 读者 - 写者问题的 <strong> 动机：对共享数据的访问</strong>，即读者想要读取共享空间中的数据，而写者想要往共享空间中写入数据，这就需要合理安排读者和写者的访问时机，否则就会出现数据错误问题。</p>
+<p>这其中有两种不同角色的使用者：</p>
+<ul>
+<li>读者：不修改数据、仅仅读取数据；</li>
+<li>写者：读取数据并写入（修改）数据。</li>
+</ul>
+<p>问题的约束（对共享数据访问的前提条件）：</p>
+<ol>
+<li>允许同一时刻有多个读者，但在任意时刻最多只有一个写者；</li>
+<li>当没有写者时，读者才能访问数据；</li>
+<li>当没有读者和写者时，写者才能访问数据；</li>
+<li>在任何时候只有一个线程可以操作共享变量。</li>
+</ol>
+<p>涉及的共享数据、变量有哪些？</p>
+<ul>
+<li>共享数据集；</li>
+<li>读者计数器 <code>ReaderCount</code>（初始化为 0）；</li>
+<li>写者访问控制信号量 <code>WriteMutex</code>（初始化为 1）——在任意时刻最多只有一个写者，故初始化值必须为 1。</li>
+<li>读者计数器访问控制信号量 <code>CountMutex</code>（初始化为 1）——这里初始化为 1，可以实现多个读者同时读取共享数据集，原因是 <code>WriteMutex</code> 和 <code>CountMutex</code> <strong>一个数对共享数据执行写入的互斥访问，另一个是对读者计数器的互斥访问，而不是对读取共享数据集的互斥访问</strong>，所以可以实现多个读者同时读取共享数据集。（具体看后续代码实现）</li>
+</ul>
+<h2 id="信号量方式实现读者优先"><a href="# 信号量方式实现读者优先" class="headerlink" title="信号量方式实现读者优先"></a>信号量方式实现读者优先 </h2><h3 id="何为读者优先"><a href="# 何为读者优先" class="headerlink" title="何为读者优先"></a> 何为读者优先 </h3><p> 何为读者优先？</p>
+<p>只要有一个读者处于活跃状态（正在读取共享数据），后来的读者都会被接纳（允许其读取数据），即使这些读者是在正在等待的写者之后到来的，也会优先让这些读者读取数据。如果读者源源不断的出现，那么写者始终处于阻塞状态。</p>
+<h3 id="共享变量定义"><a href="# 共享变量定义" class="headerlink" title="共享变量定义"></a>共享变量定义 </h3><p> 定义并初始化上述共享变量：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;semaphore.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> ReaderCount = <span class="number">0</span>; <span class="comment">// 读者计数器</span></span><br><span class="line"><span class="type">sem_t</span> WriteMutex; <span class="comment">// 写者访问控制信号量</span></span><br><span class="line"><span class="type">sem_t</span> CountMutex;  <span class="comment">// 读者计数器访问控制信号量，是! 计数器!</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 初始化信号量</span></span><br><span class="line">sem_init(&amp;WriteMutex, <span class="number">0</span>, <span class="number">1</span>);  <span class="comment">// 第二个参数是用于控制信号量的线程间共享</span></span><br><span class="line">sem_init(&amp;CountMutex, <span class="number">0</span>, <span class="number">1</span>);</span><br></pre></td></tr></table></figure>
+
+<h3 id="写者线程处理"><a href="# 写者线程处理" class="headerlink" title="写者线程处理"></a>写者线程处理</h3><p>Writer 写者线程处理：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span>* <span class="title function_">writer</span><span class="params">(<span class="type">void</span>* arg)</span> &#123;</span><br><span class="line">    sem_wait(&amp;WriteMutex);</span><br><span class="line">    write();  <span class="comment">// 写操作</span></span><br><span class="line">    sem_post(&amp;WriteMutex);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>分析：</p>
+<ul>
+<li>在写者线程中，当 <code>WriteMutex</code> 信号量为 1 时，执行 P 操作后 <code>WriteMutex &gt;=0</code>，不会触发等待；</li>
+<li>若此时再来一个写者，执行 P 操作后，<code>WriteMutex &lt; 0</code>，会进行等待。直到持有信号量的写者，执行 V 操作后，唤醒一个等待的写者线程。</li>
+</ul>
+<h3 id="读者线程处理"><a href="# 读者线程处理" class="headerlink" title="读者线程处理"></a>读者线程处理</h3><p>Reader 读者线程处理：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span>* <span class="title function_">reader</span><span class="params">(<span class="type">void</span>* arg)</span> &#123;</span><br><span class="line">    sem_wait(&amp;CountMutex);</span><br><span class="line">    <span class="keyword">if</span> (ReaderCount == <span class="number">0</span>) &#123;</span><br><span class="line">        sem_wait(&amp;WriteMutex);</span><br><span class="line">    &#125;</span><br><span class="line">    ReaderCount++;</span><br><span class="line">    sem_post(&amp;CountMutex);</span><br><span class="line"></span><br><span class="line">    read();  <span class="comment">// 读操作</span></span><br><span class="line"></span><br><span class="line">    sem_wait(&amp;CountMutex);</span><br><span class="line">    ReaderCount--;</span><br><span class="line">    <span class="keyword">if</span> (ReaderCount == <span class="number">0</span>) &#123;</span><br><span class="line">        sem_post(&amp;WriteMutex);</span><br><span class="line">    &#125;</span><br><span class="line">    sem_post(&amp;CountMutex);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>分析：</p>
+<ul>
+<li>在读者线程中，首先通过 <code>sem_wait(&amp;CountMutex)</code> 等待，获取读者计数器访问控制信号量，如果 <code>ReaderCount</code> 的值为 0，<strong>意味着第一个读者进入</strong>，需要通过 <code>sem_wait(&amp;WriteMutex)</code> 获取写者访问控制信号量（这样，如果后续来了写者线程，就会进入等待），避免写者同时存在。</li>
+<li>接下来，释放读者计数器访问控制信号量 <code>sem_post(&amp;CountMutex)</code>（以使得后续读者能够进入），进行读操作。</li>
+<li>最后，再次获取读者计数器访问控制信号量，减少读者计数器 <code>ReaderCount</code>，如果 <code>ReaderCount</code> 的值为 0，<strong>意味着没有读者了</strong>，需要通过 <code>sem_post(&amp;WriteMutex)</code> 释放写者访问控制信号量。</li>
+</ul>
+<p>为什么一个读者线程中，涉及了两对关于 <code>CountMutex</code> 的 <code>sem_wait</code> 等待和 <code>sem_post</code> 释放呢？</p>
+<p>这是因为，读者计数器 <code>ReaderCount</code> 是一个共享变量，在一个读者进入或退出时，需要修改 <code>ReaderCount</code> 的值，这要保证对该变量的互斥访问，防止数据错误。</p>
+<h2 id="管程方式实现写者优先"><a href="# 管程方式实现写者优先" class="headerlink" title="管程方式实现写者优先"></a>管程方式实现写者优先 </h2><h3 id="何为写者优先"><a href="# 何为写者优先" class="headerlink" title="何为写者优先"></a> 何为写者优先 </h3><p> 何为写者优先？</p>
+<p>只要有一个写者处于活跃状态，后来的写者都会被接纳，即使这些写者是在正在等待的读者之后到来的，也会优先让这些写者写入数据。如果写者源源不断的出现，那么读者始终处于阻塞状态。</p>
+<h3 id="伪代码"><a href="# 伪代码" class="headerlink" title="伪代码"></a>伪代码 </h3><p> 读者写者问题的写者优先可以抽象为两个方法：</p>
+<ul>
+<li>读者线程：等待没有写者 -&gt; 读取数据集 -&gt; 检查：唤醒等待的写者；</li>
+<li>写者线程：等待没有读者、写者 -&gt; 往数据集写入数据 -&gt; 检查：唤醒等待的读者或写者。</li>
+</ul>
+<img src="../images/os-kernel/chapter10/writer-priority-monitor.png" alt="管程方式实现写者优先" width="80%" height="80%">
+
+<h3 id="管程方式实现"><a href="# 管程方式实现" class="headerlink" title="管程方式实现"></a>管程方式实现 </h3><h4 id="共享变量定义 -1"><a href="# 共享变量定义 -1" class="headerlink" title="共享变量定义"></a> 共享变量定义</h4><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> AR = <span class="number">0</span>;  <span class="comment">// active reader</span></span><br><span class="line"><span class="type">int</span> AW = <span class="number">0</span>;  <span class="comment">// active writer</span></span><br><span class="line"><span class="type">int</span> WR = <span class="number">0</span>;  <span class="comment">// waiting reader</span></span><br><span class="line"><span class="type">int</span> WW = <span class="number">0</span>;  <span class="comment">// waiting writer</span></span><br><span class="line"></span><br><span class="line">Condition okToRead;</span><br><span class="line">Condition okToWrite;</span><br><span class="line">Lock lock;</span><br></pre></td></tr></table></figure>
+
+<h4 id="读者线程实现"><a href="# 读者线程实现" class="headerlink" title="读者线程实现"></a>读者线程实现</h4><img src="../images/os-kernel/chapter10/writer-priority-reader-thread.png" alt="读者线程实现" width="80%" height="80%">
+
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 读者读取数据（就像上面的伪代码）：等待没有写者 -&gt; 读取数据集 -&gt; 检查：唤醒等待的写者 -&gt; 退出</span></span><br><span class="line"><span class="function">Public <span class="title">Database::Read</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// wait until no writers;</span></span><br><span class="line">    <span class="built_in">StartRead</span>();</span><br><span class="line">    read database;</span><br><span class="line">    <span class="comment">// check out - wake up waiting writers;</span></span><br><span class="line">    <span class="built_in">DoneRead</span>();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 管程方式实现：等待没有写者后，读者开始读取</span></span><br><span class="line"><span class="function">Private <span class="title">Database::StartRead</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    lock.<span class="built_in">Acquire</span>();</span><br><span class="line">    <span class="keyword">while</span> (AW + WW &gt; <span class="number">0</span>) &#123;  <span class="comment">/* 体现写者优先的细节 1 */</span></span><br><span class="line">        WR++;</span><br><span class="line">        okToRead.<span class="built_in">wait</span>(&amp;lock);</span><br><span class="line">        WR--</span><br><span class="line">    &#125;</span><br><span class="line">    AR++;</span><br><span class="line">    lock.<span class="built_in">Release</span>();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 管程方式实现：读者退出</span></span><br><span class="line"><span class="function">Private <span class="title">Database::DoneRead</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    lock.<span class="built_in">Acquire</span>();</span><br><span class="line">    AR--;</span><br><span class="line">    <span class="comment">// 在没有活跃的读者时，才有可能唤醒写者</span></span><br><span class="line">    <span class="keyword">if</span> (AR == <span class="number">0</span> &amp;&amp; WW &gt; <span class="number">0</span>) &#123;</span><br><span class="line">        okToWrite.<span class="built_in">signal</span>();</span><br><span class="line">    &#125;</span><br><span class="line">    lock.<span class="built_in">Release</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>体现写者优先的细节 1：只要有写者，别管是活跃的、还是等待的，写者就得等待。</li>
+</ul>
+<p>在 <code>DoneRead()</code> 中，为什么有活跃的读者时，不能唤醒写者？不是写者优先吗？</p>
+<p>因为，有活跃的读者，表明读者正在读取数据，这时若唤醒写者写入（修改数据），会出现数据错误。虽然是写者优先，但优先的前提是写者 <strong> 正在占据</strong> database，这时后来的读者、写者，才会优先写者。</p>
+<h4 id="写者线程实现"><a href="# 写者线程实现" class="headerlink" title="写者线程实现"></a>写者线程实现</h4><img src="../images/os-kernel/chapter10/writer-priority-writer-thread.png" alt="读者线程实现" width="80%" height="80%">
+
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 写者写入数据（就像上面的伪代码）：等待没有读者、写者 -&gt; 往数据集写入数据 -&gt; 检查：唤醒等待的读者或写者</span></span><br><span class="line"><span class="function">Public <span class="title">Database::Read</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// wait until no readers/writers;</span></span><br><span class="line">    <span class="built_in">StartWrite</span>();</span><br><span class="line">    write database;</span><br><span class="line">    <span class="comment">// check out - wake up waiting a write/all readers;</span></span><br><span class="line">    <span class="built_in">DoneWrite</span>();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 管程方式实现：等待没有写者后，读者开始读取</span></span><br><span class="line"><span class="function">Private <span class="title">Database::StartWrite</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    lock.<span class="built_in">Acquire</span>();</span><br><span class="line">    <span class="comment">// 有活跃的写者或活跃的读者，新写者必须等待</span></span><br><span class="line">    <span class="keyword">while</span> (AW + AR &gt; <span class="number">0</span>) &#123;  <span class="comment">/* 体现写者优先的细节 2 */</span></span><br><span class="line">        WW++;</span><br><span class="line">        okToWrite.<span class="built_in">wait</span>(&amp;lock);</span><br><span class="line">        WW--</span><br><span class="line">    &#125;</span><br><span class="line">    AW++;</span><br><span class="line">    lock.<span class="built_in">Release</span>();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 管程方式实现：读者退出</span></span><br><span class="line"><span class="function">Private <span class="title">Database::DoneWrite</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    lock.<span class="built_in">Acquire</span>();</span><br><span class="line">    AW--;</span><br><span class="line">    <span class="comment">// 有等待的写者则优先唤醒写者，没有则唤醒所有读者</span></span><br><span class="line">    <span class="keyword">if</span> (WW &gt; <span class="number">0</span>) &#123;  <span class="comment">/* 体现写者优先的细节 3 */</span></span><br><span class="line">        okToWrite.<span class="built_in">signal</span>();</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (WR &gt; <span class="number">0</span>)&#123;</span><br><span class="line">        okToRead.<span class="built_in">broadcast</span>();</span><br><span class="line">    &#125;</span><br><span class="line">    lock.<span class="built_in">Release</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>体现写者优先的细节 2：有活跃的写者（和活跃的读者）时，新的写者需要等待。</li>
+<li>体现写者优先的细节 3：优先检查并唤醒等待的写者，而不是等待的读者。</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" rel="tag"># 操作系统</a>
+              <a href="/tags/%E7%BB%8F%E5%85%B8%E5%90%8C%E6%AD%A5%E9%97%AE%E9%A2%98/" rel="tag"># 经典同步问题</a>
+              <a href="/tags/%E8%AF%BB%E8%80%85%E5%86%99%E8%80%85%E9%97%AE%E9%A2%98/" rel="tag"># 读者写者问题</a>
+              <a href="/tags/%E5%93%B2%E5%AD%A6%E5%AE%B6%E5%B0%B1%E9%A4%90%E9%97%AE%E9%A2%98/" rel="tag"># 哲学家就餐问题</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/240130190208.html" rel="prev" title="计网之路由表、转发表与快速转发工作原理">
+                  <i class="fa fa-angle-left"></i> 计网之路由表、转发表与快速转发工作原理
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">aha</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">377k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">11:25</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+</div>
+  <div class="powered-by">
+    <!--由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动 -->
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/next-theme-pjax/0.6.0/pjax.min.js" integrity="sha256-vxLn1tSKWD4dqbMRyv940UYw4sXgMtYcK6reefzZrao=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script><script src="/js/pjax.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+  <script data-pjax async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+<script src="https://unpkg.com/darkmode-js@1.5.7/lib/darkmode-js.min.js"></script>
+
+<script>
+var options = {
+  bottom: '64px',
+  right: 'unset',
+  left: '32px',
+  time: '0.5s',
+  mixColor: 'transparent',
+  backgroundColor: 'transparent',
+  buttonColorDark: '#3F3F3F',
+  buttonColorLight: '#fff',
+  saveInCookies: true,
+  label: '🌓',
+  autoMatchOsTheme: true
+}
+const darkmode = new Darkmode(options);
+window.darkmode = darkmode;
+darkmode.showWidget();
+</script>
+
+</body>
+</html>

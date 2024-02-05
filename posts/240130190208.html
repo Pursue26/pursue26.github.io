@@ -27,7 +27,7 @@
 <meta property="og:description" content="本文介绍路由表（Routing Information Base, RIB）、转发表（Forwarding Information Base, FIB）和快速转发（Fast Forwarding）的相关概念和工作原理。">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2024-01-30T11:02:08.000Z">
-<meta property="article:modified_time" content="2024-01-30T09:40:08.558Z">
+<meta property="article:modified_time" content="2024-01-31T08:18:04.315Z">
 <meta property="article:author" content="aha">
 <meta property="article:tag" content="路由表">
 <meta property="article:tag" content="转发表">
@@ -154,18 +154,18 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">83</span>
+          <span class="site-state-item-count">84</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
           <a href="/categories/">
-        <span class="site-state-item-count">48</span>
+        <span class="site-state-item-count">49</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">105</span>
+        <span class="site-state-item-count">108</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -221,9 +221,15 @@
         <i class="far fa-calendar"></i>
       </span>
       <span class="post-meta-item-text">发表于</span>
-      
 
-      <time title="创建时间：2024-01-30 19:02:08 / 修改时间：17:40:08" itemprop="dateCreated datePublished" datetime="2024-01-30T19:02:08+08:00">2024-01-30</time>
+      <time title="创建时间：2024-01-30 19:02:08" itemprop="dateCreated datePublished" datetime="2024-01-30T19:02:08+08:00">2024-01-30</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-01-31 16:18:04" itemprop="dateModified" datetime="2024-01-31T16:18:04+08:00">2024-01-31</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -253,7 +259,7 @@
         <i class="far fa-file-word"></i>
       </span>
       <span class="post-meta-item-text">本文字数：</span>
-      <span>4.4k</span>
+      <span>4.5k</span>
     </span>
     <span class="post-meta-item" title="阅读时长">
       <span class="post-meta-item-icon">
@@ -284,7 +290,7 @@
 <p>转发表和快速转发表都是基于路由表的衍生物，用于加速数据包的转发过程。</p>
 </blockquote>
 <h2 id="路由转发分组"><a href="# 路由转发分组" class="headerlink" title="路由转发分组"></a>路由转发分组 </h2><p> 路由转发分组：路由转发分组是指网络设备（如路由器）根据接收到的数据包的目的地址，通过查询 <del> 路由表 </del>FIB 表，选择合适的出口接口将数据包转发到下一跳<strong> 的过程 </strong>。<del> 路由表</del>FIB 表是路由转发分组的基础和依据。</p>
-<h1 id="路由表工作原理"><a href="# 路由表工作原理" class="headerlink" title="路由表工作原理"></a>路由表工作原理 </h1><p> 在一张路由表中，当存在多个路由项可同时匹配目的地址时，路由查找进程会 <strong> 选择掩码最长的路由项用于转发</strong>，即最长匹配原则。因为掩码越长，所处的网段范围就越小，网段的范围越小，就越能快速的定位到 PC 机的具体位置，从而加快转发效率。</p>
+<h1 id="路由表工作原理"><a href="# 路由表工作原理" class="headerlink" title="路由表工作原理"></a>路由表工作原理 </h1><p> 在一张路由表中，当存在多个路由项可同时匹配目的地址时，路由查找进程会 <strong> 选择掩码（Mask）最长的路由项用于转发</strong>，即最长匹配原则。因为掩码越长，所处的网段范围就越小，网段的范围越小，就越能快速的定位到 PC 机的具体位置，从而加快转发效率。</p>
 <p>例子：在运行了 RIP (Routing Information Protocol，一种用于路由选择的动态路由协议) 的 MSR 路由器上看到如下路由信息：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&lt;MSR&gt;display ip routing-table 6.6.6.6</span><br><span class="line"></span><br><span class="line">Routing Table: Public</span><br><span class="line"></span><br><span class="line">Summary Count: 2</span><br><span class="line"></span><br><span class="line">Destination/Mask Proto Pre Cost  NextHop  Interface</span><br><span class="line"></span><br><span class="line">6.6.6.0/24       RIP   100   1  100.1.1.1  GE0/0</span><br><span class="line">6.0.0.0/8       Static 60    0  100.1.1.1  GE0/0</span><br><span class="line">&lt;MSR&gt;</span><br></pre></td></tr></table></figure>
 
@@ -299,15 +305,15 @@
 <h1 id="转发表 -1"><a href="# 转发表 -1" class="headerlink" title="转发表"></a>转发表 </h1><h2 id="转发表生成方式"><a href="# 转发表生成方式" class="headerlink" title="转发表生成方式"></a> 转发表生成方式</h2><p>FIB 表的生成有 2 种方式，一种是源于路由表项，另外一种是通过 ARP 解析获得。</p>
 <h3 id="源于路由表项"><a href="# 源于路由表项" class="headerlink" title="源于路由表项"></a>源于路由表项 </h3><p> 第一种方式，当开始计算路由信息的时候，因为在一个网络拓扑结构中，可能会运行多个路由协议，而不同路由协议所计算出的路径可能会不同。</p>
 <p>当出现这种情况时，路由器会 <strong> 选择较高路由优先级的路由协议所发现的路由 </strong> 作为最优路由，即比较路由的优先级将其选出，置为 Active（活跃）状态；而其他路由作为备份路由，置为 Inactive（非活跃）状态。<strong>系统会再把 Active 状态的路由表项导入至 FIB 表中，作为系统转发的依据</strong>。</p>
-<h3 id="通过 ARP 解析"><a href="# 通过 ARP 解析" class="headerlink" title="通过 ARP 解析"></a>通过 ARP 解析 </h3><p> 第二种方式，通过 ARP 解析，得到 MAC 地址与 IP 地址的映射关系，再得到本地网段内的主机路由信息，最后添加至 FIB 表中。</p>
-<h2 id="转发表工作原理"><a href="# 转发表工作原理" class="headerlink" title="转发表工作原理"></a>转发表工作原理 </h2><p> 在 FIB 表生成过程中，需要注意的一点是，<strong>FIB 表与路由表是同步更新的 </strong>。系统的控制平面会发现<em> 新的 <em> 路由信息，根据路由信息更新到自己的路由表中，生成 </em> 新的</em> Active 状态的路由表项，再更新至 FIB 表。</p>
+<h3 id="通过 ARP 解析"><a href="# 通过 ARP 解析" class="headerlink" title="通过 ARP 解析"></a>通过 ARP 解析 </h3><p> 第二种方式，通过 ARP 解析，得到 MAC 地址与目的 IP 地址的映射关系。为了将这个映射关系添加到 FIB 表中，主机需要将目标 IP 地址与对应的 MAC 地址加入到本地网段内的主机路由信息中。最后将主机路由信息添加到 FIB 表中。</p>
+<h2 id="转发表工作原理"><a href="# 转发表工作原理" class="headerlink" title="转发表工作原理"></a>转发表工作原理 </h2><p> 在 FIB 表生成过程中，需要注意的一点是，<strong>FIB 表与路由表是同步更新的 </strong>。系统的控制平面会发现<em> 新的 </em> 路由信息，根据路由信息更新到自己的路由表中，生成新的 Active 状态的路由表项，再更新至 FIB 表。</p>
 <p>路由表属于控制平面，FIB 表属于转发平面，这样便做到了 <strong> 控制平面与转发平面的分离</strong>。如果原路由表中处于 Active 状态的路由表项失效，系统也会删除相关 FIB 表项。</p>
 <p>由于 FIB 表 <strong> 全是 </strong> 处于 Active 状态的路由，所以 FIB 表项的 <strong> 数量远远小于 </strong> 路由表项。基于这种特性，在设计的时候，<strong>系统可以将 FIB 表项加载到硬件中，从而加快数据转发速度 </strong>。例如，在某些高端交换机启动后，FIB 表被系统加载到接口业务板的硬件中，<strong> 数据报文再通过硬件转发，不需要再通过 CPU 转发</strong>，可以大大降低转发时延。</p>
 <blockquote>
 <p>控制平面与转发平面的物理（或逻辑）分离，使得主控板上的 CPU 不负责报文转发，专注于系统的控制；而业务板则专注于数据报文转发。如果主控板损坏，业务板仍然能够转发报文。</p>
 </blockquote>
 <h1 id="快速转发"><a href="# 快速转发" class="headerlink" title="快速转发"></a>快速转发 </h1><p> 路由器常规转发报文的流程：</p>
-<p>路由器接收到一个报文后，将它从接口存储器拷贝至 CPU 中，CPU 会根据报文的目的地址寻找 FIB 表中与之匹配的转发项，最终确定一条最佳的路径。与此同时，再将报文按照数据链路层上使用的协议进行封装，最后，封装后的链路层帧通过 DMA(Direct Memory Access，直接内存访问)拷贝至输出队列中进行报文转发。这一个过程经过了 2 次系统总线，每一个报文都要重复这个过程。</p>
+<p>路由器接收到一个报文后，将它从接口存储器拷贝至 CPU 中，CPU 会根据报文的目的地址寻找 FIB 表中与之匹配的转发项，最终确定一条最佳的路径。与此同时，再将报文按照数据链路层上使用的协议进行封装，最后，封装后的链路层帧通过 DMA（Direct Memory Access，直接内存访问）拷贝至输出队列中进行报文转发。这一个过程经过了 2 次系统总线，每一个报文都要重复这个过程。</p>
 <p>路由器性能因素：</p>
 <p>衡量路由器性能因素之一是报文的转发效率，报文的转发效率越高，性能就越强。所以，需要再用到快速转发表来进行转发，<strong>快速转发表采用高速缓存来处理报文，使用基于数据流的技术来处理</strong>。</p>
 <p>什么是基于数据流？</p>
@@ -346,6 +352,9 @@
                 </a>
             </div>
             <div class="post-nav-item">
+                <a href="/posts/240205182643.html" rel="next" title="操作系统之 chapter10.2 经典同步问题">
+                  操作系统之 chapter10.2 经典同步问题 <i class="fa fa-angle-right"></i>
+                </a>
             </div>
           </div>
     </footer>
@@ -376,13 +385,13 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-line"></i>
     </span>
-    <span title="站点总字数">372k</span>
+    <span title="站点总字数">377k</span>
   </span>
   <span class="post-meta-item">
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">11:17</span>
+    <span title="站点阅读时长">11:25</span>
   </span>
 </div>
 <div class="busuanzi-count">
