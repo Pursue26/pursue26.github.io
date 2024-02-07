@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha256-HtsXJanqjKTc8vVQjO4YMhiqFoXkfBsjBWcX91T1jr8=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pursue26.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.18.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":null},"fold":{"enable":true,"height":300},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="GCC（GNU Compiler Collection）是一个开源的编程语言编译器集合，支持多种编程语言，包括C、C++、Objective-C、Fortran、Ada等。它是许多开发者和程序员首选的编译器，因为它的功能强大、稳定，并且跨平台。 这篇文章主要介绍 GCC (GNU Compiler Collection)，以及使用 GCC 编译 C 代码的分解过程。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="编译之 GCC 编译过程分解">
+<meta property="og:url" content="https://pursue26.github.io/posts/240207180410.html">
+<meta property="og:site_name" content="aha&#39;s blog">
+<meta property="og:description" content="GCC（GNU Compiler Collection）是一个开源的编程语言编译器集合，支持多种编程语言，包括C、C++、Objective-C、Fortran、Ada等。它是许多开发者和程序员首选的编译器，因为它的功能强大、稳定，并且跨平台。 这篇文章主要介绍 GCC (GNU Compiler Collection)，以及使用 GCC 编译 C 代码的分解过程。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pursue26.github.io/images/compiler-tool/gcc.png">
+<meta property="article:published_time" content="2024-02-07T10:04:10.000Z">
+<meta property="article:modified_time" content="2024-02-07T08:44:42.292Z">
+<meta property="article:author" content="aha">
+<meta property="article:tag" content="编译工具">
+<meta property="article:tag" content="GCC">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pursue26.github.io/images/compiler-tool/gcc.png">
+
+
+<link rel="canonical" href="https://pursue26.github.io/posts/240207180410.html">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://pursue26.github.io/posts/240207180410.html","path":"posts/240207180410.html","title":"编译之 GCC 编译过程分解"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>编译之 GCC 编译过程分解 | aha's blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<style>.darkmode--activated{--body-bg-color:#282828;--content-bg-color:#333;--card-bg-color:#555;--text-color:#ccc;--blockquote-color:#bbb;--link-color:#ccc;--link-hover-color:#eee;--brand-color:#ddd;--brand-hover-color:#ddd;--table-row-odd-bg-color:#282828;--table-row-hover-bg-color:#363636;--menu-item-bg-color:#555;--btn-default-bg:#222;--btn-default-color:#ccc;--btn-default-border-color:#555;--btn-default-hover-bg:#666;--btn-default-hover-color:#ccc;--btn-default-hover-border-color:#666;--highlight-background:#282b2e;--highlight-foreground:#a9b7c6;--highlight-gutter-background:#34393d;--highlight-gutter-foreground:#9ca9b6}.darkmode--activated img{opacity:.75}.darkmode--activated img:hover{opacity:.9}.darkmode--activated code{color:#69dbdc;background:0 0}button.darkmode-toggle{z-index:9999}.darkmode-ignore,img{display:flex!important}.beian img{display:inline-block!important}</style></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">aha's blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-dailyblog"><a href="/random.html" rel="section"><i class="fa fa-file fa-fw"></i>每日博客</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#C-include"><span class="nav-number">1.</span> <span class="nav-text">C include</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#GCC%20%E7%BC%96%E8%AF%91%E5%88%86%E8%A7%A3"><span class="nav-number">2.</span> <span class="nav-text">GCC 编译分解 </span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A2%84%E5%A4%84%E7%90%86"><span class="nav-number">2.1.</span> <span class="nav-text">预处理 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BC%96%E8%AF%91"><span class="nav-number">2.2.</span> <span class="nav-text">编译 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B1%87%E7%BC%96"><span class="nav-number">2.3.</span> <span class="nav-text">汇编 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%93%BE%E6%8E%A5"><span class="nav-number">2.4.</span> <span class="nav-text">链接 </span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#GCC%20%E5%8F%82%E6%95%B0%E6%80%BB%E7%BB%93"><span class="nav-number">3.</span> <span class="nav-text">GCC 参数总结</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%A4%9A%E4%B8%AA%E6%96%87%E4%BB%B6%E4%B8%80%E8%B5%B7%E7%BC%96%E8%AF%91"><span class="nav-number">4.</span> <span class="nav-text">多个文件一起编译 </span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">aha</p>
+  <div class="site-description" itemprop="description">经历一个过程然后成为更好的自己</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">85</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">51</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">110</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://pursue26.github.io/posts/240207180410.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="aha">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="aha's blog">
+      <meta itemprop="description" content="经历一个过程然后成为更好的自己">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="编译之 GCC 编译过程分解 | aha's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          编译之 GCC 编译过程分解
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+  
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2024-02-07 18:04:10 / 修改时间：16:44:42" itemprop="dateCreated datePublished" datetime="2024-02-07T18:04:10+08:00">2024-02-07</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%BC%96%E8%AF%91%E5%B7%A5%E5%85%B7/" itemprop="url" rel="index"><span itemprop="name">编译工具</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%BC%96%E8%AF%91%E5%B7%A5%E5%85%B7/GCC/" itemprop="url" rel="index"><span itemprop="name">GCC</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>4.2k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>8 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>GCC（GNU Compiler Collection）是一个开源的编程语言编译器集合，支持多种编程语言，包括 C、C++、Objective-C、Fortran、Ada 等。它是许多开发者和程序员首选的编译器，因为它的功能强大、稳定，并且跨平台。</p>
+<p>这篇文章主要介绍 GCC (GNU Compiler Collection)，以及使用 GCC 编译 C 代码的分解过程。</p>
+<span id="more"></span>
+
+<h1 id="C-include"><a href="#C-include" class="headerlink" title="C include"></a>C include</h1><p>在 C 语言程序中，会引用各种 <code>#include</code> 头文件（.h），它是如何被引用的？</p>
+<p>当我们 <code>#include</code> 头文件时，如 <code>#include &lt;stdio.h&gt;</code>，其实是告诉了 C 预处理器（C preprocessor, cpp）去指定路径 <code>/usr/include/</code> 查找特定的头文件，并将其直接插入到代码中的 <code>#include</code> 位置。</p>
+<h1 id="GCC 编译分解"><a href="#GCC 编译分解" class="headerlink" title="GCC 编译分解"></a>GCC 编译分解 </h1><p> 我么以下面的程序分解 GCC 编译的过程，文件名 <code>hw.c</code>。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* header files go up here */</span></span><br><span class="line"><span class="comment">/* note that C comments are enclosed within a slash and</span></span><br><span class="line"><span class="comment">a star, and may wrap over lines */</span></span><br><span class="line"><span class="comment">// two slashes work too (and may be preferred)</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="comment">// main returns an integer</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span> &#123;</span><br><span class="line">    <span class="comment">/* printf is our output function;</span></span><br><span class="line"><span class="comment">    by default, writes to standard out */</span></span><br><span class="line">    <span class="comment">/* printf returns an integer, but we ignore that */</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;hello, world\n&quot;</span>);</span><br><span class="line">    <span class="comment">/* return 0 to indicate all went well */</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>GCC 并不是一个真正的编译器，而是一个称为「编译器驱动（compiler driver）」的程序，因此它协调了编译的许多步骤（一般为四到五步），如下图。</p>
+<img src="../images/compiler-tool/gcc.png" alt="GCC 编译过程分解" width="100%" height="100%">
+
+<h2 id="预处理"><a href="# 预处理" class="headerlink" title="预处理"></a>预处理 </h2><p> 预处理指令：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gcc -o hw.i -E hw.c</span><br></pre></td></tr></table></figure>
+
+<p>预处理某些指令，如 <code>#define</code>、<code>#include</code>、注释，并将其 <strong> 直接 </strong> 插入到代码中。例如，下面的代码段是对 <code>hw.c</code> 进行预处理后产生的可读文件 <code>hw.i</code>。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 省略最前面的 N 行...</span></span><br><span class="line"><span class="keyword">extern</span> <span class="type">void</span> <span class="title function_">funlockfile</span> <span class="params">(FILE *__stream)</span> __<span class="title function_">attribute__</span> <span class="params">((__nothrow__ , __leaf__))</span>;</span><br><span class="line"># <span class="number">885</span> <span class="string">&quot;/usr/include/stdio.h&quot;</span> <span class="number">3</span> <span class="number">4</span></span><br><span class="line"><span class="keyword">extern</span> <span class="type">int</span> __uflow (FILE *);</span><br><span class="line"><span class="keyword">extern</span> <span class="type">int</span> __overflow (FILE *, <span class="type">int</span>);</span><br><span class="line"># <span class="number">902</span> <span class="string">&quot;/usr/include/stdio.h&quot;</span> <span class="number">3</span> <span class="number">4</span></span><br><span class="line"></span><br><span class="line"># <span class="number">6</span> <span class="string">&quot;hw.c&quot;</span> <span class="number">2</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># <span class="number">7</span> <span class="string">&quot;hw.c&quot;</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span> &#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;hello, world\n&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="编译"><a href="# 编译" class="headerlink" title="编译"></a>编译 </h2><p> 编译指令：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">gcc -o hw.s -S hw.c</span><br><span class="line">gcc -o hw.s -S hw.i # 这个也行</span><br></pre></td></tr></table></figure>
+
+<p>编译过后的文件称为汇编文件（代码）。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line">        .file   &quot;hw.c&quot;</span><br><span class="line">        .text</span><br><span class="line">        .section        .rodata</span><br><span class="line">.LC0:</span><br><span class="line">        .string &quot;hello, world&quot;</span><br><span class="line">        .text</span><br><span class="line">        .globl  main</span><br><span class="line">        .type   main, @function</span><br><span class="line">main:</span><br><span class="line">.LFB0:</span><br><span class="line">        .cfi_startproc</span><br><span class="line">        endbr64</span><br><span class="line">        pushq   %rbp</span><br><span class="line">        .cfi_def_cfa_offset 16</span><br><span class="line">        .cfi_offset 6, -16</span><br><span class="line">        movq    %rsp, %rbp</span><br><span class="line">        .cfi_def_cfa_register 6</span><br><span class="line">        subq    $16, %rsp</span><br><span class="line">        movl    %edi, -4(%rbp)</span><br><span class="line">        movq    %rsi, -16(%rbp)</span><br><span class="line">        leaq    .LC0(%rip), %rax</span><br><span class="line">        movq    %rax, %rdi</span><br><span class="line">        call    puts@PLT</span><br><span class="line">        movl    $0, %eax</span><br><span class="line">        leave</span><br><span class="line">        .cfi_def_cfa 7, 8</span><br><span class="line">        ret</span><br><span class="line">        .cfi_endproc</span><br><span class="line">.LFE0:</span><br><span class="line">        .size   main, .-main</span><br><span class="line">        .ident  &quot;GCC: (Ubuntu 11.4.0-1ubuntu1~22.04) 11.4.0&quot;</span><br><span class="line">        .section        .note.GNU-stack,&quot;&quot;,@progbits</span><br><span class="line">        .section        .note.gnu.property,&quot;a&quot;</span><br><span class="line">        .align 8</span><br><span class="line">        .long   1f - 0f</span><br><span class="line">        .long   4f - 1f</span><br><span class="line">        .long   5</span><br><span class="line">0:</span><br><span class="line">        .string &quot;GNU&quot;</span><br><span class="line">1:</span><br><span class="line">        .align 8</span><br><span class="line">        .long   0xc0000002</span><br><span class="line">        .long   3f - 2f</span><br><span class="line">2:</span><br><span class="line">        .long   0x3</span><br><span class="line">3:</span><br><span class="line">        .align 8</span><br><span class="line">4:</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>chatGPT 这样说：</p>
+<p>这段汇编代码是一个简单的 C 程序的汇编代码示例。下面是对代码中的一些关键部分的解释：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.file   &quot;hw.c&quot;</span><br></pre></td></tr></table></figure>
+<p>这一行指定了源文件的名称。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">        .section        .rodata</span><br><span class="line">.LC0:</span><br><span class="line">        .string &quot;hello, world&quot;</span><br></pre></td></tr></table></figure>
+<p>这里定义了一个只读数据段（.rodata），并在其中定义了一个字符串常量（hello, world）。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">        .globl  main</span><br><span class="line">        .type   main, @function</span><br><span class="line">main:</span><br><span class="line">.LFB0:</span><br></pre></td></tr></table></figure>
+<p>这里定义了一个全局符号（main），表示这是程序的入口点。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">pushq   %rbp</span><br><span class="line">movq    %rsp, %rbp</span><br></pre></td></tr></table></figure>
+<p>这是函数开头的标准操作，用于保存和设置栈帧。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">leaq    .LC0(%rip), %rax</span><br><span class="line">movq    %rax, %rdi</span><br><span class="line">call    puts@PLT</span><br></pre></td></tr></table></figure>
+<p>这里将字符串常量的地址加载到寄存器 rax 中，并将其作为参数传递给 puts 函数，以便在屏幕上打印出来。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">movl    $0, %eax</span><br><span class="line">leave</span><br><span class="line">ret</span><br></pre></td></tr></table></figure>
+<p>这些指令用于返回程序的退出码，并清理栈帧。</p>
+<p>这些是这段汇编代码的主要部分。它基本上是将字符串”hello, world”打印到屏幕上，然后退出程序。</p>
+<h2 id="汇编"><a href="# 汇编" class="headerlink" title="汇编"></a>汇编 </h2><p> 汇编指令：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">gcc -o hw.o -c hw.s</span><br><span class="line">gcc -o hw.o -c hw.c # 这个也行</span><br></pre></td></tr></table></figure>
+
+<p>汇编文件汇编后的文件类型是一个二进制文件，编译过程中生成目标文件，该目标文件打开是一个乱码。</p>
+<h2 id="链接"><a href="# 链接" class="headerlink" title="链接"></a>链接 </h2><p> 链接指令：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">gcc -o hw hw.o</span><br><span class="line">gcc -o hw.o hw.c # 这个也行</span><br></pre></td></tr></table></figure>
+
+<p>组合所有目标代码，并转换为可执行文件。使用 <code>file hw</code> 可查看关于可执行文件的描述。</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">root@Standard-PC-i440FX-PIIX-1996:/home/xxx# file hw</span><br><span class="line">hw: ELF 64-bit LSB pie executable, x86-64, version 1 (SYSV), dynamically linked, \</span><br><span class="line">interpreter /lib64/ld-linux-x86-64.so.2, BuildID[sha1]=190dc558406e49249a5b73b4b7513b4ab8e13385, for GNU/Linux 3.2.0, not stripped</span><br></pre></td></tr></table></figure>
+
+<p>chatGPT 说，这是一个关于一个可执行文件的描述。让我来解释一下各个部分的含义：</p>
+<ul>
+<li><code>ELF</code>：代表可执行和可链接格式 (Executable and Linkable Format)，是一种用于执行文件和目标文件的标准文件格式。</li>
+<li><code>64-bit LSB</code>：代表这是一个 64 位的可执行文件。</li>
+<li><code>pie</code>：代表这是一个位置无关可执行文件 (Position Independent Executable)，这意味着它可以在内存中的任何位置加载并执行。</li>
+<li><code>x86-64</code>：代表这是一个 x86-64 架构的可执行文件，也就是 64 位的 x86 架构。</li>
+<li><code>version 1 (SYSV)</code>：代表这个可执行文件遵循 System V ABI 的第一个版本。</li>
+<li><code>dynamically linked</code>：代表这个可执行文件是动态链接的，它依赖于其他共享库文件来运行。</li>
+<li><code>interpreter /lib64/ld-linux-x86-64.so.2</code>：代表在运行该可执行文件时，系统将使用 <code>/lib64/ld-linux-x86-64.so.2</code> 这个动态链接器来加载和解释它。</li>
+<li><code>BuildID[sha1]=190...</code>：代表这个可执行文件的构建标识符，它是通过计算文件内容的 SHA-1 哈希来生成的，可以用于唯一标识该文件。</li>
+<li><code>for GNU/Linux 3.2.0</code>：代表这个可执行文件是为 GNU/Linux 操作系统的 3.2.0 版本编译的。</li>
+<li><code>not stripped</code>：代表这个可执行文件没有被去除符号信息，也就是说，它保留了调试和符号表等信息，可以用于调试和分析。</li>
+</ul>
+<h1 id="GCC 参数总结"><a href="#GCC 参数总结" class="headerlink" title="GCC 参数总结"></a>GCC 参数总结</h1><table>
+<thead>
+<tr>
+<th>参数</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>-std=&lt;standard&gt;</td>
+<td>假设输入源文件符合 &lt;standard&gt;，如 c99。</td>
+</tr>
+<tr>
+<td>-E</td>
+<td>只预处理，不编译、汇编或链接。</td>
+</tr>
+<tr>
+<td>-S</td>
+<td>只编译，不汇编或链接。</td>
+</tr>
+<tr>
+<td>-c</td>
+<td>编译和汇编，但不链接。</td>
+</tr>
+<tr>
+<td>-o &lt;file&gt;</td>
+<td>将输出放入 &lt;file&gt; 中。</td>
+</tr>
+<tr>
+<td>-O&lt;digit&gt;</td>
+<td>打开优化，等级为 1~3，等级过高优化效果越好，但编译时间越长。</td>
+</tr>
+<tr>
+<td>-Wall</td>
+<td>给出更好的警告。</td>
+</tr>
+<tr>
+<td>-g</td>
+<td>启用 gdb 调试。</td>
+</tr>
+<tr>
+<td>-pie</td>
+<td>创建一个动态链接的位置无关可执行文件。</td>
+</tr>
+<tr>
+<td>-shared</td>
+<td>创建一个共享库。</td>
+</tr>
+</tbody></table>
+<h1 id="多个文件一起编译"><a href="# 多个文件一起编译" class="headerlink" title="多个文件一起编译"></a>多个文件一起编译 </h1><p> 第一次生成可以使用以下命令，进行一起编译、链接，生成 hw 可执行文件。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">gcc -c hw.c helper.c</span><br><span class="line">gcc -o hw hw.o helper.o</span><br></pre></td></tr></table></figure>
+
+<p>后续如果修改部分文件的代码，则 <strong> 仅对修改的源文件编译生成目标文件</strong>，最后一起对目标文件进行链接，更快（特别是大项目）。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">gcc -c hw.c  # 修改过的文件</span><br><span class="line">gcc -o hw hw.o helper.o</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>参考资料：<br>1：<a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_39258979/article/details/101023337">https://blog.csdn.net/weixin_39258979/article/details/101023337</a><br>2：<a target="_blank" rel="noopener" href="https://pages.cs.wisc.edu/~remzi/OSTEP/lab-tutorial.pdf">Operating Systems: Three Easy Pieces</a><br>3：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/bobwuming/articles/14931042.html">https://www.cnblogs.com/bobwuming/articles/14931042.html</a></p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%BC%96%E8%AF%91%E5%B7%A5%E5%85%B7/" rel="tag"># 编译工具</a>
+              <a href="/tags/GCC/" rel="tag"># GCC</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/240205182643.html" rel="prev" title="操作系统之 chapter10.2 经典同步问题">
+                  <i class="fa fa-angle-left"></i> 操作系统之 chapter10.2 经典同步问题
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">aha</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">381k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">11:33</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+</div>
+  <div class="powered-by">
+    <!--由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动 -->
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/next-theme-pjax/0.6.0/pjax.min.js" integrity="sha256-vxLn1tSKWD4dqbMRyv940UYw4sXgMtYcK6reefzZrao=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script><script src="/js/pjax.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+  <script data-pjax async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+<script src="https://unpkg.com/darkmode-js@1.5.7/lib/darkmode-js.min.js"></script>
+
+<script>
+var options = {
+  bottom: '64px',
+  right: 'unset',
+  left: '32px',
+  time: '0.5s',
+  mixColor: 'transparent',
+  backgroundColor: 'transparent',
+  buttonColorDark: '#3F3F3F',
+  buttonColorLight: '#fff',
+  saveInCookies: true,
+  label: '🌓',
+  autoMatchOsTheme: true
+}
+const darkmode = new Darkmode(options);
+window.darkmode = darkmode;
+darkmode.showWidget();
+</script>
+
+</body>
+</html>
