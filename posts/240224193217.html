@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha256-HtsXJanqjKTc8vVQjO4YMhiqFoXkfBsjBWcX91T1jr8=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pursue26.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.18.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":null},"fold":{"enable":true,"height":300},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="本文介绍了 C 语言中的一级指针和二级指针，并通过示例说明了为什么在函数参数中使用一级指针，函数内部对指针形参本身的修改不会影响外部指针的指向。同时，也演示了如何使用二级指针在函数内部改变指针的指向以及进行内存分配操作。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C 语言之一、二级指针">
+<meta property="og:url" content="https://pursue26.github.io/posts/240224193217.html">
+<meta property="og:site_name" content="aha&#39;s blog">
+<meta property="og:description" content="本文介绍了 C 语言中的一级指针和二级指针，并通过示例说明了为什么在函数参数中使用一级指针，函数内部对指针形参本身的修改不会影响外部指针的指向。同时，也演示了如何使用二级指针在函数内部改变指针的指向以及进行内存分配操作。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pursue26.github.io/images/language-notes/second-rank-pointer.png">
+<meta property="article:published_time" content="2024-02-24T11:32:17.000Z">
+<meta property="article:modified_time" content="2024-02-24T08:02:19.257Z">
+<meta property="article:author" content="aha">
+<meta property="article:tag" content="一级指针">
+<meta property="article:tag" content="二级指针">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pursue26.github.io/images/language-notes/second-rank-pointer.png">
+
+
+<link rel="canonical" href="https://pursue26.github.io/posts/240224193217.html">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://pursue26.github.io/posts/240224193217.html","path":"posts/240224193217.html","title":"C 语言之一、二级指针"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>C 语言之一、二级指针 | aha's blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<style>.darkmode--activated{--body-bg-color:#282828;--content-bg-color:#333;--card-bg-color:#555;--text-color:#ccc;--blockquote-color:#bbb;--link-color:#ccc;--link-hover-color:#eee;--brand-color:#ddd;--brand-hover-color:#ddd;--table-row-odd-bg-color:#282828;--table-row-hover-bg-color:#363636;--menu-item-bg-color:#555;--btn-default-bg:#222;--btn-default-color:#ccc;--btn-default-border-color:#555;--btn-default-hover-bg:#666;--btn-default-hover-color:#ccc;--btn-default-hover-border-color:#666;--highlight-background:#282b2e;--highlight-foreground:#a9b7c6;--highlight-gutter-background:#34393d;--highlight-gutter-foreground:#9ca9b6}.darkmode--activated img{opacity:.75}.darkmode--activated img:hover{opacity:.9}.darkmode--activated code{color:#69dbdc;background:0 0}button.darkmode-toggle{z-index:9999}.darkmode-ignore,img{display:flex!important}.beian img{display:inline-block!important}</style></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">aha's blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-dailyblog"><a href="/random.html" rel="section"><i class="fa fa-file fa-fw"></i>每日博客</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%A6%82%E5%BF%B5"><span class="nav-number">1.</span> <span class="nav-text">概念 </span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8"><span class="nav-number">2.</span> <span class="nav-text">使用 </span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E7%BA%A7%E6%8C%87%E9%92%88%E7%9A%84%E5%AE%9E%E7%8E%B0"><span class="nav-number">2.1.</span> <span class="nav-text">一级指针的实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E7%BA%A7%E6%8C%87%E9%92%88%E7%9A%84%E5%AE%9E%E7%8E%B0"><span class="nav-number">2.2.</span> <span class="nav-text">二级指针的实现 </span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BE%8B%E5%AD%90%E4%B8%80"><span class="nav-number">2.2.1.</span> <span class="nav-text"> 例子一</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BE%8B%E5%AD%90%E4%BA%8C"><span class="nav-number">2.2.2.</span> <span class="nav-text">例子二</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">3.</span> <span class="nav-text">总结 </span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">aha</p>
+  <div class="site-description" itemprop="description">经历一个过程然后成为更好的自己</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">86</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">51</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">112</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://pursue26.github.io/posts/240224193217.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="aha">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="aha's blog">
+      <meta itemprop="description" content="经历一个过程然后成为更好的自己">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="C 语言之一、二级指针 | aha's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          C 语言之一、二级指针
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+  
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2024-02-24 19:32:17 / 修改时间：16:02:19" itemprop="dateCreated datePublished" datetime="2024-02-24T19:32:17+08:00">2024-02-24</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">学习笔记</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/C%E8%AF%AD%E8%A8%80/" itemprop="url" rel="index"><span itemprop="name">C语言</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>5.6k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>10 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>本文介绍了 C 语言中的一级指针和二级指针，并通过示例说明了为什么在函数参数中使用一级指针，函数内部对指针形参本身的修改不会影响外部指针的指向。同时，也演示了如何使用二级指针在函数内部改变指针的指向以及进行内存分配操作。</p>
+<span id="more"></span>
+
+<h1 id="概念"><a href="# 概念" class="headerlink" title="概念"></a>概念 </h1><p> 在如下的 A 指向 B、B 指向 C 的指向关系中，首先：</p>
+<p>C 是一个变量，里面是「一段内容」，这段内容需要存储在一个地址空间里。C 的起始地址是 0x00000008。</p>
+<p>B 是一个指针变量，其内容是 C 的地址 0x00000008（专业术语：B 指向 C），但是 B 本身也要占空间的啊，所以 B 也有地址。B 的起始地址是 0x00000004。</p>
+<p>那么，到此为止都比较好理解：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">B == 0x00000008;   // B 的内容，也就是 C 的地址 0x00000008</span><br><span class="line">*B == 一段内容;    // B 解引用，也就是 B 指针指向的 C 的值</span><br><span class="line">&amp;B == 0x00000004;  // B 取地址，B 本身的地址是 0x00000004</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>查看指针变量 B，就是查看 B 的内容（这里是 C 的地址）。对指针变量 B 解引用，就是查看它的内容（内容是一个地址）下的内容。</p>
+</blockquote>
+<img src="../images/language-notes/second-rank-pointer.png" alt="指针访问" width="100%" height="100%">
+
+<p>A 是二级指针变量，其中存放着 B 的地址 0x00000004。A 本身也有地址，是 0x00000000。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">*A == B == 0x00000008;  // A 解引用，也就是 A 指针指向的 B 的内容（即 B 的内容是 C 的地址）</span><br><span class="line">**A == *B == 一段内容;  // B 解引用，也就是 B 指针指向的 C 的内容</span><br><span class="line">A == &amp;B == 0x00000004;  // A 存的是 B 的地址，B 的地址是 0x00000004</span><br><span class="line">&amp;A == 0x00000000;       // A 取地址，A 本身的地址是 0x00000000</span><br></pre></td></tr></table></figure>
+
+<p>上面三个变量的 C 语言定义如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> c = <span class="number">123</span>;  <span class="comment">// 一段内容</span></span><br><span class="line"><span class="type">int</span> *b = &amp;c;</span><br><span class="line"><span class="type">int</span> **a = &amp;b;  <span class="comment">// 按顺序定义，定义二级指针前要定义一级指针</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">printf</span>(<span class="string">&quot;&amp;c, &amp;b, &amp;a = %p, %p, %p\n&quot;</span>, &amp;c, &amp;b, &amp;a);</span><br><span class="line"><span class="built_in">printf</span>(<span class="string">&quot;c, b, a = %d, %p, %p\n&quot;</span>, c, b, a);</span><br><span class="line"><span class="built_in">printf</span>(<span class="string">&quot;*b, *a, **a = %d, %p, %d\n&quot;</span>, *b, *a, **a);</span><br></pre></td></tr></table></figure>
+
+<p>打印结果：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&amp;c, &amp;b, &amp;a = 0x7fff05148014, 0x7fff05148018, 0x7fff05148020</span><br><span class="line">c, b, a = 123, 0x7fff05148014, 0x7fff05148018</span><br><span class="line">*b, *a, **a = 123, 0x7fff05148014, 123</span><br></pre></td></tr></table></figure>
+
+<p>解释：</p>
+<ul>
+<li>c, b, a 各自有各自的地址；</li>
+<li>c 的内容是 123，b 的内容是 c 的地址，a 的内容是 b 的地址；</li>
+<li>b 解引用是 123，a 解引用就是 b 的内容（即 c 的地址），a 的解引用的解引用（即 b 的解引用）就是 123。</li>
+</ul>
+<h1 id="使用"><a href="# 使用" class="headerlink" title="使用"></a>使用 </h1><p> 二级指针作为函数参数的作用：在函数外部定义一个指针 p，<strong>在函数内给指针变量（是对指针变量，不是对指针解引用）赋值，函数结束后对指针 p 生效，那么我们就需要二级指针</strong>。</p>
+<p>看看下面一段代码：有两个变量 a 和 b、一个指针 q（q 指向 a）。现在，我们想让 q 指向 b（要在函数里面实现）。</p>
+<h2 id="一级指针的实现"><a href="# 一级指针的实现" class="headerlink" title="一级指针的实现"></a>一级指针的实现</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> a = <span class="number">10</span>, b = <span class="number">100</span>;</span><br><span class="line"><span class="type">int</span> *q;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">func</span><span class="params">(<span class="type">int</span>* p)</span> &#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;note:3, func:&amp;p=%p, p=%p\n&quot;</span>, &amp;p, p);</span><br><span class="line">    p = &amp;b;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;note:4, func:&amp;p=%p, p=%p\n&quot;</span>, &amp;p, p);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span>* argv[])</span> &#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;note:1, &amp;a=%p, &amp;b=%p, &amp;q=%p\n&quot;</span>, &amp;a, &amp;b, &amp;q);</span><br><span class="line"></span><br><span class="line">    q = &amp;a;  <span class="comment">// 现在让指针 q 指向 a</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;note:2, *q=%d, q=%p, &amp;q=%p\n&quot;</span>, *q, q, &amp;q);</span><br><span class="line">    func(q);  <span class="comment">// 期望在这个函数里让指针 q 指向 b</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;note:5, *q=%d, q=%p, &amp;q=%p\n&quot;</span>, *q, q, &amp;q);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>打印结果：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">note:1, &amp;a=0x5627cc40d010, &amp;b=0x5627cc40d014, &amp;q=0x5627cc40d020</span><br><span class="line">note:2, *q=10, q=0x5627cc40d010, &amp;q=0x5627cc40d020</span><br><span class="line">note:3, func:&amp;p=0x7ffd3af06678, p=0x5627cc40d010</span><br><span class="line">note:4, func:&amp;p=0x7ffd3af06678, p=0x5627cc40d014</span><br><span class="line">note:5, *q=10, q=0x5627cc40d010, &amp;q=0x5627cc40d020</span><br></pre></td></tr></table></figure>
+
+<p>从结果可以看出：</p>
+<ul>
+<li>note:1 -&gt; a, b, q 各自有各自的地址</li>
+<li>note:2 -&gt; q 指向了 a，即地址 q 里的内容是 a 的地址</li>
+<li>note:3 -&gt; 把指针 q 作为参数传入了函数，在函数内部参数 p 的地址不再是 q 的地址、但参数 p 的内容是 q 的内容（即 a 的地址）。是的，<strong>参数传递是制作了一个副本，也就是指针 p 和指针 q 不是同一个指针、但是指向的地址却是相同的</strong>。</li>
+<li>note:4 -&gt; p 指向了 b</li>
+<li>note:5 -&gt; 函数退出，<strong>p 的修改并不会对 q 造成影响</strong>。</li>
+</ul>
+<p>结论：</p>
+<p><strong>编译器总是要为函数的每个参数制作临时副本</strong>，指针入参 q 的副本是 p，编译器使得原内存和副本内存指向的内容保持一样，即 <code>p = q</code>，但是这两块内存自身的地址不一样 <code>&amp;p != &amp;q</code>。</p>
+<p>如果函数体内的程序修改了参数 p 这块副本内存的内容（比如在这里它指向 b 的地址），但是原内存 q 指向的内容不受影响。所以，在这里并不影响函数外的指针 q。</p>
+<p><strong>要想在函数内部修改对函数外部可见（生效），这就需要二级指针操作</strong>。</p>
+<h2 id="二级指针的实现"><a href="# 二级指针的实现" class="headerlink" title="二级指针的实现"></a>二级指针的实现 </h2><h3 id="例子一"><a href="# 例子一" class="headerlink" title="例子一"></a> 例子一</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> a = <span class="number">10</span>, b = <span class="number">100</span>;</span><br><span class="line"><span class="type">int</span>* q;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">func</span><span class="params">(<span class="type">int</span>** p)</span> &#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;note:3, func:&amp;p=%p, p=%p\n&quot;</span>, &amp;p, p);</span><br><span class="line">    *p = &amp;b;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;note:4, func:&amp;p=%p, p=%p\n&quot;</span>, &amp;p, p);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span>* argv[])</span> &#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;note:1, &amp;a=%p, &amp;b=%p, &amp;q=%p\n&quot;</span>, &amp;a, &amp;b, &amp;q);</span><br><span class="line"></span><br><span class="line">    q = &amp;a;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;note:2, *q=%d, q=%p, &amp;q=%p\n&quot;</span>, *q, q, &amp;q);</span><br><span class="line">    func(&amp;q);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;note:5, *q=%d, q=%p, &amp;q=%p\n&quot;</span>, *q, q, &amp;q);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这段代码只修改了三处：</p>
+<ul>
+<li>函数 func 的形参变成了二级指针 int **p</li>
+<li>函数内对二级指针解引用后，指向了 b</li>
+<li>main 函数中，将一级指针 p 的地址（即二级指针）传入了函数 func</li>
+</ul>
+<p>打印结果：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">note:1, &amp;a=0x563b8d952010, &amp;b=0x563b8d952014, &amp;q=0x563b8d952020</span><br><span class="line">note:2, *q=10, q=0x563b8d952010, &amp;q=0x563b8d952020</span><br><span class="line">note:3, func:&amp;p=0x7ffcc73f68b8, p=0x563b8d952020</span><br><span class="line">note:4, func:&amp;p=0x7ffcc73f68b8, p=0x563b8d952020</span><br><span class="line">note:5, *q=100, q=0x563b8d952014, &amp;q=0x563b8d952020</span><br></pre></td></tr></table></figure>
+
+<p>note:3 -&gt; 将一级指针 p 的地址（即二级指针）传入了函数 func。函数内部 &amp;p 就是 <strong> 副本 </strong>p 本身的地址 (&amp;p=..68b8)，二级指针 p 的值 (p=..2020) 就是指针 q 的地址 (&amp;q=..2020)，即<code>*p == q</code>；通过解引用<code>*p=&amp;b</code> 重新指定了 q 指向的地址（即等价于执行了<code>q=&amp;b</code>）。所以，在函数退出后，q 指向的地址发生改变。</p>
+<p>结论：<strong>在函数中，通过传递指向指针 (q) 的指针 (&amp;q)，可以修改指针 (q) 本身指向的地址 (q=&amp;b)</strong>。</p>
+<h3 id="例子二"><a href="# 例子二" class="headerlink" title="例子二"></a>例子二</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SIZE (100)</span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">my_malloc1</span><span class="params">(<span class="type">char</span>* s1)</span> &#123;s1 = (<span class="type">char</span>*)<span class="built_in">malloc</span>(SIZE * <span class="keyword">sizeof</span>(<span class="type">char</span>));&#125;</span><br><span class="line"><span class="type">void</span> <span class="title function_">my_malloc2</span><span class="params">(<span class="type">char</span>** s2)</span> &#123;*s2 = (<span class="type">char</span>*)<span class="built_in">malloc</span>(SIZE * <span class="keyword">sizeof</span>(<span class="type">char</span>));&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span>* argv[])</span> &#123;</span><br><span class="line">    <span class="type">const</span> <span class="type">int</span> len = <span class="number">3</span>;</span><br><span class="line">    <span class="type">char</span>** p1 = (<span class="type">char</span>**)<span class="built_in">malloc</span>(len * <span class="keyword">sizeof</span>(<span class="type">char</span>*));</span><br><span class="line">    <span class="type">char</span>** p2 = (<span class="type">char</span>**)<span class="built_in">malloc</span>(len * <span class="keyword">sizeof</span>(<span class="type">char</span>*));</span><br><span class="line"></span><br><span class="line">    <span class="built_in">memset</span>(p1, <span class="number">0</span>, <span class="keyword">sizeof</span>(p1));</span><br><span class="line">    <span class="built_in">memset</span>(p2, <span class="number">0</span>, <span class="keyword">sizeof</span>(p2));</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; len; i++) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;my_malloc1(), before: p1[%d] is %s\n&quot;</span>, i, p1[i] == <span class="literal">NULL</span> ? <span class="string">&quot;NULL&quot;</span> : <span class="string">&quot;NOT NULL&quot;</span>);</span><br><span class="line">        my_malloc1(p1[i]);</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;my_malloc1(), after:  p2[%d] is %s\n&quot;</span>, i, p1[i] == <span class="literal">NULL</span> ? <span class="string">&quot;NULL&quot;</span> : <span class="string">&quot;NOT NULL&quot;</span>);</span><br><span class="line">        <span class="keyword">if</span> (p1[i]) &#123;<span class="built_in">free</span>(p1[i]);&#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; len; i++) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;my_malloc2(), before: p2[%d] is %s\n&quot;</span>, i, p2[i] == <span class="literal">NULL</span> ? <span class="string">&quot;NULL&quot;</span> : <span class="string">&quot;NOT NULL&quot;</span>);</span><br><span class="line">        my_malloc2(&amp;p2[i]);</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;my_malloc2(), after:  p2[%d] is %s\n&quot;</span>, i, p2[i] == <span class="literal">NULL</span> ? <span class="string">&quot;NULL&quot;</span> : <span class="string">&quot;NOT NULL&quot;</span>);</span><br><span class="line">        <span class="keyword">if</span> (p2[i]) &#123;<span class="built_in">free</span>(p2[i]);&#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>打印结果：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">my_malloc1(), before: p1[0] is NULL</span><br><span class="line">my_malloc1(), after:  p2[0] is NULL</span><br><span class="line">my_malloc1(), before: p1[1] is NULL</span><br><span class="line">my_malloc1(), after:  p2[1] is NULL</span><br><span class="line">my_malloc1(), before: p1[2] is NULL</span><br><span class="line">my_malloc1(), after:  p2[2] is NULL</span><br><span class="line">my_malloc2(), before: p2[0] is NULL</span><br><span class="line">my_malloc2(), after:  p2[0] is NOT NULL</span><br><span class="line">my_malloc2(), before: p2[1] is NULL</span><br><span class="line">my_malloc2(), after:  p2[1] is NOT NULL</span><br><span class="line">my_malloc2(), before: p2[2] is NULL</span><br><span class="line">my_malloc2(), after:  p2[2] is NOT NULL</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中，我们尝试在函数内部给函数外申请的二级指针（指针数组 <code>p1, p2</code> 的每个位置（初始时都是空地址）分配一块内存。</p>
+<p>在函数 <code>my_malloc1</code> 中，使用一级指针作为函数参数。就相当于给 <code>p1[i]</code> 的拷贝副本 <code>s1</code> 分配内存，<code>p1[i]</code>依然没有分配内存，所以在函数退出后，<code>p1[i]</code>依然是空地址。</p>
+<p>在函数 <code>my_malloc2</code> 中，使用二级指针作为函数参数。<code>&amp;p2[i]</code>的拷贝副本为 <code>s2</code>，<code>*s2</code> 解引用的内容与拷贝前 <code>&amp;p2[i]</code> 指向的内容一致（是 <code>p2[i]</code>），此时对其分配内存，在函数退出后，<code>p2[i]</code> 是一个分配的有效地址。</p>
+<h1 id="总结"><a href="# 总结" class="headerlink" title="总结"></a>总结 </h1><p> 在函数中，通过传递指向指针的指针（二级指针），可以修改指针本身指向的地址。</p>
+<ul>
+<li>通过二级指针，在函数内部改变指针的指向（例子一）。</li>
+<li>通过二级指针，在函数内部进行内存分配（例子二）。</li>
+</ul>
+<p>注意，函数形参使用的是一级指针，就是值传递，值传递在函数里面 <strong> 修改指针 </strong>，改变的是形参的值，而不是实参的值；但可以通过对形参<strong> 解引用赋值</strong>，来改变实参指向的地址里的值。</p>
+<blockquote>
+<p>参考资料：</p>
+<ol>
+<li><a target="_blank" rel="noopener" href="https://www.techxiaofei.com/post/cpp/secondary_pointer">https://www.techxiaofei.com/post/cpp/secondary_pointer</a></li>
+</ol>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E4%B8%80%E7%BA%A7%E6%8C%87%E9%92%88/" rel="tag"># 一级指针</a>
+              <a href="/tags/%E4%BA%8C%E7%BA%A7%E6%8C%87%E9%92%88/" rel="tag"># 二级指针</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/240207180410.html" rel="prev" title="编译之 GCC 编译过程分解">
+                  <i class="fa fa-angle-left"></i> 编译之 GCC 编译过程分解
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">aha</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">387k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">11:44</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+</div>
+  <div class="powered-by">
+    <!--由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动 -->
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/next-theme-pjax/0.6.0/pjax.min.js" integrity="sha256-vxLn1tSKWD4dqbMRyv940UYw4sXgMtYcK6reefzZrao=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script><script src="/js/pjax.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+  <script data-pjax async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+<script src="https://unpkg.com/darkmode-js@1.5.7/lib/darkmode-js.min.js"></script>
+
+<script>
+var options = {
+  bottom: '64px',
+  right: 'unset',
+  left: '32px',
+  time: '0.5s',
+  mixColor: 'transparent',
+  backgroundColor: 'transparent',
+  buttonColorDark: '#3F3F3F',
+  buttonColorLight: '#fff',
+  saveInCookies: true,
+  label: '🌓',
+  autoMatchOsTheme: true
+}
+const darkmode = new Darkmode(options);
+window.darkmode = darkmode;
+darkmode.showWidget();
+</script>
+
+</body>
+</html>
