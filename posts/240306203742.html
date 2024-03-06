@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha256-HtsXJanqjKTc8vVQjO4YMhiqFoXkfBsjBWcX91T1jr8=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"pursue26.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.18.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":true,"style":null},"fold":{"enable":true,"height":300},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="访问控制列表 ACL（Access Control List）是一系列用于识别报文流的规则集合。这里的规则是指描述报文匹配条件的判断语句，匹配条件可以是报文的源地址、目的地址、端口号等。设备依据 ACL 规则识别出特定的报文，并根据预先设定的策略对其进行处理，从而可以实现堆网络访问行为的控制、限制网络流量、提高网络性能、防止网络攻击等。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="计网之 ACL 访问控制列表">
+<meta property="og:url" content="https://pursue26.github.io/posts/240306203742.html">
+<meta property="og:site_name" content="aha&#39;s blog">
+<meta property="og:description" content="访问控制列表 ACL（Access Control List）是一系列用于识别报文流的规则集合。这里的规则是指描述报文匹配条件的判断语句，匹配条件可以是报文的源地址、目的地址、端口号等。设备依据 ACL 规则识别出特定的报文，并根据预先设定的策略对其进行处理，从而可以实现堆网络访问行为的控制、限制网络流量、提高网络性能、防止网络攻击等。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://pursue26.github.io/images/computer-network/acl-1.png">
+<meta property="og:image" content="https://pursue26.github.io/images/computer-network/acl-2.png">
+<meta property="og:image" content="https://pursue26.github.io/images/computer-network/acl-3.png">
+<meta property="og:image" content="https://pursue26.github.io/images/computer-network/acl-4.png">
+<meta property="article:published_time" content="2024-03-06T12:37:42.000Z">
+<meta property="article:modified_time" content="2024-03-06T06:45:25.749Z">
+<meta property="article:author" content="aha">
+<meta property="article:tag" content="ACL">
+<meta property="article:tag" content="访问控制列表">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://pursue26.github.io/images/computer-network/acl-1.png">
+
+
+<link rel="canonical" href="https://pursue26.github.io/posts/240306203742.html">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://pursue26.github.io/posts/240306203742.html","path":"posts/240306203742.html","title":"计网之 ACL 访问控制列表"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>计网之 ACL 访问控制列表 | aha's blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<style>.darkmode--activated{--body-bg-color:#282828;--content-bg-color:#333;--card-bg-color:#555;--text-color:#ccc;--blockquote-color:#bbb;--link-color:#ccc;--link-hover-color:#eee;--brand-color:#ddd;--brand-hover-color:#ddd;--table-row-odd-bg-color:#282828;--table-row-hover-bg-color:#363636;--menu-item-bg-color:#555;--btn-default-bg:#222;--btn-default-color:#ccc;--btn-default-border-color:#555;--btn-default-hover-bg:#666;--btn-default-hover-color:#ccc;--btn-default-hover-border-color:#666;--highlight-background:#282b2e;--highlight-foreground:#a9b7c6;--highlight-gutter-background:#34393d;--highlight-gutter-foreground:#9ca9b6}.darkmode--activated img{opacity:.75}.darkmode--activated img:hover{opacity:.9}.darkmode--activated code{color:#69dbdc;background:0 0}button.darkmode-toggle{z-index:9999}.darkmode-ignore,img{display:flex!important}.beian img{display:inline-block!important}</style></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">aha's blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-dailyblog"><a href="/random.html" rel="section"><i class="fa fa-file fa-fw"></i>每日博客</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#ACL%20%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">1.</span> <span class="nav-text">ACL 应用场景 </span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%81%E8%AE%B8%E6%88%96%E6%8B%92%E6%8E%A5%E6%B5%81%E9%87%8F%E9%80%9A%E8%BF%87"><span class="nav-number">1.1.</span> <span class="nav-text"> 允许或拒接流量通过</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8C%B9%E9%85%8D%E5%90%8E%E6%89%A7%E8%A1%8C%E7%89%B9%E5%AE%9A%E8%A1%8C%E4%B8%BA"><span class="nav-number">1.2.</span> <span class="nav-text">匹配后执行特定行为</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ACL%20%E5%88%86%E7%B1%BB"><span class="nav-number">2.</span> <span class="nav-text">ACL 分类 </span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ACL%20%E8%A7%84%E5%88%99"><span class="nav-number">3.</span> <span class="nav-text">ACL 规则</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%AB%98%E7%BA%A7%20ACL"><span class="nav-number">4.</span> <span class="nav-text">高级 ACL</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">aha</p>
+  <div class="site-description" itemprop="description">经历一个过程然后成为更好的自己</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">88</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">53</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">115</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://pursue26.github.io/posts/240306203742.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="aha">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="aha's blog">
+      <meta itemprop="description" content="经历一个过程然后成为更好的自己">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="计网之 ACL 访问控制列表 | aha's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          计网之 ACL 访问控制列表
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+  
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2024-03-06 20:37:42 / 修改时间：14:45:25" itemprop="dateCreated datePublished" datetime="2024-03-06T20:37:42+08:00">2024-03-06</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" itemprop="url" rel="index"><span itemprop="name">计算机网络</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/%E8%AE%BF%E9%97%AE%E6%8E%A7%E5%88%B6%E5%88%97%E8%A1%A8/" itemprop="url" rel="index"><span itemprop="name">访问控制列表</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>2.7k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>5 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>访问控制列表 ACL（Access Control List）是一系列用于识别报文流的规则集合。这里的规则是指描述报文匹配条件的判断语句，匹配条件可以是报文的源地址、目的地址、端口号等。设备依据 ACL 规则识别出特定的报文，并根据预先设定的策略对其进行处理，从而可以实现堆网络访问行为的控制、限制网络流量、提高网络性能、防止网络攻击等。</p>
+<span id="more"></span>
+
+<h1 id="ACL 应用场景"><a href="#ACL 应用场景" class="headerlink" title="ACL 应用场景"></a>ACL 应用场景 </h1><h2 id="允许或拒接流量通过"><a href="# 允许或拒接流量通过" class="headerlink" title="允许或拒接流量通过"></a> 允许或拒接流量通过</h2><p>ACL 可以通过定义规则来允许（permit）或拒绝（deny）流量的通过。例如，下图允许主机 A 和 B 访问互联网、不允许访问服务器，主机 C 和 D 与其相反。</p>
+<img src="../images/computer-network/acl-1.png" alt="ACL 允许或拒接流量通过" width="80%" height="80%">
+
+<p>我们可以使用如下 basic ACL 规则实现，并对接口 G0/0/0 和 G0/0/1 出方向上的报文进行过滤：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[RTA]acl basic 2000                                                             </span><br><span class="line">[RTA-acl-ipv4-basic-2000]rule permit source 192.168.1.0 0.0.0.255               </span><br><span class="line">[RTA-acl-ipv4-basic-2000]rule deny source 192.168.2.0 0.0.0.255                 </span><br><span class="line">[RTA]interface GigabitEthernet 0/0/0                                            </span><br><span class="line">[RTA-GigabitEthernet0/0/0]packet-filter 2000 outbound                           </span><br><span class="line">[RTA]interface GigabitEthernet 0/0/1                                            </span><br><span class="line">[RTA-GigabitEthernet0/0/1]packet-filter 2000 outbound                           </span><br></pre></td></tr></table></figure>
+
+<h2 id="匹配后执行特定行为"><a href="# 匹配后执行特定行为" class="headerlink" title="匹配后执行特定行为"></a>匹配后执行特定行为</h2><p>ACL 可以根据需求来定义过滤的条件以及匹配条件后所执行的动作。例如，下图对主机 C 和 D 在入方向（inbound）进行匹配，并对匹配到的感兴趣流量进行加密之后再转发。</p>
+<img src="../images/computer-network/acl-2.png" alt="ACL 匹配后执行特定行为" width="80%" height="80%">
+
+<h1 id="ACL 分类"><a href="#ACL 分类" class="headerlink" title="ACL 分类"></a>ACL 分类 </h1><p> 根据不同的划分规则，ACL 可以有不同的分类。最常见的三种分类是基本 ACL、高级 ACL 和二层 ACL，其中高级 ACL 可以定义比基本 ACL 更准确、更丰富、更灵活的规则。</p>
+<table>
+<thead>
+<tr>
+<th><div style="width: 100px">ACL 类型</div></th>
+<th><div style="width: 100px">编号范围</div></th>
+<th>规则制定依据</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>基本 ACL</td>
+<td>2000-2999</td>
+<td>报文的源 IP 地址</td>
+</tr>
+<tr>
+<td>高级 ACL</td>
+<td>3000-3999</td>
+<td>报文的源 / 目的 IP 地址、源 / 目的端口号以及协议类型等信息</td>
+</tr>
+<tr>
+<td>二层 ACL</td>
+<td>4000-4999</td>
+<td>报文的源 / 目的 MAC 地址、链路层协议类型等二层信息</td>
+</tr>
+</tbody></table>
+<h1 id="ACL 规则"><a href="#ACL 规则" class="headerlink" title="ACL 规则"></a>ACL 规则</h1><img src="../images/computer-network/acl-3.png" alt="根据 ACL 规则过滤流量" width="80%" height="80%">
+
+<p>一个 ACL 由多条 deny 或 permit 语句组成。设备逐条匹配规则，<strong>找到匹配的规则后执行对应动作，不再继续匹配后续规则</strong>。</p>
+<blockquote>
+<p>本示例中，RTA 收到了来自两个网络的报文。默认情况下，RTA 会依据 ACL 的配置顺序来匹配这些报文。网络 172.16.0.0/24 发送的数据流量将被 RTA 上配置的 ACL2000 的规则 15 匹配，因此会被拒绝；而来自网络 172.17.0.0/24 的报文不能匹配访问控制列表中的任何规则，因此 RTA 对报文不做任何处理，而是正常转发。</p>
+</blockquote>
+<p>需要注意的是，ACL 中定义的这些 <strong> 规则可能存在重复或矛盾</strong>，规则的匹配顺序决定了规则的优先级，ACL 通过设置规则的优先级（这里是 ACL ID 越小优先级越高）来处理规则之间重复或矛盾的情形。</p>
+<p>ACL 的规则匹配顺序有以下两种：</p>
+<ul>
+<li><strong>配置顺序</strong>：按照规则编号由小到大进行匹配。默认情况按编号步长为 5 添加规则，用户也可指定编号添加规则，若指定的编号已经存在对应的规则，则替换它。</li>
+<li><strong>自动排序</strong>：按照「深度优先」原则由深到浅进行匹配，各类 ACL 的「深度优先」排序法则如表所示。</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>ACL 类型</th>
+<th>排序原则</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>基本 ACL</td>
+<td>a. 先判断规则的匹配条件中是否包含 VPN 实例，包含者优先 <br> b. 如果 VPN 实例的包含情况相同，再比较源 IPv4 (IPv6) 地址范围，较小者优先 <br> c. 如果源 IPv4 (IPv6) 地址范围也相同，再比较配置的先后次序，先配置者优先</td>
+</tr>
+<tr>
+<td>高级 ACL</td>
+<td>a. 先判断规则的匹配条件中是否包含 VPN 实例，包含者优先 <br> b. 如果 VPN 实例的包含情况相同，再比较协议范围，指定有 IPv4 (IPv6) 承载的协议类型者优先 <br> c. 如果协议范围也相同，再比较源 IPv4 (IPv6) 地址范围，较小者优先 <br> d. 如果源 IPv4 地址范围也相同，再比较目的 IPv4 (IPv6) 地址范围，较小者优先 <br> e. 如果目的 IPv4 (IPv6) 地址范围也相同，再比较四层端口号的覆盖范围，较小者优先 <br> f. 如果四层端口号的覆盖范围无法比较，再比较配置的先后次序，先配置者优先</td>
+</tr>
+<tr>
+<td>二层 ACL</td>
+<td>a. 先比较源 MAC 地址范围，较小者优先 <br> b. 如果源 MAC 地址范围相同，再比较目的 MAC 地址范围，较小者优先 <br> c. 如果目的 MAC 地址范围也相同，再比较配置的先后次序，先配置者优先</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>比较 IPv4 地址范围，就是比较通配符掩码（反向掩码）中 “0” 位的多少，”0” 位越多，范围越小。比较 IPv6 地址范围，就是比较地址前缀长度，前缀越长，范围越小。比较 MAC 地址范围，就是比较掩码中 “1” 位的多少，”1” 位越多，范围越小。</p>
+</blockquote>
+<h1 id="高级 ACL"><a href="# 高级 ACL" class="headerlink" title="高级 ACL"></a>高级 ACL</h1><p>高级 ACL 可以定义比基本 ACL 更准确、更丰富、更灵活的规则。假设下图中，我们要求主机 A 不可以访问 SFTP 服务器的 FTP 服务，主机 B 不可以访问私有服务器。</p>
+<img src="../images/computer-network/acl-4.png" alt="高级 ACL 规则" width="80%" height="80%">
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[RTA]acl advanced 3000                                                          </span><br><span class="line">[RTA-acl-ipv4-adv-3000]rule deny tcp source 192.168.1.0 0.0.0.255 destination 17</span><br><span class="line">2.16.10.1 0.0.0.0 destination-port eq 21                                        </span><br><span class="line">[RTA-acl-ipv4-adv-3000]rule deny tcp source 192.168.2.0 0.0.0.255 destination 17</span><br><span class="line">2.16.10.2 0.0.0.0                                                               </span><br><span class="line">[RTA-acl-ipv4-adv-3000]rule permit ip                                           </span><br><span class="line">[RTA]interface GigabitEthernet 0/0/0                                            </span><br><span class="line">[RTA-GigabitEthernet0/0/0]packet-filter 3000 outbound                           </span><br></pre></td></tr></table></figure>
+
+<p>上述进行了高级 ACL 的配置：</p>
+<ul>
+<li>rule 5 拒绝了主机 A 访问 SFTP 服务器的 FTP 服务，但 telnet 服务（目的端口为 23）和 ping（ICMP 协议）访问不受限制；</li>
+<li>rule 10 拒接了主机 B 访问私有服务器的所有 tcp 流量；</li>
+<li>rule 15 作为最低优先级，允许了任意 ip 协议。</li>
+<li>最后，在流量的出方向进行包过滤。</li>
+</ul>
+<p>tcp 流量有握手机制，假如我们 <strong> 仅在</strong>RTA 的 G0/0/0 方向限制 SFTP 服务器或私有服务器的流量进入（inbound），这会影响到 tcp 握手的建立，导致主机 A 的 tcp 流量无法连接到服务器。</p>
+<blockquote>
+<p>参考资料：</p>
+<ol>
+<li><a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1zy4y1t7Fj/">https://www.bilibili.com/video/BV1zy4y1t7Fj/</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.h3c.com/cn/d_201905/1181948_30005_0.htm">https://www.h3c.com/cn/d_201905/1181948_30005_0.htm</a></li>
+</ol>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/ACL/" rel="tag"># ACL</a>
+              <a href="/tags/%E8%AE%BF%E9%97%AE%E6%8E%A7%E5%88%B6%E5%88%97%E8%A1%A8/" rel="tag"># 访问控制列表</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/240303201855.html" rel="prev" title="项目之线程池原理与实现">
+                  <i class="fa fa-angle-left"></i> 项目之线程池原理与实现
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">aha</span>
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">405k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">12:16</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+</div>
+  <div class="powered-by">
+    <!--由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动 -->
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/next-theme-pjax/0.6.0/pjax.min.js" integrity="sha256-vxLn1tSKWD4dqbMRyv940UYw4sXgMtYcK6reefzZrao=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script><script src="/js/pjax.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+  <script data-pjax async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+<script src="https://unpkg.com/darkmode-js@1.5.7/lib/darkmode-js.min.js"></script>
+
+<script>
+var options = {
+  bottom: '64px',
+  right: 'unset',
+  left: '32px',
+  time: '0.5s',
+  mixColor: 'transparent',
+  backgroundColor: 'transparent',
+  buttonColorDark: '#3F3F3F',
+  buttonColorLight: '#fff',
+  saveInCookies: true,
+  label: '🌓',
+  autoMatchOsTheme: true
+}
+const darkmode = new Darkmode(options);
+window.darkmode = darkmode;
+darkmode.showWidget();
+</script>
+
+</body>
+</html>
