@@ -11,7 +11,7 @@
 
     <title>
         
-          C 语言之关键字介绍 - aha&#39;s book
+          C 语言之关键字与专有名词 - aha&#39;s book
         
     </title>
 
@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', function () {
 <h2 id="C 语言">C 语言 </h2>
 <ul>
 <li><a href="/posts/230916171929.html">main 函数参数 </a></li>
-<li><a href="/posts/231214192113.html"> 关键字介绍 </a></li>
+<li><a href="/posts/231214192113.html"> 关键字与专有名词 </a></li>
 <li><a href="/posts/240103180653.html"> 输出打印函数 </a></li>
 <li><a href="/posts/230922143003.html"> 多维数组 </a></li>
 <li><a href="/posts/230913200729.html">const 关键字 </a></li>
@@ -77,8 +77,6 @@ document.addEventListener('DOMContentLoaded', function () {
 <li><a href="/posts/240224193217.html"> 二级指针 </a></li>
 <li><a href="/posts/240307195203.html"> 代码 TOP-K 问题 </a></li>
 <li><a href="/posts/230922172626.html">uthash 哈希表基础 </a></li>
-<li><a href="/posts/230921094127.html"> 锁与原子操作基础 </a></li>
-<li><a href="/posts/230911151334.html">pthread 多线程 </a></li>
 <li><a href="/posts/230918114841.html"> 大小端知识 </a></li>
 </ul>
 <h2 id="Golang 语言">Golang 语言 </h2>
@@ -117,9 +115,10 @@ document.addEventListener('DOMContentLoaded', function () {
 <li><a href="/posts/231117095232.html">Dijkstra 单源最短路径（原理部分）</a></li>
 <li><a href="/posts/231121152713.html">Dijkstra 单源最短路径（实现部分）</a></li>
 </ul>
-<h2 id="GNU">GNU</h2>
+<h2 id="工具"> 工具 </h2>
 <ul>
 <li><a href="/posts/240207180410.html">GCC 编译过程分解 </a></li>
+<li><a href="/posts/240312184132.html">GDB 调试入门 </a></li>
 </ul>
 <h2 id="Docker">Docker</h2>
 <ul>
@@ -131,6 +130,11 @@ document.addEventListener('DOMContentLoaded', function () {
 <li><a href="/posts/240306203742.html">ACL 访问控制列表 </a></li>
 <li><a href="/posts/240130190208.html"> 路由表、转发表与快速转发工作原理 </a></li>
 <li><a href="/posts/231221200716.html">VXLAN 网络虚拟化技术 </a></li>
+</ul>
+<h2 id="多线程编程"> 多线程编程 </h2>
+<ul>
+<li><a href="/posts/230911151334.html">pthread 库 </a></li>
+<li><a href="/posts/230921094127.html"> 锁与原子操作 </a></li>
 </ul>
 <h2 id="操作系统"> 操作系统 </h2>
 <ul>
@@ -316,6 +320,15 @@ function sidebar_toggle() {
 <li><code>do</code>：循环结构，与 <code>while</code> 一起使用。</li>
 <li><code>while</code>：循环结构。</li>
 </ul>
+<h1 id="专有名词解释">专有名词解释</h1>
+<h2 id="自动变量">自动变量</h2>
+<p>在 C 和 C++ 等编程语言中，当在函数或代码块内部声明一个变量时，该变量默认为自动变量。自动变量具有以下特点：</p>
+<ol>
+<li>作用域：自动变量的作用域仅限于声明它的代码块内部。这意味着在声明的代码块外部是无法访问到该变量的。</li>
+<li>存储方式：自动变量通常存储在栈（stack）上。当进入声明变量的代码块时，该变量会在栈上分配存储空间，当代码块执行完毕时，变量会自动释放所占用的栈空间。</li>
+<li>初始化：自动变量在声明时可以选择是否进行初始化。如果未初始化，则其值是不确定的。</li>
+</ol>
+<p>自动变量适用于那些在局部范围内使用的临时数据和临时存储需求较小的变量。与全局变量和静态变量相比，自动变量具有更短的生命周期和更小的作用域，能够更有效地管理内存和避免命名冲突。</p>
 <blockquote>
 <p>参考资料：</p>
 <ol>
@@ -371,7 +384,7 @@ function sidebar_toggle() {
     <div class="link">
       <a class="category-link" href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</a> <a class="category-link" href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/C%E8%AF%AD%E8%A8%80/">C语言</a>
 
-      <a class="tag-none-link" href="/tags/%E5%85%B3%E9%94%AE%E5%AD%97/" rel="tag">#关键字</a>
+      <a class="tag-none-link" href="/tags/%E4%B8%93%E6%9C%89%E5%90%8D%E8%AF%8D/" rel="tag">#专有名词</a> <a class="tag-none-link" href="/tags/%E5%85%B3%E9%94%AE%E5%AD%97/" rel="tag">#关键字</a>
     </div>
     
   
