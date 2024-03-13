@@ -106,23 +106,15 @@ document.addEventListener('DOMContentLoaded', function () {
 </ul>
 <h2 id="数据结构算法"> 数据结构算法 </h2>
 <ul>
-<li><a href="/posts/231124181658.html"> 二分查找 </a></li>
-<li><a href="/posts/231227190828.html"> 哈希表实现 </a></li>
 <li><a href="/posts/231218181635.html"> 归并排序 </a></li>
 <li><a href="/posts/231108163339.html"> 快速排序 </a></li>
 <li><a href="/posts/231107171607.html"> 堆排序 </a></li>
+<li><a href="/posts/231124181658.html"> 二分查找 </a></li>
+<li><a href="/posts/231227190828.html"> 哈希表实现 </a></li>
+<li><a href="/posts/240313193201.html"> 字符串哈希函数 </a></li>
 <li><a href="/posts/231116150205.html">Floyd 多源最短路径 </a></li>
 <li><a href="/posts/231117095232.html">Dijkstra 单源最短路径（原理部分）</a></li>
 <li><a href="/posts/231121152713.html">Dijkstra 单源最短路径（实现部分）</a></li>
-</ul>
-<h2 id="工具"> 工具 </h2>
-<ul>
-<li><a href="/posts/240207180410.html">GCC 编译过程分解 </a></li>
-<li><a href="/posts/240312184132.html">GDB 调试入门 </a></li>
-</ul>
-<h2 id="Docker">Docker</h2>
-<ul>
-<li><a href="/posts/230909171809.html">Docker 学习笔记 </a></li>
 </ul>
 <h2 id="计算机网络"> 计算机网络 </h2>
 <ul>
@@ -130,11 +122,6 @@ document.addEventListener('DOMContentLoaded', function () {
 <li><a href="/posts/240306203742.html">ACL 访问控制列表 </a></li>
 <li><a href="/posts/240130190208.html"> 路由表、转发表与快速转发工作原理 </a></li>
 <li><a href="/posts/231221200716.html">VXLAN 网络虚拟化技术 </a></li>
-</ul>
-<h2 id="多线程编程"> 多线程编程 </h2>
-<ul>
-<li><a href="/posts/230911151334.html">pthread 库 </a></li>
-<li><a href="/posts/230921094127.html"> 锁与原子操作 </a></li>
 </ul>
 <h2 id="操作系统"> 操作系统 </h2>
 <ul>
@@ -156,6 +143,20 @@ document.addEventListener('DOMContentLoaded', function () {
 <li><a href="/posts/240104202828.html"> 同步与互斥 </a></li>
 <li><a href="/posts/240113115605.html"> 信号量与管程 </a></li>
 <li><a href="/posts/240205182643.html"> 经典同步问题 </a></li>
+</ul>
+<h2 id="多线程编程"> 多线程编程 </h2>
+<ul>
+<li><a href="/posts/230911151334.html">pthread 库 </a></li>
+<li><a href="/posts/230921094127.html"> 锁与原子操作 </a></li>
+</ul>
+<h2 id="工具"> 工具 </h2>
+<ul>
+<li><a href="/posts/240207180410.html">GCC 编译过程分解 </a></li>
+<li><a href="/posts/240312184132.html">GDB 调试入门 </a></li>
+</ul>
+<h2 id="Docker">Docker</h2>
+<ul>
+<li><a href="/posts/230909171809.html">Docker 学习笔记 </a></li>
 </ul>
 <h1 id="LeetCode 刷题">LeetCode 刷题 </h1>
 <h2 id="链表相关"> 链表相关 </h2>
@@ -279,7 +280,7 @@ function sidebar_toggle() {
 <p><code>import &quot;fmt&quot;</code> - 我们引入了 fmt 包，用于在 main 函数里面打印文本到标准输出。</p>
 </li>
 <li>
-<p><code>func main()</code> - main 是一个特殊的函数。整个程序就是从 main 函数开始运行的。main 函数必须放置在 main 包中。{和} 分别表示 main 函数的开始和结束部分。</p>
+<p><code>func main()</code> - main 是一个特殊的函数。整个程序就是从 main 函数开始运行的。main 函数必须放置在 main 包中。</p>
 </li>
 <li>
 <p><code>fmt.Println(&quot;Hello World&quot;)</code> - fmt 包中的 Println 函数用于把文本写入标准输出。</p>
@@ -305,9 +306,9 @@ function sidebar_toggle() {
 <p>在一个语句中声明不同类型的变量，如：</p>
 </li>
 </ol>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> (</span><br><span class="line">    age = <span class="number">19</span></span><br><span class="line">    name = “laowang”</span><br><span class="line">    adult = <span class="literal">true</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> (</span><br><span class="line">    age = <span class="number">19</span></span><br><span class="line">    name = <span class="string">&quot;laowang&quot;</span></span><br><span class="line">    adult = <span class="literal">true</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
 <ol start="6">
-<li>变量的简短声明语法：<code>:=</code> 操作符，例如：<code>age, name := 20, &quot;zhangsan&quot;</code>。简短声明要求 <code>:=</code> 操作符左边的 <strong> 所有变量都有初始值</strong>。</li>
+<li>变量的简短 <strong> 声明 </strong> 语法：<code>:=</code> 操作符，例如：<code>age, name := 20, &quot;zhangsan&quot;</code>。简短声明要求 <code>:=</code> 操作符左边：所有变量都要进行初始化且至少存在一个未声明过的变量。</li>
 </ol>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;  </span><br><span class="line">    a, b := <span class="number">20</span>, <span class="number">30</span> <span class="comment">// 声明 a 和 b</span></span><br><span class="line">    fmt.Println(<span class="string">&quot;a is&quot;</span>, a, <span class="string">&quot;b is&quot;</span>, b)</span><br><span class="line">    a, b := <span class="number">40</span>, <span class="number">50</span> <span class="comment">// 错误，没有尚未声明的变量</span></span><br><span class="line">    a, c := <span class="number">40</span>, <span class="number">60</span> <span class="comment">// 正确，有新的尚未声明的变量</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <ol start="7">
@@ -326,7 +327,7 @@ function sidebar_toggle() {
 </ol>
 <figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">bool</span><br><span class="line">数字类型</span><br><span class="line">    int8, int16, int32, int64, int</span><br><span class="line">    uint8, uint16, uint32, uint64, uint</span><br><span class="line">    float32, float64</span><br><span class="line">    complex64, complex128 // 复数型</span><br><span class="line">    byte</span><br><span class="line">    rune</span><br><span class="line">string</span><br></pre></td></tr></table></figure>
 <ol start="2">
-<li>在 Printf 方法中，使用 <code>%T</code> 格式说明符（Format Specifier），可以打印出变量的类型。Go 的 <code>unsafe</code> 包提供了一个 <code>Sizeof</code> 函数，该函数接收变量并返回它的字节大小。如：</li>
+<li>在 Printf 方法中，使用 <code>%T</code> 格式说明符（Format Specifier）打印出变量的类型。Go 的 <code>unsafe</code> 包提供了一个 <code>Sizeof</code> 函数，该函数接收变量并返回它的字节大小。</li>
 </ol>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fmt.Printf(<span class="string">&quot;type of age is %T, size of age is %d&quot;</span>, age, unsafe.Sizeof(age))</span><br></pre></td></tr></table></figure>
 <ol start="3">
@@ -361,14 +362,15 @@ function sidebar_toggle() {
 <p>Go 的类型策略不允许将一种类型的变量赋值给另一种类型的变量。</p>
 </li>
 </ol>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;  </span><br><span class="line">    <span class="keyword">var</span> defaultName = <span class="string">&quot;Sam&quot;</span> <span class="comment">// 允许</span></span><br><span class="line">    <span class="keyword">type</span> myString <span class="type">string</span></span><br><span class="line">    <span class="keyword">var</span> customName myString = <span class="string">&quot;Sam&quot;</span> <span class="comment">// 允许</span></span><br><span class="line">    customName = defaultName <span class="comment">// 不允许，即使 myString 是 string 类型的别名</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;  </span><br><span class="line">    <span class="keyword">var</span> defaultName = <span class="string">&quot;Sam&quot;</span> <span class="comment">// 允许</span></span><br><span class="line">    <span class="keyword">type</span> myString <span class="type">string</span>  <span class="comment">// 类似于 C 语言中的 typedef char myChar</span></span><br><span class="line">    <span class="keyword">var</span> customName myString = <span class="string">&quot;Sam&quot;</span> <span class="comment">// 允许</span></span><br><span class="line">    customName = defaultName <span class="comment">// 不允许，即使 myString 是 string 类型的别名</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <ol start="5">
 <li><strong>布尔常量</strong>：字符串常量的规则适用于布尔常量。</li>
 </ol>
-<p><code>var name = &quot;Sam&quot;</code> 无类型的 <strong> 常量 </strong> Sam 是如何赋值给<strong> 变量</strong> name 的？</p>
 <blockquote>
-<p>答案是 <strong> 无类型的常量有一个与它们相关联的默认类型，并且当且仅当一行代码需要时才提供它</strong>（常量可以赋值给 “合适的” 类型，而不需要类型转换）。在声明变量时，如果使用常量来赋值，变量会从常量的默认类型中获取类型。在这种情况下，常量 “Sam” 的默认类型是字符串，所以变量 name 的类型也是字符串。</p>
+<p><code>var name = &quot;Sam&quot;</code> 无类型的 <strong> 常量 </strong> Sam 是如何赋值给<strong> 变量</strong> name 的？</p>
 </blockquote>
+<p>答案是 <strong> 无类型的常量有一个与它们相关联的默认类型，并且当且仅当一行代码需要时才提供它</strong>（即常量可以赋值给「合适的」类型，而不需要类型转换）。</p>
+<p>在声明变量时，如果使用常量来赋值，则 <strong> 变量会从常量的默认类型中获取类型</strong>。在这种情况下，常量 “Sam” 的默认类型是字符串，所以变量 name 的类型也是字符串。</p>
 <blockquote>
 <p>学习链接：<a target="_blank" rel="noopener" href="https://studygolang.com/subject/2">https://studygolang.com/subject/2</a>，感谢如此优秀的教程！</p>
 </blockquote>
@@ -402,7 +404,7 @@ function sidebar_toggle() {
       
         <figure
           class="avatar avatar-lg"
-          data-initial="a"
+          data-initial="A"
           style="background-color: #3b4351;">
         </figure>
       

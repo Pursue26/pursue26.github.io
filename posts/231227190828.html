@@ -106,23 +106,15 @@ document.addEventListener('DOMContentLoaded', function () {
 </ul>
 <h2 id="数据结构算法"> 数据结构算法 </h2>
 <ul>
-<li><a href="/posts/231124181658.html"> 二分查找 </a></li>
-<li><a href="/posts/231227190828.html"> 哈希表实现 </a></li>
 <li><a href="/posts/231218181635.html"> 归并排序 </a></li>
 <li><a href="/posts/231108163339.html"> 快速排序 </a></li>
 <li><a href="/posts/231107171607.html"> 堆排序 </a></li>
+<li><a href="/posts/231124181658.html"> 二分查找 </a></li>
+<li><a href="/posts/231227190828.html"> 哈希表实现 </a></li>
+<li><a href="/posts/240313193201.html"> 字符串哈希函数 </a></li>
 <li><a href="/posts/231116150205.html">Floyd 多源最短路径 </a></li>
 <li><a href="/posts/231117095232.html">Dijkstra 单源最短路径（原理部分）</a></li>
 <li><a href="/posts/231121152713.html">Dijkstra 单源最短路径（实现部分）</a></li>
-</ul>
-<h2 id="工具"> 工具 </h2>
-<ul>
-<li><a href="/posts/240207180410.html">GCC 编译过程分解 </a></li>
-<li><a href="/posts/240312184132.html">GDB 调试入门 </a></li>
-</ul>
-<h2 id="Docker">Docker</h2>
-<ul>
-<li><a href="/posts/230909171809.html">Docker 学习笔记 </a></li>
 </ul>
 <h2 id="计算机网络"> 计算机网络 </h2>
 <ul>
@@ -130,11 +122,6 @@ document.addEventListener('DOMContentLoaded', function () {
 <li><a href="/posts/240306203742.html">ACL 访问控制列表 </a></li>
 <li><a href="/posts/240130190208.html"> 路由表、转发表与快速转发工作原理 </a></li>
 <li><a href="/posts/231221200716.html">VXLAN 网络虚拟化技术 </a></li>
-</ul>
-<h2 id="多线程编程"> 多线程编程 </h2>
-<ul>
-<li><a href="/posts/230911151334.html">pthread 库 </a></li>
-<li><a href="/posts/230921094127.html"> 锁与原子操作 </a></li>
 </ul>
 <h2 id="操作系统"> 操作系统 </h2>
 <ul>
@@ -156,6 +143,20 @@ document.addEventListener('DOMContentLoaded', function () {
 <li><a href="/posts/240104202828.html"> 同步与互斥 </a></li>
 <li><a href="/posts/240113115605.html"> 信号量与管程 </a></li>
 <li><a href="/posts/240205182643.html"> 经典同步问题 </a></li>
+</ul>
+<h2 id="多线程编程"> 多线程编程 </h2>
+<ul>
+<li><a href="/posts/230911151334.html">pthread 库 </a></li>
+<li><a href="/posts/230921094127.html"> 锁与原子操作 </a></li>
+</ul>
+<h2 id="工具"> 工具 </h2>
+<ul>
+<li><a href="/posts/240207180410.html">GCC 编译过程分解 </a></li>
+<li><a href="/posts/240312184132.html">GDB 调试入门 </a></li>
+</ul>
+<h2 id="Docker">Docker</h2>
+<ul>
+<li><a href="/posts/230909171809.html">Docker 学习笔记 </a></li>
 </ul>
 <h1 id="LeetCode 刷题">LeetCode 刷题 </h1>
 <h2 id="链表相关"> 链表相关 </h2>
@@ -287,7 +288,7 @@ function sidebar_toggle() {
 <p>首位成员必须是 <code>HASH_NODE_S</code> 哈希节点，使得哈希桶中仅存储了数据的首地址，而不会过多的存储数据信息。其次，这样设计，使得数据节点结构可以包含任何你想要的信息，而无需修改哈希表的各个函数接口。</p>
 </blockquote>
 <h2 id="哈希函数">哈希函数</h2>
-<p>哈希函数的作用是将一个较大的输入空间映射到一个较小的输出空间。在哈希表中，输入空间是所有 <code>key</code>，输出空间是所有桶（数组索引）。换句话说，输入一个 <code>key</code>，我们可以通过哈希函数得到该 <code>key</code> 对应的键值对在数组中的存储位置。哈希函数应尽可能保证映射后的输出空间尽可能均匀、分散，以减少哈希冲突的发生。</p>
+<p>哈希函数的作用是将一个较大的输入空间映射到一个较小的输出空间，且尽可能保证均匀映射。在哈希表中，输入空间是所有 <code>key</code>，输出空间是所有哈希桶（数组索引）。换句话说，对于一个输入 <code>key</code>，可以通过哈希函数得到该 <code>key</code> 在数组中的位置。哈希函数应尽可能保证映射后的输出空间尽可能均匀、分散，以减少哈希冲突的发生。</p>
 <p>在这里，我们简单地使用 <code>DATA_S</code> 节点的 <code>identifier</code> 模上哈希桶大小，作为哈希函数。</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">unsigned</span> <span class="type">long</span> <span class="title function_">hashFunc</span><span class="params">(<span class="type">const</span> <span class="type">void</span> *pKey)</span> &#123;</span><br><span class="line">    <span class="type">const</span> DATA_S *pstKey = (<span class="type">const</span> DATA_S *)pKey;</span><br><span class="line">    <span class="keyword">if</span> (<span class="literal">NULL</span> == pstKey) &#123;</span><br><span class="line">        err(<span class="string">&quot;hashFunc(): null pointer\n&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> (<span class="type">unsigned</span> <span class="type">long</span>)(pstKey-&gt;identifier % HASH_BUCKET_SIZE);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h2 id="哈希键比较函数">哈希键比较函数</h2>
@@ -417,7 +418,7 @@ function sidebar_toggle() {
       
         <figure
           class="avatar avatar-lg"
-          data-initial="a"
+          data-initial="A"
           style="background-color: #3b4351;">
         </figure>
       

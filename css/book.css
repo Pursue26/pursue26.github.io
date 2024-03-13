@@ -88,7 +88,8 @@ img {
     .off-canvas-content .book-content .book-post p {
       margin-bottom: 1rem;
       text-align: justify;
-      /* 两端对齐 */ }
+      /* 两端对齐 */
+      font-size: 16px; }
     .off-canvas-content .book-content .book-post hr {
       border: 1px solid #e7e7e7;
       background-color: #e7e7e7;
@@ -109,7 +110,8 @@ img {
     .off-canvas-content .book-content .book-post ul,
     .off-canvas-content .book-content .book-post ol {
       list-style-position: outside;
-      margin: 0 0 1rem 1.4rem; }
+      margin: 0 0 1rem 1.4rem;
+      font-size: 16px; }
       .off-canvas-content .book-content .book-post ul ol,
       .off-canvas-content .book-content .book-post ol ol {
         margin-top: 0;
@@ -123,7 +125,9 @@ img {
         margin: 0; }
     .off-canvas-content .book-content .book-post blockquote {
       margin: 1.125rem 0 1.125rem 0;
-      padding: 0.2rem 1rem; }
+      background-color: #EEF3EE66;
+      padding: 0.2rem 1rem;
+      font-size: 16px; }
       .off-canvas-content .book-content .book-post blockquote p {
         margin-bottom: 0.5rem; }
       .off-canvas-content .book-content .book-post blockquote p:last-child {
