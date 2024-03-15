@@ -264,7 +264,7 @@ function sidebar_toggle() {
         </div>
         <div class="book-content">
           <div class="book-post">
-  <h2 id="Go 语言学习笔记 -14：字符串">Go 语言学习笔记 -14：字符串</h2>
+  <h2 id="Go 语言笔记 -14：字符串">Go 语言笔记 -14：字符串</h2>
 <ol>
 <li>
 <p>Go 语言中的字符串是一个 <strong> 字节切片</strong>。</p>
@@ -302,7 +302,7 @@ function sidebar_toggle() {
 </ol>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">mutate</span><span class="params">(s []<span class="type">rune</span>)</span></span> <span class="type">string</span> &#123;  </span><br><span class="line">    s[<span class="number">0</span>] = <span class="string">&#x27;a&#x27;</span> <span class="comment">// 修改切片</span></span><br><span class="line">    <span class="keyword">return</span> <span class="type">string</span>(s) <span class="comment">// 转换为一个字符串</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;  </span><br><span class="line">    h := <span class="string">&quot;hello&quot;</span></span><br><span class="line">    fmt.Println(mutate([]<span class="type">rune</span>(h))) <span class="comment">// 用 rune 切片构造字符串，输出 aello</span></span><br><span class="line">    fmt.Println(h) <span class="comment">// 输出 hello</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <hr>
-<h2 id="Go 语言学习笔记 -15：指针">Go 语言学习笔记 -15：指针</h2>
+<h2 id="Go 语言笔记 -15：指针">Go 语言笔记 -15：指针</h2>
 <ol>
 <li>
 <p>指针是一种存储变量内存地址（Memory Address）的变量。例如，变量 b 的值为 156，而 b 的内存地址为 0x1040a124，变量 a 存储了 b 的地址。我们就称 a 指向了 b。</p>

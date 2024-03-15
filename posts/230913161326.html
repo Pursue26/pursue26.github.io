@@ -264,7 +264,7 @@ function sidebar_toggle() {
         </div>
         <div class="book-content">
           <div class="book-post">
-  <h2 id="Go 语言学习笔记 -12：可变参数函数">Go 语言学习笔记 -12：可变参数函数</h2>
+  <h2 id="Go 语言笔记 -12：可变参数函数">Go 语言笔记 -12：可变参数函数</h2>
 <ol>
 <li>
 <p>可变参数函数是一种 <strong> 参数个数可变 </strong> 的函数。如果函数最后一个参数的类型被记作 <code>...T</code> ，这时函数可以接受任意个 <code>T</code> 类型的参数作为最后一个参数。<strong>只有 </strong> 函数的最后一个参数才允许是可变的。</p>
@@ -278,7 +278,7 @@ function sidebar_toggle() {
 </ol>
 <span id="more"></span>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">find</span><span class="params">(num <span class="type">int</span>, nums ...<span class="type">int</span>)</span></span> &#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    find(<span class="number">89</span>, <span class="number">88</span>, <span class="number">89</span>, <span class="number">90</span>) <span class="comment">// 语法正确，[88, 89, 90] 将被转换为一个新的切片传入 find 函数</span></span><br><span class="line">    find(<span class="number">89</span>) <span class="comment">// 语法正确, 一个长度和容量为 0 的 nil 切片将被传入 find 函数</span></span><br><span class="line">    nums := []<span class="type">int</span>&#123;<span class="number">87</span>, <span class="number">88</span>, <span class="number">89</span>&#125;</span><br><span class="line">    find(<span class="number">89</span>, nums) <span class="comment">// 语法错误，find 的可变参数要求为 int 型，不能传入 []int 切片</span></span><br><span class="line">    find(<span class="number">89</span>, nums...) <span class="comment">// 语法正确，切片直接传入函数，不再创建新的切片</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="Go 语言学习笔记 -13：Maps">Go 语言学习笔记 -13：Maps</h2>
+<h2 id="Go 语言笔记 -13：Maps">Go 语言笔记 -13：Maps</h2>
 <ol>
 <li>
 <p>map 是在 Go 中将值（value）与键（key）关联的 <strong> 内置类型</strong>。通过相应的键可以获取到值。</p>

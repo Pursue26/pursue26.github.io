@@ -269,14 +269,14 @@ function sidebar_toggle() {
 <ul>
 <li><code>LRUCache(int capacity)</code> 以正整数作为容量 <code>capacity</code> 初始化 LRU 缓存。</li>
 <li><code>int get(int key)</code> 如果关键字 <code>key</code> 存在于缓存中，则返回关键字的值，否则返回 <code>-1</code>。</li>
-<li><code>void put(int key, int value)</code> 如果关键字 <code>key</code> 已经存在，则变更其数据值 <code>value</code> ；如果不存在，则向缓存中插入该组 <code>key-value</code> 。如果插入操作导致关键字数量超过 <code>capacity</code> ，则应该逐出最久未使用的关键字。</li>
+<li><code>void put(int key, int value)</code> 如果关键字 <code>key</code> 已经存在，则变更其数据值 <code>value</code> ；如果不存在，则向缓存中插入该组 <code>key-value</code> 。<strong>如果插入操作导致关键字数量超过 <code>capacity</code> ，则应该逐出最久未使用的关键字</strong>。</li>
 </ul>
 <p>函数 <code>get</code> 和 <code>put</code> 必须以 <code>O(1)</code> 的平均时间复杂度运行。</p>
 <span id="more"></span>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">输入 </span><br><span class="line">[&quot;LRUCache&quot;, &quot;put&quot;, &quot;put&quot;, &quot;get&quot;, &quot;put&quot;, &quot;get&quot;, &quot;put&quot;, &quot;get&quot;, &quot;get&quot;, &quot;get&quot;]</span><br><span class="line">[[2], [1, 1], [2, 2], [1], [3, 3], [2], [4, 4], [1], [3], [4]]</span><br><span class="line"> 输出 </span><br><span class="line">[null, null, null, 1, null, -1, null, -1, 3, 4]</span><br><span class="line"></span><br><span class="line"> 解释</span><br><span class="line">LRUCache lRUCache = new LRUCache(2);</span><br><span class="line">lRUCache.put(1, 1); // 缓存是 &#123;1=1&#125;</span><br><span class="line">lRUCache.put(2, 2); // 缓存是 &#123;1=1, 2=2&#125;</span><br><span class="line">lRUCache.get(1);    // 返回 1</span><br><span class="line">lRUCache.put(3, 3); // 该操作会使得关键字 2 作废，缓存是 &#123;1=1, 3=3&#125;</span><br><span class="line">lRUCache.get(2);    // 返回 -1 (未找到)</span><br><span class="line">lRUCache.put(4, 4); // 该操作会使得关键字 1 作废，缓存是 &#123;4=4, 3=3&#125;</span><br><span class="line">lRUCache.get(1);    // 返回 -1 (未找到)</span><br><span class="line">lRUCache.get(3);    // 返回 3</span><br><span class="line">lRUCache.get(4);    // 返回 4</span><br></pre></td></tr></table></figure>
 <h2 id="题目分析">题目分析</h2>
 <p>最近最久使用页面置换算法（Least Recently Used, LRU）是操作系统中局部页面置换算法中性能较好的一种算法，当一个缺页中断发生时，它选择 <strong> 最近最久未使用 </strong> 的那个页面淘汰。</p>
-<p>在题目中，如果 <code>get</code> 方法获取的关键字存在于缓存中，除了要返回关键字对应的值，同时这条记录将会被刷新为最近（最新）被使用的一条记录。同样地，如果 <code>put</code> 方法存储的关键字存在于缓存中，除了要修改关键字对应的值，同时这条记录也将会被刷新为最近（最新）被使用的一条记录。</p>
+<p>在题目中，如果 <code>get</code> 方法获取的关键字存在于缓存中，除了要返回关键字对应的值，同时 <strong> 这条记录将会被刷新为最近（最新）被使用的一条记录 </strong>。同样地，如果 <code>put</code> 方法存储的关键字存在于缓存中，除了要修改关键字对应的值，同时<strong> 这条记录也将会被刷新为最近（最新）被使用的一条记录</strong>。</p>
 <p>题目还要求使用 <code>O(1)</code> 的平均时间复杂度完成 <code>get</code> 和 <code>put</code> 方法，这可以使用「双向链表」和「哈希表」来共同设计这个 LRU 缓存数据结构。</p>
 <h2 id="双向链表 - 哈希表">双向链表 + 哈希表</h2>
 <p>使用「双向链表」和「哈希表」来共同设计这个 LRU 缓存数据结构：</p>

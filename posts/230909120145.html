@@ -264,7 +264,7 @@ function sidebar_toggle() {
         </div>
         <div class="book-content">
           <div class="book-post">
-  <h2 id="Go 语言学习笔记 -5：函数">Go 语言学习笔记 -5：函数</h2>
+  <h2 id="Go 语言笔记 -5：函数">Go 语言笔记 -5：函数</h2>
 <ol>
 <li>函数声明语法：</li>
 </ol>
@@ -285,15 +285,15 @@ function sidebar_toggle() {
 <ol start="5">
 <li><strong>空白符</strong>：<code>_</code> 在 Go 中被用作空白符，可以用作表示任何类型的任何值。</li>
 </ol>
-<p><code>area, _ := rectProps(10.8, 5.6) // 返回值周长被丢弃</code>。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">area, _ := rectProps(<span class="number">10.8</span>, <span class="number">5.6</span>) <span class="comment">// 返回值周长被丢弃</span></span><br></pre></td></tr></table></figure>
 <hr>
-<h2 id="Go 语言学习笔记 -6：包">Go 语言学习笔记 -6：包</h2>
+<h2 id="Go 语言笔记 -6：包">Go 语言笔记 -6：包</h2>
 <ol>
 <li>
 <p><code>package packagename</code> 指定了某一源文件属于一个包，它应该放在每一个源文件的第一行。</p>
 </li>
 <li>
-<p><code>main</code> 包和自定义包目录结构（属于某一个包的源文件都应该放置于一个单独命名的文件夹里，且应该用包名命名文件夹名）：</p>
+<p><code>main</code> 包和自定义包目录结构（属于某一个包的源文件，都应该放置于一个单独命名的文件夹里，且应该用包名命名文件夹名）：</p>
 </li>
 </ol>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">src</span><br><span class="line">    geometry  <span class="comment">// 自定义 main 包</span></span><br><span class="line">        geometry.<span class="keyword">go</span> <span class="comment">// main 函数</span></span><br><span class="line">        rectangle <span class="comment">// 自定义包，文件名为包名</span></span><br><span class="line">            rectprops.<span class="keyword">go</span> <span class="comment">// 属于 rectangle 包的源文件</span></span><br><span class="line">bin</span><br><span class="line">    <span class="comment">// 通过执行 go build geometry/geometry.go 编译得到 </span></span><br><span class="line">    geometry (Linux)</span><br><span class="line">    geometry.exe (Windows)</span><br></pre></td></tr></table></figure>
@@ -302,12 +302,10 @@ function sidebar_toggle() {
 <p>导入自定义包：<code>import packagepath</code>，必须指定自定义包 <code>packagename</code> 相对于工作区 <code>src</code> 文件夹的相对路径，如：<code>import &quot;geometry/rectangle&quot;</code>。</p>
 </li>
 <li>
-<p>导出名字：在 Go 中，任何 <strong> 以大写字母开头的变量或者函数都是被导出的名字，其它包只能访问被导出的函数和变量</strong>（即，如果想在包外访问一个函数，它应该首首字母大写）。</p>
+<p>导出名字：在 Go 中，任何 <strong> 以大写字母开头的变量或者函数都是被导出的名字，其它包只能访问被导出的函数和变量</strong>（即，如果想在包外访问一个函数，它应该首首字母大写。也就是说，小写字母开头的变量或函数类似于 C 语言中被 static 修饰的变量或函数）。</p>
 </li>
 <li>
 <p><code>init</code> 函数：所有包都可以包含一个 <code>init</code> 函数，<code>init</code> 函数不应该有任何返回值类型和参数。</p>
-</li>
-</ol>
 <ul>
 <li>
 <p>包的初始化顺序：1）首先初始化 <strong> 被导入的 </strong> 包；2）然后初始化 <strong> 包级别（package level）的变量 </strong>；3）紧接着<strong> 调用 <code>init</code> 函数</strong>，按照编译器解析它们的顺序进行调用。</p>
@@ -316,22 +314,24 @@ function sidebar_toggle() {
 <p>如果一个包导入了另一个包，会先初始化 <strong> 被导入的 </strong> 包。</p>
 </li>
 <li>
-<p>尽管一个包可能会被导入多次，但是它们只会被初始化一次。</p>
+<p>尽管一个包可能会被导入多次，但是它们 <strong> 只会被初始化一次</strong>。</p>
 </li>
 </ul>
-<ol start="6">
-<li>空白标识符导入包中的使用：导入了包，却不在代码中使用它，这在 Go 中是非法的，会抛出 <code>xxx.go:6: imported and not used: packagename_yyy</code>。</li>
-</ol>
+</li>
+<li>
+<p>空白标识符导入包中的使用：导入了包，却不在代码中使用它，这在 Go 中是非法的，会抛出 <code>xxx.go:6: imported and not used: packagename_yyy</code>。</p>
 <ul>
 <li>
-<p>为了避免这种程序错误，通常会在函数外调用其中的一个函数，并将返回值赋给 <code>_</code> 变量，把这一操作称为 <code> 错误屏蔽器</code>。</p>
+<p>为了避免这种程序错误，通常会在函数外调用其中的一个函数，并将返回值赋给 <code>_</code> 变量，把这一操作称为「错误屏蔽器」。</p>
 </li>
 <li>
-<p>同时，有时我们并不想使用导入的包中的任一函数或变量，只是为了 <strong> 确保它进行初始化</strong>，这种情况可以使用空白标识符 <code>_</code>，如 <code>import _ &quot;geometry/rectangle&quot;</code>。这样在不调用包中的函数或变量时，也不会报错。</p>
+<p>同时，有时我们并不想使用导入的包中的任一函数或变量，只是 <strong> 为了确保它进行初始化</strong>，这种情况可以使用空白标识符 <code>_</code>，如 <code>import _ &quot;geometry/rectangle&quot;</code>。这样在不调用包中的函数或变量时，也不会报错。</p>
 </li>
 </ul>
+</li>
+</ol>
 <hr>
-<h2 id="Go 语言学习笔记 -7：if-else">Go 语言学习笔记 -7：if-else</h2>
+<h2 id="Go 语言笔记 -7：if-else">Go 语言笔记 -7：if-else</h2>
 <ol>
 <li>即使 <code>if</code> 状态下仅有一条语句，也必须加 <code>&#123; &#125;</code></li>
 </ol>
@@ -343,19 +343,20 @@ function sidebar_toggle() {
 <ol start="3">
 <li><strong>一个注意点</strong>：<code>else</code> 必须键入在 <code>&#125;</code> 后面，不能另取一行键入，因为 Go 语言默认在每条语句结束时插入一个分号，但 <code>if else</code> 是一个整体。</li>
 </ol>
-<h2 id="Go 语言学习笔记 -8：循环">Go 语言学习笔记 -8：循环</h2>
+<h2 id="Go 语言笔记 -8：循环">Go 语言笔记 -8：循环</h2>
 <ol>
 <li>Go 语言中唯一的循环语句是 <code>for</code>，没有 <code>while</code> 和 <code>do while</code> 循环。</li>
 </ol>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> initialisation; condition; post &#123;  </span><br><span class="line">    <span class="comment">// 循环体</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <ul>
-<li><code>for</code> 循环的三个组成部分，即初始化，条件和 post 都是可选的（可有可无），如：<code>for ;i &lt;= 10; &#123;...&#125;</code>、<code>for &#123;...&#125;</code> 或 <code>for i &lt;= 10 &#123;... i += 2&#125;</code>，即 <code>;</code> 也是可以省略的。</li>
+<li><code>for</code> 循环的三个组成部分，即初始化、条件和 post 都是可选的（可有可无），如下示例都可以（分号也是可以省略的）。</li>
 </ul>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> ; i &lt;= <span class="number">10</span>; &#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">for</span> &#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">for</span> i &lt;= <span class="number">10</span> &#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">    i += <span class="number">2</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <ol start="2">
 <li><code>break</code> 为跳出循环，<code>continue</code> 为不执行后续语句，进入下一次循环。</li>
 </ol>
 <hr>
-<h2 id="Go 语言学习笔记 -9：switch 语句">Go 语言学习笔记 -9：switch 语句</h2>
+<h2 id="Go 语言笔记 -9：switch 语句">Go 语言笔记 -9：switch 语句</h2>
 <ol>
 <li><code>switch</code>是一个条件语句，它可以被认为是替代多个 <code>if else</code> 子句的常用方式，<code>case</code> 不允许出现重复项。</li>
 </ol>
@@ -368,7 +369,7 @@ function sidebar_toggle() {
 <p><strong>无表达式的 <code>switch</code></strong>：在 switch 语句中，表达式是可选的，可以被省略。如果省略表达式，则表示这个 switch 语句 <strong> 等同于 switch true</strong>，并且 <strong> 每个 case 表达式都被认定为有效，相应的代码块也会被执行</strong>。</p>
 </li>
 <li>
-<p><strong>fallthrough</strong>：fallthrough 语句可以在已经执行完成的 case 之后，把控制权转移到下一个 case 的执行代码中，而不会跳出 switch。</p>
+<p><strong>fallthrough</strong> 关键字：<code>fallthrough</code> 语句可以在已经执行完成的 case 之后，把控制权转移到下一个 case 的执行代码中，而不会跳出 switch。</p>
 </li>
 </ol>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span>  <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">switch</span> num := <span class="number">3</span>; &#123;</span><br><span class="line">        <span class="keyword">case</span> num == <span class="number">3</span>:</span><br><span class="line">            fmt.Println(<span class="string">&quot;==&quot;</span>)</span><br><span class="line">            <span class="keyword">fallthrough</span></span><br><span class="line">        <span class="keyword">case</span> num &lt; <span class="number">10</span>:</span><br><span class="line">            fmt.Println(<span class="string">&quot;yes&quot;</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>

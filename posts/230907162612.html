@@ -264,7 +264,7 @@ function sidebar_toggle() {
         </div>
         <div class="book-content">
           <div class="book-post">
-  <h2 id="Go 语言学习笔记 -1：HelloWorld">Go 语言学习笔记 -1：HelloWorld</h2>
+  <h2 id="Go 语言笔记 -1：HelloWorld">Go 语言笔记 -1：HelloWorld</h2>
 <p>Go 语言是一种编译型语言，源代码都会编译成二进制机器码。</p>
 <p>所有 Go 源文件都应该放置在工作区里的 src 目录下。Linux 的工作区（Workspace）应该设置在 $HOME/go，也可以通过设置 GOPATH 环境变量，用其他目录来作为工作区。</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">go</span></span><br><span class="line">  bin <span class="comment">// 编译生成的二进制文件存储位置</span></span><br><span class="line">    hello</span><br><span class="line">  src <span class="comment">// 所有 Go 源文件都应该放置在工作区里的 src 目录下</span></span><br><span class="line">    hello <span class="comment">// 为每个 project 新建一个文件夹</span></span><br><span class="line">      helloworld.<span class="keyword">go</span></span><br></pre></td></tr></table></figure>
@@ -287,7 +287,7 @@ function sidebar_toggle() {
 </li>
 </ul>
 <hr>
-<h2 id="Go 语言学习笔记 -2：变量">Go 语言学习笔记 -2：变量</h2>
+<h2 id="Go 语言笔记 -2：变量">Go 语言笔记 -2：变量</h2>
 <p><strong>变量 </strong> 指定了某存储单元（Memory Location）的名称，该存储单元会存储特定类型的值。</p>
 <ol>
 <li>
@@ -321,7 +321,7 @@ function sidebar_toggle() {
 </ol>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;  </span><br><span class="line">    age := <span class="number">29</span>      <span class="comment">// age 是 int 类型</span></span><br><span class="line">    age = <span class="string">&quot;naveen&quot;</span> <span class="comment">// 错误，尝试赋值一个字符串给 int 类型变量</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <hr>
-<h2 id="Go 语言学习笔记 -3：变量类型">Go 语言学习笔记 -3：变量类型</h2>
+<h2 id="Go 语言笔记 -3：变量类型">Go 语言笔记 -3：变量类型</h2>
 <ol>
 <li>Go 语言支持的变量类型：</li>
 </ol>
@@ -344,7 +344,7 @@ function sidebar_toggle() {
 </ol>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> i, j <span class="type">int</span>, float = <span class="number">5</span>, <span class="number">10.2</span></span><br><span class="line">diff := i - j <span class="comment">// 错误， int - float 不被允许</span></span><br><span class="line">diff := i - <span class="type">int</span>(j) <span class="comment">// 正确</span></span><br></pre></td></tr></table></figure>
 <hr>
-<h2 id="Go 语言学习笔记 -4：常量">Go 语言学习笔记 -4：常量</h2>
+<h2 id="Go 语言笔记 -4：常量">Go 语言笔记 -4：常量</h2>
 <ol>
 <li>
 <p>关键字：<code>const</code>，常量不能再重新赋值为其他的值。</p>
