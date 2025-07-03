@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
+
+    
+      <link rel="icon" href="/favicon.png" />
+    
+
+    <title>
+        
+          操作系统之 chapter10.1 信号量与管程 - aha&#39;s book
+        
+    </title>
+
+    <!-- Spectre.css framework -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre-exp.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre-icons.min.css">
+
+    <!-- theme css & js -->
+    
+<link rel="stylesheet" href="/css/book.css">
+
+    
+<script src="/js/book.js"></script>
+
+
+    <!-- tocbot -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.css">
+    
+    <!-- katex -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/zooming/2.1.1/zooming.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const zooming = new Zooming()
+    zooming.listen('.book-content img')
+})
+</script>
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+    <style>
+      body {
+        background-color: #FFFFFF;
+        /* color: #000000; */
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+
+      /* Floating Button Styles */
+      .floating-button {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 999;
+        background-color: #000000;
+        color: #ffffff;
+        padding: 12px;
+        border-radius: 50%;
+        cursor: pointer;
+        border: 2px solid #000000;
+      }
+
+      .floating-button:hover {
+        background-color: #FFFFFF;
+      }
+
+      /* Dropdown Menu Styles */
+      .dropdown-menu {
+        position: fixed;
+        bottom: 60px;
+        right: 10px;
+        display: none;
+        min-width: 60px;
+        padding: 2px;
+        background-color: #fff;
+        /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
+        z-index: 1000;
+      }
+
+      .floating-button.active+.dropdown-menu {
+        display: block;
+      }
+
+      .dropdown-item {
+        display: block;
+        padding: 8px 16px;
+        cursor: pointer;
+      }
+
+      .dropdown-item:hover {
+        background-color: #f5f5f5;
+      }
+    </style>
+<style>.darkmode--activated{--body-bg-color:#282828;--content-bg-color:#333;--card-bg-color:#555;--text-color:#ccc;--blockquote-color:#bbb;--link-color:#ccc;--link-hover-color:#eee;--brand-color:#ddd;--brand-hover-color:#ddd;--table-row-odd-bg-color:#282828;--table-row-hover-bg-color:#363636;--menu-item-bg-color:#555;--btn-default-bg:#222;--btn-default-color:#ccc;--btn-default-border-color:#555;--btn-default-hover-bg:#666;--btn-default-hover-color:#ccc;--btn-default-hover-border-color:#666;--highlight-background:#282b2e;--highlight-foreground:#a9b7c6;--highlight-gutter-background:#34393d;--highlight-gutter-foreground:#9ca9b6}.darkmode--activated img{opacity:.75}.darkmode--activated img:hover{opacity:.9}.darkmode--activated code{color:#69dbdc;background:0 0}button.darkmode-toggle{z-index:9999}.darkmode-ignore,img{display:flex!important}.beian img{display:inline-block!important}</style></head>
+
+<body>
+  <div class="book-container">
+    <div class="book-sidebar">
+      <div class="book-brand">
+  <a href="/">
+    <img src="/favicon.png">
+    <span>AHA&#39;S BOOK</span>
+  </a>
+</div>
+        <div id="menu" class="book-menu hide">
+  <h2 id="基础知识"> 基础知识 </h2>
+<ul>
+<li><a href="/posts/231010144856.html"> 模运算 </a></li>
+<li><a href="/posts/231014105311.html"> 异或运算 </a></li>
+<li><a href="/posts/231210181853.html"> 计算机中的寄存器 </a></li>
+<li><a href="/posts/231213183051.html"> 正则表达式基础 </a></li>
+</ul>
+<h2 id="C 语言">C 语言 </h2>
+<ul>
+<li><a href="/posts/230916171929.html">main 函数参数 </a></li>
+<li><a href="/posts/231214192113.html"> 关键字与专有名词 </a></li>
+<li><a href="/posts/240103180653.html"> 输出打印函数 </a></li>
+<li><a href="/posts/230922143003.html"> 多维数组 </a></li>
+<li><a href="/posts/230913200729.html">const 关键字 </a></li>
+<li><a href="/posts/230918174223.html">typedef 类型基础 </a></li>
+<li><a href="/posts/230920172849.html">typedef 类型实践 </a></li>
+<li><a href="/posts/240224193217.html"> 二级指针 </a></li>
+<li><a href="/posts/240307195203.html"> 代码 TOP-K 问题 </a></li>
+<li><a href="/posts/230922172626.html">uthash 哈希表基础 </a></li>
+<li><a href="/posts/230918114841.html"> 大小端知识 </a></li>
+</ul>
+<h2 id="Golang 语言">Golang 语言 </h2>
+<ul>
+<li><a href="/posts/230907162612.html"> 变量与常量 </a></li>
+<li><a href="/posts/230909120145.html"> 函数 &amp; 包 &amp; 判断 &amp; 循环 </a></li>
+<li><a href="/posts/230912152800.html"> 数组与切片 </a></li>
+<li><a href="/posts/230913161326.html"> 可变参数函数与 Map 集合 </a></li>
+<li><a href="/posts/230915155105.html"> 字符串和指针 </a></li>
+</ul>
+<h2 id="数据结构"> 数据结构 </h2>
+<ul>
+<li><a href="/posts/231007174854.html"> 链表（数组实现）</a></li>
+<li><a href="/posts/231008213450.html"> 链表（链式实现）</a></li>
+<li><a href="/posts/231016161508.html"> 堆栈（数组实现）</a></li>
+<li><a href="/posts/231016184406.html"> 堆栈（链表实现）</a></li>
+<li><a href="/posts/231127185207.html"> 单调栈 </a></li>
+<li><a href="/posts/231017105123.html"> 队列（链表实现）</a></li>
+<li><a href="/posts/231017154121.html"> 双端队列（链表实现）</a></li>
+<li><a href="/posts/231018102559.html"> 堆基础与堆结构（数组实现）</a></li>
+<li><a href="/posts/231019102311.html"> 优先队列（堆实现）</a></li>
+<li><a href="/posts/230905224335.html"> 二叉树的遍历 </a></li>
+<li><a href="/posts/231020174358.html"> 二叉搜索树 </a></li>
+<li><a href="/posts/230916094606.html"> 拓扑排序 </a></li>
+<li><a href="/posts/230925185057.html">Trie 字典树 </a></li>
+<li><a href="/posts/231023164532.html"> 并查集（数组实现）</a></li>
+<li><a href="/posts/240702200642.html">Linux 数据结构之队列 </a></li>
+</ul>
+<h2 id="数据结构算法"> 数据结构算法 </h2>
+<ul>
+<li><a href="/posts/231218181635.html"> 归并排序 </a></li>
+<li><a href="/posts/231108163339.html"> 快速排序 </a></li>
+<li><a href="/posts/231107171607.html"> 堆排序 </a></li>
+<li><a href="/posts/231124181658.html"> 二分查找 </a></li>
+<li><a href="/posts/231227190828.html"> 哈希表实现 </a></li>
+<li><a href="/posts/240313193201.html"> 字符串哈希函数 </a></li>
+<li><a href="/posts/231116150205.html">Floyd 多源最短路径 </a></li>
+<li><a href="/posts/231117095232.html">Dijkstra 单源最短路径（原理部分）</a></li>
+<li><a href="/posts/231121152713.html">Dijkstra 单源最短路径（实现部分）</a></li>
+</ul>
+<h2 id="数据库"> 数据库 </h2>
+<ul>
+<li><a href="/posts/250605180332.html">MySQL 基础 </a></li>
+</ul>
+<h2 id="计算机网络"> 计算机网络 </h2>
+<ul>
+<li><a href="/posts/231011192359.html">OSI 参考模型 </a></li>
+<li><a href="/posts/240329202000.html"> 计网 CyC2018 之概述 </a></li>
+<li><a href="/posts/240329202004.html"> 计网 CyC2018 之链路层 </a></li>
+<li><a href="/posts/240329202003.html"> 计网 CyC2018 之网络层 </a></li>
+<li><a href="/posts/240329202002.html"> 计网 CyC2018 之传输层 </a></li>
+<li><a href="/posts/240329202001.html"> 计网 CyC2018 之应用层 </a></li>
+<li><a href="/posts/240306203742.html">ACL 访问控制列表 </a></li>
+<li><a href="/posts/240130190208.html"> 路由表、转发表与快速转发工作原理 </a></li>
+<li><a href="/posts/231221200716.html">VXLAN 网络虚拟化技术 </a></li>
+<li><a href="/posts/240903191243.html">TCP/IP checksum 计算 </a></li>
+<li><a href="/posts/240911185603.html"> 抓包分析 TCP 三次握手与四次挥手过程 </a></li>
+</ul>
+<h2 id="操作系统"> 操作系统 </h2>
+<ul>
+<li><a href="/posts/230921190726.html"> 概述 </a></li>
+<li><a href="/posts/230924172528.html"> 中断 &amp; 异常 &amp; 系统调用 </a></li>
+<li><a href="/posts/231017195157.html"> 内存分层体系与地址空间生成 </a></li>
+<li><a href="/posts/231108195351.html"> 连续内存分配 </a></li>
+<li><a href="/posts/231111172507.html"> 非连续内存分配之分段与分页 </a></li>
+<li><a href="/posts/231119170537.html"> 非连续内存分配之页表 </a></li>
+<li><a href="/posts/231123184526.html"> 内存管理之覆盖技术与交换技术 </a></li>
+<li><a href="/posts/231127193658.html"> 内存管理之虚存技术 </a></li>
+<li><a href="/posts/231129182631.html"> 局部页面置换算法 </a></li>
+<li><a href="/posts/231207184239.html"> 全局页面置换算法 </a></li>
+<li><a href="/posts/231207204958.html"> 进程描述 </a></li>
+<li><a href="/posts/231210211306.html"> 进程状态 </a></li>
+<li><a href="/posts/231215213932.html"> 线程 </a></li>
+<li><a href="/posts/231218220813.html"> 进程控制 </a></li>
+<li><a href="/posts/231228193143.html"> 调度 </a></li>
+<li><a href="/posts/240104202828.html"> 同步与互斥 </a></li>
+<li><a href="/posts/240113115605.html"> 信号量与管程 </a></li>
+<li><a href="/posts/240205182643.html"> 经典同步问题 </a></li>
+<li><a href="/posts/240310162231.html"> 死锁 </a></li>
+</ul>
+<h2 id="系统与网络编程"> 系统与网络编程 </h2>
+<ul>
+<li><a href="/posts/230911151334.html">pthread 库 </a></li>
+<li><a href="/posts/230921094127.html"> 锁与原子操作 </a></li>
+<li><a href="/posts/240319195609.html"> 读者写者问题 </a></li>
+<li><a href="/posts/240527200241.html"> 网络编程卷一阅读随笔 </a></li>
+<li><a href="/posts/240414190410.html"> 进程间通信 IPC 机制 </a></li>
+<li><a href="/posts/240424200123.html"> 多进程相关练习 </a></li>
+<li><a href="/posts/240516221527.html">I/O 模式与 I/O 多路复用 </a></li>
+<li><a href="/posts/240626192803.html">Linux 内核 kfifo 环形队列 </a></li>
+<li><a href="/posts/241009203126.html">Linux 内核等待队列 </a></li>
+<li><a href="/posts/240627210637.html">DPDK 无锁环形队列 </a></li>
+<li><a href="/posts/240919200410.html"> 解密内存屏障 </a></li>
+<li><a href="/posts/240927202500.html"> 内核线程的创建 </a></li>
+<li><a href="/posts/241015195205.html">Linux 网络数据包接收过程 </a></li>
+<li><a href="/posts/2410232111015.html"> 源码解读 epoll 实现原理 </a></li>
+<li><a href="/posts/241106182619.html">Linux 文件系统 </a></li>
+<li><a href="/posts/250619154429.html">Libevent 高性能 IO 事件驱动库 </a></li>
+</ul>
+<h2 id="工具与命令"> 工具与命令 </h2>
+<ul>
+<li><a href="/posts/240207180410.html">GCC 编译过程分解 </a></li>
+<li><a href="/posts/240312184132.html">GDB 调试入门 </a></li>
+<li><a href="/posts/240512184921.html">Makefile 学习 </a></li>
+<li><a href="/posts/250629214430.html">CMake 学习 </a></li>
+<li><a href="/posts/240417193754.html">Linux 命令之文件权限 </a></li>
+</ul>
+<h2 id="开源项目"> 开源项目 </h2>
+<ul>
+<li><a href="/posts/240303201855.html"> 线程池原理与实现 </a></li>
+<li><a href="/posts/240507194549.html">HTTP 服务器实现 </a></li>
+<li><a href="/posts/240904203605.html"> 聊天服务器实现 </a></li>
+<li><a href="/posts/241119182636.html">Linux 文件系统 </a></li>
+</ul>
+<h2 id="Docker">Docker</h2>
+<ul>
+<li><a href="/posts/230909171809.html">Docker 学习笔记 </a></li>
+</ul>
+<h1 id="LeetCode 刷题">LeetCode 刷题 </h1>
+<h2 id="链表相关"> 链表相关 </h2>
+<ul>
+<li><a href="/posts/231025143947.html">160 相交链表 </a></li>
+<li><a href="/posts/231025185947.html">206 反转链表 </a></li>
+<li><a href="/posts/231026101239.html">21 合并两个有序链表 </a></li>
+<li><a href="/posts/231026184514.html">83 删除排序链表中的重复元素 </a></li>
+<li><a href="/posts/231027150243.html">19 删除链表的倒数第 N 个节点 </a></li>
+<li><a href="/posts/231031120718.html">2 两数相加 </a></li>
+<li><a href="/posts/231031163133.html">445 两数相加 II</a></li>
+<li><a href="/posts/231101094219.html">234 回文链表 </a></li>
+<li><a href="/posts/231101135228.html">725 分隔链表 </a></li>
+<li><a href="/posts/231102120708.html">328 奇偶链表 </a></li>
+<li><a href="/posts/231102165703.html">142 环形链表 II</a></li>
+</ul>
+<h2 id="设计"> 设计 </h2>
+<ul>
+<li><a href="/posts/231201184542.html">146 LRU 缓存 </a></li>
+</ul>
+<h2 id="贪心算法"> 贪心算法 </h2>
+<ul>
+<li><a href="/posts/231107094652.html">1029 两地调度 </a></li>
+<li><a href="/posts/231109150855.html">435 无重叠区间 </a></li>
+</ul>
+<h2 id="哈希表"> 哈希表 </h2>
+<ul>
+<li><a href="/posts/231123181539.html">1410 实体解析器 </a></li>
+</ul>
+<h2 id="树的遍历"> 树的遍历 </h2>
+<ul>
+<li><a href="/posts/231103121209.html">117 填充每个节点的下一个右侧节点指针 II</a></li>
+</ul>
+<h2 id="深度优先搜索（递归）"> 深度优先搜索（递归）</h2>
+<ul>
+<li><a href="/posts/231206201243.html">2477 达到首都的最少油耗 </a></li>
+</ul>
+<h2 id="图或路径问题"> 图或路径问题 </h2>
+<ul>
+<li><a href="/posts/231211184652.html">1631 最小体力消耗路径 </a></li>
+</ul>
+<h2 id="其它"> 其它 </h2>
+<ul>
+<li><a href="/posts/230101120000.html"> 备忘录 </a></li>
+</ul>
+
+</div>
+
+
+<script src="/js/book-menu.js"></script>
+
+    </div>
+    <div class="sidebar-toggle" onclick="sidebar_toggle()" onmouseover="add_inner()" onmouseleave="remove_inner()">
+  <div class="sidebar-toggle-inner"></div>
+</div>
+
+<script>
+function add_inner() {
+  let inner = document.querySelector('.sidebar-toggle-inner')
+  inner.classList.add('show')  
+}
+
+function remove_inner() {
+  let inner = document.querySelector('.sidebar-toggle-inner')
+  inner.classList.remove('show')
+}
+
+function sidebar_toggle() {
+    let sidebar_toggle = document.querySelector('.sidebar-toggle')
+    let sidebar = document.querySelector('.book-sidebar')
+    let content = document.querySelector('.off-canvas-content')
+    if (sidebar_toggle.classList.contains('extend')) { // show
+        sidebar_toggle.classList.remove('extend')
+        sidebar.classList.remove('hide')
+        content.classList.remove('extend')
+    }
+    else { // hide
+        sidebar_toggle.classList.add('extend')
+        sidebar.classList.add('hide')
+        content.classList.add('extend')
+    }
+}
+</script>
+
+      <div class="off-canvas-content">
+        <div class="columns">
+          <div class="column col-10 col-lg-12">
+            <div class="book-navbar">
+              <!-- For Responsive Layout -->
+
+<header class="navbar">
+  <section class="navbar-section">
+    <a onclick="open_sidebar()">
+      <i class="icon icon-menu"></i>
+    </a>
+  </section>
+</header>
+
+            </div>
+            <div class="book-content">
+              <div class="book-post">
+  <p>锁（Lock）可以实现对临界区的互斥访问，但多道程序设计仅考虑互斥问题是不够的。除了互斥，还需要考虑同步，以及在临界区内允许多个进程（或线程）进入临界区执行的情况。为了实现这些目标，需要借助更高层的同步互斥的语义，并利用硬件实现的原子操作来实现。</p>
+<p>本文介绍信号量（Semaphore），包括二元信号量和一般（计数）信号量。信号量可以实现多个进程（或线程）之间的互斥和同步操作，并允许多个进程（或线程）进入临界区执行。同时，介绍了一种更高级的抽象——管程（Monitor），它可以缓解信号量机制在编写并发程序上的复杂性、简化并发编程。管程是一种程序结构，包含了一组共享变量和操作集合，用于控制对共享资源的访问。</p>
+<span id="more"></span>
+<img src="../images/os-kernel/chapter10/lock.png" alt="多程序理念" width="70%" height="70%">
+<h1 id="信号量（Semaphore）">信号量（Semaphore）</h1>
+<h2 id="信号量操作">信号量操作</h2>
+<p>信号量（Semaphore）是一种抽象数据结构，用于实现多个进程（或线程）之间的同步和互斥操作的机制。它是一个整型变量（<code>sem</code>），可以用来控制对共享资源的访问。</p>
+<p>一个整型变量（<code>sem</code>），具有 2 个原子操作：</p>
+<ul>
+<li><code>P()</code> 操作：<code>sem</code> 减 1，如果 <code>sem &lt; 0</code>，等待，否则继续；</li>
+<li><code>V()</code> 操作：<code>sem</code> 加 1，如果 <code>sem &lt;= 0</code>，唤醒一个等待的进程 P。</li>
+</ul>
+<p>信号量类似铁路，初始化 2 个资源控制信号灯，进入临界区的进程执行 <code>P()</code> 操作，当临界区已经有 2 个进程时，信号量不足，变为红灯。当再来的进程想要进入临界区时，只能等待，直到某一个进程离开了临界区，变为绿灯，此时进程执行 <code>V()</code> 操作，并将等待的进程唤醒，进入临界区。</p>
+<img src="../images/os-kernel/chapter10/semaphore-vivid.gif" alt="信号量比喻" width="80%" height="80%">
+<blockquote>
+<p>信号量由 dijkstra 在 20 世纪 60 年代提出。<code>P()</code>操作是荷兰语中的 Proberen，意为“尝试”或“试图获取资源”；<code>V()</code>操作是荷兰语中的 Verhogen，意为“增加”或“释放资源”。</p>
+</blockquote>
+<h2 id="信号量特征">信号量特征</h2>
+<ul>
+<li>信号量是整数；</li>
+<li>信号量是被保护的变量：初始化完成后，唯一改变一个信号量的值的办法是通过 <code>P(), V()</code> 操作（操作必须是原子）；</li>
+<li><code>P()</code> 操作能够阻塞、<code>V()</code> 操作不会阻塞；</li>
+<li>我们假定信号量是公平的：
+<ul>
+<li>如果 <code>V()</code> 被无限频繁调用（在同一个信号量上），那么没有线程会被阻塞在 <code>P()</code> 操作上；</li>
+<li>在实践中，FIFO 经常被使用，也就是先被阻塞的线程，先出。</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>自旋锁（Spinlock）能否是 FIFO 类型？不能，锁已被其他线程占用时，该线程会一直自旋（忙等待）直到锁被释放。</p>
+</blockquote>
+<h2 id="信号量两种类型">信号量两种类型</h2>
+<ul>
+<li>二进制信号量：值可以是 0 或 1；</li>
+<li>一般 / 计数信号量：值可取任意非负值。</li>
+</ul>
+<details>
+  <summary>可以通过使用一个类型的信号量来实现另一个类型的信号量（两者相互实现）。</summary>
+<ol>
+<li>
+<p>使用二进制信号量实现计数信号量：<br>
+可以使用一个二进制信号量作为互斥锁（类似于互斥量），用于控制对计数信号量的访问。每当线程要进行计数操作时，需要先获取互斥锁，然后进行计数操作，最后释放互斥锁。这样可以确保每次只有一个线程可以访问计数信号量，保证计数的正确性和一致性。</p>
+</li>
+<li>
+<p>使用计数信号量实现二进制信号量：<br>
+可以使用一个计数信号量来实现二进制信号量。计数信号量的初始值为 1，表示资源可用。当线程需要访问二进制信号量时，需要先尝试获取计数信号量。如果计数信号量的值为 1，表示资源可用，线程可以继续执行。如果计数信号量的值为 0，表示资源不可用，线程需要等待。当资源被释放时，线程释放计数信号量，将其值设置为 1，表示资源可用。</p>
+</li>
+</ol>
+</details>
+<h2 id="信号量两种用途">信号量两种用途</h2>
+<ul>
+<li>互斥；</li>
+<li>条件同步（如调度约束：一个线程等待另一个线程的事情发生）。</li>
+</ul>
+<h1 id="信号量使用">信号量使用</h1>
+<h2 id="用二进制信号量实现互斥">用二进制信号量实现互斥</h2>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">mutex = <span class="keyword">new</span> <span class="built_in">Semaphore</span>(<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">mutex-&gt;<span class="built_in">P</span>();</span><br><span class="line"></span><br><span class="line"><span class="comment">/* Critical Section; */</span></span><br><span class="line"></span><br><span class="line">mutex-&gt;<span class="built_in">V</span>();</span><br></pre></td></tr></table></figure>
+<p>必须成对使用 <code>P(), V()</code> 操作：</p>
+<ul>
+<li><code>P()</code> 操作保证互斥访问临界资源；</li>
+<li><code>V()</code> 操作在使用后释放临界资源；</li>
+<li><code>P(), V()</code> 操作不能次序错误、重复或遗漏。</li>
+</ul>
+<h2 id="用二进制信号量实现调度约束（同步）">用二进制信号量实现调度约束（同步）</h2>
+<p><code>P()</code> 等待，<code>V()</code> 发出信号后，两个线程实现同步：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">condition = <span class="keyword">new</span> <span class="built_in">Semaphore</span>(<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">/* thread A */</span></span><br><span class="line"><span class="comment">// ...</span></span><br><span class="line">condition-&gt;<span class="built_in">P</span>();</span><br><span class="line"><span class="comment">// （阻塞等待，直到其它线程执行了 `V()` 操作）...</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* thread B */</span></span><br><span class="line"><span class="comment">// ...</span></span><br><span class="line">condition-&gt;<span class="built_in">V</span>();</span><br><span class="line"><span class="comment">// ...</span></span><br></pre></td></tr></table></figure>
+<h2 id="生产者 - 消费者问题（线程同步）">生产者 - 消费者问题（线程同步）</h2>
+<h3 id="问题描述与分析">问题描述与分析</h3>
+<p>生产者 - 消费者问题 <strong> 是一个线程同步的问题</strong>，其中一个线程等待另一个线程完成某个任务。这个问题通常用于模拟生产者和消费者的情景。</p>
+<p>例如，在有界缓冲区的生产者 - 消费者问题中：</p>
+<ul>
+<li>一个或多个生产者生成数据并将其放入缓冲区；</li>
+<li>单个消费者每次从缓冲区中取出数据；</li>
+<li>在任何给定的时刻，<strong>只有一个 </strong> 生产者或消费者能够访问该缓冲区。</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"> ----------      --------      ----------</span><br><span class="line">| Producer | -&gt; | Buffer | -&gt; | Consumer |</span><br><span class="line"> ----------      --------      ----------</span><br></pre></td></tr></table></figure>
+<p>在这种情况下，缓冲区有一个固定的大小，生产者在缓冲区已满时需要等待，而消费者在缓冲区为空时需要等待。</p>
+<p>互斥（锁机制）是不够解决这个问题的，因为 <strong> 生产者和消费者需要在某些条件下等待对方的操作完成 </strong>。因此，需要使用其他<strong> 同步机制 </strong> 来协调生产者和消费者的操作。</p>
+<h3 id="实现关键与实现方式">实现关键与实现方式</h3>
+<p>实现生产者 - 消费者问题的关键点（正确定要求）：</p>
+<ul>
+<li>在任何一个时刻，只能有一个线程操作缓冲区（互斥约束）；</li>
+<li>当缓冲区为空时，消费者必须等待生产者（调度，同步约束）；</li>
+<li>当缓冲区为满时，生产者必须等待消费者（调度，同步约束）。</li>
+</ul>
+<p>实现方式：上述每个约束使用一个单独的信号量：</p>
+<ul>
+<li>二进制信号量 <code>mutex</code>，初始化为 1，实现互斥访问；</li>
+<li>一般信号量 <code>emptySem</code>，初始化为 n，实现缓冲区空时的同步约束；</li>
+<li>一般信号量 <code>fullSem</code>，初始化为 0，实现缓冲区满时的同步约束。</li>
+</ul>
+<h3 id="实现代码">实现代码</h3>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">BoundedBuffer</span> &#123;</span><br><span class="line">    mutex = <span class="keyword">new</span> <span class="built_in">Semaphore</span>(<span class="number">1</span>);</span><br><span class="line">    emptySem = <span class="keyword">new</span> <span class="built_in">Semaphore</span>(n); <span class="comment">// 初始化时，空的程度为〇，每次消费数据后，空的程度提升</span></span><br><span class="line">    fullSem = <span class="keyword">new</span> <span class="built_in">Semaphore</span>(<span class="number">0</span>);  <span class="comment">// 初始化时，满的程度为〇，每次生产数据后，满的程度提升</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 生产者 添加数据</span></span><br><span class="line">BoundedBuffer::<span class="built_in">Deposit</span>(c) &#123;</span><br><span class="line">    emptySem-&gt;<span class="built_in">P</span>(); <span class="comment">// 生产前，空信号量减一</span></span><br><span class="line">    mutex-&gt;<span class="built_in">P</span>();</span><br><span class="line">    <span class="comment">// Add `c` to the buffer;</span></span><br><span class="line">    mutex-&gt;<span class="built_in">V</span>();</span><br><span class="line">    fullSem-&gt;<span class="built_in">V</span>(); <span class="comment">// 生产后，满信号量加一</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 消费者 取出数据</span></span><br><span class="line">BoundedBuffer::<span class="built_in">Remove</span>(c) &#123;</span><br><span class="line">    fullSem-&gt;<span class="built_in">P</span>(); <span class="comment">// 消费前，满信号量减一</span></span><br><span class="line">    mutex-&gt;<span class="built_in">P</span>();</span><br><span class="line">    <span class="comment">// Remove `c` from buffer; </span></span><br><span class="line">    mutex-&gt;<span class="built_in">V</span>();</span><br><span class="line">    emptySem-&gt;<span class="built_in">V</span>(); <span class="comment">// 消费后，空信号量加一</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>上述代码中，当生产者添加了 n 个数据后，缓冲区满。此时再想添加数据时，<code>emptySem</code> 会小于 0，需要等待。同样地，当消费者取出了一些数据后，缓冲区空。此时再想取出数据时，<code>fullSem</code> 会小于 0，需要等待。缓冲区不满、也不空时，可以互斥的添加或取出数据，无需等待。</p>
+<h1 id="信号量实现">信号量实现</h1>
+<p>使用硬件原语：</p>
+<ul>
+<li>禁用中断</li>
+<li>原子指令（Test-And-Set）</li>
+</ul>
+<p>类似锁：如禁用中断</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Semaphore</span> &#123;</span><br><span class="line">    <span class="type">int</span> sem;</span><br><span class="line">    WaitQueue q;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Semaphore::<span class="built_in">P</span>() &#123;</span><br><span class="line">    --sem;</span><br><span class="line">    <span class="keyword">if</span> (sem &lt; <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="comment">// Add this thread `t` to queue `q`;</span></span><br><span class="line">        <span class="built_in">block</span>(t);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Semaphore::<span class="built_in">V</span>() &#123;</span><br><span class="line">    ++sem;</span><br><span class="line">    <span class="keyword">if</span> (sem &lt;= <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="comment">// Remove a thread `t` from queue `q`;</span></span><br><span class="line">        <span class="built_in">wakeup</span>(t);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="管程（monitor）与条件变量">管程（monitor）与条件变量</h1>
+<h2 id="管程定义">管程定义</h2>
+<p>管程（monitor）是一种程序结构，结构内的多个子程序形成的多个工作线程互斥访问共享资源——这些共享资源一般是硬件或一群变量。管程实现了 <strong> 在一个时间点，最多只有一个线程在执行管程的某个子程序</strong>。与那些通过修改数据结构实现互斥访问的并发程序设计相比，管程实现很大程度上简化了程序设计。（来自 Wikipedia 的定义）</p>
+<p>管程的目的是：将互斥和条件同步的 <strong> 关注点分离 </strong> 开来。</p>
+<ul>
+<li>互斥指的是确保在同一时间只有一个进程可以访问共享资源，而条件同步指的是进程之间通过条件变量进行等待和唤醒的机制。</li>
+</ul>
+<blockquote>
+<p>关注点分离（Separation of Concerns, SoC）是将计算机程序分隔为不同部分的设计原则，每一部分会有各自的关注焦点。</p>
+</blockquote>
+<p>管程主要包含的两个组件：</p>
+<ul>
+<li>一个锁：用于指定临界区，实现对共享资源的互斥访问；</li>
+<li>零或多个条件变量：等待 / 通知信号量，用于管程并发访问共享数据。</li>
+</ul>
+<p>实现管程的一般方法包括 <strong> 收集相关共享数据和定义方法来访问这些共享数据</strong>：</p>
+<ul>
+<li>共享数据通常包括需要互斥访问的临界区和条件变量等。</li>
+<li>方法定义了对共享数据的操作，用于实现互斥访问和条件等待 / 通知的功能。</li>
+</ul>
+<p>通过将共享数据和操作封装在一个对象或模块中，可以有效地实现对并发访问的同步控制。</p>
+<blockquote>
+<p>概括之，管程包含一系列共享变量，以及针对这些变量的一系列操作函数（方法），这些变量和函数被封装在一个对象或模块中，便形成了管程的程序结构。</p>
+</blockquote>
+<h2 id="管程设计与实现">管程设计与实现</h2>
+<img src="../images/os-kernel/chapter10/monitor-arch.png" alt="管程结构" width="70%" height="70%">
+<p>如上图所示，多个线程都想进入管程访问共享资源，这就需要一个 entry queue 等待队列，等待获取管程的锁。当某个线程取得锁后，可以进入管程的临界区，并执行管程管理的一些列操作，如函数 <code>Wait(x)</code> 和 <code>Signal(x)</code>。但当在执行某一个操作时，函数可能对共享变量的需求得不到满足，<strong>这时线程会先释放锁 </strong>，并将自身挂到相应的条件变量关联的等待队列上，直到条件变量得到满足后，<strong> 重新获得锁</strong>，并执行相应的操作。</p>
+<p>为了完成上述动作，需要实现如下操作：</p>
+<p>锁 Lock：</p>
+<ul>
+<li><code>Lock::Acquire()</code>：等待…直到锁可用，然后抢占锁；</li>
+<li><code>Lock::Release()</code>：释放锁，唤醒等待者（若有）。</li>
+</ul>
+<p>条件变量 Condition variable：</p>
+<ul>
+<li>允许线程在等待状态下进入临界区，而且可以在某个时刻原子释放锁并进入睡眠。</li>
+<li><code>Wait()</code> 操作用于释放锁、进入睡眠并重新获得锁。</li>
+<li><code>Signal()</code>操作用于唤醒等待者（或者使用 <code>broadcast()</code> 操作唤醒所有等待者）。</li>
+</ul>
+<blockquote>
+<p>条件变量“允许线程在等待状态下（让其他线程）进入临界区”的意思是，当线程需要等待某个条件满足时，它可以调用条件变量的 <code>Wait()</code> 操作来暂时释放锁并进入等待状态。在等待期间，<strong>其他线程 </strong> 可以获得锁并访问临界区。当条件满足时，等待的线程会被唤醒，并重新获得锁，然后可以进入临界区执行相应的操作。</p>
+<p>这样做的好处是，在等待状态下，线程不会占用系统资源，同时其他线程有机会进入临界区执行任务，提高了系统的并发性能。当条件满足时，被唤醒的线程可以安全地继续执行，而不会出现竞争条件和数据不一致的问题。</p>
+</blockquote>
+<p><strong>条件变量的实现</strong>：</p>
+<ul>
+<li>需要维护每个条件队列；</li>
+<li>需要实现线程的条件等待 <code>Wait()</code> 和通知<code>Signal()</code>。</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Condition</span> &#123;</span><br><span class="line">    <span class="type">int</span> numWaiting = <span class="number">0</span>;</span><br><span class="line">    WaitQueue q;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Condition::<span class="built_in">Wait</span>(lock) &#123;</span><br><span class="line">    numWaiting++;</span><br><span class="line">    <span class="comment">// Add this thread `t` to `q`;</span></span><br><span class="line">    <span class="built_in">release</span>(lock);</span><br><span class="line">    <span class="built_in">schedule</span>(); <span class="comment">// 运行态 -&gt; 等待态 need mutex</span></span><br><span class="line">    <span class="built_in">require</span>(lock);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Condition::<span class="built_in">Signal</span>() &#123;</span><br><span class="line">    <span class="keyword">if</span> (numWaiting &gt; <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="comment">// Remove a thread `t` from `q`;</span></span><br><span class="line">        <span class="built_in">wakeup</span>(t); <span class="comment">// 等待态 -&gt; 就绪态 need mutex</span></span><br><span class="line">        numWaiting--;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>上面的 <code>Wait(lock)</code> 函数，为什么是先释放锁、再获取锁呢？</strong></p>
+<p>当在执行某一个操作时，函数可能对共享变量的需求得不到满足，<strong>这时线程会先释放锁，以便其它线程可以获取锁并执行</strong>。如果不释放锁，那所有线程都将无法获取锁，而持有锁的线程也无法满足条件继续执行并释放锁，最终会造成系统崩溃。</p>
+<h2 id="管程解决生产者 - 消费者问题">管程解决生产者 - 消费者问题</h2>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">BoundedBuffer</span> &#123;</span><br><span class="line">    ...</span><br><span class="line">    Lock lock;</span><br><span class="line">    <span class="type">int</span> count = <span class="number">0</span>; <span class="comment">// buffer 为空</span></span><br><span class="line">    Condition notFull, notEmpty;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">BoundedBuffer::<span class="built_in">Deposit</span>(c) &#123;</span><br><span class="line">    lock-&gt;<span class="built_in">Acquire</span>(); <span class="comment">// 管程的定义：只有一个线程能够进入管程，所以将锁放在函数的最开始和最末尾，而不像信号量那样紧贴着临界区</span></span><br><span class="line">    <span class="keyword">while</span> (count == n) &#123;</span><br><span class="line">        notFull.<span class="built_in">Wait</span>(&amp;lock); <span class="comment">// 内部释放刚刚获取的锁</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// Add `c` to the buffer;</span></span><br><span class="line">    count++;</span><br><span class="line">    notEmpty.<span class="built_in">Signal</span>();</span><br><span class="line">    lock-&gt;<span class="built_in">Release</span>();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">BoundedBuffer::<span class="built_in">Remove</span>(c) &#123;</span><br><span class="line">    lock-&gt;<span class="built_in">Acquire</span>();</span><br><span class="line">    <span class="keyword">while</span> (count == <span class="number">0</span>) &#123;</span><br><span class="line">        notEmpty.<span class="built_in">Wait</span>(&amp;lock);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// Remove `c` from buffer;</span></span><br><span class="line">    count--;</span><br><span class="line">    notFull.<span class="built_in">Signal</span>();</span><br><span class="line">    lock-&gt;<span class="built_in">Release</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p><code>Deposit(c)</code> 和 <code>Remove(c)</code> 中的 <code>while</code> 可以改成 <code>if</code> 吗？</p>
+</blockquote>
+<h2 id="管程条件变量的释放处理方式">管程条件变量的释放处理方式</h2>
+<p>把上面的 <code>Deposit(c)</code> 和 <code>Remove(c)</code> 分别看做下图中的线程 T1 和 T2，管程条件变量的释放后的处理方式有两种：Hoare-style 和 Hoare-style。</p>
+<img src="../images/os-kernel/chapter10/hansen-vs-hoare.png" alt="管程条件变量的释放处理方式" width="80%" height="80%">
+<p>Hansen-style 的<code>Deposit(c)</code>：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">Hansen_style::<span class="built_in">Deposit</span>(c) &#123;</span><br><span class="line">    lock-&gt;<span class="built_in">Acquire</span>();</span><br><span class="line">    <span class="keyword">while</span> (count == n) &#123; <span class="comment">// using `while` for Hansen-style</span></span><br><span class="line">        notFull.<span class="built_in">Wait</span>(&amp;lock);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// Add thing...</span></span><br><span class="line">    count++;</span><br><span class="line">    notEmpty.<span class="built_in">Signal</span>();</span><br><span class="line">    lock-&gt;<span class="built_in">Release</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Hansen-style 管程：条件变量的释放仅仅是一个提示、还需要 <strong> 重新检查 </strong> 条件，所以用 <code>while</code> 反复检查。</p>
+<p>Hoare-style 的<code>Deposit(c)</code>：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">Hoare_style::<span class="built_in">Deposit</span>(c) &#123;</span><br><span class="line">    lock-&gt;<span class="built_in">Acquire</span>();</span><br><span class="line">    <span class="keyword">if</span> (count == n) &#123; <span class="comment">// using `if` for Hoare-style</span></span><br><span class="line">        notFull.<span class="built_in">Wait</span>(&amp;lock);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// Add thing...</span></span><br><span class="line">    count++;</span><br><span class="line">    notEmpty.<span class="built_in">Signal</span>();</span><br><span class="line">    lock-&gt;<span class="built_in">Release</span>();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Hoare-style 管程：条件变量释放的同时表示放弃管程访问、释放后条件变量的状态可用，所以用 <code>if</code>。</p>
+<ul>
+<li>Hansen-style 管程：高效。</li>
+<li>Hoare-style 管程：低效。</li>
+</ul>
+<p>在 Hansen-style 管程中，使用 <code>while</code> 循环来防止虚假唤醒（spurious wakeups）。虚假唤醒指的是当一个线程被唤醒时，条件可能并没有满足，但唤醒仍然发生。因此，使用 <code>while</code> 循环来检查条件是否满足，如果条件不满足，则线程继续等待。<br>
+在 Hoare-style 管程中，使用 <code>if</code> 语句来等待条件满足。Hoare-style 管程假设条件变量的等待队列中只有满足条件的线程，因此使用 <code>if</code> 语句即可。虽然在 Hoare-style 管程中也可能发生虚假唤醒，但它并不对此进行特别处理。（由 GPT 生成）</p>
+<p>现在，这张图多了两种种并发编程的实现，即信号量和「锁 + 条件变量」的管程：<br>
+<img src="../images/os-kernel/chapter10/concurrent-summary.png" alt="多程序理念" width="80%" height="80%"></p>
+<blockquote>
+<p>参考资料：<br>
+1：<a target="_blank" rel="noopener" href="https://github.com/OXygenMoon/OperatingSystemInDepth">https://github.com/OXygenMoon/OperatingSystemInDepth</a><br>
+2：<a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_53407527/article/details/125207305">https://blog.csdn.net/weixin_53407527/article/details/125207305</a></p>
+</blockquote>
+
+</div>
+
+
+  <div class="book-comments">
+    
+
+
+
+
+  </div>
+
+
+
+<script src="/js/book-post.js"></script>
+
+
+            </div>
+          </div>
+          <div class="column col-2 hide-lg">
+            <div class="book-post-info">
+  
+    <div class="book-post-meta">
+
+  <div class="author">
+
+    <!-- Author image -->
+    <div class="author-img">
+      
+        <figure
+          class="avatar avatar-lg"
+          data-initial="A"
+          style="background-color: #3b4351;">
+        </figure>
+      
+    </div>
+
+    <!-- Author title -->
+    <div class="author-title">
+      <div>aha</div>
+      <div>2024-01-13</div>
+    </div>
+  </div>
+
+  
+    <div class="divider"></div>
+
+    <div class="link">
+      <a class="category-link" href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">操作系统</a> <a class="category-link" href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E4%BF%A1%E5%8F%B7%E9%87%8F/">信号量</a>
+
+      <a class="tag-none-link" href="/tags/%E4%BF%A1%E5%8F%B7%E9%87%8F/" rel="tag">#信号量</a> <a class="tag-none-link" href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" rel="tag">#操作系统</a> <a class="tag-none-link" href="/tags/%E7%AE%A1%E7%A8%8B/" rel="tag">#管程</a>
+    </div>
+    
+  
+
+  <div class="divider"></div>
+</div>
+  
+
+  <div class="book-tocbot">
+</div>
+<div class="book-tocbot-menu">
+  <a class="book-toc-expand" onclick="expand_toc()">Expand all</a>
+  <a onclick="go_top()">Back to top</a>
+  <a onclick="go_bottom()">Go to bottom</a>
+  <a onclick="toggleSearch()">Search in blogs</a> <!-- 添加搜索文字的点击事件 -->
+</div>
+
+<div id="search-overlay" class="search-overlay" style="display: none;"> <!-- 初始状态为隐藏 -->
+  <div class="search-box">
+    <input type="text" id="search-input" placeholder="Search in all blogs...">
+    <button onclick="closeSearch()">Close</button> <!-- 添加关闭按钮 -->
+    <div id="search-results" class="search-results"></div>
+  </div>
+</div>
+
+<script>
+  function performSearch(query) {
+    if (!query.trim()) {
+      return;
+    }
+
+    fetch('/search.xml')
+      .then(response => response.text())
+      .then(data => {
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(data, "text/xml");
+        const entries = xmlDoc.getElementsByTagName('entry');
+        let results = '';
+
+        for (let i = 0; i < entries.length; i++) {
+          const title = entries[i].getElementsByTagName('title')[0].textContent;
+          const content = entries[i].getElementsByTagName('content')[0].textContent;
+          const url = entries[i].getElementsByTagName('url')[0].textContent;
+
+          let count = (title.match(new RegExp(query, "gi")) || []).length; // 统计查询词出现的次数
+          count += (content.match(new RegExp(query, "gi")) || []).length;
+
+          if (count > 0) { // title.includes(query) || content.includes(query)
+            results += `
+              <div class="search-result-item">
+                <a href="${url}">${title}</a> (${count})
+              </div>`;
+          }
+        }
+
+        const searchResultsElement = document.getElementById('search-results');
+        searchResultsElement.innerHTML = results;
+        searchResultsElement.classList.add('active');
+      });
+  }
+
+  function toggleSearch() {
+    const searchOverlay = document.getElementById('search-overlay');
+    searchOverlay.style.display = searchOverlay.style.display === 'none' ? 'flex' : 'none';
+  }
+
+  function closeSearch() {
+    document.getElementById('search-overlay').style.display = 'none';
+  }
+
+  document.getElementById('search-input').addEventListener('input', function() {
+    const query = this.value;
+    performSearch(query);
+  });
+</script>
+
+<style>
+  .search-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  .search-box {
+    background: white;
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+    width: 80%;
+    max-width: 500px;
+  }
+
+  .search-results {
+    margin-top: 10px;
+    max-height: 300px;
+    overflow-y: auto;
+    background: white;
+    padding: 10px;
+    border-radius: 5px;
+    width: 100%;
+  }
+
+  .search-result-item {
+    margin: 10px 0;
+  }
+
+  .search-result-item a {
+    color: blue; /* 设置链接颜色为蓝色 */
+    text-decoration: none;
+  }
+
+  .search-result-item a:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+<script src="/js/book-toc.js"></script>
+
+
+</div>
+          </div>
+        </div>
+      </div>
+
+      <a class="off-canvas-overlay" onclick="hide_canvas()"></a>
+
+      <button class="floating-button" onclick="toggleDropdownMenu()"></button>
+
+      <div class="dropdown-menu">
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FFFFFF', '#000000')">银河白</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#C7EDCC', '#000000')">豆沙绿</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FAF9DE', '#000000')">杏仁黄</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#E3EDCD', '#000000')">青草绿</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FFF2E2', '#000000')">秋叶褐</div>
+      </div>
+  </div>
+
+  <script>
+    function toggleDropdownMenu() {
+      document.querySelector('.floating-button').classList.toggle('active');
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      var storedBackgroundColor = localStorage.getItem('blogBackgroundColor');
+      var storedColor = localStorage.getItem('blogColor');
+
+      if (storedBackgroundColor && storedColor) {
+        document.body.style.backgroundColor = storedBackgroundColor;
+        document.body.style.color = storedColor;
+      }
+    });
+
+    function changeBackgroundColor(backgroundColor, color) {
+      document.body.style.backgroundColor = backgroundColor;
+      document.body.style.color = color;
+
+      localStorage.setItem('blogBackgroundColor', backgroundColor);
+      localStorage.setItem('blogColor', color);
+
+      document.querySelector('.floating-button').classList.remove('active');
+    }
+  </script>
+</body>
+
+</html>
+
+
+<script src="/js/book.js"></script>

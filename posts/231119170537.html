@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
+
+    
+      <link rel="icon" href="/favicon.png" />
+    
+
+    <title>
+        
+          操作系统之 chapter4.2 非连续内存分配之页表 - aha&#39;s book
+        
+    </title>
+
+    <!-- Spectre.css framework -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre-exp.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre-icons.min.css">
+
+    <!-- theme css & js -->
+    
+<link rel="stylesheet" href="/css/book.css">
+
+    
+<script src="/js/book.js"></script>
+
+
+    <!-- tocbot -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.css">
+    
+    <!-- katex -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/zooming/2.1.1/zooming.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const zooming = new Zooming()
+    zooming.listen('.book-content img')
+})
+</script>
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+    <style>
+      body {
+        background-color: #FFFFFF;
+        /* color: #000000; */
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+
+      /* Floating Button Styles */
+      .floating-button {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 999;
+        background-color: #000000;
+        color: #ffffff;
+        padding: 12px;
+        border-radius: 50%;
+        cursor: pointer;
+        border: 2px solid #000000;
+      }
+
+      .floating-button:hover {
+        background-color: #FFFFFF;
+      }
+
+      /* Dropdown Menu Styles */
+      .dropdown-menu {
+        position: fixed;
+        bottom: 60px;
+        right: 10px;
+        display: none;
+        min-width: 60px;
+        padding: 2px;
+        background-color: #fff;
+        /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
+        z-index: 1000;
+      }
+
+      .floating-button.active+.dropdown-menu {
+        display: block;
+      }
+
+      .dropdown-item {
+        display: block;
+        padding: 8px 16px;
+        cursor: pointer;
+      }
+
+      .dropdown-item:hover {
+        background-color: #f5f5f5;
+      }
+    </style>
+<style>.darkmode--activated{--body-bg-color:#282828;--content-bg-color:#333;--card-bg-color:#555;--text-color:#ccc;--blockquote-color:#bbb;--link-color:#ccc;--link-hover-color:#eee;--brand-color:#ddd;--brand-hover-color:#ddd;--table-row-odd-bg-color:#282828;--table-row-hover-bg-color:#363636;--menu-item-bg-color:#555;--btn-default-bg:#222;--btn-default-color:#ccc;--btn-default-border-color:#555;--btn-default-hover-bg:#666;--btn-default-hover-color:#ccc;--btn-default-hover-border-color:#666;--highlight-background:#282b2e;--highlight-foreground:#a9b7c6;--highlight-gutter-background:#34393d;--highlight-gutter-foreground:#9ca9b6}.darkmode--activated img{opacity:.75}.darkmode--activated img:hover{opacity:.9}.darkmode--activated code{color:#69dbdc;background:0 0}button.darkmode-toggle{z-index:9999}.darkmode-ignore,img{display:flex!important}.beian img{display:inline-block!important}</style></head>
+
+<body>
+  <div class="book-container">
+    <div class="book-sidebar">
+      <div class="book-brand">
+  <a href="/">
+    <img src="/favicon.png">
+    <span>AHA&#39;S BOOK</span>
+  </a>
+</div>
+        <div id="menu" class="book-menu hide">
+  <h2 id="基础知识"> 基础知识 </h2>
+<ul>
+<li><a href="/posts/231010144856.html"> 模运算 </a></li>
+<li><a href="/posts/231014105311.html"> 异或运算 </a></li>
+<li><a href="/posts/231210181853.html"> 计算机中的寄存器 </a></li>
+<li><a href="/posts/231213183051.html"> 正则表达式基础 </a></li>
+</ul>
+<h2 id="C 语言">C 语言 </h2>
+<ul>
+<li><a href="/posts/230916171929.html">main 函数参数 </a></li>
+<li><a href="/posts/231214192113.html"> 关键字与专有名词 </a></li>
+<li><a href="/posts/240103180653.html"> 输出打印函数 </a></li>
+<li><a href="/posts/230922143003.html"> 多维数组 </a></li>
+<li><a href="/posts/230913200729.html">const 关键字 </a></li>
+<li><a href="/posts/230918174223.html">typedef 类型基础 </a></li>
+<li><a href="/posts/230920172849.html">typedef 类型实践 </a></li>
+<li><a href="/posts/240224193217.html"> 二级指针 </a></li>
+<li><a href="/posts/240307195203.html"> 代码 TOP-K 问题 </a></li>
+<li><a href="/posts/230922172626.html">uthash 哈希表基础 </a></li>
+<li><a href="/posts/230918114841.html"> 大小端知识 </a></li>
+</ul>
+<h2 id="Golang 语言">Golang 语言 </h2>
+<ul>
+<li><a href="/posts/230907162612.html"> 变量与常量 </a></li>
+<li><a href="/posts/230909120145.html"> 函数 &amp; 包 &amp; 判断 &amp; 循环 </a></li>
+<li><a href="/posts/230912152800.html"> 数组与切片 </a></li>
+<li><a href="/posts/230913161326.html"> 可变参数函数与 Map 集合 </a></li>
+<li><a href="/posts/230915155105.html"> 字符串和指针 </a></li>
+</ul>
+<h2 id="数据结构"> 数据结构 </h2>
+<ul>
+<li><a href="/posts/231007174854.html"> 链表（数组实现）</a></li>
+<li><a href="/posts/231008213450.html"> 链表（链式实现）</a></li>
+<li><a href="/posts/231016161508.html"> 堆栈（数组实现）</a></li>
+<li><a href="/posts/231016184406.html"> 堆栈（链表实现）</a></li>
+<li><a href="/posts/231127185207.html"> 单调栈 </a></li>
+<li><a href="/posts/231017105123.html"> 队列（链表实现）</a></li>
+<li><a href="/posts/231017154121.html"> 双端队列（链表实现）</a></li>
+<li><a href="/posts/231018102559.html"> 堆基础与堆结构（数组实现）</a></li>
+<li><a href="/posts/231019102311.html"> 优先队列（堆实现）</a></li>
+<li><a href="/posts/230905224335.html"> 二叉树的遍历 </a></li>
+<li><a href="/posts/231020174358.html"> 二叉搜索树 </a></li>
+<li><a href="/posts/230916094606.html"> 拓扑排序 </a></li>
+<li><a href="/posts/230925185057.html">Trie 字典树 </a></li>
+<li><a href="/posts/231023164532.html"> 并查集（数组实现）</a></li>
+<li><a href="/posts/240702200642.html">Linux 数据结构之队列 </a></li>
+</ul>
+<h2 id="数据结构算法"> 数据结构算法 </h2>
+<ul>
+<li><a href="/posts/231218181635.html"> 归并排序 </a></li>
+<li><a href="/posts/231108163339.html"> 快速排序 </a></li>
+<li><a href="/posts/231107171607.html"> 堆排序 </a></li>
+<li><a href="/posts/231124181658.html"> 二分查找 </a></li>
+<li><a href="/posts/231227190828.html"> 哈希表实现 </a></li>
+<li><a href="/posts/240313193201.html"> 字符串哈希函数 </a></li>
+<li><a href="/posts/231116150205.html">Floyd 多源最短路径 </a></li>
+<li><a href="/posts/231117095232.html">Dijkstra 单源最短路径（原理部分）</a></li>
+<li><a href="/posts/231121152713.html">Dijkstra 单源最短路径（实现部分）</a></li>
+</ul>
+<h2 id="数据库"> 数据库 </h2>
+<ul>
+<li><a href="/posts/250605180332.html">MySQL 基础 </a></li>
+</ul>
+<h2 id="计算机网络"> 计算机网络 </h2>
+<ul>
+<li><a href="/posts/231011192359.html">OSI 参考模型 </a></li>
+<li><a href="/posts/240329202000.html"> 计网 CyC2018 之概述 </a></li>
+<li><a href="/posts/240329202004.html"> 计网 CyC2018 之链路层 </a></li>
+<li><a href="/posts/240329202003.html"> 计网 CyC2018 之网络层 </a></li>
+<li><a href="/posts/240329202002.html"> 计网 CyC2018 之传输层 </a></li>
+<li><a href="/posts/240329202001.html"> 计网 CyC2018 之应用层 </a></li>
+<li><a href="/posts/240306203742.html">ACL 访问控制列表 </a></li>
+<li><a href="/posts/240130190208.html"> 路由表、转发表与快速转发工作原理 </a></li>
+<li><a href="/posts/231221200716.html">VXLAN 网络虚拟化技术 </a></li>
+<li><a href="/posts/240903191243.html">TCP/IP checksum 计算 </a></li>
+<li><a href="/posts/240911185603.html"> 抓包分析 TCP 三次握手与四次挥手过程 </a></li>
+</ul>
+<h2 id="操作系统"> 操作系统 </h2>
+<ul>
+<li><a href="/posts/230921190726.html"> 概述 </a></li>
+<li><a href="/posts/230924172528.html"> 中断 &amp; 异常 &amp; 系统调用 </a></li>
+<li><a href="/posts/231017195157.html"> 内存分层体系与地址空间生成 </a></li>
+<li><a href="/posts/231108195351.html"> 连续内存分配 </a></li>
+<li><a href="/posts/231111172507.html"> 非连续内存分配之分段与分页 </a></li>
+<li><a href="/posts/231119170537.html"> 非连续内存分配之页表 </a></li>
+<li><a href="/posts/231123184526.html"> 内存管理之覆盖技术与交换技术 </a></li>
+<li><a href="/posts/231127193658.html"> 内存管理之虚存技术 </a></li>
+<li><a href="/posts/231129182631.html"> 局部页面置换算法 </a></li>
+<li><a href="/posts/231207184239.html"> 全局页面置换算法 </a></li>
+<li><a href="/posts/231207204958.html"> 进程描述 </a></li>
+<li><a href="/posts/231210211306.html"> 进程状态 </a></li>
+<li><a href="/posts/231215213932.html"> 线程 </a></li>
+<li><a href="/posts/231218220813.html"> 进程控制 </a></li>
+<li><a href="/posts/231228193143.html"> 调度 </a></li>
+<li><a href="/posts/240104202828.html"> 同步与互斥 </a></li>
+<li><a href="/posts/240113115605.html"> 信号量与管程 </a></li>
+<li><a href="/posts/240205182643.html"> 经典同步问题 </a></li>
+<li><a href="/posts/240310162231.html"> 死锁 </a></li>
+</ul>
+<h2 id="系统与网络编程"> 系统与网络编程 </h2>
+<ul>
+<li><a href="/posts/230911151334.html">pthread 库 </a></li>
+<li><a href="/posts/230921094127.html"> 锁与原子操作 </a></li>
+<li><a href="/posts/240319195609.html"> 读者写者问题 </a></li>
+<li><a href="/posts/240527200241.html"> 网络编程卷一阅读随笔 </a></li>
+<li><a href="/posts/240414190410.html"> 进程间通信 IPC 机制 </a></li>
+<li><a href="/posts/240424200123.html"> 多进程相关练习 </a></li>
+<li><a href="/posts/240516221527.html">I/O 模式与 I/O 多路复用 </a></li>
+<li><a href="/posts/240626192803.html">Linux 内核 kfifo 环形队列 </a></li>
+<li><a href="/posts/241009203126.html">Linux 内核等待队列 </a></li>
+<li><a href="/posts/240627210637.html">DPDK 无锁环形队列 </a></li>
+<li><a href="/posts/240919200410.html"> 解密内存屏障 </a></li>
+<li><a href="/posts/240927202500.html"> 内核线程的创建 </a></li>
+<li><a href="/posts/241015195205.html">Linux 网络数据包接收过程 </a></li>
+<li><a href="/posts/2410232111015.html"> 源码解读 epoll 实现原理 </a></li>
+<li><a href="/posts/241106182619.html">Linux 文件系统 </a></li>
+<li><a href="/posts/250619154429.html">Libevent 高性能 IO 事件驱动库 </a></li>
+</ul>
+<h2 id="工具与命令"> 工具与命令 </h2>
+<ul>
+<li><a href="/posts/240207180410.html">GCC 编译过程分解 </a></li>
+<li><a href="/posts/240312184132.html">GDB 调试入门 </a></li>
+<li><a href="/posts/240512184921.html">Makefile 学习 </a></li>
+<li><a href="/posts/250629214430.html">CMake 学习 </a></li>
+<li><a href="/posts/240417193754.html">Linux 命令之文件权限 </a></li>
+</ul>
+<h2 id="开源项目"> 开源项目 </h2>
+<ul>
+<li><a href="/posts/240303201855.html"> 线程池原理与实现 </a></li>
+<li><a href="/posts/240507194549.html">HTTP 服务器实现 </a></li>
+<li><a href="/posts/240904203605.html"> 聊天服务器实现 </a></li>
+<li><a href="/posts/241119182636.html">Linux 文件系统 </a></li>
+</ul>
+<h2 id="Docker">Docker</h2>
+<ul>
+<li><a href="/posts/230909171809.html">Docker 学习笔记 </a></li>
+</ul>
+<h1 id="LeetCode 刷题">LeetCode 刷题 </h1>
+<h2 id="链表相关"> 链表相关 </h2>
+<ul>
+<li><a href="/posts/231025143947.html">160 相交链表 </a></li>
+<li><a href="/posts/231025185947.html">206 反转链表 </a></li>
+<li><a href="/posts/231026101239.html">21 合并两个有序链表 </a></li>
+<li><a href="/posts/231026184514.html">83 删除排序链表中的重复元素 </a></li>
+<li><a href="/posts/231027150243.html">19 删除链表的倒数第 N 个节点 </a></li>
+<li><a href="/posts/231031120718.html">2 两数相加 </a></li>
+<li><a href="/posts/231031163133.html">445 两数相加 II</a></li>
+<li><a href="/posts/231101094219.html">234 回文链表 </a></li>
+<li><a href="/posts/231101135228.html">725 分隔链表 </a></li>
+<li><a href="/posts/231102120708.html">328 奇偶链表 </a></li>
+<li><a href="/posts/231102165703.html">142 环形链表 II</a></li>
+</ul>
+<h2 id="设计"> 设计 </h2>
+<ul>
+<li><a href="/posts/231201184542.html">146 LRU 缓存 </a></li>
+</ul>
+<h2 id="贪心算法"> 贪心算法 </h2>
+<ul>
+<li><a href="/posts/231107094652.html">1029 两地调度 </a></li>
+<li><a href="/posts/231109150855.html">435 无重叠区间 </a></li>
+</ul>
+<h2 id="哈希表"> 哈希表 </h2>
+<ul>
+<li><a href="/posts/231123181539.html">1410 实体解析器 </a></li>
+</ul>
+<h2 id="树的遍历"> 树的遍历 </h2>
+<ul>
+<li><a href="/posts/231103121209.html">117 填充每个节点的下一个右侧节点指针 II</a></li>
+</ul>
+<h2 id="深度优先搜索（递归）"> 深度优先搜索（递归）</h2>
+<ul>
+<li><a href="/posts/231206201243.html">2477 达到首都的最少油耗 </a></li>
+</ul>
+<h2 id="图或路径问题"> 图或路径问题 </h2>
+<ul>
+<li><a href="/posts/231211184652.html">1631 最小体力消耗路径 </a></li>
+</ul>
+<h2 id="其它"> 其它 </h2>
+<ul>
+<li><a href="/posts/230101120000.html"> 备忘录 </a></li>
+</ul>
+
+</div>
+
+
+<script src="/js/book-menu.js"></script>
+
+    </div>
+    <div class="sidebar-toggle" onclick="sidebar_toggle()" onmouseover="add_inner()" onmouseleave="remove_inner()">
+  <div class="sidebar-toggle-inner"></div>
+</div>
+
+<script>
+function add_inner() {
+  let inner = document.querySelector('.sidebar-toggle-inner')
+  inner.classList.add('show')  
+}
+
+function remove_inner() {
+  let inner = document.querySelector('.sidebar-toggle-inner')
+  inner.classList.remove('show')
+}
+
+function sidebar_toggle() {
+    let sidebar_toggle = document.querySelector('.sidebar-toggle')
+    let sidebar = document.querySelector('.book-sidebar')
+    let content = document.querySelector('.off-canvas-content')
+    if (sidebar_toggle.classList.contains('extend')) { // show
+        sidebar_toggle.classList.remove('extend')
+        sidebar.classList.remove('hide')
+        content.classList.remove('extend')
+    }
+    else { // hide
+        sidebar_toggle.classList.add('extend')
+        sidebar.classList.add('hide')
+        content.classList.add('extend')
+    }
+}
+</script>
+
+      <div class="off-canvas-content">
+        <div class="columns">
+          <div class="column col-10 col-lg-12">
+            <div class="book-navbar">
+              <!-- For Responsive Layout -->
+
+<header class="navbar">
+  <section class="navbar-section">
+    <a onclick="open_sidebar()">
+      <i class="icon icon-menu"></i>
+    </a>
+  </section>
+</header>
+
+            </div>
+            <div class="book-content">
+              <div class="book-post">
+  <p><a href="https://pursue26.github.io/posts/231111172507.html">操作系统之 chapter4.1 非连续内存分配之分段与分页 </a> 介绍了非连续内存的分段与分页技术。那么，如何才能有效的实现逻辑地址到物理地址的转换机制呢？那就是通过页表。本文将介绍页表、快表 TLB、二级 &amp; 多级页表和反向页表，你将学习到如何进行地址转换，以及如何进一步高效的进行地址转换。</p>
+<span id="more"></span>
+<h2 id="页表">页表</h2>
+<h3 id="页表概述">页表概述</h3>
+<p>页表是操作系统中用于管理虚拟内存和物理内存之间 <strong> 映射关系 </strong> 的数据结构。它记录了虚拟地址和物理地址之间的对应关系，使得程序可以使用虚拟地址来访问物理内存，而无需关注具体的物理内存地址。</p>
+<p>每一个运行的程序都有一个独立的页表：</p>
+<ul>
+<li>页表属于程序运行状态，会动态变化</li>
+<li>PTBR（Page Table Base Register）：页表基址寄存器，用于存储页表的基地址，以指示当前使用的页表位置。</li>
+</ul>
+<h3 id="页表结构">页表结构</h3>
+<p>页表其实就是一个大数组，它的索引 index 指的是 page-number（页号），索引对应的内容是 frame−number（帧号）。得到帧号后，再叠加上 offset（页帧内偏移）即可得到物理地址。</p>
+<img src="/images/os-kernel/chapter4/page-table.png" alt="页表结构" width="80%" height="80%">
+<p>页表中还有一些特殊标志位：</p>
+<ul>
+<li>dirty bit，脏位</li>
+<li>resident bit，表示这个页表项是否合法（对应的物理地址中是否存在），0- 不存在，1- 存在</li>
+<li>clock/reference bit，时钟 / 参考位</li>
+</ul>
+<p><strong>上图中 PTBR 的作用</strong>？</p>
+<p>当程序访问虚拟内存时，CPU 会将虚拟地址发送给内存管理单元（MMU），MMU 根据页表进行地址转换。在这个过程中，CPU 会读取 PTBR 寄存器中的值，以确定当前使用的页表的位置。通过 <strong> 将虚拟地址的高位（即虚拟页号部分）与页表基地址相加，CPU 可以找到相应的表项，并进行地址转换</strong>，获取虚拟地址对应的物理地址。</p>
+<blockquote>
+<p>PTBR 的值通常在操作系统进行上下文切换时被修改，以切换不同的页表。这样，不同的进程可以拥有独立的页表，实现虚拟内存的隔离和保护。通过修改 PTBR，操作系统可以控制不同进程之间的地址空间映射关系，从而实现多进程共享物理内存的管理。</p>
+</blockquote>
+<h3 id="地址转换实例">地址转换实例</h3>
+<p>具有 16 位地址的系统，具有：</p>
+<ul>
+<li>每页 1024 bytes，占用 10 位；帧号占用 6 位</li>
+<li>物理内存大小为 2^6 * 1024 bytes = 64KB （图中应是 64KB）</li>
+</ul>
+<img src="/images/os-kernel/chapter4/address-translation.png" alt="地址转换实例" width="80%" height="80%">
+<p>从图中可以了解到：</p>
+<ul>
+<li>
+<p>对于二元组为 <code>(4, 0)</code> 的逻辑地址空间，它在页表中对应 <code>index = 4</code> 的那个页表项。可以看出，它对应的 resident bit 位的值为 0，表明这个页表项对应的物理地址不存在。这时请求访问物理内存，可能会造成 <strong> 内存访问异常（可能要杀死程序）</strong>。</p>
+</li>
+<li>
+<p>对于二元组为 <code>(3, 1023)</code> 的逻辑地址空间，它在页表中对应 <code>index = 3</code> 的那个页表项。可以看出，它对应的 resident bit 位的值为 1，表明这个页表项对应的物理地址存在，对应的页帧号的二进制表示为 <code>00100</code>，则对应的物理内存地址为 <code>(4, 1023)</code> ，即 4x1024+1023=5119。</p>
+</li>
+</ul>
+<h3 id="分页机制的性能问题">分页机制的性能问题</h3>
+<p>进程访问一次内存单元，需要 2 次内存访问：</p>
+<ul>
+<li>一次用于获取页表项（通过页号查表获取页帧号）。</li>
+<li>一次用于访问数据（访问物理内存的数据）。</li>
+</ul>
+<p>页表可能非常大：</p>
+<ul>
+<li>64 位的机器，如果每页 1024 字节，那么一个页表的大小是多少（有多少个页号）？
+<ul>
+<li><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>2</mn><mn>64</mn></msup><mi mathvariant="normal">/</mi><msup><mn>2</mn><mn>10</mn></msup><mo>=</mo><msup><mn>2</mn><mn>54</mn></msup></mrow><annotation encoding="application/x-tex">2^{64} / 2^{10} = 2^{54}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.064108em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">6</span><span class="mord mtight">4</span></span></span></span></span></span></span></span></span><span class="mord">/</span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span><span class="mord mtight">0</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.8141079999999999em;vertical-align:0em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">5</span><span class="mord mtight">4</span></span></span></span></span></span></span></span></span></span></span></span>，这么大的页表，在内存中是放不下的。</li>
+</ul>
+</li>
+<li>每一个运行的程序都需要有一个页表。</li>
+</ul>
+<p>如何处理？</p>
+<ul>
+<li>缓存（Caching）：使用 CPU 内部的 TLB（使用相关存储器，可以进行并发的、高速的查询）。</li>
+<li>间接（Indirection）访问：使用二级页表、多级页表。</li>
+</ul>
+<h2 id="快表（TLB）——解决时间问题">快表（TLB）——解决时间问题</h2>
+<p>转换后备缓冲区（Translation Look-aside Buffer, TLB）是一种高速缓存，也叫快表，<strong>用于加快虚拟地址到物理地址的转换过程 </strong>。它是页表的一部分，<strong> 用于存储最近使用的虚拟页与物理页的映射关系，以减少对页表的访问次数，提高地址转换的效率</strong>。</p>
+<img src="/images/os-kernel/chapter4/cpu-tlb.png" alt="快表" width="80%" height="80%">
+<p>TLB 缓存近期访问的页帧转换表项：</p>
+<ul>
+<li>TLB 是一个小而快速的硬件缓存，使用关联内存（associative memory）实现，具备快速访问性能。每个 TLB 条目包含一个虚拟页号（VPN）和对应的物理页号（PPN），以及一些其他用于管理的标志位，如访问权限、脏位等。</li>
+<li>如果 TLB 命中，物理页号可以很快被获取。</li>
+<li>如果 TLB 未命中、缺失（TLB miss），对应的表项被更新到 TLB 中（该动作在 x86 的 CPU 中由硬件实现，其他的可能是由操作系统实现）。</li>
+</ul>
+<blockquote>
+<p>当程序访问一个虚拟地址时，CPU 首先在 TLB 中查找对应的虚拟页号。如果找到了匹配的 TLB 条目，就可以直接从 TLB 中获取对应的物理页帧号，然后进行内存访问，无需访问页表。这个过程称为 TLB 命中。</p>
+</blockquote>
+<p>TLB 缺失会不会很频繁呢？</p>
+<p>不会的。假如 32 位的系统，每页的大小为 4K 字节，如果该页的每一个地址都访问一次的话，需要 4K 次才会造成一次 TLB 缺失——因为从当前页首访问到当前页尾，下次访问时会是不同的逻辑页号，这个页号可能不在 TLB 表中。（这是假设情况，实际中 TLB 缺失的频率取决于许多因素，无法简单地通过每页的大小和访问次数来确定 TLB 缺失的频率）</p>
+<h2 id="二级 - 多级页表——解决空间问题">二级 &amp; 多级页表——解决空间问题</h2>
+<p>二级 &amp; 多级页表利用时间换空间，来解决页表的空间问题。</p>
+<p>二级页表：</p>
+<ol>
+<li>将页号分为两个部分、页表分为两个，一级页号对应一级页表，二级页号对应二级页表；</li>
+<li>一级页号查表获得在二级页表的起始地址，地址加上二级页号的值，在二级页表中获得帧号。</li>
+</ol>
+<p>二级页表节约了一定的空间 —— 在一级页表中如果 <code>resident bit=0</code>，则在二级页表中 <strong> 不存储 </strong> 相关 <code>index</code>，而只有一张页表的话，这一些 <code>index</code> 都需要保留。</p>
+<img src="/images/os-kernel/chapter4/secondary-page-table.png" alt="二级页表" width="80%" height="80%">
+<blockquote>
+<p>二级页表就像是目录的目录，先找到一级目录，再在一级目录内找到二级目录。</p>
+</blockquote>
+<p>多级页表：</p>
+<ul>
+<li>通过把页号分为 <code>k</code> 个部分，来实现多级间接页表，建立一棵「页表树」。</li>
+</ul>
+<img src="/images/os-kernel/chapter4/multi-page-table.png" alt="多级页表" width="80%" height="80%">
+<blockquote>
+<p>多级页表就像是目录的目录的目录…</p>
+</blockquote>
+<h2 id="反向页表">反向页表</h2>
+<p>有没有一种方法使得页表的大小与逻辑地址大小没有那么大的关系，尽量与物理地址大小建立对应关系？——反向页表</p>
+<h3 id="什么是反向页表">什么是反向页表</h3>
+<p>在操作系统中，反向页表（Inverted Page Table）是一种用于虚拟内存管理的数据结构。与传统的页表不同，<strong>传统的页表将虚拟页号映射到物理页帧号，而反向页表将物理页帧号映射到虚拟页号</strong>。</p>
+<h3 id="反向页表的目的">反向页表的目的</h3>
+<p>反向页表的目的是 <strong> 为了解决大型内存系统（地址的寻址空间非常大）中的页表大小太大（占用内存空间太大）和访问效率的问题</strong>。</p>
+<h4 id="传统页表和多级页表的弊端">传统页表和多级页表的弊端</h4>
+<p><strong>传统页表</strong>：<br>
+在传统的页表中，每个进程都有自己的页表，而随着进程数量的增加和每个进程的逻辑地址空间的增大，页表的大小也会急剧增加。这样会导致内存开销大，并且访问页表的时间也会增加。</p>
+<p><strong>多级页表</strong>：<br>
+在大型内存系统（64-bits 系统）中，前向映射页表变得繁琐，比如：使用了 5 级页表。</p>
+<h4 id="反向页表的优势">反向页表的优势</h4>
+<p>在传统的页表中，每个进程都有自己的页表。而 <strong> 反向页表只有一张，它只需要为系统中的每个物理页帧分配一个表项，每个表项记录了该物理页帧所属的进程号（PID）和虚拟页号 </strong>。当进行地址转换时，<em> 操作系统只需通过物理页帧号查找反向页表，即可得到对应的进程号和虚拟页号</em>。这样就避免了每个进程都拥有一个独立的页表，大大减少了页表的大小。</p>
+<p>也就是，<strong>反向页表的大小只跟物理地址空间的大小相对应，而与快速增长的虚拟地址空间的大小无关</strong>。</p>
+<blockquote>
+<p><em>操作系统只需通过物理页帧号查找反向页表，即可得到对应的进程号和虚拟页号</em>：（个人理解）只要遍历查找的虚拟页号和进程号，跟当前的进程的 PID 和虚拟页号匹配上了，那么就可以使用这个物理页帧号来获取对应的物理内存，并访问数据了。</p>
+</blockquote>
+<h3 id="基于页寄存器（Page-Registers）的方案">基于页寄存器（Page Registers）的方案</h3>
+<h4 id="方案">方案</h4>
+<p>页表中存储（页帧号，页号），使得页表大小与物理内存大小相关，而与逻辑内存关联减小。</p>
+<img src="/images/os-kernel/chapter4/page-registers.png" alt="基于页寄存器的方案" width="80%" height="80%">
+<p>每一个页帧和一个页寄存器关联，寄存器内容包括：</p>
+<ul>
+<li>使用位（resident bit）：此帧是否被进程占用</li>
+<li>占用页号（occupier）：对应的页号 p</li>
+<li>保护位（protection bits）：保护位</li>
+</ul>
+<h4 id="页寄存器空间占比">页寄存器空间占比</h4>
+<p>有如下一个操作系统：</p>
+<ul>
+<li>页面大小：4096 bytes = 4KB</li>
+<li>页帧数：4096 = 4K</li>
+<li>物理内存大小：4096 * 4096 bytes = 4K * 4KB = 16MB</li>
+</ul>
+<p>则页寄存器使用的空间（假设 8 bytes/register）：8 bytes * 4096 = 32KB</p>
+<ul>
+<li>每一个页帧和一个页寄存器关联——页寄存器使用的空间即页表中所有页帧号对应页的页寄存器空间</li>
+<li>页寄存器带来的额外内存开销占比：32KB / 16MB = 0.195%</li>
+<li>虚拟内存大小：任意</li>
+</ul>
+<h4 id="优势">优势</h4>
+<p>从上面的示例可以看出，基于页寄存器的方案有如下优势：</p>
+<ul>
+<li>转换表的大小相对于物理内存来说很小</li>
+<li>转换表的大小跟逻辑地址空间的大小无关</li>
+</ul>
+<h4 id="劣势">劣势</h4>
+<p>需要的信息对调了，即根据帧号可以找到页号。如何转换回来（如何根据页号找到页帧号）？</p>
+<p>答：<strong>需要在反向页表中搜索想要的页号，才能得到对应的页帧号</strong>。</p>
+<h3 id="基于关联内存（associative-memory）的方案">基于关联内存（associative memory）的方案</h3>
+<p>就是在前面 TLB 中提到的相关存储器，并发的、高速的查询，效率很快。</p>
+<p>该方案在设计上，页表中存储（页帧号，页号），而不是像 TLB 中存储（页号，页帧号）。</p>
+<h4 id="劣势 -v2">劣势</h4>
+<p>硬件设计太复杂，容量不可能做大，需要放置在 CPU 中。</p>
+<p>在反向页表中搜索一个页对应的页帧号：</p>
+<ul>
+<li>如果帧数较少，页寄存器可以被放在关联内存中。</li>
+<li>在关联内存中查找逻辑页号：
+<ul>
+<li>成功：页帧号被提取</li>
+<li>失败：页错误异常（page fault）</li>
+</ul>
+</li>
+<li>限制因素，大量的关联存储非常昂贵
+<ul>
+<li>难以在单个时钟周期内完成</li>
+<li>耗电</li>
+</ul>
+</li>
+</ul>
+<h3 id="基于哈希（hash）的方案">基于哈希（hash）的方案</h3>
+<p>基于哈希的方案可以有效缓解页帧号 - 页号的映射的开销，需要硬件帮助，但会出现哈希冲突。哈希冲突是指不同的页号可能映射到相同的页帧号，这会导致冲突和错误的映射。</p>
+<h4 id="方案 -v2">方案</h4>
+<p>在基于哈希的反向页表中，为了解决哈希冲突，可以利用进程的 <code>PID</code>，在哈希函数的基础上再加一个 <code>PID</code> 参数，标记当前运行程序的编号，根据 <code>hash(PID, p)</code> 哈希函数，算出当前进程的页号所对应的页帧号。</p>
+<img src="/images/os-kernel/chapter4/hash-reverse-page-table.png" alt="基于哈希的方案" width="80%" height="80%">
+<h4 id="映射过程">映射过程</h4>
+<p>基于哈希的反向页表解决哈希冲突示意图（图中 vpn 表示虚拟页号，ppn 表示物理页帧号）：<br>
+<img src="/images/os-kernel/chapter4/hash-reverse-page-table-hash-collisions.png" alt="基于哈希的反向页表解决哈希冲突" width="80%" height="80%"></p>
+<p>上图为基于哈希的反向页表解决哈希冲突，并搜索一个页对应的页帧号的过程，可以按照以下步骤进行：</p>
+<ol>
+<li>
+<p>对 <code>PID</code> 和页号做哈希计算 <code>hash(PID, p)</code>，并使用它作为页寄存器表的索引，获取对应的页寄存器内容。</p>
+<ul>
+<li>如果寄存器表项中包含 <code>p</code> 和 <code>PID</code>，则搜索成功，索引号就是页帧号；</li>
+<li>如果寄存器表项中不包含 <code>p</code> 和 <code>PID</code>，说明存在哈希冲突。</li>
+</ul>
+</li>
+<li>
+<p>如果存在哈希冲突：</p>
+<ul>
+<li>在表项中寻找 <code>next</code> 提供的页寄存器索引，通过该索引，重复步骤 1，直到寄存器表项中包含 <code>p</code> 和 <code>PID</code> 为止。</li>
+</ul>
+</li>
+<li>
+<p>获取页帧号后，根据页帧号和页内偏移可以计算出虚拟地址映射的物理地址，并进行数据访问。</p>
+</li>
+</ol>
+<blockquote>
+<p>这样，即使存在哈希冲突，不同的进程会根据不同的 <code>PID</code> 选择不同的页帧号，从而避免了冲突和错误的映射。</p>
+</blockquote>
+<h4 id="劣势 -v3">劣势</h4>
+<p>基于哈希的反向页表还是需要把反向页表放到内存中，做哈希计算时也需要到内存中取值。由于内存访问的时间开销较大，所以还需要有一个类似 TLB 的机制缓存起来，避免频繁地访问内存，提高寻址的效率。</p>
+<h4 id="优势 -v2">优势</h4>
+<p>目前来说，这种机制只在高端 CPU 中存在，好处：</p>
+<ul>
+<li>表的容量可以做的很小，只和物理空间关联</li>
+<li>反向页表只有一张，它的大小只跟物理地址空间的大小相对应，所以它占的空间节省很多；但它是有代价的，它需要以一种很高速的哈希计算、硬件处理机制、高效函数以及解决冲突的机制才可以使访问的效率得到保障。这种机制由硬件、相应的操作系统软件配合，可以在空间和时间上取得比较好的结果。</li>
+</ul>
+<blockquote>
+<p>参考资料：<br>
+1：<a target="_blank" rel="noopener" href="https://github.com/OXygenMoon/OperatingSystemInDepth">https://github.com/OXygenMoon/OperatingSystemInDepth</a><br>
+2：<a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_53407527/article/details/124891795">https://blog.csdn.net/weixin_53407527/article/details/124891795</a></p>
+</blockquote>
+
+</div>
+
+
+  <div class="book-comments">
+    
+
+
+
+
+  </div>
+
+
+
+<script src="/js/book-post.js"></script>
+
+
+            </div>
+          </div>
+          <div class="column col-2 hide-lg">
+            <div class="book-post-info">
+  
+    <div class="book-post-meta">
+
+  <div class="author">
+
+    <!-- Author image -->
+    <div class="author-img">
+      
+        <figure
+          class="avatar avatar-lg"
+          data-initial="A"
+          style="background-color: #3b4351;">
+        </figure>
+      
+    </div>
+
+    <!-- Author title -->
+    <div class="author-title">
+      <div>aha</div>
+      <div>2023-11-19</div>
+    </div>
+  </div>
+
+  
+    <div class="divider"></div>
+
+    <div class="link">
+      <a class="category-link" href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">操作系统</a> <a class="category-link" href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E9%9D%9E%E8%BF%9E%E7%BB%AD%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D/">非连续内存分配</a>
+
+      <a class="tag-none-link" href="/tags/%E5%8F%8D%E5%90%91%E9%A1%B5%E8%A1%A8/" rel="tag">#反向页表</a> <a class="tag-none-link" href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" rel="tag">#操作系统</a> <a class="tag-none-link" href="/tags/%E9%9D%9E%E8%BF%9E%E7%BB%AD%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D/" rel="tag">#非连续内存分配</a> <a class="tag-none-link" href="/tags/%E9%A1%B5%E8%A1%A8/" rel="tag">#页表</a>
+    </div>
+    
+  
+
+  <div class="divider"></div>
+</div>
+  
+
+  <div class="book-tocbot">
+</div>
+<div class="book-tocbot-menu">
+  <a class="book-toc-expand" onclick="expand_toc()">Expand all</a>
+  <a onclick="go_top()">Back to top</a>
+  <a onclick="go_bottom()">Go to bottom</a>
+  <a onclick="toggleSearch()">Search in blogs</a> <!-- 添加搜索文字的点击事件 -->
+</div>
+
+<div id="search-overlay" class="search-overlay" style="display: none;"> <!-- 初始状态为隐藏 -->
+  <div class="search-box">
+    <input type="text" id="search-input" placeholder="Search in all blogs...">
+    <button onclick="closeSearch()">Close</button> <!-- 添加关闭按钮 -->
+    <div id="search-results" class="search-results"></div>
+  </div>
+</div>
+
+<script>
+  function performSearch(query) {
+    if (!query.trim()) {
+      return;
+    }
+
+    fetch('/search.xml')
+      .then(response => response.text())
+      .then(data => {
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(data, "text/xml");
+        const entries = xmlDoc.getElementsByTagName('entry');
+        let results = '';
+
+        for (let i = 0; i < entries.length; i++) {
+          const title = entries[i].getElementsByTagName('title')[0].textContent;
+          const content = entries[i].getElementsByTagName('content')[0].textContent;
+          const url = entries[i].getElementsByTagName('url')[0].textContent;
+
+          let count = (title.match(new RegExp(query, "gi")) || []).length; // 统计查询词出现的次数
+          count += (content.match(new RegExp(query, "gi")) || []).length;
+
+          if (count > 0) { // title.includes(query) || content.includes(query)
+            results += `
+              <div class="search-result-item">
+                <a href="${url}">${title}</a> (${count})
+              </div>`;
+          }
+        }
+
+        const searchResultsElement = document.getElementById('search-results');
+        searchResultsElement.innerHTML = results;
+        searchResultsElement.classList.add('active');
+      });
+  }
+
+  function toggleSearch() {
+    const searchOverlay = document.getElementById('search-overlay');
+    searchOverlay.style.display = searchOverlay.style.display === 'none' ? 'flex' : 'none';
+  }
+
+  function closeSearch() {
+    document.getElementById('search-overlay').style.display = 'none';
+  }
+
+  document.getElementById('search-input').addEventListener('input', function() {
+    const query = this.value;
+    performSearch(query);
+  });
+</script>
+
+<style>
+  .search-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  .search-box {
+    background: white;
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+    width: 80%;
+    max-width: 500px;
+  }
+
+  .search-results {
+    margin-top: 10px;
+    max-height: 300px;
+    overflow-y: auto;
+    background: white;
+    padding: 10px;
+    border-radius: 5px;
+    width: 100%;
+  }
+
+  .search-result-item {
+    margin: 10px 0;
+  }
+
+  .search-result-item a {
+    color: blue; /* 设置链接颜色为蓝色 */
+    text-decoration: none;
+  }
+
+  .search-result-item a:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+<script src="/js/book-toc.js"></script>
+
+
+</div>
+          </div>
+        </div>
+      </div>
+
+      <a class="off-canvas-overlay" onclick="hide_canvas()"></a>
+
+      <button class="floating-button" onclick="toggleDropdownMenu()"></button>
+
+      <div class="dropdown-menu">
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FFFFFF', '#000000')">银河白</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#C7EDCC', '#000000')">豆沙绿</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FAF9DE', '#000000')">杏仁黄</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#E3EDCD', '#000000')">青草绿</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FFF2E2', '#000000')">秋叶褐</div>
+      </div>
+  </div>
+
+  <script>
+    function toggleDropdownMenu() {
+      document.querySelector('.floating-button').classList.toggle('active');
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      var storedBackgroundColor = localStorage.getItem('blogBackgroundColor');
+      var storedColor = localStorage.getItem('blogColor');
+
+      if (storedBackgroundColor && storedColor) {
+        document.body.style.backgroundColor = storedBackgroundColor;
+        document.body.style.color = storedColor;
+      }
+    });
+
+    function changeBackgroundColor(backgroundColor, color) {
+      document.body.style.backgroundColor = backgroundColor;
+      document.body.style.color = color;
+
+      localStorage.setItem('blogBackgroundColor', backgroundColor);
+      localStorage.setItem('blogColor', color);
+
+      document.querySelector('.floating-button').classList.remove('active');
+    }
+  </script>
+</body>
+
+</html>
+
+
+<script src="/js/book.js"></script>

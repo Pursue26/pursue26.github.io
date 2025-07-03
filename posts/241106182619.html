@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
+
+    
+      <link rel="icon" href="/favicon.png" />
+    
+
+    <title>
+        
+          Linux 文件系统 - aha&#39;s book
+        
+    </title>
+
+    <!-- Spectre.css framework -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre-exp.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre-icons.min.css">
+
+    <!-- theme css & js -->
+    
+<link rel="stylesheet" href="/css/book.css">
+
+    
+<script src="/js/book.js"></script>
+
+
+    <!-- tocbot -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.css">
+    
+    <!-- katex -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/zooming/2.1.1/zooming.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const zooming = new Zooming()
+    zooming.listen('.book-content img')
+})
+</script>
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+    <style>
+      body {
+        background-color: #FFFFFF;
+        /* color: #000000; */
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+
+      /* Floating Button Styles */
+      .floating-button {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 999;
+        background-color: #000000;
+        color: #ffffff;
+        padding: 12px;
+        border-radius: 50%;
+        cursor: pointer;
+        border: 2px solid #000000;
+      }
+
+      .floating-button:hover {
+        background-color: #FFFFFF;
+      }
+
+      /* Dropdown Menu Styles */
+      .dropdown-menu {
+        position: fixed;
+        bottom: 60px;
+        right: 10px;
+        display: none;
+        min-width: 60px;
+        padding: 2px;
+        background-color: #fff;
+        /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
+        z-index: 1000;
+      }
+
+      .floating-button.active+.dropdown-menu {
+        display: block;
+      }
+
+      .dropdown-item {
+        display: block;
+        padding: 8px 16px;
+        cursor: pointer;
+      }
+
+      .dropdown-item:hover {
+        background-color: #f5f5f5;
+      }
+    </style>
+<style>.darkmode--activated{--body-bg-color:#282828;--content-bg-color:#333;--card-bg-color:#555;--text-color:#ccc;--blockquote-color:#bbb;--link-color:#ccc;--link-hover-color:#eee;--brand-color:#ddd;--brand-hover-color:#ddd;--table-row-odd-bg-color:#282828;--table-row-hover-bg-color:#363636;--menu-item-bg-color:#555;--btn-default-bg:#222;--btn-default-color:#ccc;--btn-default-border-color:#555;--btn-default-hover-bg:#666;--btn-default-hover-color:#ccc;--btn-default-hover-border-color:#666;--highlight-background:#282b2e;--highlight-foreground:#a9b7c6;--highlight-gutter-background:#34393d;--highlight-gutter-foreground:#9ca9b6}.darkmode--activated img{opacity:.75}.darkmode--activated img:hover{opacity:.9}.darkmode--activated code{color:#69dbdc;background:0 0}button.darkmode-toggle{z-index:9999}.darkmode-ignore,img{display:flex!important}.beian img{display:inline-block!important}</style></head>
+
+<body>
+  <div class="book-container">
+    <div class="book-sidebar">
+      <div class="book-brand">
+  <a href="/">
+    <img src="/favicon.png">
+    <span>AHA&#39;S BOOK</span>
+  </a>
+</div>
+        <div id="menu" class="book-menu hide">
+  <h2 id="基础知识"> 基础知识 </h2>
+<ul>
+<li><a href="/posts/231010144856.html"> 模运算 </a></li>
+<li><a href="/posts/231014105311.html"> 异或运算 </a></li>
+<li><a href="/posts/231210181853.html"> 计算机中的寄存器 </a></li>
+<li><a href="/posts/231213183051.html"> 正则表达式基础 </a></li>
+</ul>
+<h2 id="C 语言">C 语言 </h2>
+<ul>
+<li><a href="/posts/230916171929.html">main 函数参数 </a></li>
+<li><a href="/posts/231214192113.html"> 关键字与专有名词 </a></li>
+<li><a href="/posts/240103180653.html"> 输出打印函数 </a></li>
+<li><a href="/posts/230922143003.html"> 多维数组 </a></li>
+<li><a href="/posts/230913200729.html">const 关键字 </a></li>
+<li><a href="/posts/230918174223.html">typedef 类型基础 </a></li>
+<li><a href="/posts/230920172849.html">typedef 类型实践 </a></li>
+<li><a href="/posts/240224193217.html"> 二级指针 </a></li>
+<li><a href="/posts/240307195203.html"> 代码 TOP-K 问题 </a></li>
+<li><a href="/posts/230922172626.html">uthash 哈希表基础 </a></li>
+<li><a href="/posts/230918114841.html"> 大小端知识 </a></li>
+</ul>
+<h2 id="Golang 语言">Golang 语言 </h2>
+<ul>
+<li><a href="/posts/230907162612.html"> 变量与常量 </a></li>
+<li><a href="/posts/230909120145.html"> 函数 &amp; 包 &amp; 判断 &amp; 循环 </a></li>
+<li><a href="/posts/230912152800.html"> 数组与切片 </a></li>
+<li><a href="/posts/230913161326.html"> 可变参数函数与 Map 集合 </a></li>
+<li><a href="/posts/230915155105.html"> 字符串和指针 </a></li>
+</ul>
+<h2 id="数据结构"> 数据结构 </h2>
+<ul>
+<li><a href="/posts/231007174854.html"> 链表（数组实现）</a></li>
+<li><a href="/posts/231008213450.html"> 链表（链式实现）</a></li>
+<li><a href="/posts/231016161508.html"> 堆栈（数组实现）</a></li>
+<li><a href="/posts/231016184406.html"> 堆栈（链表实现）</a></li>
+<li><a href="/posts/231127185207.html"> 单调栈 </a></li>
+<li><a href="/posts/231017105123.html"> 队列（链表实现）</a></li>
+<li><a href="/posts/231017154121.html"> 双端队列（链表实现）</a></li>
+<li><a href="/posts/231018102559.html"> 堆基础与堆结构（数组实现）</a></li>
+<li><a href="/posts/231019102311.html"> 优先队列（堆实现）</a></li>
+<li><a href="/posts/230905224335.html"> 二叉树的遍历 </a></li>
+<li><a href="/posts/231020174358.html"> 二叉搜索树 </a></li>
+<li><a href="/posts/230916094606.html"> 拓扑排序 </a></li>
+<li><a href="/posts/230925185057.html">Trie 字典树 </a></li>
+<li><a href="/posts/231023164532.html"> 并查集（数组实现）</a></li>
+<li><a href="/posts/240702200642.html">Linux 数据结构之队列 </a></li>
+</ul>
+<h2 id="数据结构算法"> 数据结构算法 </h2>
+<ul>
+<li><a href="/posts/231218181635.html"> 归并排序 </a></li>
+<li><a href="/posts/231108163339.html"> 快速排序 </a></li>
+<li><a href="/posts/231107171607.html"> 堆排序 </a></li>
+<li><a href="/posts/231124181658.html"> 二分查找 </a></li>
+<li><a href="/posts/231227190828.html"> 哈希表实现 </a></li>
+<li><a href="/posts/240313193201.html"> 字符串哈希函数 </a></li>
+<li><a href="/posts/231116150205.html">Floyd 多源最短路径 </a></li>
+<li><a href="/posts/231117095232.html">Dijkstra 单源最短路径（原理部分）</a></li>
+<li><a href="/posts/231121152713.html">Dijkstra 单源最短路径（实现部分）</a></li>
+</ul>
+<h2 id="数据库"> 数据库 </h2>
+<ul>
+<li><a href="/posts/250605180332.html">MySQL 基础 </a></li>
+</ul>
+<h2 id="计算机网络"> 计算机网络 </h2>
+<ul>
+<li><a href="/posts/231011192359.html">OSI 参考模型 </a></li>
+<li><a href="/posts/240329202000.html"> 计网 CyC2018 之概述 </a></li>
+<li><a href="/posts/240329202004.html"> 计网 CyC2018 之链路层 </a></li>
+<li><a href="/posts/240329202003.html"> 计网 CyC2018 之网络层 </a></li>
+<li><a href="/posts/240329202002.html"> 计网 CyC2018 之传输层 </a></li>
+<li><a href="/posts/240329202001.html"> 计网 CyC2018 之应用层 </a></li>
+<li><a href="/posts/240306203742.html">ACL 访问控制列表 </a></li>
+<li><a href="/posts/240130190208.html"> 路由表、转发表与快速转发工作原理 </a></li>
+<li><a href="/posts/231221200716.html">VXLAN 网络虚拟化技术 </a></li>
+<li><a href="/posts/240903191243.html">TCP/IP checksum 计算 </a></li>
+<li><a href="/posts/240911185603.html"> 抓包分析 TCP 三次握手与四次挥手过程 </a></li>
+</ul>
+<h2 id="操作系统"> 操作系统 </h2>
+<ul>
+<li><a href="/posts/230921190726.html"> 概述 </a></li>
+<li><a href="/posts/230924172528.html"> 中断 &amp; 异常 &amp; 系统调用 </a></li>
+<li><a href="/posts/231017195157.html"> 内存分层体系与地址空间生成 </a></li>
+<li><a href="/posts/231108195351.html"> 连续内存分配 </a></li>
+<li><a href="/posts/231111172507.html"> 非连续内存分配之分段与分页 </a></li>
+<li><a href="/posts/231119170537.html"> 非连续内存分配之页表 </a></li>
+<li><a href="/posts/231123184526.html"> 内存管理之覆盖技术与交换技术 </a></li>
+<li><a href="/posts/231127193658.html"> 内存管理之虚存技术 </a></li>
+<li><a href="/posts/231129182631.html"> 局部页面置换算法 </a></li>
+<li><a href="/posts/231207184239.html"> 全局页面置换算法 </a></li>
+<li><a href="/posts/231207204958.html"> 进程描述 </a></li>
+<li><a href="/posts/231210211306.html"> 进程状态 </a></li>
+<li><a href="/posts/231215213932.html"> 线程 </a></li>
+<li><a href="/posts/231218220813.html"> 进程控制 </a></li>
+<li><a href="/posts/231228193143.html"> 调度 </a></li>
+<li><a href="/posts/240104202828.html"> 同步与互斥 </a></li>
+<li><a href="/posts/240113115605.html"> 信号量与管程 </a></li>
+<li><a href="/posts/240205182643.html"> 经典同步问题 </a></li>
+<li><a href="/posts/240310162231.html"> 死锁 </a></li>
+</ul>
+<h2 id="系统与网络编程"> 系统与网络编程 </h2>
+<ul>
+<li><a href="/posts/230911151334.html">pthread 库 </a></li>
+<li><a href="/posts/230921094127.html"> 锁与原子操作 </a></li>
+<li><a href="/posts/240319195609.html"> 读者写者问题 </a></li>
+<li><a href="/posts/240527200241.html"> 网络编程卷一阅读随笔 </a></li>
+<li><a href="/posts/240414190410.html"> 进程间通信 IPC 机制 </a></li>
+<li><a href="/posts/240424200123.html"> 多进程相关练习 </a></li>
+<li><a href="/posts/240516221527.html">I/O 模式与 I/O 多路复用 </a></li>
+<li><a href="/posts/240626192803.html">Linux 内核 kfifo 环形队列 </a></li>
+<li><a href="/posts/241009203126.html">Linux 内核等待队列 </a></li>
+<li><a href="/posts/240627210637.html">DPDK 无锁环形队列 </a></li>
+<li><a href="/posts/240919200410.html"> 解密内存屏障 </a></li>
+<li><a href="/posts/240927202500.html"> 内核线程的创建 </a></li>
+<li><a href="/posts/241015195205.html">Linux 网络数据包接收过程 </a></li>
+<li><a href="/posts/2410232111015.html"> 源码解读 epoll 实现原理 </a></li>
+<li><a href="/posts/241106182619.html">Linux 文件系统 </a></li>
+<li><a href="/posts/250619154429.html">Libevent 高性能 IO 事件驱动库 </a></li>
+</ul>
+<h2 id="工具与命令"> 工具与命令 </h2>
+<ul>
+<li><a href="/posts/240207180410.html">GCC 编译过程分解 </a></li>
+<li><a href="/posts/240312184132.html">GDB 调试入门 </a></li>
+<li><a href="/posts/240512184921.html">Makefile 学习 </a></li>
+<li><a href="/posts/250629214430.html">CMake 学习 </a></li>
+<li><a href="/posts/240417193754.html">Linux 命令之文件权限 </a></li>
+</ul>
+<h2 id="开源项目"> 开源项目 </h2>
+<ul>
+<li><a href="/posts/240303201855.html"> 线程池原理与实现 </a></li>
+<li><a href="/posts/240507194549.html">HTTP 服务器实现 </a></li>
+<li><a href="/posts/240904203605.html"> 聊天服务器实现 </a></li>
+<li><a href="/posts/241119182636.html">Linux 文件系统 </a></li>
+</ul>
+<h2 id="Docker">Docker</h2>
+<ul>
+<li><a href="/posts/230909171809.html">Docker 学习笔记 </a></li>
+</ul>
+<h1 id="LeetCode 刷题">LeetCode 刷题 </h1>
+<h2 id="链表相关"> 链表相关 </h2>
+<ul>
+<li><a href="/posts/231025143947.html">160 相交链表 </a></li>
+<li><a href="/posts/231025185947.html">206 反转链表 </a></li>
+<li><a href="/posts/231026101239.html">21 合并两个有序链表 </a></li>
+<li><a href="/posts/231026184514.html">83 删除排序链表中的重复元素 </a></li>
+<li><a href="/posts/231027150243.html">19 删除链表的倒数第 N 个节点 </a></li>
+<li><a href="/posts/231031120718.html">2 两数相加 </a></li>
+<li><a href="/posts/231031163133.html">445 两数相加 II</a></li>
+<li><a href="/posts/231101094219.html">234 回文链表 </a></li>
+<li><a href="/posts/231101135228.html">725 分隔链表 </a></li>
+<li><a href="/posts/231102120708.html">328 奇偶链表 </a></li>
+<li><a href="/posts/231102165703.html">142 环形链表 II</a></li>
+</ul>
+<h2 id="设计"> 设计 </h2>
+<ul>
+<li><a href="/posts/231201184542.html">146 LRU 缓存 </a></li>
+</ul>
+<h2 id="贪心算法"> 贪心算法 </h2>
+<ul>
+<li><a href="/posts/231107094652.html">1029 两地调度 </a></li>
+<li><a href="/posts/231109150855.html">435 无重叠区间 </a></li>
+</ul>
+<h2 id="哈希表"> 哈希表 </h2>
+<ul>
+<li><a href="/posts/231123181539.html">1410 实体解析器 </a></li>
+</ul>
+<h2 id="树的遍历"> 树的遍历 </h2>
+<ul>
+<li><a href="/posts/231103121209.html">117 填充每个节点的下一个右侧节点指针 II</a></li>
+</ul>
+<h2 id="深度优先搜索（递归）"> 深度优先搜索（递归）</h2>
+<ul>
+<li><a href="/posts/231206201243.html">2477 达到首都的最少油耗 </a></li>
+</ul>
+<h2 id="图或路径问题"> 图或路径问题 </h2>
+<ul>
+<li><a href="/posts/231211184652.html">1631 最小体力消耗路径 </a></li>
+</ul>
+<h2 id="其它"> 其它 </h2>
+<ul>
+<li><a href="/posts/230101120000.html"> 备忘录 </a></li>
+</ul>
+
+</div>
+
+
+<script src="/js/book-menu.js"></script>
+
+    </div>
+    <div class="sidebar-toggle" onclick="sidebar_toggle()" onmouseover="add_inner()" onmouseleave="remove_inner()">
+  <div class="sidebar-toggle-inner"></div>
+</div>
+
+<script>
+function add_inner() {
+  let inner = document.querySelector('.sidebar-toggle-inner')
+  inner.classList.add('show')  
+}
+
+function remove_inner() {
+  let inner = document.querySelector('.sidebar-toggle-inner')
+  inner.classList.remove('show')
+}
+
+function sidebar_toggle() {
+    let sidebar_toggle = document.querySelector('.sidebar-toggle')
+    let sidebar = document.querySelector('.book-sidebar')
+    let content = document.querySelector('.off-canvas-content')
+    if (sidebar_toggle.classList.contains('extend')) { // show
+        sidebar_toggle.classList.remove('extend')
+        sidebar.classList.remove('hide')
+        content.classList.remove('extend')
+    }
+    else { // hide
+        sidebar_toggle.classList.add('extend')
+        sidebar.classList.add('hide')
+        content.classList.add('extend')
+    }
+}
+</script>
+
+      <div class="off-canvas-content">
+        <div class="columns">
+          <div class="column col-10 col-lg-12">
+            <div class="book-navbar">
+              <!-- For Responsive Layout -->
+
+<header class="navbar">
+  <section class="navbar-section">
+    <a onclick="open_sidebar()">
+      <i class="icon icon-menu"></i>
+    </a>
+  </section>
+</header>
+
+            </div>
+            <div class="book-content">
+              <div class="book-post">
+  <p>Linux 支持多种文件系统，为了让应用程序能够对所有系统不加区分的操作，Linux 提供了一个抽象层，这个抽象层介于应用程序和具体的文件系统之间，就像一个开关一样将用户请求转换到具体文件系统系统去，让具体文件系统去实现对应的操作，最后再将结果返回给用户。所以 VFS (Virtual File System/Virtual Filesystem Switch) 就叫做虚拟文件系统开关，确切地也可称之为虚拟文件系统转换，不过我认为开关比较形象。</p>
+<p>另一方面，VFS 是 Linux 所有子系统中的一员，还有其他子系统如 IPC, SCHED, MM, NET 等，它们只会和 VFS 打交道，而不会去针对具体的文件系统直接操作。也就是说不仅用户空间接受 VFS 服务，内核空间也接受 VFS 服务。</p>
+<span id="more"></span>
+<h1 id="磁盘结构">磁盘结构</h1>
+<p>硬盘首先在逻辑上被划分为磁道、柱面以及扇区。磁盘在格式化时被划分成许多同心圆，这些同心圆轨迹叫做磁道（Track），磁道从外向内从 0 开始顺序编号。所有盘面上的同一磁道构成一个圆柱，通常称做柱面（Cylinder），每个圆柱上的磁头由上而下从 0 开始编号。每个磁道会被分成许多段圆弧，每段圆弧叫做一个扇区，扇区从 1 开始编号，每个扇区中的数据作为一个单元同时读出或写入，操作系统以扇区（Sector）形式将信息存储在硬盘上，每个扇区包括 512 个字节的数据和一些其他信息。</p>
+<h2 id="盘片">盘片</h2>
+<p>一个磁盘（如一个 1T 的机械硬盘）由多个盘片（如下图中的 0 号盘片）叠加而成。</p>
+<p>盘片的表面涂有磁性物质，这些磁性物质用来记录二进制数据。因为正反两面都可涂上磁性物质，故一个盘片 <em> 可能会有 </em> 两个盘面。</p>
+<img src="/images/linux-kernel/filesystem/disk-1.png" alt="磁盘结构" width="50%" height="50%">
+<h2 id="磁道、扇区">磁道、扇区</h2>
+<p>每个盘片被划分为一个个磁道，每个磁道又划分为一个个扇区。其中，最内侧磁道上的扇区面积最小，因此数据密度最大（但所能存储的数据量相同）。</p>
+<img src="/images/linux-kernel/filesystem/disk-2.png" alt="磁盘的磁道、扇区" width="50%" height="50%">
+<p>文件系统中有逻辑块（Block）的概念，其中每个 block 大小为 4KB，是文件存储的最小单位。一个 4KB 的 block 通常由 8 个扇区组成，每个扇区为 512 字节。</p>
+<h2 id="柱面">柱面</h2>
+<p>每个盘面对应一个磁头（读写头）。所有的磁头都是连在同一个磁臂上的，因此所有磁头只能“共进退”。</p>
+<p>所有盘面中相对位置相同的磁道组成柱面。如下图所示。</p>
+<img src="/images/linux-kernel/filesystem/disk-3.png" alt="磁盘结构" width="50%" height="50%">
+<h2 id="磁盘的物理地址">磁盘的物理地址</h2>
+<p>由上，可用（柱面号，盘面号，扇区号）组合来寻址，即定位任意一个“磁盘块”，这种方式被称为 CHS 寻址（Cylinder-Head-Sector）。</p>
+<p>我们经常提到文件数据存放在外存中的几号块（逻辑地址），这个块号就可以转换成（柱面号，盘面号，扇区号）的 CHS 地址形式。</p>
+<p>可根据该地址读取一个“块（Block）”，操作如下：</p>
+<ol>
+<li>根据“柱面号”移动磁臂，让磁头指向指定柱面；</li>
+<li>激活指定盘面对应的磁头；</li>
+<li>磁盘旋转的过程中，指定的扇区会从磁头下面划过，这样就完成了对指定扇区的读 / 写。</li>
+</ol>
+<h1 id="LBA（逻辑块寻址）">LBA（逻辑块寻址）</h1>
+<p>LBA（Logical Block Addressing，逻辑块寻址）是一种硬盘寻址方式，<strong>它将硬盘视为一块扁平的逻辑存储区域，每个存储块（通常是扇区）都有一个唯一的逻辑地址</strong>。这种寻址方式使得操作系统能够通过逻辑地址而不是物理位置来访问硬盘数据，从而简化了硬盘的管理和数据访问。</p>
+<h2 id="LBA 工作原理">LBA 工作原理</h2>
+<p>LBA 采用的是一种简单的线性寻址方法，每个存储块（通常是 512 字节的扇区）都有一个唯一的编号。硬盘的每个逻辑块都有一个逻辑块号，操作系统和磁盘控制器通过这个逻辑地址来访问相应的物理存储区域。</p>
+<ul>
+<li>
+<p><strong>LBA 地址</strong>：LBA 地址是一个简单的整数，它代表了硬盘上每个扇区的逻辑编号。例如，LBA 地址 0 表示硬盘的第一个扇区，LBA 地址 1 表示第二个扇区，以此类推。</p>
+</li>
+<li>
+<p><strong>扇区大小</strong>：LBA 通常与硬盘的扇区大小（通常为 512 字节，现代硬盘也可能使用 4K 扇区）相关。每个 LBA 地址对应一个固定大小的数据块（扇区）。操作系统通过 LBA 地址进行读写操作，不需要知道硬盘的具体物理结构。</p>
+</li>
+<li>
+<p><strong>逻辑到物理的映射</strong>：硬盘的控制器负责将 LBA 地址转换为硬盘的物理位置（即 CHS 地址）。当操作系统通过 LBA 进行寻址时，硬盘控制器会在内部进行地址转换，将逻辑地址映射到实际的物理位置（柱面、磁头和扇区）。</p>
+</li>
+</ul>
+<h2 id="LBA-CHS 转换公式">LBA-CHS 转换公式</h2>
+<p>LBA 转换成 CHS 公式：</p>
+<p>Cylinder = LBA / (Heads per Cylinder * Sector Per Track)<br>
+Remainder = LBA % (Heads per Cylinder * Sector Per Track)<br>
+Head = Remainder / Sector Per Track<br>
+Sector = (LBA % Sector Per Track) + 1</p>
+<p>其中，Cylinder 表示柱面数，Heads per Cylinder 表示每个柱面的磁头数，Sector Per Track 表示每个磁道的扇区数，Head 表示磁头数，Sector 表示扇区数。</p>
+<h1 id="磁盘文件存储">磁盘文件存储</h1>
+<p>APUE P91，4.14 节的图很清楚的说明了磁盘、分区、文件系统、文件节点、数据块之间的关系，看图：</p>
+<img src="/images/linux-kernel/filesystem/linux-vfs.png" alt="Disk driver, partitions, and a file system" width="80%" height="80%">
+<p>一整块磁盘可以划分为多个分区，每个分区都包含一个超级块和 n 个柱面组。每个柱面组下会包含 inode bitmap 和 inodes 以及 blcok bitmap 和 data blocks。出于数据安全考虑，超级块不仅仅存储在分区的起始位置，也会在某些柱面组（而非全部）下进行拷贝备份。</p>
+<img src="/images/linux-kernel/filesystem/linux-vfs2.png" alt="Cylinder group's inodes and data blocks in more detail"width="80%"height="80%">
+<p>当我们使用命令 mkdir testdir 创建一个目录后，磁盘结构如下图：</p>
+<img src="/images/linux-kernel/filesystem/linux-vfs3.png" alt="Sample cylinder group after creating the directory testdir" width="80%" height="80%">
+<ul>
+<li>i-node 2549(8683543) 指向一个目录块，即 testdir 目录的实际数据块。</li>
+<li>i-node 2549 的引用计数为 2，任何叶子目录的引用计数都是 2：一个来自父目录 <code>..</code> 的引用、一个来自自身目录 <code>.</code> 的引用。</li>
+<li>i-node 2549 的父目录为 1267(8683541)，同样指向一个目录数据块，里边包含指向自身的 <code>.</code>，指向其父目录的 <code>..</code>，和包含的目录项 <code>2549:testdir</code>。</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">/home/abc<span class="comment"># tree</span></span><br><span class="line">.</span><br><span class="line">└── apue</span><br><span class="line">    └── testdir</span><br><span class="line"></span><br><span class="line">2 directories, 0 files</span><br><span class="line"></span><br><span class="line">/home/abc/apue<span class="comment"># ls -a -l -i</span></span><br><span class="line">总计 12</span><br><span class="line">8683542 drwxr-xr-x 3 root root 4096 11 月 11 16:44 .</span><br><span class="line">8683541 drwxr-xr-x 3 root root 4096 11 月 11 16:44 ..</span><br><span class="line">8683543 drwxr-xr-x 2 root root 4096 11 月 11 16:44 testdir</span><br><span class="line"></span><br><span class="line">/home/abc<span class="comment"># ls -a -l -i</span></span><br><span class="line">总计 12</span><br><span class="line">8683541 drwxr-xr-x 3 root root 4096 11 月 11 16:44 .</span><br><span class="line">8663454 drwxr-xr-x 9 root root 4096 11 月 11 16:43 ..</span><br><span class="line">8683542 drwxr-xr-x 3 root root 4096 11 月 11 16:44 apue</span><br></pre></td></tr></table></figure>
+<h1 id="文件基本操作（抽象）">文件基本操作（抽象）</h1>
+<p>Linux 文件系统的 10 个基本抽象（系统调用）：</p>
+<ul>
+<li>open/close/(creat)</li>
+<li>read/write/lseek/(tell)</li>
+<li>fstat/ftruncate</li>
+<li>unlink/mkdir/dup</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>系统调用</th>
+<th>功能描述</th>
+<th>参数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>open</td>
+<td>打开文件，返回文件描述符，允许对文件进行读写操作</td>
+<td>pathname（文件路径）, flags（打开方式）, mode（文件权限，可选）</td>
+</tr>
+<tr>
+<td>close</td>
+<td>关闭文件描述符，释放文件资源</td>
+<td>fd（文件描述符）</td>
+</tr>
+<tr>
+<td>creat</td>
+<td>创建一个文件，如果文件已存在则清空文件内容</td>
+<td>pathname（文件路径）, mode（文件权限）</td>
+</tr>
+<tr>
+<td>read</td>
+<td>从打开的文件中读取数据</td>
+<td>fd, buf（存储数据的缓冲区）, count（读取字节数）</td>
+</tr>
+<tr>
+<td>write</td>
+<td>向打开的文件中写入数据</td>
+<td>fd, buf（写入数据的缓冲区）, count（写入字节数）</td>
+</tr>
+<tr>
+<td>lseek</td>
+<td>移动文件指针位置，用于随机读写</td>
+<td>fd, offset（偏移量）, whence（偏移起点）</td>
+</tr>
+<tr>
+<td>tell</td>
+<td>返回文件指针当前的位置</td>
+<td>fd</td>
+</tr>
+<tr>
+<td>fstat</td>
+<td>获取文件的相关信息</td>
+<td>fd, statbuf（存储信息的缓冲区）</td>
+</tr>
+<tr>
+<td>ftruncate</td>
+<td>截断文件，使文件的大小缩小到指定长度</td>
+<td>fd, length（文件的目标长度）</td>
+</tr>
+<tr>
+<td>unlink</td>
+<td>inode 引用计数减一，当 inode 引用计数为 0 时才会删除文件</td>
+<td>pathname（文件路径）</td>
+</tr>
+<tr>
+<td>mkdir</td>
+<td>创建目录</td>
+<td>pathname（目录路径）, mode（目录权限）</td>
+</tr>
+<tr>
+<td>dup</td>
+<td>复制文件描述符，创建一个新的描述符引用相同的文件</td>
+<td>fd（原文件描述符）</td>
+</tr>
+</tbody>
+</table>
+<h1 id="文件系统架构">文件系统架构</h1>
+<h2 id="VFS 与文件系统">VFS 与文件系统</h2>
+<p>Linux 支持多种文件系统，为了让应用程序能够对所有系统不加区分的操作，Linux 提供了一个抽象层，这个抽象层介于应用程序和具体的文件系统之间，就像一个开关一样将用户请求转换到具体文件系统系统去，让具体文件系统去实现对应的操作，最后再将结果返回给用户。</p>
+<p>这种引入一个抽象层次的设计思想，即“上层不依赖于具体实现，而依赖于接口；下层也不用关心调用，只用实现接口”，就算面向对象里的“面向接口编程”吧。</p>
+<img src="/images/linux-kernel/filesystem/vfs-architecture.png" alt="VFS 架构" width="60%" height="60%">
+<h2 id="块设备驱动架构">块设备驱动架构</h2>
+<img src="/images/linux-kernel/filesystem/block-fs-arch.png" alt="块设备驱动架构" width="60%" height="60%">
+<h1 id="Linux-VFS">Linux VFS</h1>
+<h2 id="文件系统分类">文件系统分类</h2>
+<p>从功能的角度来看，文件系统可以分为以下几类：</p>
+<ul>
+<li>磁盘文件系统（ext3、ext4、xfs、fat 以及 ntfs 等）</li>
+<li>网络文件系统（nfs、smbfs/cifs、ncp 等）</li>
+<li>虚拟文件系统（procfs、sysfs、sockfs、pipefs 等）</li>
+</ul>
+<p>Linux 内核实例使用 VFS 来处理目录和文件的层次结构（一棵树）。通过挂载操作，新的文件系统将被添加为 VFS 子树。</p>
+<h2 id="文件系统模型">文件系统模型</h2>
+<p>常见的文件系统模型（任何实现的文件系统都需要符合该模型）包括几种明确定义的实体: superblock, inode, file 和 dentry。这些实体是文件系统的元数据（包含有关数据或其他元数据的信息）。</p>
+<h3 id="super-block">super_block</h3>
+<p><strong>超级块（super block）存储了挂载文件系统所需的信息，是针对文件系统级别的概念</strong>：</p>
+<ul>
+<li>inode 和块的位置；</li>
+<li>文件系统块大小；</li>
+<li>最大文件名长度；</li>
+<li>最大文件大小；</li>
+<li>根 inode 的位置。</li>
+</ul>
+<p><strong>本地化</strong>：</p>
+<ul>
+<li>对于磁盘文件系统，超级块在磁盘的 <strong> 第一个块 </strong> 中有对应项（文件系统控制块）。</li>
+<li>在 VFS 中，<strong>所有文件系统的超级块 </strong> 都保留在类型为 struct super_block 的结构 <strong> 列表中</strong>，操作方法则保留在类型为 struct super_operations 的结构中。</li>
+</ul>
+<p>文件系统都有一个根节点 root，其他的节点都是通过 root 向下查找而来，<strong>查找的手段都是通过文件名匹配</strong>。</p>
+<blockquote>
+<p>每个超级块实例对应一个挂载的文件系统，如果已经挂载，就是活动超级块，当然一个超级块可以挂载到多个分区。</p>
+</blockquote>
+<h3 id="inode">inode</h3>
+<p>inode（索引节点）保存了有关文件的信息。注意这里的文件指的是泛指意义上的文件，常规文件、目录、特殊文件（管道、fifo）、块设备、字符设备、链接或可以抽象为文件的任何内容都包括在内。</p>
+<p>inode 存储了以下信息（可以分为两个部分，一个是文件状态信息、一个是保存的数据，状态信息叫元数据）：</p>
+<ul>
+<li>文件类型；</li>
+<li>文件大小；</li>
+<li>访问权限；</li>
+<li>访问或修改时间；</li>
+<li>数据在磁盘上的位置（指向包含数据的磁盘块的指针）。</li>
+</ul>
+<p>索引节点和文件容易混淆，<strong>inode 和 file 的设计目的是不一样的，inode 主要提供了对文件节点创建、命名、删除等操作方法，而 file 则关注文件中数据的读写</strong>。</p>
+<blockquote>
+<ol>
+<li>通常，inode 不包含文件名。文件名由 dentry 实体存储。这样，一个 inode 可以有多个名称（硬链接）。</li>
+<li>目录也是用 inode 表示，只不其内容是录下的文件名与其 inode 编号的对应表。</li>
+</ol>
+</blockquote>
+<p><strong>本地化</strong>：</p>
+<p>与 superblock 类似，inode 也有磁盘对应项。磁盘上的 inodes 通常分组存储在一个专用区域（inode 区域）中，与数据块区域分开；作为 VFS 实体，inode 由 struct inode 结构表示，并由 struct inode_operations 结构定义与之相关的操作方法。</p>
+<hr>
+<p>符号链接（symbolic links）和硬链接（hard links）都是由 inode 表示。</p>
+<ul>
+<li>符号链接的 inode 数据段包含一个路径字符串，指向链接的地址。</li>
+<li>多个硬链接实际是由同一个 inode 表示，只不过 inode 中有一个引用计数器，记住了总共有多少个硬链接。</li>
+</ul>
+<blockquote>
+<p>硬链接不能是目录，因为每个目录由一个 inode 表示，如果多个目录指向同一个 inode，那么从该目录向上查找就会发现由多个 parent，这会破坏目录树的结构。更糟糕的是，如果把一个目录和它的子目录互相硬链接会发生什么？进入这个目录就意味着直接进入其子目录，进入子目录又进一步进入父目录，产生死循环。</p>
+</blockquote>
+<h3 id="file">file</h3>
+<p>file 是文件系统模型中距离用户最近的组件。file 对象是文件被打开的时候创建的，该结构体仅作为 VFS 在内存中的实体存在，没有在磁盘上的物理对应物。</p>
+<p>inode 抽象了磁盘上的文件，而 file 结构抽象了打开的文件。从进程的角度来看，file 实体抽象了文件。然而，从文件系统实现的角度来看，inode 才是抽象文件的那个实体。</p>
+<p>file 结构维护了以下信息：</p>
+<ul>
+<li>文件游标位置；</li>
+<li>文件打开权限；</li>
+<li>指向关联 inode 的指针（最终是 inode 的索引）。</li>
+</ul>
+<p><strong>本地化</strong>：</p>
+<p>与之关联的 VFS 实体是 struct file 结构，与之相关的操作方法由 struct file_operations 结构表示。</p>
+<blockquote>
+<p>定义 file 是为了让进程对文件的记录是私有的（进程间互相独立），父子进程对文件共享。由于一个文件可以被多个进程打开，所以文件指针要放在 file 对象中而不是 inode 对象中。换句话说，一个文件与唯一的一个 inode 对应，多个进程打开同一文件进行 I/O 操作（如以什么模式打开、读取的偏移等），不能直接修改 inode 对象的数据，因为对 inode 的修改对所有进程可见）。</p>
+</blockquote>
+<h3 id="dentry">dentry</h3>
+<p>名字查找是 VFS 当中非常复杂的一个部分。前面说了查找 inode 是通过名字匹配来实现的，但是并不是每个文件系统都能够快速的实现名字到 inode 的转换。于是 VFS 实现了 dcache，为快速名字查找提供了可靠的保障。VFS 处理了所有文件路径名的管理操作，在底层文件系统能够看到他们之前，将其转换为 dcache 的入口。</p>
+<p>dcache 称之为高速目录缓存，由许多 dentry 组成，每个 dentry 对应到系统中的一个文件名。当前活动的文件名字和最近使用的文件名字都缓存在 dcache 中。每个 dentry 的父节点必须在 dcache 中，只要在 dcache 中存在一个目录项，那么相应的 inode 就在 inode 高速缓存中。反过来，如果 inode 在 inode 高速缓存中，那么它一定引用 dcache 中的一个 dentry。也就是可以理解为 dcache 的存在就是为了加速文件名字到具体 inode 的转换，VFS 三个字母中的 S-switch 和这个功能息息相关。</p>
+<p>dcache 是一个树状结构，每个 dcache 节点对应一个目录，也就是指定名字的 inode。一个 inode 可以和树中的多个 dcache 节点联系，因为硬链接可以在多个地方指向同一个节点。</p>
+<p>dentry 是目录或文件路径的特定部分。例如，对于路径 /bin/vi，将为 /, bin 和 vi 创建 dentry 对象（总共 3 个 dentry 对象）。</p>
+<ul>
+<li>一个打开的 file 一定会指向 dentry，而一个 dentry 又会指向 inode，所以 dentry 可以看作是 file 到 inode 的 switch。</li>
+<li>在 VFS 中，dentry 实体由 struct dentry 结构表示，与之相关的操作方法在 struct dentry_operations 结构中定义。</li>
+</ul>
+<blockquote>
+<p>请注意目录项和目录区别，目录不过是 inode 的一种形式（目录是一个特殊的文件）。</p>
+</blockquote>
+<h2 id="注册与注销文件系统">注册与注销文件系统</h2>
+<p>Linux 内核支持约 50 种文件系统。如果文件系统（更准确地说，文件系统类型）没有注册，那么自然就无法使用。文件系统注册可以有两种方式：</p>
+<ul>
+<li>一种是将文件系统编译到内核里，这样系统启动就会自动完成注册；</li>
+<li>一种是将文件系统编译成模块，在模块载入的时候注册。</li>
+</ul>
+<blockquote>
+<p>当文件系统编译到内核时，在 start_kernel() 就会调用注册函数，如 rootfs、proc 等，而永远不会调用注销函数。当文件编译为模块时，在模块的 init() 函数中就会调用注册函数，在模块的 exit() 函数中会调用注销函数。</p>
+</blockquote>
+<h3 id="注册文件系统">注册文件系统</h3>
+<p>注册文件系统并不复杂，可以直接看源代码。但是，要理解原理需要先理解描述特定文件系统的结构 struct file_system_type。文件系统类型最关键的是要 <strong> 提供两个操作——挂载和卸载</strong>，对应到 file_system_type 就是函数指针成员 mount 和 kill_sb。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// include/linux/fs.h 结构体已删减</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">file_system_type</span> &#123;</span></span><br><span class="line">    <span class="comment">// 文件系统的名称（如 &quot;ext4&quot;、&quot;vfat&quot;），用于标识文件系统类型</span></span><br><span class="line">    <span class="type">const</span> <span class="type">char</span>* name;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 标志字段，描述文件系统的特性</span></span><br><span class="line">    <span class="type">int</span> fs_flags;</span><br><span class="line"><span class="meta">#<span class="keyword">define</span> FS_REQUIRES_DEV 1      <span class="comment">// 文件系统需要设备支持</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> FS_BINARY_MOUNTDATA 2  <span class="comment">// 挂载时需要二进制格式的数据</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> FS_HAS_SUBTYPE 4       <span class="comment">// 文件系统具有子类型，支持不同的挂载子类型</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> FS_USERNS_MOUNT 8      <span class="comment">// 允许用户命名空间中的 root 挂载此文件系统</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> FS_USERNS_DEV_MOUNT 16</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> FS_RENAME_DOES_D_MOVE 32768</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 函数指针，挂载文件系统，返回根目录的 dentry 结构指针，表示挂载点</span></span><br><span class="line">    <span class="comment">// 参数：文件系统类型、挂载标志、设备路径、挂载数据</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">dentry</span>* (*<span class="title">mount</span>)(<span class="keyword">struct</span> <span class="title">file_system_type</span>*, <span class="title">int</span>, <span class="title">const</span> <span class="title">char</span>*, <span class="title">void</span>*);</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 函数指针，卸载文件系统，释放挂载点的超级块结构</span></span><br><span class="line">    <span class="type">void</span> (*kill_sb)(<span class="keyword">struct</span> super_block*);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 指向文件系统模块的指针，一般都是设置为 THIS_MODULE</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">module</span>* <span class="title">owner</span>;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 指向链表中下一个文件系统类型结构，用于组织多个文件系统类型</span></span><br><span class="line">    <span class="comment">// 在注册的时候会找到最后一个文件系统，并将其 next 指向新注册的文件系统</span></span><br><span class="line">    <span class="comment">// 链表头：static struct file_system_type *file_systems;</span></span><br><span class="line">    <span class="comment">// 保护锁：static DEFINE_RWLOCK(file_systems_lock);</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">file_system_type</span>* <span class="title">next</span>;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 哈希表头，用于记录该文件系统的所有 super_block 实例，</span></span><br><span class="line">    <span class="comment">// 由于同一文件系统可能会被多次挂载，因此每个挂载点都会有一个单独的超级块</span></span><br><span class="line">    <span class="comment">// 链表头：LIST_HEAD(super_blocks); -&gt; struct list_head super_blocks</span></span><br><span class="line">    <span class="comment">// 保护锁：DEFINE_SPINLOCK(sb_lock);</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">hlist_head</span> <span class="title">fs_supers</span>;</span>  <span class="comment">// 与 list_head 结构完全相同，只是名称不同而已</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>注册的思路上非常简单，如果找到同名字的文件系统就说明已经注册了，返回 -EBUSY。反之 find_filesystem() 会获取到最后一个文件系统的 next 指针，将其指向新的文件系统就完成注册了。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// fs/filesystems.c</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* 全局变量 */</span></span><br><span class="line"><span class="type">static</span> <span class="class"><span class="keyword">struct</span> <span class="title">file_system_type</span> *<span class="title">file_systems</span>;</span></span><br><span class="line"><span class="type">static</span> <span class="title function_">DEFINE_RWLOCK</span><span class="params">(file_systems_lock)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> *	register_filesystem - register a new filesystem</span></span><br><span class="line"><span class="comment"> *	@fs: the file system structure</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> *	Adds the file system passed to the list of file systems the kernel</span></span><br><span class="line"><span class="comment"> *	is aware of for mount and other syscalls. Returns 0 on success,</span></span><br><span class="line"><span class="comment"> *	or a negative errno code on an error.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> *	The &amp;struct file_system_type that is passed is linked into the kernel</span></span><br><span class="line"><span class="comment"> *	structures and must not be freed until the file system has been</span></span><br><span class="line"><span class="comment"> *	unregistered.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">register_filesystem</span><span class="params">(<span class="keyword">struct</span> file_system_type* fs)</span> &#123;</span><br><span class="line">    <span class="type">int</span> res = <span class="number">0</span>;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">file_system_type</span>** <span class="title">p</span>;</span></span><br><span class="line"></span><br><span class="line">    BUG_ON(<span class="built_in">strchr</span>(fs-&gt;name, <span class="string">&#x27;.&#x27;</span>));  <span class="comment">// 文件系统的名称不能出现 &#x27;.&#x27;</span></span><br><span class="line">    <span class="keyword">if</span> (fs-&gt;next)</span><br><span class="line">        <span class="keyword">return</span> -EBUSY;</span><br><span class="line"></span><br><span class="line">    write_lock(&amp;file_systems_lock);</span><br><span class="line">    <span class="comment">// 找到同名字的文件系统就说明已经注册，否则将其（入参 fs）挂到 -&gt;next 链表最后</span></span><br><span class="line">    p = find_filesystem(fs-&gt;name, <span class="built_in">strlen</span>(fs-&gt;name));</span><br><span class="line">    <span class="keyword">if</span> (*p)</span><br><span class="line">        res = -EBUSY;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        *p = fs;</span><br><span class="line">    write_unlock(&amp;file_systems_lock);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> res;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">EXPORT_SYMBOL(register_filesystem);</span><br></pre></td></tr></table></figure>
+<p>不妨看一下 find_filesystem() 的实现。所有的文件系统类型形成一个链表，链表头存放在一个叫 file_systems 的全局变量中。所以不需要特殊的参数来传递链表头。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="keyword">struct</span> file_system_type** <span class="title function_">find_filesystem</span><span class="params">(<span class="type">const</span> <span class="type">char</span>* name, <span class="type">unsigned</span> len)</span> &#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">file_system_type</span>** <span class="title">p</span>;</span></span><br><span class="line">    <span class="keyword">for</span> (p = &amp;file_systems; *p; p = &amp;(*p)-&gt;next)</span><br><span class="line">        <span class="keyword">if</span> (<span class="built_in">strlen</span>((*p)-&gt;name) == len &amp;&amp; <span class="built_in">strncmp</span>((*p)-&gt;name, name, len) == <span class="number">0</span>)</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">    <span class="keyword">return</span> p;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="注销文件系统">注销文件系统</h3>
+<p>注销文件系统的代码也比较简单，直接看源代码。这里 tmp 作为一个二级指针，它会向后移动，假设这里移动到了 fs，这时 *tmp 和 fs 指向同一位置，需要注意的是 tmp 实际上是上一个节点的 next 地址，因此 *tmp = fs-&gt;next 实际上是改变上一个节点 next 的指向，也就是让其跳过 fs、指向 fs 的下一个节点。接下来由于 fs 已经被 file_systems 链表所抛弃，我们必须将 fs-&gt;next 清空。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> *	unregister_filesystem - unregister a file system</span></span><br><span class="line"><span class="comment"> *	@fs: filesystem to unregister</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> *	Remove a file system that was previously successfully registered</span></span><br><span class="line"><span class="comment"> *	with the kernel. An error is returned if the file system is not found.</span></span><br><span class="line"><span class="comment"> *	Zero is returned on a success.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> *	Once this function has returned the &amp;struct file_system_type structure</span></span><br><span class="line"><span class="comment"> *	may be freed or reused.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">unregister_filesystem</span><span class="params">(<span class="keyword">struct</span> file_system_type* fs)</span> &#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">file_system_type</span>** <span class="title">tmp</span>;</span></span><br><span class="line"></span><br><span class="line">    write_lock(&amp;file_systems_lock);</span><br><span class="line">    tmp = &amp;file_systems;</span><br><span class="line">    <span class="keyword">while</span> (*tmp) &#123;</span><br><span class="line">        <span class="keyword">if</span> (fs == *tmp) &#123;     <span class="comment">// 地址比较相等</span></span><br><span class="line">            *tmp = fs-&gt;next;  <span class="comment">// 跳过将要移除的节点（上一个节点的 next 指向 fs 的下一个节点）</span></span><br><span class="line">            fs-&gt;next = <span class="literal">NULL</span>;  <span class="comment">// 将要移除的节点的 next 指向空</span></span><br><span class="line">            write_unlock(&amp;file_systems_lock);</span><br><span class="line">            synchronize_rcu();</span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 更新 tmp，使之指向下一个 file_system_type* 的地址，</span></span><br><span class="line">        <span class="comment">// 换句话说，现在 tmp 指向了上一个节点的 next 地址</span></span><br><span class="line">        tmp = &amp;(*tmp)-&gt;next;</span><br><span class="line">    &#125;</span><br><span class="line">    write_unlock(&amp;file_systems_lock);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> -EINVAL;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">EXPORT_SYMBOL(unregister_filesystem);</span><br></pre></td></tr></table></figure>
+<h3 id="rootfs 和 ramfs 注册">rootfs 和 ramfs 注册</h3>
+<p>以下是内核注册虚拟文件系统的示例。</p>
+<p>注册 rootfs 是在 init_rootfs() 中完成的（将文件系统编译到内核里），主要工作就是注册 rootfs_fs_type。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="class"><span class="keyword">struct</span> <span class="title">file_system_type</span> <span class="title">rootfs_fs_type</span> =</span> &#123;</span><br><span class="line">	.name		= <span class="string">&quot;rootfs&quot;</span>,</span><br><span class="line">	.mount		= rootfs_mount,  <span class="comment">// 挂载和卸载操作</span></span><br><span class="line">	.kill_sb	= kill_litter_super,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> __init <span class="title function_">init_rootfs</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="type">int</span> err;</span><br><span class="line">	<span class="comment">// ...</span></span><br><span class="line">	err = register_filesystem(&amp;rootfs_fs_type);</span><br><span class="line">	<span class="comment">// ...</span></span><br><span class="line">	<span class="keyword">return</span> err;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>注册 ramfs 是在 module 加载时初始化注册的（将文件系统编译成模块）。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="class"><span class="keyword">struct</span> <span class="title">file_system_type</span> <span class="title">ramfs_fs_type</span> =</span> &#123;</span><br><span class="line">	.name		= <span class="string">&quot;ramfs&quot;</span>,</span><br><span class="line">	.mount		= ramfs_mount,</span><br><span class="line">	.kill_sb	= ramfs_kill_sb,</span><br><span class="line">	.fs_flags	= FS_USERNS_MOUNT,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">int</span> __init <span class="title function_">init_ramfs_fs</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">return</span> register_filesystem(&amp;ramfs_fs_type);</span><br><span class="line">&#125;</span><br><span class="line">module_init(init_ramfs_fs)</span><br></pre></td></tr></table></figure>
+<h2 id="数据结构">数据结构</h2>
+<h3 id="各对象之间的关系">各对象之间的关系</h3>
+<p>这里，首先通过一个示例给出下面各种数据结构的组织关系，然后再详细介绍各类数据结构。</p>
+<p>Figure 12-2 illustrates with a simple example how processes interact with files. Three different processes have opened the same file, two of them using the same hard link. In this case, each of the three processes uses its own file object, while only two dentry objects are required—one for each hard link. Both dentry objects refer to the same inode object, which identifies the superblock object and, together with the latter, the common disk file.</p>
+<img src="/images/linux-kernel/filesystem/process-and-vfs-object.png" alt="进程与 VFS 对象交互" width="80%" height="80%">
+<h3 id="超级块">超级块</h3>
+<h4 id="super-block-v2">super_block</h4>
+<p>超级块既作为物理实体（磁盘上的实体）存在，也作为 VFS 实体（在 struct super_block 结构中）存在。超级块仅包含元信息，并用于从磁盘中读取和写入元数据（如 inode、目录项）。超级块（以及隐式的 struct super_block 结构）将包含有关所使用的块设备、inode 列表、文件系统根目录的 inode 指针以及超级块操作的指针的信息。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// include/linux/fs.h 结构体已删减</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">super_block</span> &#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> <span class="title">s_list</span>;</span>              <span class="comment">// Keep this first，链接所有超级块的链表头，便于管理多个挂载的文件系统</span></span><br><span class="line"></span><br><span class="line">    <span class="type">dev_t</span> s_dev;                          <span class="comment">// 标识文件系统的设备编号</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">char</span> s_blocksize_bits;       <span class="comment">// block 大小的幂数</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> s_blocksize;            <span class="comment">// block 的实际字节，s_blocksize=2^s_blocksize_bits</span></span><br><span class="line">    <span class="type">loff_t</span> s_maxbytes;                    <span class="comment">// 支持的单个文件的最大字节大小 MAX_LFS_FILESIZE</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">file_system_type</span>* <span class="title">s_type</span>;</span>      <span class="comment">// 此超级块所属的文件系统类型</span></span><br><span class="line"></span><br><span class="line">    <span class="type">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">super_operations</span>* <span class="title">s_op</span>;</span>  <span class="comment">// 指向超级块操作函数，如 alloc_inode/write_inode/destroy_inode 等</span></span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">dentry</span>* <span class="title">s_root</span>;</span>                <span class="comment">// 根目录项，表示文件系统的挂载点</span></span><br><span class="line">    <span class="type">int</span> s_count;                          <span class="comment">// 超级块的引用次数，决定何时可以销毁超级块</span></span><br><span class="line">    <span class="type">atomic_t</span> s_active;                    <span class="comment">// 超级块是否处于活跃状态</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> <span class="title">s_inodes</span>;</span>            <span class="comment">// 文件系统中 inode 链表头，记录文件系统的所有 inode</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> <span class="title">s_mounts</span>;</span>            <span class="comment">// list of mounts; _not_ for fs use，记录当前挂载该文件系统的所有挂载点</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">hlist_node</span> <span class="title">s_instances</span>;</span>        <span class="comment">// 链接所有 super_block 实例</span></span><br><span class="line">    <span class="type">fmode_t</span> s_mode;                       <span class="comment">// 文件系统的访问模式（读 / 写等）</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>相关函数：</p>
+<ul>
+<li>sget 构造函数，如果没有从已经挂载的文件系统找到需要的 super_block 就会调用 alloc_super 分配一个。</li>
+<li>put_super 析构函数，当引用计数减少到 0 时才会调用 destroy_super 真正释放。</li>
+</ul>
+<h4 id="super-operations">super_operations</h4>
+<p>主要包括对 inode 数据结构的操作（操作系统 VFS 层面），注意不是对 inode 的操作（磁盘层面），对 inode 的操作由 inode_operations 来完成。如：alloc_inode、destroy_inode、dirty_inode 等等。</p>
+<p>所有的函数由 VFS 调用，都在进程上下文调用，所有的函数都可能阻塞。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">super_operations</span> &#123;</span></span><br><span class="line">   	<span class="class"><span class="keyword">struct</span> <span class="title">inode</span> *(*<span class="title">alloc_inode</span>)(<span class="keyword">struct</span> <span class="title">super_block</span> *<span class="title">sb</span>);</span></span><br><span class="line">	<span class="type">void</span> (*destroy_inode)(<span class="keyword">struct</span> inode *);</span><br><span class="line"></span><br><span class="line">   	<span class="type">void</span> (*dirty_inode) (<span class="keyword">struct</span> inode *, <span class="type">int</span> flags);</span><br><span class="line">	<span class="type">int</span> (*write_inode) (<span class="keyword">struct</span> inode *, <span class="keyword">struct</span> writeback_control *wbc);</span><br><span class="line">	<span class="type">int</span> (*drop_inode) (<span class="keyword">struct</span> inode *);</span><br><span class="line">	<span class="type">void</span> (*evict_inode) (<span class="keyword">struct</span> inode *);</span><br><span class="line">	<span class="type">void</span> (*put_super) (<span class="keyword">struct</span> super_block *);</span><br><span class="line">	<span class="type">int</span> (*sync_fs)(<span class="keyword">struct</span> super_block *sb, <span class="type">int</span> wait);</span><br><span class="line">	<span class="type">int</span> (*freeze_fs) (<span class="keyword">struct</span> super_block *);</span><br><span class="line">	<span class="type">int</span> (*unfreeze_fs) (<span class="keyword">struct</span> super_block *);</span><br><span class="line">	<span class="type">int</span> (*statfs) (<span class="keyword">struct</span> dentry *, <span class="keyword">struct</span> kstatfs *);</span><br><span class="line">	<span class="type">int</span> (*remount_fs) (<span class="keyword">struct</span> super_block *, <span class="type">int</span> *, <span class="type">char</span> *);</span><br><span class="line">	<span class="type">void</span> (*umount_begin) (<span class="keyword">struct</span> super_block *);</span><br><span class="line"></span><br><span class="line">	<span class="type">int</span> (*show_options)(<span class="keyword">struct</span> seq_file *, <span class="keyword">struct</span> dentry *);</span><br><span class="line">	<span class="type">int</span> (*show_devname)(<span class="keyword">struct</span> seq_file *, <span class="keyword">struct</span> dentry *);</span><br><span class="line">	<span class="type">int</span> (*show_path)(<span class="keyword">struct</span> seq_file *, <span class="keyword">struct</span> dentry *);</span><br><span class="line">	<span class="type">int</span> (*show_stats)(<span class="keyword">struct</span> seq_file *, <span class="keyword">struct</span> dentry *);</span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> CONFIG_QUOTA</span></span><br><span class="line">	<span class="type">ssize_t</span> (*quota_read)(<span class="keyword">struct</span> super_block *, <span class="type">int</span>, <span class="type">char</span> *, <span class="type">size_t</span>, <span class="type">loff_t</span>);</span><br><span class="line">	<span class="type">ssize_t</span> (*quota_write)(<span class="keyword">struct</span> super_block *, <span class="type">int</span>, <span class="type">const</span> <span class="type">char</span> *, <span class="type">size_t</span>, <span class="type">loff_t</span>);</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line">	<span class="type">int</span> (*bdev_try_to_free_page)(<span class="keyword">struct</span> super_block*, <span class="keyword">struct</span> page*, <span class="type">gfp_t</span>);</span><br><span class="line">	<span class="type">int</span> (*nr_cached_objects)(<span class="keyword">struct</span> super_block *);</span><br><span class="line">	<span class="type">void</span> (*free_cached_objects)(<span class="keyword">struct</span> super_block *, <span class="type">int</span>);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h3 id="索引节点">索引节点</h3>
+<h4 id="inode-v2">inode</h4>
+<p>inode 既存在于 VFS 中（内存中），也存在于磁盘中（对于 UNIX、HFS 以及 NTFS 等）。VFS 中的 inode 由 struct inode 结构表示。和 VFS 中的其他结构一样, struct inode 是通用结构，涵盖了所有支持的文件类型的选项，甚至包括那些没有关联磁盘实体的文件类型（比如 FAT 文件系统）。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// include/linux/fs.h 结构体已删减</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">inode</span> &#123;</span></span><br><span class="line">    <span class="type">umode_t</span> i_mode;                       <span class="comment">// 文件权限及类型</span></span><br><span class="line">    <span class="type">kuid_t</span> i_uid;                         <span class="comment">// user id</span></span><br><span class="line">    <span class="type">kgid_t</span> i_gid;                         <span class="comment">// group id</span></span><br><span class="line">    <span class="type">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">inode_operations</span>* <span class="title">i_op</span>;</span>  <span class="comment">// inode 操作函数，如 create，mkdir，lookup，rename 等</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">super_block</span>* <span class="title">i_sb</span>;</span>             <span class="comment">// 所属的 SuperBlock</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">address_space</span>* <span class="title">i_mapping</span>;</span>      <span class="comment">// 地址空间（用于处理文件的“内存”映射）</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">address_space</span> <span class="title">i_data</span>;</span>          <span class="comment">// inode 的数据地址空间</span></span><br><span class="line">    <span class="type">loff_t</span> i_size;                        <span class="comment">// 文件大小</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">timespec</span> <span class="title">i_atime</span>;</span>              <span class="comment">// 文件最后访问时间</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">timespec</span> <span class="title">i_mtime</span>;</span>              <span class="comment">// 文件最后修改时间</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">timespec</span> <span class="title">i_ctime</span>;</span>              <span class="comment">// 文件元数据最后修改时间（包括文件名称）</span></span><br><span class="line">    <span class="type">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">file_operations</span>* <span class="title">i_fop</span>;</span>  <span class="comment">// 文件操作函数，open、write 等</span></span><br><span class="line">    <span class="type">void</span>* i_private;                      <span class="comment">// 文件系统的私有数据</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>相关函数：</p>
+<ul>
+<li>new_inode 构造函数，调用 alloc_inode 从 inode_cachep 分配索引节点。</li>
+</ul>
+<h4 id="inode-operations">inode_operations</h4>
+<p>对 inode 的操作，包括 create、lookup、mkdir、rmdir、link、unlink 等等。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">inode_operations</span> &#123;</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">dentry</span> * (*<span class="title">lookup</span>) (<span class="keyword">struct</span> <span class="title">inode</span> *,<span class="keyword">struct</span> <span class="title">dentry</span> *, <span class="title">unsigned</span> <span class="title">int</span>);</span></span><br><span class="line">	<span class="type">void</span> * (*follow_link) (<span class="keyword">struct</span> dentry *, <span class="keyword">struct</span> nameidata *);</span><br><span class="line">	<span class="type">int</span> (*permission) (<span class="keyword">struct</span> inode *, <span class="type">int</span>);</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">posix_acl</span> * (*<span class="title">get_acl</span>)(<span class="keyword">struct</span> <span class="title">inode</span> *, <span class="title">int</span>);</span></span><br><span class="line"></span><br><span class="line">	<span class="type">int</span> (*readlink) (<span class="keyword">struct</span> dentry *, <span class="type">char</span> __user *,<span class="type">int</span>);</span><br><span class="line">	<span class="type">void</span> (*put_link) (<span class="keyword">struct</span> dentry *, <span class="keyword">struct</span> nameidata *, <span class="type">void</span> *);</span><br><span class="line"></span><br><span class="line">	<span class="type">int</span> (*create) (<span class="keyword">struct</span> inode *,<span class="keyword">struct</span> dentry *, <span class="type">umode_t</span>, <span class="type">bool</span>);</span><br><span class="line">	<span class="type">int</span> (*link) (<span class="keyword">struct</span> dentry *,<span class="keyword">struct</span> inode *,<span class="keyword">struct</span> dentry *);</span><br><span class="line">	<span class="type">int</span> (*unlink) (<span class="keyword">struct</span> inode *,<span class="keyword">struct</span> dentry *);</span><br><span class="line">	<span class="type">int</span> (*symlink) (<span class="keyword">struct</span> inode *,<span class="keyword">struct</span> dentry *,<span class="type">const</span> <span class="type">char</span> *);</span><br><span class="line">	<span class="type">int</span> (*mkdir) (<span class="keyword">struct</span> inode *,<span class="keyword">struct</span> dentry *,<span class="type">umode_t</span>);</span><br><span class="line">	<span class="type">int</span> (*rmdir) (<span class="keyword">struct</span> inode *,<span class="keyword">struct</span> dentry *);</span><br><span class="line">	<span class="type">int</span> (*mknod) (<span class="keyword">struct</span> inode *,<span class="keyword">struct</span> dentry *,<span class="type">umode_t</span>,<span class="type">dev_t</span>);</span><br><span class="line">	<span class="type">int</span> (*rename) (<span class="keyword">struct</span> inode *, <span class="keyword">struct</span> dentry *,</span><br><span class="line">			<span class="keyword">struct</span> inode *, <span class="keyword">struct</span> dentry *);</span><br><span class="line">	<span class="type">int</span> (*setattr) (<span class="keyword">struct</span> dentry *, <span class="keyword">struct</span> iattr *);</span><br><span class="line">	<span class="type">int</span> (*getattr) (<span class="keyword">struct</span> vfsmount *mnt, <span class="keyword">struct</span> dentry *, <span class="keyword">struct</span> kstat *);</span><br><span class="line">	<span class="type">int</span> (*setxattr) (<span class="keyword">struct</span> dentry *, <span class="type">const</span> <span class="type">char</span> *,<span class="type">const</span> <span class="type">void</span> *,<span class="type">size_t</span>,<span class="type">int</span>);</span><br><span class="line">	<span class="type">ssize_t</span> (*getxattr) (<span class="keyword">struct</span> dentry *, <span class="type">const</span> <span class="type">char</span> *, <span class="type">void</span> *, <span class="type">size_t</span>);</span><br><span class="line">	<span class="type">ssize_t</span> (*listxattr) (<span class="keyword">struct</span> dentry *, <span class="type">char</span> *, <span class="type">size_t</span>);</span><br><span class="line">	<span class="type">int</span> (*removexattr) (<span class="keyword">struct</span> dentry *, <span class="type">const</span> <span class="type">char</span> *);</span><br><span class="line">	<span class="type">int</span> (*fiemap)(<span class="keyword">struct</span> inode *, <span class="keyword">struct</span> fiemap_extent_info *, u64 start,</span><br><span class="line">		      u64 len);</span><br><span class="line">	<span class="type">int</span> (*update_time)(<span class="keyword">struct</span> inode *, <span class="keyword">struct</span> timespec *, <span class="type">int</span>);</span><br><span class="line">	<span class="type">int</span> (*<span class="type">atomic_open</span>)(<span class="keyword">struct</span> inode *, <span class="keyword">struct</span> dentry *,</span><br><span class="line">			   <span class="keyword">struct</span> file *, <span class="type">unsigned</span> open_flag,</span><br><span class="line">			   <span class="type">umode_t</span> create_mode, <span class="type">int</span> *opened);</span><br><span class="line">&#125; ____cacheline_aligned;</span><br></pre></td></tr></table></figure>
+<h3 id="进程与文件">进程与文件</h3>
+<p>文件是和进程息息相关的，和文件相关的结构包括：</p>
+<ul>
+<li>task_struct: 进程的表示，包括 fs_struct 和 files_struct</li>
+<li>fs_struct: 进程和文件系统的关系</li>
+<li>files_struct: 用于将 fd 转换为 file</li>
+<li>file: 文件的表示</li>
+</ul>
+<h4 id="file-v2">file</h4>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// include/linux/fs.h 结构体已删减</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">file</span> &#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">path</span> <span class="title">f_path</span>;</span>                  <span class="comment">// 包含的目录项</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">inode</span>* <span class="title">f_inode</span>;</span>               <span class="comment">// 缓存值</span></span><br><span class="line">    <span class="type">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">file_operations</span>* <span class="title">f_op</span>;</span>  <span class="comment">// 文件操作函数</span></span><br><span class="line">    <span class="type">atomic_long_t</span> f_count;               <span class="comment">// 文件对象引用计数</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> f_flags;</span><br><span class="line">    <span class="type">fmode_t</span> f_mode;</span><br><span class="line">    <span class="type">loff_t</span> f_pos;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">fown_struct</span> <span class="title">f_owner</span>;</span></span><br><span class="line">    <span class="type">void</span>* private_data;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">address_space</span> *<span class="title">f_mapping</span>;</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>相关函数：</p>
+<ul>
+<li>alloc_file 调用 get_empty_filp 从 filp_cachep 分配一个文件。</li>
+</ul>
+<h4 id="file-operations">file_operations</h4>
+<p>这个操作集包含了对文件的所有操作，如读取、写入、打开和关闭等等。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">file_operations</span> &#123;</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">module</span> *<span class="title">owner</span>;</span></span><br><span class="line">	<span class="type">loff_t</span> (*llseek) (<span class="keyword">struct</span> file *, <span class="type">loff_t</span>, <span class="type">int</span>);</span><br><span class="line">	<span class="type">ssize_t</span> (*read) (<span class="keyword">struct</span> file *, <span class="type">char</span> __user *, <span class="type">size_t</span>, <span class="type">loff_t</span> *);</span><br><span class="line">	<span class="type">ssize_t</span> (*write) (<span class="keyword">struct</span> file *, <span class="type">const</span> <span class="type">char</span> __user *, <span class="type">size_t</span>, <span class="type">loff_t</span> *);</span><br><span class="line">	<span class="type">ssize_t</span> (*aio_read) (<span class="keyword">struct</span> kiocb *, <span class="type">const</span> <span class="keyword">struct</span> iovec *, <span class="type">unsigned</span> <span class="type">long</span>, <span class="type">loff_t</span>);</span><br><span class="line">	<span class="type">ssize_t</span> (*aio_write) (<span class="keyword">struct</span> kiocb *, <span class="type">const</span> <span class="keyword">struct</span> iovec *, <span class="type">unsigned</span> <span class="type">long</span>, <span class="type">loff_t</span>);</span><br><span class="line">	<span class="type">int</span> (*readdir) (<span class="keyword">struct</span> file *, <span class="type">void</span> *, <span class="type">filldir_t</span>);</span><br><span class="line">	<span class="type">unsigned</span> <span class="title function_">int</span> <span class="params">(*poll)</span> <span class="params">(<span class="keyword">struct</span> file *, <span class="keyword">struct</span> poll_table_struct *)</span>;</span><br><span class="line">	<span class="type">long</span> (*unlocked_ioctl) (<span class="keyword">struct</span> file *, <span class="type">unsigned</span> <span class="type">int</span>, <span class="type">unsigned</span> <span class="type">long</span>);</span><br><span class="line">	<span class="type">long</span> (*compat_ioctl) (<span class="keyword">struct</span> file *, <span class="type">unsigned</span> <span class="type">int</span>, <span class="type">unsigned</span> <span class="type">long</span>);</span><br><span class="line">	<span class="type">int</span> (*mmap) (<span class="keyword">struct</span> file *, <span class="keyword">struct</span> vm_area_struct *);</span><br><span class="line">	<span class="type">int</span> (*open) (<span class="keyword">struct</span> inode *, <span class="keyword">struct</span> file *);</span><br><span class="line">	<span class="type">int</span> (*flush) (<span class="keyword">struct</span> file *, <span class="type">fl_owner_t</span> id);</span><br><span class="line">	<span class="type">int</span> (*release) (<span class="keyword">struct</span> inode *, <span class="keyword">struct</span> file *);</span><br><span class="line">	<span class="type">int</span> (*fsync) (<span class="keyword">struct</span> file *, <span class="type">loff_t</span>, <span class="type">loff_t</span>, <span class="type">int</span> datasync);</span><br><span class="line">	<span class="type">int</span> (*aio_fsync) (<span class="keyword">struct</span> kiocb *, <span class="type">int</span> datasync);</span><br><span class="line">	<span class="type">int</span> (*fasync) (<span class="type">int</span>, <span class="keyword">struct</span> file *, <span class="type">int</span>);</span><br><span class="line">	<span class="type">int</span> (*lock) (<span class="keyword">struct</span> file *, <span class="type">int</span>, <span class="keyword">struct</span> file_lock *);</span><br><span class="line">	<span class="type">ssize_t</span> (*sendpage) (<span class="keyword">struct</span> file *, <span class="keyword">struct</span> page *, <span class="type">int</span>, <span class="type">size_t</span>, <span class="type">loff_t</span> *, <span class="type">int</span>);</span><br><span class="line">	<span class="type">unsigned</span> <span class="title function_">long</span> <span class="params">(*get_unmapped_area)</span><span class="params">(<span class="keyword">struct</span> file *, <span class="type">unsigned</span> <span class="type">long</span>, <span class="type">unsigned</span> <span class="type">long</span>, <span class="type">unsigned</span> <span class="type">long</span>, <span class="type">unsigned</span> <span class="type">long</span>)</span>;</span><br><span class="line">	<span class="type">int</span> (*check_flags)(<span class="type">int</span>);</span><br><span class="line">	<span class="type">int</span> (*flock) (<span class="keyword">struct</span> file *, <span class="type">int</span>, <span class="keyword">struct</span> file_lock *);</span><br><span class="line">	<span class="type">ssize_t</span> (*splice_write)(<span class="keyword">struct</span> pipe_inode_info *, <span class="keyword">struct</span> file *, <span class="type">loff_t</span> *, <span class="type">size_t</span>, <span class="type">unsigned</span> <span class="type">int</span>);</span><br><span class="line">	<span class="type">ssize_t</span> (*splice_read)(<span class="keyword">struct</span> file *, <span class="type">loff_t</span> *, <span class="keyword">struct</span> pipe_inode_info *, <span class="type">size_t</span>, <span class="type">unsigned</span> <span class="type">int</span>);</span><br><span class="line">	<span class="type">int</span> (*setlease)(<span class="keyword">struct</span> file *, <span class="type">long</span>, <span class="keyword">struct</span> file_lock **);</span><br><span class="line">	<span class="type">long</span> (*fallocate)(<span class="keyword">struct</span> file *file, <span class="type">int</span> mode, <span class="type">loff_t</span> offset,</span><br><span class="line">			  <span class="type">loff_t</span> len);</span><br><span class="line">	<span class="type">int</span> (*show_fdinfo)(<span class="keyword">struct</span> seq_file *m, <span class="keyword">struct</span> file *f);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h4 id="task-struct">task_struct</h4>
+<p>进程中与文件相关的两个成员。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// include/linux/sched.h 结构体已删减</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">task_struct</span> &#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">fs_struct</span>* <span class="title">fs</span>;</span>        <span class="comment">// filesystem information</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">files_struct</span>* <span class="title">files</span>;</span>  <span class="comment">// open file information</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h4 id="fs-struct">fs_struct</h4>
+<p>主要包含两个路径，一个是当前工作目录，一个是工作目录所在文件系统的根目录。主要体现了进程和具体文件系统的关系。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// include/linux/path.h</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">path</span> &#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">vfsmount</span>* <span class="title">mnt</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">dentry</span>* <span class="title">dentry</span>;</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// include/linux/fs_struct.h 结构体已删减 </span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">fs_struct</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> users;         <span class="comment">// 当前有多少个用户（线程或进程）共享这个 fs_struct 资源</span></span><br><span class="line">    <span class="type">int</span> umask;         <span class="comment">// 文件权限的掩码</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">path</span> <span class="title">root</span>;</span>  <span class="comment">// 根目录(/) 路径 </span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">path</span> <span class="title">pwd</span>;</span>   <span class="comment">// 当前工作目录(.) 路径</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h4 id="files-struct">files_struct</h4>
+<p>我们通常说的 fd 是一个整数，而这个整数正好可以作为下标，从而从 files_struct 中获得 file 结构。具体查找是通过 fdt-&gt;fd[fd] 来找到对应的 file（在默认数量内，这里的 file 地址就是 fd_array[fd]）。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// include/linux/fdtable.h 结构体已删减</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">files_struct</span> &#123;</span>  <span class="comment">// Open file table structure</span></span><br><span class="line">    <span class="type">atomic_t</span> count;    <span class="comment">// 引用计数</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">fdtable</span> __<span class="title">rcu</span>* <span class="title">fdt</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">fdtable</span> <span class="title">fdtab</span>;</span></span><br><span class="line">    <span class="type">spinlock_t</span> file_lock ____cacheline_aligned_in_smp;</span><br><span class="line">    <span class="type">int</span> next_fd;  <span class="comment">// 下一个可用的 fd 索引：当前 fd+1</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> close_on_exec_init[<span class="number">1</span>];</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> open_fds_init[<span class="number">1</span>];          <span class="comment">// 记录当前已打开的 fd 的 bitmap，用数组是便于以后扩展</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">file</span>* <span class="title">fd_array</span>[<span class="title">NR_OPEN_DEFAULT</span>];</span>  <span class="comment">// 默认数量内，fd 索引对应的 file 对象</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>fdt</p>
+<ul>
+<li>fdt 指针默认是指向 fdtab 的。当打开的文件数目比较多的时候，就需要重新分配一个 fdtable，并增大其 fd 数组和打开位图，然后将这个 fdt 指针指向新分配的 fdtable 资源。原来 fdt 所指向的内存会复制到新的 fdtable。</li>
+<li>至于如何判断 fdt 是否指向动态 fdtable，也就是最后是否需要释放 fdt 所指向的内存，可以通过判断 fdt 和 &amp;fdtab 的地址是否相等来确定。</li>
+</ul>
+<p>从 fd 转换为 file 的关键数据结构就是 fdtable。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// include/linux/fdtable.h</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">fdtable</span> &#123;</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> max_fds;          <span class="comment">// 最大可打开文件数，即 fd 数组长度</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">file</span> __<span class="title">rcu</span>** <span class="title">fd</span>;</span>        <span class="comment">// 当前的 fd 数组</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span>* close_on_exec;  <span class="comment">// 位图：带 O_CLOEXEC 打开标志的 fd</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span>* open_fds;       <span class="comment">// 位图：已经打开的 fd</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">rcu_head</span> <span class="title">rcu</span>;</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>fd/close_on_exec/open_fds</p>
+<ul>
+<li>如果打开的文件比较少，那么这个 fd 将指向 files_struct 的 fd_array。</li>
+<li>如果打开的文件比较多，fdtable 本身就是动态分配的、fd 成员也是动态分配。所以，是否要释放 fd 所指空间很好判断，如果要释放 fdtable 就一定会释放 fd。对 fd 的分配会尝试 kmalloc() 和 vmalloc() 两种方法。</li>
+<li>另外，close_on_exec 与 open_fds 的行为同 fd，如果 fdtable 是动态分配的，那么他们也必然是动态分配的。</li>
+</ul>
+<h3 id="目录项">目录项</h3>
+<p>目录操作使用 struct dentry 结构体。它的主要任务是在索引节点和文件名之间建立链接。</p>
+<h4 id="dentry-v2">dentry</h4>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// include/linux/dcache.h 结构体已删减</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">dentry</span> &#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">dentry</span>* <span class="title">d_parent</span>;</span>               <span class="comment">// 父目录</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">qstr</span> <span class="title">d_name</span>;</span>                    <span class="comment">// 文件名称及哈希值</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">inode</span>* <span class="title">d_inode</span>;</span>                 <span class="comment">// 关联的 inode，NULL 表示 negative</span></span><br><span class="line">    <span class="type">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">dentry_operations</span>* <span class="title">d_op</span>;</span>  <span class="comment">// 目录项操作相关函数</span></span><br><span class="line">    <span class="type">void</span>* d_fsdata;                        <span class="comment">// 文件系统特定的数据</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">super_block</span>* <span class="title">d_sb</span>;</span>              <span class="comment">// 指向超级块</span></span><br><span class="line">    <span class="class"><span class="keyword">union</span> &#123;</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> <span class="title">d_child</span>;</span>  <span class="comment">// 父目录中的子目录和文件</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">rcu_head</span> <span class="title">d_rcu</span>;</span></span><br><span class="line">    &#125; d_u;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> <span class="title">d_subdirs</span>;</span>  <span class="comment">// 当前目录中的子目录和文件</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>相关函数：</p>
+<ul>
+<li>d_alloc 构造函数，从 dentry_cache 分配一个 negative 目录项。</li>
+<li>dput 析构函数，当引用计数为 0 时调用 dentry_kill 释放目录项。</li>
+</ul>
+<h4 id="dentry-operations">dentry_operations</h4>
+<p>由于 dentry 主要供 VFS 使用，所以操作集中的函数一般情况下也不需要具体文件系统去实现。这里的函数是针对 dentry 的操作，如 d_revalidate、d_hash、d_compare、d_delete、 d_release、d_prune 等等。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">dentry_operations</span> &#123;</span></span><br><span class="line">	<span class="type">int</span> (*d_revalidate)(<span class="keyword">struct</span> dentry *, <span class="type">unsigned</span> <span class="type">int</span>);</span><br><span class="line">	<span class="type">int</span> (*d_weak_revalidate)(<span class="keyword">struct</span> dentry *, <span class="type">unsigned</span> <span class="type">int</span>);</span><br><span class="line">	<span class="type">int</span> (*d_hash)(<span class="type">const</span> <span class="keyword">struct</span> dentry *, <span class="type">const</span> <span class="keyword">struct</span> inode *,</span><br><span class="line">			<span class="keyword">struct</span> qstr *);</span><br><span class="line">	<span class="type">int</span> (*d_compare)(<span class="type">const</span> <span class="keyword">struct</span> dentry *, <span class="type">const</span> <span class="keyword">struct</span> inode *,</span><br><span class="line">			<span class="type">const</span> <span class="keyword">struct</span> dentry *, <span class="type">const</span> <span class="keyword">struct</span> inode *,</span><br><span class="line">			<span class="type">unsigned</span> <span class="type">int</span>, <span class="type">const</span> <span class="type">char</span> *, <span class="type">const</span> <span class="keyword">struct</span> qstr *);</span><br><span class="line">	<span class="type">int</span> (*d_delete)(<span class="type">const</span> <span class="keyword">struct</span> dentry *);</span><br><span class="line">	<span class="type">void</span> (*d_release)(<span class="keyword">struct</span> dentry *);</span><br><span class="line">	<span class="type">void</span> (*d_prune)(<span class="keyword">struct</span> dentry *);</span><br><span class="line">	<span class="type">void</span> (*d_iput)(<span class="keyword">struct</span> dentry *, <span class="keyword">struct</span> inode *);</span><br><span class="line">	<span class="type">char</span> *(*d_dname)(<span class="keyword">struct</span> dentry *, <span class="type">char</span> *, <span class="type">int</span>);</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">vfsmount</span> *(*<span class="title">d_automount</span>)(<span class="keyword">struct</span> <span class="title">path</span> *);</span></span><br><span class="line">	<span class="type">int</span> (*d_manage)(<span class="keyword">struct</span> dentry *, <span class="type">bool</span>);</span><br><span class="line">&#125; ____cacheline_aligned;</span><br></pre></td></tr></table></figure>
+<h2 id="数据结构关系图">数据结构关系图</h2>
+<img src="/images/linux-kernel/filesystem/vfs-datastruct.png" alt="数据结构关系图" width="100%" height="100%">
+<img src="/images/linux-kernel/filesystem/vfs-datastruct2.png" alt="各实例组织关系图" width="100%" height="100%">
+<img src="/images/linux-kernel/filesystem/vfs-datastruct3.png" alt="数据结构关系图" width="100%" height="100%">
+<h2 id="基本操作">基本操作</h2>
+<h3 id="从 fd 获取 file">从 fd 获取 file</h3>
+<p>查找 fd 对应的 file 结构的线路图为：current -&gt; files_struct -&gt; fdtable -&gt; file，具体可以参考 fget 函数。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> file* <span class="title function_">fget</span><span class="params">(<span class="type">unsigned</span> <span class="type">int</span> fd)</span> &#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">file</span>* <span class="title">file</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">files_struct</span>* <span class="title">files</span> =</span> current-&gt;files;  <span class="comment">// 1. current -&gt; files_struct ⭐</span></span><br><span class="line"></span><br><span class="line">    rcu_read_lock();</span><br><span class="line">    file = fcheck_files(files, fd);  <span class="comment">// 2. files_struct -&gt; fdtable -&gt; file ⭐</span></span><br><span class="line">    <span class="keyword">if</span> (file) &#123;</span><br><span class="line">        <span class="comment">/* File object ref couldn&#x27;t be taken 要求文件不是目录、可以引用 */</span></span><br><span class="line">        <span class="keyword">if</span> (file-&gt;f_mode &amp; FMODE_PATH || !atomic_long_inc_not_zero(&amp;file-&gt;f_count))</span><br><span class="line">            file = <span class="literal">NULL</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    rcu_read_unlock();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> file;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="keyword">struct</span> file* <span class="title function_">fcheck_files</span><span class="params">(<span class="keyword">struct</span> files_struct* files, <span class="type">unsigned</span> <span class="type">int</span> fd)</span> &#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">file</span>* <span class="title">file</span> =</span> <span class="literal">NULL</span>;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">fdtable</span>* <span class="title">fdt</span> =</span> files_fdtable(files);  <span class="comment">// 2.1 files_struct -&gt; fdtable ⭐</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 2.2 fdtable -&gt; file ⭐ */</span></span><br><span class="line">    <span class="keyword">if</span> (fd &lt; fdt-&gt;max_fds)</span><br><span class="line">        <span class="comment">// 如果 fd 小于 NR_OPEN_DEFAULT，这里 fdt-&gt;fd[fd] 便是 files-&gt;fd_array[fd] </span></span><br><span class="line">        file = rcu_dereference_check_fdtable(files, fdt-&gt;fd[fd]);</span><br><span class="line">    <span class="keyword">return</span> file;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> rcu_dereference_check_fdtable(files, fdtfd) \</span></span><br><span class="line"><span class="meta">    (rcu_dereference_check((fdtfd), \</span></span><br><span class="line"><span class="meta">                   lockdep_is_held(&amp;(files)-&gt;file_lock) || \</span></span><br><span class="line"><span class="meta">                   atomic_read(&amp;(files)-&gt;count) == 1 || \</span></span><br><span class="line"><span class="meta">                   rcu_my_thread_group_empty()))</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> files_fdtable(files) \</span></span><br><span class="line"><span class="meta">        (rcu_dereference_check_fdtable((files), (files)-&gt;fdt))</span></span><br></pre></td></tr></table></figure>
+<h1 id="块设备驱动">块设备驱动</h1>
+<h2 id="简介">简介</h2>
+<h3 id="字符设备">字符设备</h3>
+<p>字符设备是一种顺序的数据流设备，对字符设备的读写是以字节为单位进行的，这些字符连续地形成一个数据流，字符设备没有缓存区，对于字符设备的读写是实时的。字符设备包括键盘、鼠标、串口、终端等。</p>
+<h3 id="块设备">块设备</h3>
+<p>块设备是一种具有一定结构的随机存取设备，对块设备的读写是以块为单位进行的，块设备使用缓存区来存放数据，待条件满足后，将数据从缓存区一次性写入到设备，或者从设备一次性读取到缓存区。块设备包括硬盘、SSD 等存储介质。</p>
+<table>
+<thead>
+<tr>
+<th>特性</th>
+<th>字符设备</th>
+<th>块设备</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>访问方式</td>
+<td>顺序访问</td>
+<td>随机访问</td>
+</tr>
+<tr>
+<td>类型</td>
+<td>数据流设备</td>
+<td>存储设备</td>
+</tr>
+<tr>
+<td>读写单位</td>
+<td>以字节为单位</td>
+<td>以块为单位</td>
+</tr>
+<tr>
+<td>缓存支持</td>
+<td>没有缓存区，实时读写</td>
+<td>有缓存区，非实时</td>
+</tr>
+<tr>
+<td>调用层</td>
+<td>由应用层程序调用</td>
+<td>由文件系统程序调用</td>
+</tr>
+</tbody>
+</table>
+<p>块设备的速度通常比字符设备的速度快得多，并且它们的性能也很重要。与字符设备相比，使用块设备更加复杂。<strong>字符设备只有当前位置，而块设备必须能够移动到设备上的任何位置，以提供对数据的随机访问</strong>。为了简化对块设备的操作，Linux 内核提供了一整个子系统，称为块 I/O（或块层）子系统。</p>
+<h2 id="块设备驱动架构 -v2">块设备驱动架构</h2>
+<img src="/images/linux-kernel/filesystem/block-fs-arch.png" alt="块设备驱动架构" width="60%" height="60%">
+<p>块设备使用请求队列，缓存并重排读写数据块的请求，用高效的方式读取数据；块设备的每个设备都关联了请求队列；对块设备的读写请求不会立即执行，这些请求会汇总起来，经过协同之后传输到设备。</p>
+<h2 id="注册块 I-O 设备">注册块 I/O 设备</h2>
+<p>要注册块设备，请使用函数 register_blkdev()。要注销一个块设备，可以使用函数 unregister_blkdev()。</p>
+<p>register_blkdev() 函数执行的唯一操作是 <strong> 动态分配一个主设备号</strong>（如果调用函数时主设备号参数为 0），并在 /proc/devices 中创建一个条目。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/fs.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> MY_BLOCK_MAJOR 240</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> MY_BLKDEV_NAME <span class="string">&quot;mybdev&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">my_block_init</span><span class="params">(<span class="type">void</span>)</span> &#123;</span><br><span class="line">    <span class="type">int</span> status;</span><br><span class="line"></span><br><span class="line">    status = register_blkdev(MY_BLOCK_MAJOR, MY_BLKDEV_NAME);</span><br><span class="line">    <span class="keyword">if</span> (status &lt; <span class="number">0</span>) &#123;</span><br><span class="line">        printk(KERN_ERR <span class="string">&quot;unable to register mybdev block device\n&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> -EBUSY;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">void</span> <span class="title function_">my_block_exit</span><span class="params">(<span class="type">void</span>)</span> &#123;</span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line">    unregister_blkdev(MY_BLOCK_MAJOR, MY_BLKDEV_NAME);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>通过 <code>cat /proc/devices</code> 命令，可得已注册的字符设备和块设备的主设备号和设备名称。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># cat /proc/devices</span></span><br><span class="line">Character devices:</span><br><span class="line">  1 mem</span><br><span class="line">  4 /dev/vc/0</span><br><span class="line">  4 <span class="built_in">tty</span></span><br><span class="line">  4 ttyS</span><br><span class="line">...</span><br><span class="line">261 accel</span><br><span class="line"></span><br><span class="line">Block devices:</span><br><span class="line">  2 fd</span><br><span class="line">  7 loop</span><br><span class="line">  8 sd</span><br><span class="line">  9 md</span><br><span class="line">...</span><br><span class="line">259 blkext</span><br></pre></td></tr></table></figure>
+<h2 id="注册磁盘">注册磁盘</h2>
+<p>尽管 register_blkdev() 函数获取了主设备号，但它并没有向系统提供设备（磁盘）。为了创建和使用块设备（磁盘），我们使用在 linux/genhd.h 中定义的专门接口。</p>
+<p>在 linux/genhd.h 中定义的有用函数是用于注册 / 分配磁盘、将其添加到系统中以及注销 / 卸载磁盘的函数。</p>
+<p><strong>alloc_disk() 函数用于分配磁盘，del_gendisk() 函数用于释放磁盘。使用 add_disk() 函数将磁盘添加到系统中</strong>。</p>
+<p>通常在模块初始化函数中使用 alloc_disk() 和 add_disk() 函数，而在模块退出函数中使用 del_gendisk() 函数。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/fs.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/genhd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> MY_BLOCK_MINORS 1</span></span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="class"><span class="keyword">struct</span> <span class="title">my_block_dev</span> &#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">gendisk</span>* <span class="title">gd</span>;</span></span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line">&#125; dev;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">create_block_device</span><span class="params">(<span class="keyword">struct</span> my_block_dev* dev)</span> &#123;</span><br><span class="line">    dev-&gt;gd = alloc_disk(MY_BLOCK_MINORS);</span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line">    add_disk(dev-&gt;gd);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">my_block_init</span><span class="params">(<span class="type">void</span>)</span> &#123;</span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line">    create_block_device(&amp;dev);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">void</span> <span class="title function_">delete_block_device</span><span class="params">(<span class="keyword">struct</span> my_block_dev* dev)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (dev-&gt;gd)</span><br><span class="line">        del_gendisk(dev-&gt;gd);</span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">void</span> <span class="title function_">my_block_exit</span><span class="params">(<span class="type">void</span>)</span> &#123;</span><br><span class="line">    delete_block_device(&amp;dev);</span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>与字符设备一样，建议使用 my_block_dev 结构来存储描述块设备的重要元素。</p>
+<p>请注意，在调用 add_disk() 函数之后（实际上，甚至包括调用期间），磁盘是活动的，可以随时调用其方法。因此，<strong>在驱动程序完全初始化并准备好响应对注册磁盘的请求之前，不应调用此函数</strong>。</p>
+<p>可以注意到，用于处理块设备（磁盘）的基本结构是 struct gendisk 结构。</p>
+<p>在调用 del_gendisk() 函数后，如果仍然有用户（对设备调用了打开操作，但关联的释放操作尚未被调用），则 struct gendisk 结构可能继续存在（并且设备操作仍然可以调用）。一种解决方法是 <strong> 记录设备的用户数</strong>，并仅在设备没有剩余用户后调用 del_gendisk() 函数。</p>
+<h2 id="gendisk 结构体">gendisk 结构体</h2>
+<p>Linux 提供了一个 gendisk 数据结构体，用来表示一个独立的磁盘设备或分区，用于对底层物理磁盘进行访问。在 gendisk 中有一个类似字符设备中 file_operations 的硬件操作结构指针，是 block_device_operations 结构体。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// include/linux/genhd.h 结构体已删减</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">gendisk</span> &#123;</span></span><br><span class="line">    <span class="comment">/* 描述磁盘使用的标识符；磁盘必须至少有一个次设备号；</span></span><br><span class="line"><span class="comment">       如果磁盘允许分区操作，则必须为每个可能的分区分配一个次设备号 */</span></span><br><span class="line">    <span class="type">int</span> major;       <span class="comment">/* 磁盘设备的主设备号 */</span></span><br><span class="line">    <span class="type">int</span> first_minor; <span class="comment">/* 磁盘的第一个次设备号 */</span></span><br><span class="line">    <span class="type">int</span> minors;      <span class="comment">/* 磁盘的次设备号数量，即磁盘的分区数量 */</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 在 /proc/partitions 和 sysfs (/sys/block) 中显示 */</span></span><br><span class="line">    <span class="type">char</span> disk_name[DISK_NAME_LEN]; <span class="comment">/* name of major driver */</span></span><br><span class="line"></span><br><span class="line">    <span class="type">char</span>* (*devnode)(<span class="keyword">struct</span> gendisk* gd, <span class="type">umode_t</span>* mode);</span><br><span class="line"></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> events; <span class="comment">/* supported events */</span></span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">hd_struct</span> <span class="title">part0</span>;</span>  <span class="comment">/* 分区描述 */</span></span><br><span class="line"></span><br><span class="line">    <span class="type">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">block_device_operations</span>* <span class="title">fops</span>;</span> <span class="comment">/* 块设备操作集 */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">request_queue</span>* <span class="title">queue</span>;</span>                <span class="comment">/* 磁盘对应的请求队列 */</span></span><br><span class="line">    <span class="type">void</span>* private_data;                         <span class="comment">/* 指向私有数据的指针 */</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>对于每一个分区来说，都有一个 hd_struct 结构体，用于描述该分区：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// include/linux/genhd.h 结构体已删减</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">hd_struct</span> &#123;</span></span><br><span class="line">    <span class="comment">/* 定义了该分区在块设备上的起始扇区和长度，唯一地描述了该分区 */</span></span><br><span class="line">    <span class="type">sector_t</span> start_sect;</span><br><span class="line">    <span class="type">sector_t</span> nr_sects;</span><br><span class="line"></span><br><span class="line">    <span class="type">sector_t</span> alignment_offset;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> discard_alignment;</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">partition_meta_info</span>* <span class="title">info</span>;</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>如上所述，这样的结构体是通过 alloc_disk() 调用获得的，在将其作为参数传入 add_disk() 函数之前，必须填充其字段。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/blkdev.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/fs.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/genhd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> NR_SECTORS 1024</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> KERNEL_SECTOR_SIZE 512</span></span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="class"><span class="keyword">struct</span> <span class="title">my_block_dev</span> &#123;</span></span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line">    <span class="type">spinlock_t</span> lock;             <span class="comment">/* 互斥锁 */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">request_queue</span>* <span class="title">queue</span>;</span> <span class="comment">/* 设备请求队列 */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">gendisk</span>* <span class="title">gd</span>;</span>          <span class="comment">/* gendisk 结构体 */</span></span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line">&#125; dev;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">create_block_device</span><span class="params">(<span class="keyword">struct</span> my_block_dev* dev)</span> &#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">    <span class="comment">/* 初始化 gendisk 结构体 */</span></span><br><span class="line">    dev-&gt;gd = alloc_disk(MY_BLOCK_MINORS);</span><br><span class="line">    <span class="keyword">if</span> (!dev-&gt;gd) &#123;</span><br><span class="line">        printk(KERN_NOTICE <span class="string">&quot;alloc_disk failure\n&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> -ENOMEM;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    dev-&gt;gd-&gt;major = MY_BLOCK_MAJOR;</span><br><span class="line">    dev-&gt;gd-&gt;first_minor = <span class="number">0</span>;</span><br><span class="line">    dev-&gt;gd-&gt;fops = &amp;my_block_ops;</span><br><span class="line">    dev-&gt;gd-&gt;<span class="built_in">queue</span> = dev-&gt;<span class="built_in">queue</span>;</span><br><span class="line">    dev-&gt;gd-&gt;private_data = dev;</span><br><span class="line">    <span class="built_in">snprintf</span>(dev-&gt;gd-&gt;disk_name, <span class="number">32</span>, <span class="string">&quot;myblock&quot;</span>);</span><br><span class="line">    set_capacity(dev-&gt;gd, NR_SECTORS);  <span class="comment">// dev-gd-&gt;part0.nr_sects = NR_SECTORS</span></span><br><span class="line"></span><br><span class="line">    add_disk(dev-&gt;gd);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如前所述，<strong>内核将磁盘视为一连串的 512 字节扇区 </strong>。实际上，设备可能具有不同大小的扇区。为了与这些设备一起工作，<strong> 内核需要了解实际扇区的大小，并且在所有操作中需要进行必要的转换</strong>。</p>
+<p>要向内核通知设备的扇区大小，必须在分配请求队列后设置请求队列的参数，使用 blk_queue_logical_block_size() 函数完成设置。内核生成的所有请求都将是该扇区大小的倍数，并相应地对齐。但是，设备和驱动程序之间的通信仍将以 512 字节大小的扇区进行，因此每次都需要进行转换（上述代码中调用 set_capacity() 函数时就是一个例子）。</p>
+<h2 id="block-device-operations 结构体">block_device_operations 结构体</h2>
+<p>就像对于字符设备，需要完成 struct file_operations 中的操作一样，对于块设备，需要完成 struct block_device_operations 中的操作（来告诉 <strong> 文件系统</strong>，块设备驱动的操作接口）。操作的关联是通过 struct gendisk 结构体中的 fops 字段完成的。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">block_device_operations</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> (*open)(<span class="keyword">struct</span> block_device*, <span class="type">fmode_t</span>);</span><br><span class="line">    <span class="type">int</span> (*release)(<span class="keyword">struct</span> gendisk*, <span class="type">fmode_t</span>);</span><br><span class="line">    <span class="type">int</span> (*locked_ioctl)(<span class="keyword">struct</span> block_device*, <span class="type">fmode_t</span>, <span class="type">unsigned</span>, <span class="type">unsigned</span> <span class="type">long</span>);</span><br><span class="line">    <span class="type">int</span> (*ioctl)(<span class="keyword">struct</span> block_device*, <span class="type">fmode_t</span>, <span class="type">unsigned</span>, <span class="type">unsigned</span> <span class="type">long</span>);</span><br><span class="line">    <span class="type">int</span> (*compat_ioctl)(<span class="keyword">struct</span> block_device*, <span class="type">fmode_t</span>, <span class="type">unsigned</span>, <span class="type">unsigned</span> <span class="type">long</span>);</span><br><span class="line">    <span class="type">int</span> (*direct_access)(<span class="keyword">struct</span> block_device*, <span class="type">sector_t</span>, <span class="type">void</span>**, <span class="type">unsigned</span> <span class="type">long</span>*);</span><br><span class="line">    <span class="type">int</span> (*media_changed)(<span class="keyword">struct</span> gendisk*);</span><br><span class="line">    <span class="type">int</span> (*revalidate_disk)(<span class="keyword">struct</span> gendisk*);</span><br><span class="line">    <span class="comment">// 获取磁盘信息，包括磁头、柱面和扇区等信息</span></span><br><span class="line">    <span class="type">int</span> (*getgeo)(<span class="keyword">struct</span> block_device*, <span class="keyword">struct</span> hd_geometry*);</span><br><span class="line">    <span class="type">blk_qc_t</span> (*submit_bio)(<span class="keyword">struct</span> bio* bio);</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">module</span>* <span class="title">owner</span>;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>和字符设备驱动不同，块设备驱动的 block_device_operations 操作集中没有负责读和写数据的函数；<strong>在块设备驱动中，这些操作是由 request() 函数处理的</strong>。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/fs.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/genhd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="class"><span class="keyword">struct</span> <span class="title">my_block_dev</span> &#123;</span></span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">gendisk</span>* <span class="title">gd</span>;</span></span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line">&#125; dev;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">my_block_open</span><span class="params">(<span class="keyword">struct</span> block_device* bdev, <span class="type">fmode_t</span> mode)</span> &#123;</span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">my_block_release</span><span class="params">(<span class="keyword">struct</span> gendisk* gd, <span class="type">fmode_t</span> mode)</span> &#123;</span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">block_device_operations</span> <span class="title">my_block_ops</span> =</span> &#123;.owner = THIS_MODULE, .open = my_block_open, .release = my_block_release&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">create_block_device</span><span class="params">(<span class="keyword">struct</span> my_block_dev* dev)</span> &#123;</span><br><span class="line">    <span class="comment">//....</span></span><br><span class="line">    dev-&gt;gd-&gt;fops = &amp;my_block_ops;</span><br><span class="line">    dev-&gt;gd-&gt;private_data = dev;</span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="请求队列">请求队列</h2>
+<p>块设备驱动程序的核心是请求函数，包含请求处理过程。块设备的读写请求放置在请求队列中，在 struct gendisk 中，通过 struct request_queue *queue 指针指向请求队列。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// include/linux/blkdev.h 结构体已删减</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">request_queue</span> &#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> <span class="title">queue_head</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">request</span>* <span class="title">last_merge</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">elevator_queue</span>* <span class="title">elevator</span>;</span></span><br><span class="line">    request_fn_proc* request_fn;</span><br><span class="line">    make_request_fn* make_request_fn;</span><br><span class="line">    <span class="type">void</span>* queuedata;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> <span class="title">icq_list</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">queue_limits</span> <span class="title">limits</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">blk_flush_queue</span>* <span class="title">fq</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> <span class="title">requeue_list</span>;</span></span><br><span class="line">    <span class="type">spinlock_t</span> requeue_lock;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">delayed_work</span> <span class="title">requeue_work</span>;</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>参考资料：</p>
+<ol>
+<li><a target="_blank" rel="noopener" href="http://mickyching.github.io/kernel/linux-vfs-introduction.html">http://mickyching.github.io/kernel/linux-vfs-introduction.html</a></li>
+<li><a target="_blank" rel="noopener" href="http://mickyching.github.io/kernel/linux-vfs-source-annotation.html">http://mickyching.github.io/kernel/linux-vfs-source-annotation.html</a></li>
+<li>磁盘结构：<a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_37641832/article/details/103217311">https://blog.csdn.net/weixin_37641832/article/details/103217311</a></li>
+<li>LBA: <a target="_blank" rel="noopener" href="https://www.cnblogs.com/suv789/p/18536525">https://www.cnblogs.com/suv789/p/18536525</a></li>
+<li><a target="_blank" rel="noopener" href="https://lan-cyl.github.io/linux%20kernel/Linux-kernel-05-vfs.html">https://lan-cyl.github.io/linux kernel/Linux-kernel-05-vfs.html</a></li>
+<li><a target="_blank" rel="noopener" href="https://linux-kernel-labs-zh.xyz/labs/block_device_drivers.html">https://linux-kernel-labs-zh.xyz/labs/block_device_drivers.html</a></li>
+<li><a target="_blank" rel="noopener" href="https://linux-kernel-labs-zh.xyz/">https://linux-kernel-labs-zh.xyz/</a></li>
+</ol>
+</blockquote>
+
+</div>
+
+
+  <div class="book-comments">
+    
+
+
+
+
+  </div>
+
+
+
+<script src="/js/book-post.js"></script>
+
+
+            </div>
+          </div>
+          <div class="column col-2 hide-lg">
+            <div class="book-post-info">
+  
+    <div class="book-post-meta">
+
+  <div class="author">
+
+    <!-- Author image -->
+    <div class="author-img">
+      
+        <figure
+          class="avatar avatar-lg"
+          data-initial="A"
+          style="background-color: #3b4351;">
+        </figure>
+      
+    </div>
+
+    <!-- Author title -->
+    <div class="author-title">
+      <div>aha</div>
+      <div>2024-11-06</div>
+    </div>
+  </div>
+
+  
+    <div class="divider"></div>
+
+    <div class="link">
+      <a class="category-link" href="/categories/Linux/">Linux</a> <a class="category-link" href="/categories/Linux/%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/">文件系统</a>
+
+      <a class="tag-none-link" href="/tags/%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F/" rel="tag">#文件系统</a>
+    </div>
+    
+  
+
+  <div class="divider"></div>
+</div>
+  
+
+  <div class="book-tocbot">
+</div>
+<div class="book-tocbot-menu">
+  <a class="book-toc-expand" onclick="expand_toc()">Expand all</a>
+  <a onclick="go_top()">Back to top</a>
+  <a onclick="go_bottom()">Go to bottom</a>
+  <a onclick="toggleSearch()">Search in blogs</a> <!-- 添加搜索文字的点击事件 -->
+</div>
+
+<div id="search-overlay" class="search-overlay" style="display: none;"> <!-- 初始状态为隐藏 -->
+  <div class="search-box">
+    <input type="text" id="search-input" placeholder="Search in all blogs...">
+    <button onclick="closeSearch()">Close</button> <!-- 添加关闭按钮 -->
+    <div id="search-results" class="search-results"></div>
+  </div>
+</div>
+
+<script>
+  function performSearch(query) {
+    if (!query.trim()) {
+      return;
+    }
+
+    fetch('/search.xml')
+      .then(response => response.text())
+      .then(data => {
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(data, "text/xml");
+        const entries = xmlDoc.getElementsByTagName('entry');
+        let results = '';
+
+        for (let i = 0; i < entries.length; i++) {
+          const title = entries[i].getElementsByTagName('title')[0].textContent;
+          const content = entries[i].getElementsByTagName('content')[0].textContent;
+          const url = entries[i].getElementsByTagName('url')[0].textContent;
+
+          let count = (title.match(new RegExp(query, "gi")) || []).length; // 统计查询词出现的次数
+          count += (content.match(new RegExp(query, "gi")) || []).length;
+
+          if (count > 0) { // title.includes(query) || content.includes(query)
+            results += `
+              <div class="search-result-item">
+                <a href="${url}">${title}</a> (${count})
+              </div>`;
+          }
+        }
+
+        const searchResultsElement = document.getElementById('search-results');
+        searchResultsElement.innerHTML = results;
+        searchResultsElement.classList.add('active');
+      });
+  }
+
+  function toggleSearch() {
+    const searchOverlay = document.getElementById('search-overlay');
+    searchOverlay.style.display = searchOverlay.style.display === 'none' ? 'flex' : 'none';
+  }
+
+  function closeSearch() {
+    document.getElementById('search-overlay').style.display = 'none';
+  }
+
+  document.getElementById('search-input').addEventListener('input', function() {
+    const query = this.value;
+    performSearch(query);
+  });
+</script>
+
+<style>
+  .search-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  .search-box {
+    background: white;
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+    width: 80%;
+    max-width: 500px;
+  }
+
+  .search-results {
+    margin-top: 10px;
+    max-height: 300px;
+    overflow-y: auto;
+    background: white;
+    padding: 10px;
+    border-radius: 5px;
+    width: 100%;
+  }
+
+  .search-result-item {
+    margin: 10px 0;
+  }
+
+  .search-result-item a {
+    color: blue; /* 设置链接颜色为蓝色 */
+    text-decoration: none;
+  }
+
+  .search-result-item a:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+<script src="/js/book-toc.js"></script>
+
+
+</div>
+          </div>
+        </div>
+      </div>
+
+      <a class="off-canvas-overlay" onclick="hide_canvas()"></a>
+
+      <button class="floating-button" onclick="toggleDropdownMenu()"></button>
+
+      <div class="dropdown-menu">
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FFFFFF', '#000000')">银河白</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#C7EDCC', '#000000')">豆沙绿</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FAF9DE', '#000000')">杏仁黄</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#E3EDCD', '#000000')">青草绿</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FFF2E2', '#000000')">秋叶褐</div>
+      </div>
+  </div>
+
+  <script>
+    function toggleDropdownMenu() {
+      document.querySelector('.floating-button').classList.toggle('active');
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      var storedBackgroundColor = localStorage.getItem('blogBackgroundColor');
+      var storedColor = localStorage.getItem('blogColor');
+
+      if (storedBackgroundColor && storedColor) {
+        document.body.style.backgroundColor = storedBackgroundColor;
+        document.body.style.color = storedColor;
+      }
+    });
+
+    function changeBackgroundColor(backgroundColor, color) {
+      document.body.style.backgroundColor = backgroundColor;
+      document.body.style.color = color;
+
+      localStorage.setItem('blogBackgroundColor', backgroundColor);
+      localStorage.setItem('blogColor', color);
+
+      document.querySelector('.floating-button').classList.remove('active');
+    }
+  </script>
+</body>
+
+</html>
+
+
+<script src="/js/book.js"></script>

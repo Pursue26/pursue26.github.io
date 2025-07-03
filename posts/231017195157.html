@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
+
+    
+      <link rel="icon" href="/favicon.png" />
+    
+
+    <title>
+        
+          操作系统之 chapter3.1 内存分层体系与地址空间生成 - aha&#39;s book
+        
+    </title>
+
+    <!-- Spectre.css framework -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre-exp.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre-icons.min.css">
+
+    <!-- theme css & js -->
+    
+<link rel="stylesheet" href="/css/book.css">
+
+    
+<script src="/js/book.js"></script>
+
+
+    <!-- tocbot -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.css">
+    
+    <!-- katex -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/zooming/2.1.1/zooming.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const zooming = new Zooming()
+    zooming.listen('.book-content img')
+})
+</script>
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+    <style>
+      body {
+        background-color: #FFFFFF;
+        /* color: #000000; */
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+
+      /* Floating Button Styles */
+      .floating-button {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 999;
+        background-color: #000000;
+        color: #ffffff;
+        padding: 12px;
+        border-radius: 50%;
+        cursor: pointer;
+        border: 2px solid #000000;
+      }
+
+      .floating-button:hover {
+        background-color: #FFFFFF;
+      }
+
+      /* Dropdown Menu Styles */
+      .dropdown-menu {
+        position: fixed;
+        bottom: 60px;
+        right: 10px;
+        display: none;
+        min-width: 60px;
+        padding: 2px;
+        background-color: #fff;
+        /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
+        z-index: 1000;
+      }
+
+      .floating-button.active+.dropdown-menu {
+        display: block;
+      }
+
+      .dropdown-item {
+        display: block;
+        padding: 8px 16px;
+        cursor: pointer;
+      }
+
+      .dropdown-item:hover {
+        background-color: #f5f5f5;
+      }
+    </style>
+<style>.darkmode--activated{--body-bg-color:#282828;--content-bg-color:#333;--card-bg-color:#555;--text-color:#ccc;--blockquote-color:#bbb;--link-color:#ccc;--link-hover-color:#eee;--brand-color:#ddd;--brand-hover-color:#ddd;--table-row-odd-bg-color:#282828;--table-row-hover-bg-color:#363636;--menu-item-bg-color:#555;--btn-default-bg:#222;--btn-default-color:#ccc;--btn-default-border-color:#555;--btn-default-hover-bg:#666;--btn-default-hover-color:#ccc;--btn-default-hover-border-color:#666;--highlight-background:#282b2e;--highlight-foreground:#a9b7c6;--highlight-gutter-background:#34393d;--highlight-gutter-foreground:#9ca9b6}.darkmode--activated img{opacity:.75}.darkmode--activated img:hover{opacity:.9}.darkmode--activated code{color:#69dbdc;background:0 0}button.darkmode-toggle{z-index:9999}.darkmode-ignore,img{display:flex!important}.beian img{display:inline-block!important}</style></head>
+
+<body>
+  <div class="book-container">
+    <div class="book-sidebar">
+      <div class="book-brand">
+  <a href="/">
+    <img src="/favicon.png">
+    <span>AHA&#39;S BOOK</span>
+  </a>
+</div>
+        <div id="menu" class="book-menu hide">
+  <h2 id="基础知识"> 基础知识 </h2>
+<ul>
+<li><a href="/posts/231010144856.html"> 模运算 </a></li>
+<li><a href="/posts/231014105311.html"> 异或运算 </a></li>
+<li><a href="/posts/231210181853.html"> 计算机中的寄存器 </a></li>
+<li><a href="/posts/231213183051.html"> 正则表达式基础 </a></li>
+</ul>
+<h2 id="C 语言">C 语言 </h2>
+<ul>
+<li><a href="/posts/230916171929.html">main 函数参数 </a></li>
+<li><a href="/posts/231214192113.html"> 关键字与专有名词 </a></li>
+<li><a href="/posts/240103180653.html"> 输出打印函数 </a></li>
+<li><a href="/posts/230922143003.html"> 多维数组 </a></li>
+<li><a href="/posts/230913200729.html">const 关键字 </a></li>
+<li><a href="/posts/230918174223.html">typedef 类型基础 </a></li>
+<li><a href="/posts/230920172849.html">typedef 类型实践 </a></li>
+<li><a href="/posts/240224193217.html"> 二级指针 </a></li>
+<li><a href="/posts/240307195203.html"> 代码 TOP-K 问题 </a></li>
+<li><a href="/posts/230922172626.html">uthash 哈希表基础 </a></li>
+<li><a href="/posts/230918114841.html"> 大小端知识 </a></li>
+</ul>
+<h2 id="Golang 语言">Golang 语言 </h2>
+<ul>
+<li><a href="/posts/230907162612.html"> 变量与常量 </a></li>
+<li><a href="/posts/230909120145.html"> 函数 &amp; 包 &amp; 判断 &amp; 循环 </a></li>
+<li><a href="/posts/230912152800.html"> 数组与切片 </a></li>
+<li><a href="/posts/230913161326.html"> 可变参数函数与 Map 集合 </a></li>
+<li><a href="/posts/230915155105.html"> 字符串和指针 </a></li>
+</ul>
+<h2 id="数据结构"> 数据结构 </h2>
+<ul>
+<li><a href="/posts/231007174854.html"> 链表（数组实现）</a></li>
+<li><a href="/posts/231008213450.html"> 链表（链式实现）</a></li>
+<li><a href="/posts/231016161508.html"> 堆栈（数组实现）</a></li>
+<li><a href="/posts/231016184406.html"> 堆栈（链表实现）</a></li>
+<li><a href="/posts/231127185207.html"> 单调栈 </a></li>
+<li><a href="/posts/231017105123.html"> 队列（链表实现）</a></li>
+<li><a href="/posts/231017154121.html"> 双端队列（链表实现）</a></li>
+<li><a href="/posts/231018102559.html"> 堆基础与堆结构（数组实现）</a></li>
+<li><a href="/posts/231019102311.html"> 优先队列（堆实现）</a></li>
+<li><a href="/posts/230905224335.html"> 二叉树的遍历 </a></li>
+<li><a href="/posts/231020174358.html"> 二叉搜索树 </a></li>
+<li><a href="/posts/230916094606.html"> 拓扑排序 </a></li>
+<li><a href="/posts/230925185057.html">Trie 字典树 </a></li>
+<li><a href="/posts/231023164532.html"> 并查集（数组实现）</a></li>
+<li><a href="/posts/240702200642.html">Linux 数据结构之队列 </a></li>
+</ul>
+<h2 id="数据结构算法"> 数据结构算法 </h2>
+<ul>
+<li><a href="/posts/231218181635.html"> 归并排序 </a></li>
+<li><a href="/posts/231108163339.html"> 快速排序 </a></li>
+<li><a href="/posts/231107171607.html"> 堆排序 </a></li>
+<li><a href="/posts/231124181658.html"> 二分查找 </a></li>
+<li><a href="/posts/231227190828.html"> 哈希表实现 </a></li>
+<li><a href="/posts/240313193201.html"> 字符串哈希函数 </a></li>
+<li><a href="/posts/231116150205.html">Floyd 多源最短路径 </a></li>
+<li><a href="/posts/231117095232.html">Dijkstra 单源最短路径（原理部分）</a></li>
+<li><a href="/posts/231121152713.html">Dijkstra 单源最短路径（实现部分）</a></li>
+</ul>
+<h2 id="数据库"> 数据库 </h2>
+<ul>
+<li><a href="/posts/250605180332.html">MySQL 基础 </a></li>
+</ul>
+<h2 id="计算机网络"> 计算机网络 </h2>
+<ul>
+<li><a href="/posts/231011192359.html">OSI 参考模型 </a></li>
+<li><a href="/posts/240329202000.html"> 计网 CyC2018 之概述 </a></li>
+<li><a href="/posts/240329202004.html"> 计网 CyC2018 之链路层 </a></li>
+<li><a href="/posts/240329202003.html"> 计网 CyC2018 之网络层 </a></li>
+<li><a href="/posts/240329202002.html"> 计网 CyC2018 之传输层 </a></li>
+<li><a href="/posts/240329202001.html"> 计网 CyC2018 之应用层 </a></li>
+<li><a href="/posts/240306203742.html">ACL 访问控制列表 </a></li>
+<li><a href="/posts/240130190208.html"> 路由表、转发表与快速转发工作原理 </a></li>
+<li><a href="/posts/231221200716.html">VXLAN 网络虚拟化技术 </a></li>
+<li><a href="/posts/240903191243.html">TCP/IP checksum 计算 </a></li>
+<li><a href="/posts/240911185603.html"> 抓包分析 TCP 三次握手与四次挥手过程 </a></li>
+</ul>
+<h2 id="操作系统"> 操作系统 </h2>
+<ul>
+<li><a href="/posts/230921190726.html"> 概述 </a></li>
+<li><a href="/posts/230924172528.html"> 中断 &amp; 异常 &amp; 系统调用 </a></li>
+<li><a href="/posts/231017195157.html"> 内存分层体系与地址空间生成 </a></li>
+<li><a href="/posts/231108195351.html"> 连续内存分配 </a></li>
+<li><a href="/posts/231111172507.html"> 非连续内存分配之分段与分页 </a></li>
+<li><a href="/posts/231119170537.html"> 非连续内存分配之页表 </a></li>
+<li><a href="/posts/231123184526.html"> 内存管理之覆盖技术与交换技术 </a></li>
+<li><a href="/posts/231127193658.html"> 内存管理之虚存技术 </a></li>
+<li><a href="/posts/231129182631.html"> 局部页面置换算法 </a></li>
+<li><a href="/posts/231207184239.html"> 全局页面置换算法 </a></li>
+<li><a href="/posts/231207204958.html"> 进程描述 </a></li>
+<li><a href="/posts/231210211306.html"> 进程状态 </a></li>
+<li><a href="/posts/231215213932.html"> 线程 </a></li>
+<li><a href="/posts/231218220813.html"> 进程控制 </a></li>
+<li><a href="/posts/231228193143.html"> 调度 </a></li>
+<li><a href="/posts/240104202828.html"> 同步与互斥 </a></li>
+<li><a href="/posts/240113115605.html"> 信号量与管程 </a></li>
+<li><a href="/posts/240205182643.html"> 经典同步问题 </a></li>
+<li><a href="/posts/240310162231.html"> 死锁 </a></li>
+</ul>
+<h2 id="系统与网络编程"> 系统与网络编程 </h2>
+<ul>
+<li><a href="/posts/230911151334.html">pthread 库 </a></li>
+<li><a href="/posts/230921094127.html"> 锁与原子操作 </a></li>
+<li><a href="/posts/240319195609.html"> 读者写者问题 </a></li>
+<li><a href="/posts/240527200241.html"> 网络编程卷一阅读随笔 </a></li>
+<li><a href="/posts/240414190410.html"> 进程间通信 IPC 机制 </a></li>
+<li><a href="/posts/240424200123.html"> 多进程相关练习 </a></li>
+<li><a href="/posts/240516221527.html">I/O 模式与 I/O 多路复用 </a></li>
+<li><a href="/posts/240626192803.html">Linux 内核 kfifo 环形队列 </a></li>
+<li><a href="/posts/241009203126.html">Linux 内核等待队列 </a></li>
+<li><a href="/posts/240627210637.html">DPDK 无锁环形队列 </a></li>
+<li><a href="/posts/240919200410.html"> 解密内存屏障 </a></li>
+<li><a href="/posts/240927202500.html"> 内核线程的创建 </a></li>
+<li><a href="/posts/241015195205.html">Linux 网络数据包接收过程 </a></li>
+<li><a href="/posts/2410232111015.html"> 源码解读 epoll 实现原理 </a></li>
+<li><a href="/posts/241106182619.html">Linux 文件系统 </a></li>
+<li><a href="/posts/250619154429.html">Libevent 高性能 IO 事件驱动库 </a></li>
+</ul>
+<h2 id="工具与命令"> 工具与命令 </h2>
+<ul>
+<li><a href="/posts/240207180410.html">GCC 编译过程分解 </a></li>
+<li><a href="/posts/240312184132.html">GDB 调试入门 </a></li>
+<li><a href="/posts/240512184921.html">Makefile 学习 </a></li>
+<li><a href="/posts/250629214430.html">CMake 学习 </a></li>
+<li><a href="/posts/240417193754.html">Linux 命令之文件权限 </a></li>
+</ul>
+<h2 id="开源项目"> 开源项目 </h2>
+<ul>
+<li><a href="/posts/240303201855.html"> 线程池原理与实现 </a></li>
+<li><a href="/posts/240507194549.html">HTTP 服务器实现 </a></li>
+<li><a href="/posts/240904203605.html"> 聊天服务器实现 </a></li>
+<li><a href="/posts/241119182636.html">Linux 文件系统 </a></li>
+</ul>
+<h2 id="Docker">Docker</h2>
+<ul>
+<li><a href="/posts/230909171809.html">Docker 学习笔记 </a></li>
+</ul>
+<h1 id="LeetCode 刷题">LeetCode 刷题 </h1>
+<h2 id="链表相关"> 链表相关 </h2>
+<ul>
+<li><a href="/posts/231025143947.html">160 相交链表 </a></li>
+<li><a href="/posts/231025185947.html">206 反转链表 </a></li>
+<li><a href="/posts/231026101239.html">21 合并两个有序链表 </a></li>
+<li><a href="/posts/231026184514.html">83 删除排序链表中的重复元素 </a></li>
+<li><a href="/posts/231027150243.html">19 删除链表的倒数第 N 个节点 </a></li>
+<li><a href="/posts/231031120718.html">2 两数相加 </a></li>
+<li><a href="/posts/231031163133.html">445 两数相加 II</a></li>
+<li><a href="/posts/231101094219.html">234 回文链表 </a></li>
+<li><a href="/posts/231101135228.html">725 分隔链表 </a></li>
+<li><a href="/posts/231102120708.html">328 奇偶链表 </a></li>
+<li><a href="/posts/231102165703.html">142 环形链表 II</a></li>
+</ul>
+<h2 id="设计"> 设计 </h2>
+<ul>
+<li><a href="/posts/231201184542.html">146 LRU 缓存 </a></li>
+</ul>
+<h2 id="贪心算法"> 贪心算法 </h2>
+<ul>
+<li><a href="/posts/231107094652.html">1029 两地调度 </a></li>
+<li><a href="/posts/231109150855.html">435 无重叠区间 </a></li>
+</ul>
+<h2 id="哈希表"> 哈希表 </h2>
+<ul>
+<li><a href="/posts/231123181539.html">1410 实体解析器 </a></li>
+</ul>
+<h2 id="树的遍历"> 树的遍历 </h2>
+<ul>
+<li><a href="/posts/231103121209.html">117 填充每个节点的下一个右侧节点指针 II</a></li>
+</ul>
+<h2 id="深度优先搜索（递归）"> 深度优先搜索（递归）</h2>
+<ul>
+<li><a href="/posts/231206201243.html">2477 达到首都的最少油耗 </a></li>
+</ul>
+<h2 id="图或路径问题"> 图或路径问题 </h2>
+<ul>
+<li><a href="/posts/231211184652.html">1631 最小体力消耗路径 </a></li>
+</ul>
+<h2 id="其它"> 其它 </h2>
+<ul>
+<li><a href="/posts/230101120000.html"> 备忘录 </a></li>
+</ul>
+
+</div>
+
+
+<script src="/js/book-menu.js"></script>
+
+    </div>
+    <div class="sidebar-toggle" onclick="sidebar_toggle()" onmouseover="add_inner()" onmouseleave="remove_inner()">
+  <div class="sidebar-toggle-inner"></div>
+</div>
+
+<script>
+function add_inner() {
+  let inner = document.querySelector('.sidebar-toggle-inner')
+  inner.classList.add('show')  
+}
+
+function remove_inner() {
+  let inner = document.querySelector('.sidebar-toggle-inner')
+  inner.classList.remove('show')
+}
+
+function sidebar_toggle() {
+    let sidebar_toggle = document.querySelector('.sidebar-toggle')
+    let sidebar = document.querySelector('.book-sidebar')
+    let content = document.querySelector('.off-canvas-content')
+    if (sidebar_toggle.classList.contains('extend')) { // show
+        sidebar_toggle.classList.remove('extend')
+        sidebar.classList.remove('hide')
+        content.classList.remove('extend')
+    }
+    else { // hide
+        sidebar_toggle.classList.add('extend')
+        sidebar.classList.add('hide')
+        content.classList.add('extend')
+    }
+}
+</script>
+
+      <div class="off-canvas-content">
+        <div class="columns">
+          <div class="column col-10 col-lg-12">
+            <div class="book-navbar">
+              <!-- For Responsive Layout -->
+
+<header class="navbar">
+  <section class="navbar-section">
+    <a onclick="open_sidebar()">
+      <i class="icon icon-menu"></i>
+    </a>
+  </section>
+</header>
+
+            </div>
+            <div class="book-content">
+              <div class="book-post">
+  <p>这篇文章主要介绍计算机的体系结构，内存的分层体系，操作系统的内存管理，地址空间和地址生成等内容。</p>
+<span id="more"></span>
+<h2 id="计算机体系结构">计算机体系结构</h2>
+<p>CPU：主要完成了对整个程序或软件的执行的控制。<br>
+内存：主要是放置了程序的代码和它所处理的数据。<br>
+外设：各种外部设备配合程序更好的完成工作。</p>
+<img src="/images/os-kernel/chapter3/computer-architecture.png" alt="计算机体系结构" width="80%" height="80%">
+<h2 id="内存分层体系">内存分层体系</h2>
+<img src="/images/os-kernel/chapter3/memory-layering.png" alt="内存分层体系" width="80%" height="80%">
+<p>计算机内存包含多个层次，包括 CPU 寄存器、cache 和主存（物理内存）、硬盘（虚拟内存）。硬盘用于保存持久化数据。</p>
+<ul>
+<li>CPU 寄存器和 cache：
+<ul>
+<li>访问速度快，但容量小；</li>
+<li>寄存器是 CPU 内部的存储单元，用于存储临时数据和指令；</li>
+<li>cache 是位于 CPU 和主存之间的高速缓存，<strong>用于加速对主存的访问</strong>。</li>
+</ul>
+</li>
+<li>主存（物理内存）：
+<ul>
+<li>存放操作系统和程序代码等数据；</li>
+<li>容量较大，但访问速度相对较慢；</li>
+<li>主存中的数据掉电会丢失。</li>
+</ul>
+</li>
+<li>硬盘（虚拟内存）：
+<ul>
+<li>保存持久化数据，即使掉电也不会丢失；</li>
+<li>访问速度较慢，但容量可以很大。</li>
+</ul>
+</li>
+</ul>
+<p>操作系统会根据需要将数据从主存中放到硬盘中，以便管理数据的容量和提高运行效率。</p>
+<h2 id="操作系统的内存管理">操作系统的内存管理</h2>
+<h3 id="目标">目标</h3>
+<p>操作系统的内存管理到底要做什么事情呢？它有如下几个重要的目标。</p>
+<ul>
+<li>抽象：逻辑地址空间
+<ul>
+<li>操作系统通过提供逻辑地址空间，将底层细节抽象化，使应用程序不需要关心物理内存和外设的管理。</li>
+</ul>
+</li>
+<li>保护：独立地址空间
+<ul>
+<li>为了避免应用程序相互访问彼此的地址空间，操作系统提供了独立的地址空间，将它们隔离，以保护应用程序免受破坏。</li>
+</ul>
+</li>
+<li>共享：访问相同内存
+<ul>
+<li>多个应用程序之间也可能进行交互，操作系统允许多个应用程序共享相同的内存空间，以实现高效和可靠的数据传递。</li>
+</ul>
+</li>
+<li>虚拟：更多的地址空间
+<ul>
+<li>物理内存空间有限，操作系统将必要的数据放在主存中，而将暂时不需要访问的数据临时存放在磁盘上，从而扩展了可用的地址空间。</li>
+</ul>
+</li>
+</ul>
+<img src="/images/os-kernel/chapter3/os-memory-management.png" alt="操作系统的内存管理" width="80%" height="80%">
+<p>在这张图中，操作系统将进程 P1、P2、P3 和 P4 的必要数据放在主存中（进程 P1 优先级最高，所有数据都在主存中），暂时不需要访问的数据（进程 P4/P2/P3 的一部分数据）临时存放在磁盘上。</p>
+<p>从上图中，也可以看出进程（我们的程序）属于逻辑地址空间，主存和磁盘的内存空间属于物理内存空间。</p>
+<h3 id="内存管理的不同方法">内存管理的不同方法</h3>
+<ul>
+<li>程序重定位（relocation）</li>
+<li>分段（segmentation）</li>
+<li>分页（page）</li>
+<li>虚拟内存（virtual memory）</li>
+<li>按需分页虚拟内存：目前多数操作系统（如 Linux）采用</li>
+</ul>
+<blockquote>
+<p>内存管理的实现高度依赖于硬件：</p>
+<ul>
+<li>必须知道内存架构（与计算机存储架构紧耦合）</li>
+<li>MMU（内存管理单元）：硬件组件负责处理 CPU 的内存访问请求</li>
+</ul>
+</blockquote>
+<h2 id="地址空间与地址生成">地址空间与地址生成</h2>
+<h3 id="地址空间定义">地址空间定义</h3>
+<p>物理地址空间就是内存条和硬盘的空间，它的管理和控制由硬件来完成的。</p>
+<p>逻辑地址空间就是一个运行的程序所拥有的的内存空间，是一种一维的线性地址空间（这种设计可以使得应用程序很容易的进行数据访问操作）。</p>
+<blockquote>
+<p>逻辑地址空间的设计使得数据访问更加方便的「其中一个原因」就是：<br>
+逻辑地址空间是一维的线性地址空间，即内存地址在逻辑上是连续的。这种设计使得程序可以使用简单的地址计算来访问数据，而不需要考虑数据在内存中的实际物理位置。这样，程序员可以通过 <strong> 使用相对地址来访问数据，而不需要关注数据的具体位置</strong>。</p>
+</blockquote>
+<img src="/images/os-kernel/chapter3/memory-space.png" alt="地址空间" width="80%" height="80%">
+<h3 id="地址空间对应关系">地址空间对应关系</h3>
+<p>一个运行的程序所访问的逻辑地址空间，最终都会对应着物理地址空间中的某一位置，可能放在主存中、也可能放在硬盘中。物理地址空间和逻辑地址空间通过映射关系对应起来（映射关系由操作系统进行有效地管理）。</p>
+<h3 id="逻辑地址生成">逻辑地址生成</h3>
+<p>下图展示了逻辑地址的生成过程。</p>
+<img src="/images/os-kernel/chapter3/logical-address-generation.png" alt="逻辑地址生成" width="80%" height="80%">
+<ol>
+<li>C 程序文件（.c 文件）中的函数和变量名即逻辑地址。编译器会将 C 程序转换为汇编语言程序（.s 文件），并在汇编代码中使用符号来代表函数和变量的名字。</li>
+<li>汇编语言程序（.s 文件）中的符号仍然是逻辑地址。编译器将汇编语言程序转换为机器语言程序（.o 文件），并将变量和函数的符号名转换为逻辑地址。</li>
+<li>链接器（linker）将多个机器语言程序（.o 文件）链接在一起，形成一个单一的可执行文件（.exe 文件）。链接器会为每个变量和函数分配唯一的逻辑地址，并解决不同文件之间的符号引用关系。</li>
+<li>加载器（loader）将可执行文件（.exe 文件）加载到内存中运行。加载器会将可执行文件的代码和数据加载到内存的适当位置，并进行地址的重定位。由于加载过程中会存在一定的偏移量，程序需要根据偏移量来进行正确的数据访问和指令操作。</li>
+</ol>
+<blockquote>
+<p>逻辑地址生成的过程可以在编译器、链接器和加载器等工具的协同作用下完成，操作系统通常不需要干预该过程。这样的设计使得程序员可以方便地使用符号和逻辑地址进行开发，而无需关心实际的物理地址和内存布局。</p>
+</blockquote>
+<h3 id="物理地址生成">物理地址生成</h3>
+<p>下图展示了物理地址的生成过程。</p>
+<img src="/images/os-kernel/chapter3/physical-address-generation.png" alt="物理地址生成" width="80%" height="80%">
+<p>物理地址的生成过程是由操作系统的内存管理单元（MMU）来完成的。MMU 负责将逻辑地址转换为物理地址，使得程序能够正确地访问内存。</p>
+<ol>
+<li>分页：操作系统将整个物理内存划分为固定大小的页面（page），通常是 4KB 或者更大的大小。同时，逻辑地址空间也被划分为相同大小的页面。</li>
+<li>页表：每个进程都有一个页表，用于记录逻辑地址与物理地址的映射关系。页表的每个表项（entry）记录了逻辑页面号与物理页面号的对应关系。</li>
+<li>地址转换：当程序访问某个逻辑地址时，MMU 会根据页表中的映射关系将逻辑地址转换为物理地址。具体的转换过程是 <strong> 通过逻辑地址中的页号（page number）和页内偏移（page offset）进行计算得到</strong>：paddr = (page_num &lt;&lt; PAGE_SHIFT(12)) + (vaddr % PAGE_SIZE(1U &lt;&lt; 12))。</li>
+<li>物理地址访问：得到物理地址后，程序就可以使用该地址直接访问内存中的数据或指令。</li>
+</ol>
+<blockquote>
+<p>需要注意的是，物理地址生成的过程是 <strong> 在程序运行时 </strong> 由硬件执行的，而不是编译、链接或加载阶段进行的。<strong>操作系统会在程序加载到内存时设置好页表，并将页表的基地址告诉 MMU，以便进行地址转换</strong>。这样，程序在运行过程中，无需关心物理地址的生成和管理，而是通过逻辑地址进行访问。</p>
+</blockquote>
+<p>为了加快地址转换的速度，操作系统会将逻辑地址到物理地址的映射关系存储在内存中，并由 CPU 进行缓存。</p>
+<blockquote>
+<p>具体来说，当 CPU 首次访问某个逻辑地址时，MMU 会根据页表将逻辑地址转换为物理地址，并将该映射关系存储在一个特殊的高速缓存中，称为转换后备缓冲器（Translation Lookaside Buffer，简称 TLB）。TLB 是一种硬件缓存，用于临时存储逻辑地址到物理地址的映射关系。<br>
+当程序再次访问相同的逻辑地址时，CPU 会首先检查 TLB 中是否存在该映射关系：</p>
+<ul>
+<li>如果存在，则可以直接从 TLB 中获取物理地址，从而避免了访问内存的开销；</li>
+<li>如果 TLB 中没有找到对应的映射关系，则需要通过页表来进行地址转换（上述序号 2 和 3），并将新的映射关系存储到 TLB 中，以便下次访问时可以直接使用。</li>
+</ul>
+</blockquote>
+<h3 id="地址安全检查">地址安全检查</h3>
+<p>为了避免应用程序相互访问彼此的地址空间，操作系统提供了独立的地址空间，将它们隔离，以保护应用程序免受破坏。</p>
+<img src="/images/os-kernel/chapter3/address-security-check.png" alt="地址安全检查" width="80%" height="80%">
+<p>地址安全检查使应用程序在内存中正常执行，同时保证在内存中不同的应用程序之间不会相互破坏。</p>
+<blockquote>
+<p>参考资料：</p>
+<ol>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_53407527/article/details/124930556">https://blog.csdn.net/weixin_53407527/article/details/124930556</a></li>
+</ol>
+</blockquote>
+
+</div>
+
+
+  <div class="book-comments">
+    
+
+
+
+
+  </div>
+
+
+
+<script src="/js/book-post.js"></script>
+
+
+            </div>
+          </div>
+          <div class="column col-2 hide-lg">
+            <div class="book-post-info">
+  
+    <div class="book-post-meta">
+
+  <div class="author">
+
+    <!-- Author image -->
+    <div class="author-img">
+      
+        <figure
+          class="avatar avatar-lg"
+          data-initial="A"
+          style="background-color: #3b4351;">
+        </figure>
+      
+    </div>
+
+    <!-- Author title -->
+    <div class="author-title">
+      <div>aha</div>
+      <div>2023-10-17</div>
+    </div>
+  </div>
+
+  
+    <div class="divider"></div>
+
+    <div class="link">
+      <a class="category-link" href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">操作系统</a> <a class="category-link" href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E5%9C%B0%E5%9D%80%E7%A9%BA%E9%97%B4%E4%B8%8E%E5%9C%B0%E5%9D%80%E7%94%9F%E6%88%90/">地址空间与地址生成</a>
+
+      <a class="tag-none-link" href="/tags/%E5%86%85%E5%AD%98%E5%88%86%E5%B1%82%E4%BD%93%E7%B3%BB/" rel="tag">#内存分层体系</a> <a class="tag-none-link" href="/tags/%E5%9C%B0%E5%9D%80%E7%A9%BA%E9%97%B4%E7%94%9F%E6%88%90/" rel="tag">#地址空间生成</a> <a class="tag-none-link" href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" rel="tag">#操作系统</a>
+    </div>
+    
+  
+
+  <div class="divider"></div>
+</div>
+  
+
+  <div class="book-tocbot">
+</div>
+<div class="book-tocbot-menu">
+  <a class="book-toc-expand" onclick="expand_toc()">Expand all</a>
+  <a onclick="go_top()">Back to top</a>
+  <a onclick="go_bottom()">Go to bottom</a>
+  <a onclick="toggleSearch()">Search in blogs</a> <!-- 添加搜索文字的点击事件 -->
+</div>
+
+<div id="search-overlay" class="search-overlay" style="display: none;"> <!-- 初始状态为隐藏 -->
+  <div class="search-box">
+    <input type="text" id="search-input" placeholder="Search in all blogs...">
+    <button onclick="closeSearch()">Close</button> <!-- 添加关闭按钮 -->
+    <div id="search-results" class="search-results"></div>
+  </div>
+</div>
+
+<script>
+  function performSearch(query) {
+    if (!query.trim()) {
+      return;
+    }
+
+    fetch('/search.xml')
+      .then(response => response.text())
+      .then(data => {
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(data, "text/xml");
+        const entries = xmlDoc.getElementsByTagName('entry');
+        let results = '';
+
+        for (let i = 0; i < entries.length; i++) {
+          const title = entries[i].getElementsByTagName('title')[0].textContent;
+          const content = entries[i].getElementsByTagName('content')[0].textContent;
+          const url = entries[i].getElementsByTagName('url')[0].textContent;
+
+          let count = (title.match(new RegExp(query, "gi")) || []).length; // 统计查询词出现的次数
+          count += (content.match(new RegExp(query, "gi")) || []).length;
+
+          if (count > 0) { // title.includes(query) || content.includes(query)
+            results += `
+              <div class="search-result-item">
+                <a href="${url}">${title}</a> (${count})
+              </div>`;
+          }
+        }
+
+        const searchResultsElement = document.getElementById('search-results');
+        searchResultsElement.innerHTML = results;
+        searchResultsElement.classList.add('active');
+      });
+  }
+
+  function toggleSearch() {
+    const searchOverlay = document.getElementById('search-overlay');
+    searchOverlay.style.display = searchOverlay.style.display === 'none' ? 'flex' : 'none';
+  }
+
+  function closeSearch() {
+    document.getElementById('search-overlay').style.display = 'none';
+  }
+
+  document.getElementById('search-input').addEventListener('input', function() {
+    const query = this.value;
+    performSearch(query);
+  });
+</script>
+
+<style>
+  .search-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  .search-box {
+    background: white;
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+    width: 80%;
+    max-width: 500px;
+  }
+
+  .search-results {
+    margin-top: 10px;
+    max-height: 300px;
+    overflow-y: auto;
+    background: white;
+    padding: 10px;
+    border-radius: 5px;
+    width: 100%;
+  }
+
+  .search-result-item {
+    margin: 10px 0;
+  }
+
+  .search-result-item a {
+    color: blue; /* 设置链接颜色为蓝色 */
+    text-decoration: none;
+  }
+
+  .search-result-item a:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+<script src="/js/book-toc.js"></script>
+
+
+</div>
+          </div>
+        </div>
+      </div>
+
+      <a class="off-canvas-overlay" onclick="hide_canvas()"></a>
+
+      <button class="floating-button" onclick="toggleDropdownMenu()"></button>
+
+      <div class="dropdown-menu">
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FFFFFF', '#000000')">银河白</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#C7EDCC', '#000000')">豆沙绿</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FAF9DE', '#000000')">杏仁黄</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#E3EDCD', '#000000')">青草绿</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FFF2E2', '#000000')">秋叶褐</div>
+      </div>
+  </div>
+
+  <script>
+    function toggleDropdownMenu() {
+      document.querySelector('.floating-button').classList.toggle('active');
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      var storedBackgroundColor = localStorage.getItem('blogBackgroundColor');
+      var storedColor = localStorage.getItem('blogColor');
+
+      if (storedBackgroundColor && storedColor) {
+        document.body.style.backgroundColor = storedBackgroundColor;
+        document.body.style.color = storedColor;
+      }
+    });
+
+    function changeBackgroundColor(backgroundColor, color) {
+      document.body.style.backgroundColor = backgroundColor;
+      document.body.style.color = color;
+
+      localStorage.setItem('blogBackgroundColor', backgroundColor);
+      localStorage.setItem('blogColor', color);
+
+      document.querySelector('.floating-button').classList.remove('active');
+    }
+  </script>
+</body>
+
+</html>
+
+
+<script src="/js/book.js"></script>

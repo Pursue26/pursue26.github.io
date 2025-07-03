@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
+
+    
+      <link rel="icon" href="/favicon.png" />
+    
+
+    <title>
+        
+          Linux 命令之文件权限 - aha&#39;s book
+        
+    </title>
+
+    <!-- Spectre.css framework -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre-exp.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre-icons.min.css">
+
+    <!-- theme css & js -->
+    
+<link rel="stylesheet" href="/css/book.css">
+
+    
+<script src="/js/book.js"></script>
+
+
+    <!-- tocbot -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.css">
+    
+    <!-- katex -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/zooming/2.1.1/zooming.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const zooming = new Zooming()
+    zooming.listen('.book-content img')
+})
+</script>
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+    <style>
+      body {
+        background-color: #FFFFFF;
+        /* color: #000000; */
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+
+      /* Floating Button Styles */
+      .floating-button {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 999;
+        background-color: #000000;
+        color: #ffffff;
+        padding: 12px;
+        border-radius: 50%;
+        cursor: pointer;
+        border: 2px solid #000000;
+      }
+
+      .floating-button:hover {
+        background-color: #FFFFFF;
+      }
+
+      /* Dropdown Menu Styles */
+      .dropdown-menu {
+        position: fixed;
+        bottom: 60px;
+        right: 10px;
+        display: none;
+        min-width: 60px;
+        padding: 2px;
+        background-color: #fff;
+        /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
+        z-index: 1000;
+      }
+
+      .floating-button.active+.dropdown-menu {
+        display: block;
+      }
+
+      .dropdown-item {
+        display: block;
+        padding: 8px 16px;
+        cursor: pointer;
+      }
+
+      .dropdown-item:hover {
+        background-color: #f5f5f5;
+      }
+    </style>
+<style>.darkmode--activated{--body-bg-color:#282828;--content-bg-color:#333;--card-bg-color:#555;--text-color:#ccc;--blockquote-color:#bbb;--link-color:#ccc;--link-hover-color:#eee;--brand-color:#ddd;--brand-hover-color:#ddd;--table-row-odd-bg-color:#282828;--table-row-hover-bg-color:#363636;--menu-item-bg-color:#555;--btn-default-bg:#222;--btn-default-color:#ccc;--btn-default-border-color:#555;--btn-default-hover-bg:#666;--btn-default-hover-color:#ccc;--btn-default-hover-border-color:#666;--highlight-background:#282b2e;--highlight-foreground:#a9b7c6;--highlight-gutter-background:#34393d;--highlight-gutter-foreground:#9ca9b6}.darkmode--activated img{opacity:.75}.darkmode--activated img:hover{opacity:.9}.darkmode--activated code{color:#69dbdc;background:0 0}button.darkmode-toggle{z-index:9999}.darkmode-ignore,img{display:flex!important}.beian img{display:inline-block!important}</style></head>
+
+<body>
+  <div class="book-container">
+    <div class="book-sidebar">
+      <div class="book-brand">
+  <a href="/">
+    <img src="/favicon.png">
+    <span>AHA&#39;S BOOK</span>
+  </a>
+</div>
+        <div id="menu" class="book-menu hide">
+  <h2 id="基础知识"> 基础知识 </h2>
+<ul>
+<li><a href="/posts/231010144856.html"> 模运算 </a></li>
+<li><a href="/posts/231014105311.html"> 异或运算 </a></li>
+<li><a href="/posts/231210181853.html"> 计算机中的寄存器 </a></li>
+<li><a href="/posts/231213183051.html"> 正则表达式基础 </a></li>
+</ul>
+<h2 id="C 语言">C 语言 </h2>
+<ul>
+<li><a href="/posts/230916171929.html">main 函数参数 </a></li>
+<li><a href="/posts/231214192113.html"> 关键字与专有名词 </a></li>
+<li><a href="/posts/240103180653.html"> 输出打印函数 </a></li>
+<li><a href="/posts/230922143003.html"> 多维数组 </a></li>
+<li><a href="/posts/230913200729.html">const 关键字 </a></li>
+<li><a href="/posts/230918174223.html">typedef 类型基础 </a></li>
+<li><a href="/posts/230920172849.html">typedef 类型实践 </a></li>
+<li><a href="/posts/240224193217.html"> 二级指针 </a></li>
+<li><a href="/posts/240307195203.html"> 代码 TOP-K 问题 </a></li>
+<li><a href="/posts/230922172626.html">uthash 哈希表基础 </a></li>
+<li><a href="/posts/230918114841.html"> 大小端知识 </a></li>
+</ul>
+<h2 id="Golang 语言">Golang 语言 </h2>
+<ul>
+<li><a href="/posts/230907162612.html"> 变量与常量 </a></li>
+<li><a href="/posts/230909120145.html"> 函数 &amp; 包 &amp; 判断 &amp; 循环 </a></li>
+<li><a href="/posts/230912152800.html"> 数组与切片 </a></li>
+<li><a href="/posts/230913161326.html"> 可变参数函数与 Map 集合 </a></li>
+<li><a href="/posts/230915155105.html"> 字符串和指针 </a></li>
+</ul>
+<h2 id="数据结构"> 数据结构 </h2>
+<ul>
+<li><a href="/posts/231007174854.html"> 链表（数组实现）</a></li>
+<li><a href="/posts/231008213450.html"> 链表（链式实现）</a></li>
+<li><a href="/posts/231016161508.html"> 堆栈（数组实现）</a></li>
+<li><a href="/posts/231016184406.html"> 堆栈（链表实现）</a></li>
+<li><a href="/posts/231127185207.html"> 单调栈 </a></li>
+<li><a href="/posts/231017105123.html"> 队列（链表实现）</a></li>
+<li><a href="/posts/231017154121.html"> 双端队列（链表实现）</a></li>
+<li><a href="/posts/231018102559.html"> 堆基础与堆结构（数组实现）</a></li>
+<li><a href="/posts/231019102311.html"> 优先队列（堆实现）</a></li>
+<li><a href="/posts/230905224335.html"> 二叉树的遍历 </a></li>
+<li><a href="/posts/231020174358.html"> 二叉搜索树 </a></li>
+<li><a href="/posts/230916094606.html"> 拓扑排序 </a></li>
+<li><a href="/posts/230925185057.html">Trie 字典树 </a></li>
+<li><a href="/posts/231023164532.html"> 并查集（数组实现）</a></li>
+<li><a href="/posts/240702200642.html">Linux 数据结构之队列 </a></li>
+</ul>
+<h2 id="数据结构算法"> 数据结构算法 </h2>
+<ul>
+<li><a href="/posts/231218181635.html"> 归并排序 </a></li>
+<li><a href="/posts/231108163339.html"> 快速排序 </a></li>
+<li><a href="/posts/231107171607.html"> 堆排序 </a></li>
+<li><a href="/posts/231124181658.html"> 二分查找 </a></li>
+<li><a href="/posts/231227190828.html"> 哈希表实现 </a></li>
+<li><a href="/posts/240313193201.html"> 字符串哈希函数 </a></li>
+<li><a href="/posts/231116150205.html">Floyd 多源最短路径 </a></li>
+<li><a href="/posts/231117095232.html">Dijkstra 单源最短路径（原理部分）</a></li>
+<li><a href="/posts/231121152713.html">Dijkstra 单源最短路径（实现部分）</a></li>
+</ul>
+<h2 id="数据库"> 数据库 </h2>
+<ul>
+<li><a href="/posts/250605180332.html">MySQL 基础 </a></li>
+</ul>
+<h2 id="计算机网络"> 计算机网络 </h2>
+<ul>
+<li><a href="/posts/231011192359.html">OSI 参考模型 </a></li>
+<li><a href="/posts/240329202000.html"> 计网 CyC2018 之概述 </a></li>
+<li><a href="/posts/240329202004.html"> 计网 CyC2018 之链路层 </a></li>
+<li><a href="/posts/240329202003.html"> 计网 CyC2018 之网络层 </a></li>
+<li><a href="/posts/240329202002.html"> 计网 CyC2018 之传输层 </a></li>
+<li><a href="/posts/240329202001.html"> 计网 CyC2018 之应用层 </a></li>
+<li><a href="/posts/240306203742.html">ACL 访问控制列表 </a></li>
+<li><a href="/posts/240130190208.html"> 路由表、转发表与快速转发工作原理 </a></li>
+<li><a href="/posts/231221200716.html">VXLAN 网络虚拟化技术 </a></li>
+<li><a href="/posts/240903191243.html">TCP/IP checksum 计算 </a></li>
+<li><a href="/posts/240911185603.html"> 抓包分析 TCP 三次握手与四次挥手过程 </a></li>
+</ul>
+<h2 id="操作系统"> 操作系统 </h2>
+<ul>
+<li><a href="/posts/230921190726.html"> 概述 </a></li>
+<li><a href="/posts/230924172528.html"> 中断 &amp; 异常 &amp; 系统调用 </a></li>
+<li><a href="/posts/231017195157.html"> 内存分层体系与地址空间生成 </a></li>
+<li><a href="/posts/231108195351.html"> 连续内存分配 </a></li>
+<li><a href="/posts/231111172507.html"> 非连续内存分配之分段与分页 </a></li>
+<li><a href="/posts/231119170537.html"> 非连续内存分配之页表 </a></li>
+<li><a href="/posts/231123184526.html"> 内存管理之覆盖技术与交换技术 </a></li>
+<li><a href="/posts/231127193658.html"> 内存管理之虚存技术 </a></li>
+<li><a href="/posts/231129182631.html"> 局部页面置换算法 </a></li>
+<li><a href="/posts/231207184239.html"> 全局页面置换算法 </a></li>
+<li><a href="/posts/231207204958.html"> 进程描述 </a></li>
+<li><a href="/posts/231210211306.html"> 进程状态 </a></li>
+<li><a href="/posts/231215213932.html"> 线程 </a></li>
+<li><a href="/posts/231218220813.html"> 进程控制 </a></li>
+<li><a href="/posts/231228193143.html"> 调度 </a></li>
+<li><a href="/posts/240104202828.html"> 同步与互斥 </a></li>
+<li><a href="/posts/240113115605.html"> 信号量与管程 </a></li>
+<li><a href="/posts/240205182643.html"> 经典同步问题 </a></li>
+<li><a href="/posts/240310162231.html"> 死锁 </a></li>
+</ul>
+<h2 id="系统与网络编程"> 系统与网络编程 </h2>
+<ul>
+<li><a href="/posts/230911151334.html">pthread 库 </a></li>
+<li><a href="/posts/230921094127.html"> 锁与原子操作 </a></li>
+<li><a href="/posts/240319195609.html"> 读者写者问题 </a></li>
+<li><a href="/posts/240527200241.html"> 网络编程卷一阅读随笔 </a></li>
+<li><a href="/posts/240414190410.html"> 进程间通信 IPC 机制 </a></li>
+<li><a href="/posts/240424200123.html"> 多进程相关练习 </a></li>
+<li><a href="/posts/240516221527.html">I/O 模式与 I/O 多路复用 </a></li>
+<li><a href="/posts/240626192803.html">Linux 内核 kfifo 环形队列 </a></li>
+<li><a href="/posts/241009203126.html">Linux 内核等待队列 </a></li>
+<li><a href="/posts/240627210637.html">DPDK 无锁环形队列 </a></li>
+<li><a href="/posts/240919200410.html"> 解密内存屏障 </a></li>
+<li><a href="/posts/240927202500.html"> 内核线程的创建 </a></li>
+<li><a href="/posts/241015195205.html">Linux 网络数据包接收过程 </a></li>
+<li><a href="/posts/2410232111015.html"> 源码解读 epoll 实现原理 </a></li>
+<li><a href="/posts/241106182619.html">Linux 文件系统 </a></li>
+<li><a href="/posts/250619154429.html">Libevent 高性能 IO 事件驱动库 </a></li>
+</ul>
+<h2 id="工具与命令"> 工具与命令 </h2>
+<ul>
+<li><a href="/posts/240207180410.html">GCC 编译过程分解 </a></li>
+<li><a href="/posts/240312184132.html">GDB 调试入门 </a></li>
+<li><a href="/posts/240512184921.html">Makefile 学习 </a></li>
+<li><a href="/posts/250629214430.html">CMake 学习 </a></li>
+<li><a href="/posts/240417193754.html">Linux 命令之文件权限 </a></li>
+</ul>
+<h2 id="开源项目"> 开源项目 </h2>
+<ul>
+<li><a href="/posts/240303201855.html"> 线程池原理与实现 </a></li>
+<li><a href="/posts/240507194549.html">HTTP 服务器实现 </a></li>
+<li><a href="/posts/240904203605.html"> 聊天服务器实现 </a></li>
+<li><a href="/posts/241119182636.html">Linux 文件系统 </a></li>
+</ul>
+<h2 id="Docker">Docker</h2>
+<ul>
+<li><a href="/posts/230909171809.html">Docker 学习笔记 </a></li>
+</ul>
+<h1 id="LeetCode 刷题">LeetCode 刷题 </h1>
+<h2 id="链表相关"> 链表相关 </h2>
+<ul>
+<li><a href="/posts/231025143947.html">160 相交链表 </a></li>
+<li><a href="/posts/231025185947.html">206 反转链表 </a></li>
+<li><a href="/posts/231026101239.html">21 合并两个有序链表 </a></li>
+<li><a href="/posts/231026184514.html">83 删除排序链表中的重复元素 </a></li>
+<li><a href="/posts/231027150243.html">19 删除链表的倒数第 N 个节点 </a></li>
+<li><a href="/posts/231031120718.html">2 两数相加 </a></li>
+<li><a href="/posts/231031163133.html">445 两数相加 II</a></li>
+<li><a href="/posts/231101094219.html">234 回文链表 </a></li>
+<li><a href="/posts/231101135228.html">725 分隔链表 </a></li>
+<li><a href="/posts/231102120708.html">328 奇偶链表 </a></li>
+<li><a href="/posts/231102165703.html">142 环形链表 II</a></li>
+</ul>
+<h2 id="设计"> 设计 </h2>
+<ul>
+<li><a href="/posts/231201184542.html">146 LRU 缓存 </a></li>
+</ul>
+<h2 id="贪心算法"> 贪心算法 </h2>
+<ul>
+<li><a href="/posts/231107094652.html">1029 两地调度 </a></li>
+<li><a href="/posts/231109150855.html">435 无重叠区间 </a></li>
+</ul>
+<h2 id="哈希表"> 哈希表 </h2>
+<ul>
+<li><a href="/posts/231123181539.html">1410 实体解析器 </a></li>
+</ul>
+<h2 id="树的遍历"> 树的遍历 </h2>
+<ul>
+<li><a href="/posts/231103121209.html">117 填充每个节点的下一个右侧节点指针 II</a></li>
+</ul>
+<h2 id="深度优先搜索（递归）"> 深度优先搜索（递归）</h2>
+<ul>
+<li><a href="/posts/231206201243.html">2477 达到首都的最少油耗 </a></li>
+</ul>
+<h2 id="图或路径问题"> 图或路径问题 </h2>
+<ul>
+<li><a href="/posts/231211184652.html">1631 最小体力消耗路径 </a></li>
+</ul>
+<h2 id="其它"> 其它 </h2>
+<ul>
+<li><a href="/posts/230101120000.html"> 备忘录 </a></li>
+</ul>
+
+</div>
+
+
+<script src="/js/book-menu.js"></script>
+
+    </div>
+    <div class="sidebar-toggle" onclick="sidebar_toggle()" onmouseover="add_inner()" onmouseleave="remove_inner()">
+  <div class="sidebar-toggle-inner"></div>
+</div>
+
+<script>
+function add_inner() {
+  let inner = document.querySelector('.sidebar-toggle-inner')
+  inner.classList.add('show')  
+}
+
+function remove_inner() {
+  let inner = document.querySelector('.sidebar-toggle-inner')
+  inner.classList.remove('show')
+}
+
+function sidebar_toggle() {
+    let sidebar_toggle = document.querySelector('.sidebar-toggle')
+    let sidebar = document.querySelector('.book-sidebar')
+    let content = document.querySelector('.off-canvas-content')
+    if (sidebar_toggle.classList.contains('extend')) { // show
+        sidebar_toggle.classList.remove('extend')
+        sidebar.classList.remove('hide')
+        content.classList.remove('extend')
+    }
+    else { // hide
+        sidebar_toggle.classList.add('extend')
+        sidebar.classList.add('hide')
+        content.classList.add('extend')
+    }
+}
+</script>
+
+      <div class="off-canvas-content">
+        <div class="columns">
+          <div class="column col-10 col-lg-12">
+            <div class="book-navbar">
+              <!-- For Responsive Layout -->
+
+<header class="navbar">
+  <section class="navbar-section">
+    <a onclick="open_sidebar()">
+      <i class="icon icon-menu"></i>
+    </a>
+  </section>
+</header>
+
+            </div>
+            <div class="book-content">
+              <div class="book-post">
+  <p>Linux 是 UNIX like，UNIX 是一种可以由多个用户同时访问的多用户操作系统。Linux 也可以在不进行任何修改的情况下用于大型机和服务器。但这会引发安全问题，因为未经请求或恶意的用户可能会损坏、更改或删除关键数据。<strong>为了有效的安全性，Linux 将授权分为 2 个级别：权限（permission）和所有权（ownership）</strong>。</p>
+<span id="more"></span>
+<h1 id="Linux- 文件权限">Linux 文件权限</h1>
+<p>Linux 文件权限系统基于用户（user）、用户组（group）和其他用户（other）的访问级别来控制文件和目录的访问。权限（permission）包括读取（r）、写入（w）和执行（x）。</p>
+<h2 id="基本概念">基本概念</h2>
+<p><strong>文件类型</strong>：共 7 种类型，需要 3 bits 即可（实际分配了 4 bits）。</p>
+<table>
+<thead>
+<tr>
+<th>表示</th>
+<th>描述</th>
+<th>文件类型</th>
+<th>宏定义</th>
+<th>八进制值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>s</td>
+<td>套接字文件</td>
+<td>socket file</td>
+<td>S_IFSOCK</td>
+<td>0140000</td>
+</tr>
+<tr>
+<td>l</td>
+<td>符号链接（软链接）</td>
+<td>symbolic link</td>
+<td>S_IFLINK</td>
+<td>0120000</td>
+</tr>
+<tr>
+<td>-</td>
+<td>普通文件</td>
+<td>regular file</td>
+<td>S_IFREG</td>
+<td>0100000</td>
+</tr>
+<tr>
+<td>b</td>
+<td>块设备文件</td>
+<td>block device</td>
+<td>S_IFBLK</td>
+<td>060000</td>
+</tr>
+<tr>
+<td>d</td>
+<td>目录</td>
+<td>directory</td>
+<td>S_IFDIR</td>
+<td>040000</td>
+</tr>
+<tr>
+<td>c</td>
+<td>字符设备文件</td>
+<td>character device</td>
+<td>S_IFCHR</td>
+<td>020000</td>
+</tr>
+<tr>
+<td>p</td>
+<td>命名管道</td>
+<td>named FIFO pipe</td>
+<td>S_IFIFO</td>
+<td>010000</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>宏定义定义在文件 #include &lt;sys/stat.h&gt; 中，低 12 bits 为权限位，文件类型只需关心高 4bits，故低 12 bits 填充为 0。</p>
+</blockquote>
+<p><strong>文件权限</strong>：共三类权限，每类权限独立控制，故需要 3 bits。</p>
+<ul>
+<li><code>r</code> = read permission</li>
+<li><code>w</code> = write permission</li>
+<li><code>x</code> = execute permission</li>
+<li><code>–</code> = no permission</li>
+</ul>
+<p><strong>所有权</strong>：三类用户，每类用户对文件权限独立控制，故共需要 3 * 3 bits。</p>
+<ul>
+<li><strong>user</strong>：文件拥有者。默认情况下，创建文件的人成为其拥有者。</li>
+<li><strong>group</strong>：文件拥有者所在用户组（user-group）的其他成员。属于一个组的所有用户都将具有相同的组权限来访问该文件。</li>
+<li><strong>other</strong>：除拥有者和用户组成员以外的其他用户。</li>
+</ul>
+<img src="/images/linux-cmd/PermissionsConcept.png" alt="Linux/Unix 中的文件权限" width="50%" height="50%">
+<p>每个“文件”有 9 bits 权限位：每 3 个权限位分为一组，分别代表文件所有者、文件所有者所属组、其他用户。同时，具有 4 bits 的“文件”类型，用于表示 7 种类型。其它 3 bits 为特殊权限位。Linux 文件类型和模式的组织结构如下：</p>
+<img src="/images/linux-cmd/stat_mode.png" alt="Linux 文件类型和模式的组织结构" width="80%" height="80%">
+<p><strong>Linux 命令显示示例</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">ls</span> -l</span><br><span class="line">-rw-r--r-- 1 user group 1024 Apr 18 10:00 file.txt</span><br><span class="line">prw-r--r-- 1 root root    10 Apr 18 10:02 tester</span><br><span class="line">drwxr-xr-x 2 root root  4096 Apr 18 13:38 data</span><br></pre></td></tr></table></figure>
+<h2 id="文件权限表示方式">文件权限表示方式</h2>
+<h3 id="数字模式">数字模式</h3>
+<p>在此模式下，文件权限不表示为字符，而是 <strong> 表示为三位八进制数</strong>。下表给出了所有权限类型的数字。</p>
+<ul>
+<li>每组权限位用数字表示，r=4，w=2，x=1，然后将三个权限相加得到相应的数字。</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Number</th>
+<th>Permission Type</th>
+<th>Symbol</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>No Permission</td>
+<td>---</td>
+</tr>
+<tr>
+<td>1</td>
+<td>Execute</td>
+<td>--x</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Write</td>
+<td>-w-</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Execute + Write</td>
+<td>-wx</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Read</td>
+<td>r--</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Read + Execute</td>
+<td>r-x</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Read + Write</td>
+<td>rw-</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Read + Write + Execute</td>
+<td>rwx</td>
+</tr>
+</tbody>
+</table>
+<p>例如，一个文件权限的 <strong> 数字表示法 </strong> 为<code>764</code>，其对应的 <strong> 符号表示法 </strong> 为 <code>-rwxrw-r--</code>。其中，第一个字符代表文件类型，后面三组分别代表文件所有者、组成员、其他用户的权限。在这个示例中：</p>
+<ul>
+<li><strong>owner</strong> can read, write and execute</li>
+<li><strong>group</strong> can read and write</li>
+<li><strong>other</strong> can only read</li>
+</ul>
+<h3 id="符号模式">符号模式</h3>
+<p>在绝对（数字）模式下，你可以同时更改 3 个所有者的权限。但是，<strong>在符号模式下，你可以修改特定所有者的权限</strong>。它利用数学符号来修改 Unix 文件权限。</p>
+<table>
+<thead>
+<tr>
+<th>操作符</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>+</td>
+<td>为文件或目录添加权限</td>
+</tr>
+<tr>
+<td>–</td>
+<td>删除权限</td>
+</tr>
+<tr>
+<td>=</td>
+<td>设置权限并覆盖之前设置的权限</td>
+</tr>
+</tbody>
+</table>
+<p>不同的所有者的表示：</p>
+<table>
+<thead>
+<tr>
+<th>标记</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>u</td>
+<td>用户（所有者）</td>
+</tr>
+<tr>
+<td>g</td>
+<td>用户组</td>
+</tr>
+<tr>
+<td>o</td>
+<td>其他用户</td>
+</tr>
+<tr>
+<td>a</td>
+<td>所有用户</td>
+</tr>
+</tbody>
+</table>
+<h2 id="示例命令">示例命令</h2>
+<p>ch-change, mod-mode, own-owner, grp-group</p>
+<p><code>chmod</code>：改变文件的权限模式</p>
+<ul>
+<li><code>chmod u+x file.txt</code>：给文件所有者添加执行权限</li>
+<li><code>chmod g-w file.txt</code>：删除用户组的写入权限</li>
+<li><code>chmod o=rwx file.txt</code>：设置其它用户的文件权限位 <code>rwx</code></li>
+<li><code>chmod 644 file.txt</code>：设置文件权限为 <code>-rw-r--r--</code></li>
+<li><code>chmod u=rwx,go+x file.txt</code>：设置文件所有者的权限，并给用户组、其它用户添加执行权限</li>
+</ul>
+<p><code>chown</code>：改变文件的所有者和所属组</p>
+<ul>
+<li><code>chown user:group file.txt</code>：将文件所有者修改为 <code>user</code>，所属组修改为 <code>group</code></li>
+<li><code>chown root file.txt</code>：将文件所有者修改为 <code>root</code></li>
+</ul>
+<p><code>chgrp</code>：改变文件的所属组</p>
+<ul>
+<li><code>chgrp group file.txt</code>：将文件所属组修改为 <code>group</code></li>
+</ul>
+<h1 id="UNIX- 接口">UNIX 接口</h1>
+<h2 id="stat-fstat-lstat 函数">stat/fstat/lstat 函数</h2>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">    <span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/stat.h&gt;</span></span></span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> <span class="title function_">stat</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *<span class="keyword">restrict</span> pathname, <span class="keyword">struct</span> stat *<span class="keyword">restrict</span> statbuf)</span>;</span><br><span class="line">    <span class="type">int</span> <span class="title function_">fstat</span><span class="params">(<span class="type">int</span> fd, <span class="keyword">struct</span> stat *statbuf)</span>;</span><br><span class="line">    <span class="type">int</span> <span class="title function_">lstat</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *<span class="keyword">restrict</span> pathname, <span class="keyword">struct</span> stat *<span class="keyword">restrict</span> statbuf)</span>;</span><br><span class="line"></span><br><span class="line">DESCRIPTION</span><br><span class="line">    These functions <span class="keyword">return</span> information about a file, in the buffer</span><br><span class="line">    pointed to by statbuf.  No permissions are required on the file</span><br><span class="line">    itself, but—in the <span class="keyword">case</span> of stat(), fstatat(), and lstat()—execute</span><br><span class="line">    (search) permission is required on all of the directories in</span><br><span class="line">    pathname that lead to the file.</span><br><span class="line"></span><br><span class="line">RETURN VALUE</span><br><span class="line">    On success, zero is returned.  On error, <span class="number">-1</span> is returned, and</span><br><span class="line">    errno is <span class="built_in">set</span> to indicate the error.</span><br></pre></td></tr></table></figure>
+<p>这些 <strong> 函数返回指定文件的状态信息，存储在 statbuf 指向的缓冲区中</strong>。文件本身不需要任何权限，但在 stat()、fstatat() 和 lstat() 的情况下，需要对通向该文件的路径名中的所有目录具有执行（搜索）权限。</p>
+<ul>
+<li>fstat() 与 stat() 相同，只是要检索其信息的文件由文件描述符 fd 指定。</li>
+<li>lstat() 与 stat() 相同，只不过如果路径名是符号链接（symbolic link），则它返回有关链接本身的信息，而不是链接引用的文件的信息。</li>
+</ul>
+<h2 id="struct-stat 结构体">struct stat 结构体</h2>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/stat.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">stat</span> &#123;</span></span><br><span class="line">    <span class="type">dev_t</span>      st_dev;      <span class="comment">/* ID of device containing file */</span></span><br><span class="line">    <span class="type">ino_t</span>      st_ino;      <span class="comment">/* Inode number */</span></span><br><span class="line">    <span class="type">mode_t</span>     st_mode;     <span class="comment">/* File type and mode */</span></span><br><span class="line">    <span class="type">nlink_t</span>    st_nlink;    <span class="comment">/* Number of hard links */</span></span><br><span class="line">    <span class="type">uid_t</span>      st_uid;      <span class="comment">/* User ID of owner */</span></span><br><span class="line">    <span class="type">gid_t</span>      st_gid;      <span class="comment">/* Group ID of owner */</span></span><br><span class="line">    <span class="type">dev_t</span>      st_rdev;     <span class="comment">/* Device ID (if special file) */</span></span><br><span class="line">    <span class="type">off_t</span>      st_size;     <span class="comment">/* Total size, in bytes */</span></span><br><span class="line">    <span class="type">blksize_t</span>  st_blksize;  <span class="comment">/* Block size for filesystem I/O */</span></span><br><span class="line">    <span class="type">blkcnt_t</span>   st_blocks;   <span class="comment">/* Number of 512 B blocks allocated */</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Since POSIX.1-2008, this structure supports nanosecond</span></span><br><span class="line"><span class="comment">        precision for the following timestamp fields.</span></span><br><span class="line"><span class="comment">        For the details before POSIX.1-2008, see VERSIONS. */</span></span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">timespec</span>  <span class="title">st_atim</span>;</span>  <span class="comment">/* Time of last access */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">timespec</span>  <span class="title">st_mtim</span>;</span>  <span class="comment">/* Time of last modification */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">timespec</span>  <span class="title">st_ctim</span>;</span>  <span class="comment">/* Time of last status change */</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> st_atime  st_atim.tv_sec  <span class="comment">/* Backward compatibility */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> st_mtime  st_mtim.tv_sec</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> st_ctime  st_ctim.tv_sec</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>该结构中 st_mode 字段就是上文中的“Linux 文件类型和模式的组织结构”那张图，只用了 16 bits 就可以得知文件的类型和权限设置，很节省空间！下面是与 st_mode 字段相关的一些宏定义。</p>
+<p><strong>判断文件类型的宏定义</strong>：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> S_IFMT (0xF000)</span></span><br><span class="line"><span class="comment">/* 判断原理就是拿 m 的高 4bits 与高 4bits 全 1 的 mask 值进行与运算后，与各个文件类型的定义进行比较 */</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span>	S_ISDIR(m)	(((m) &amp; S_IFMT) == S_IFDIR) <span class="comment">// 判断文件是否是一个 directory</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span>	S_ISFIFO(m)	(((m) &amp; S_IFMT) == S_IFIFO) <span class="comment">// 判断文件是否是一个 named FIFO pipe</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span>	S_ISCHR(m)	(((m) &amp; S_IFMT) == S_IFCHR) <span class="comment">// 判断文件是否是一个 character device</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span>	S_ISBLK(m)	(((m) &amp; S_IFMT) == S_IFBLK) <span class="comment">// 判断文件是否是一个 block device</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span>	S_ISREG(m)	(((m) &amp; S_IFMT) == S_IFREG) <span class="comment">// 判断文件是否是一个 regular file</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* 使用示例 */</span></span><br><span class="line"><span class="type">int</span> ret_code;</span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">stat</span> <span class="title">st</span>;</span></span><br><span class="line"></span><br><span class="line">ret_code = stat(path, &amp;st);</span><br><span class="line">assert(ret_code, <span class="number">0</span>);</span><br><span class="line">S_ISREG(st.st_mode); <span class="comment">// 判断文件是否是一个 regular file</span></span><br></pre></td></tr></table></figure>
+<p><strong>检查文件权限的宏定义</strong>：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> S_IRWXU  00700 <span class="comment">// owner has read, write, and execute permission</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> S_IRUSR  00400 <span class="comment">// owner has read permission</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> S_IWUSR  00200 <span class="comment">// owner has write permission</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> S_IXUSR  00100 <span class="comment">// owner has execute permission</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> S_IRWXG  00070 <span class="comment">// group has read, write, and execute permission</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> S_IRGRP  00040 <span class="comment">// group has read permission</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> S_IWGRP  00020 <span class="comment">// group has write permission</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> S_IXGRP  00010 <span class="comment">// group has execute permission</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> S_IRWXO  00007 <span class="comment">// others (not in group) have read, write, and execute permission</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> S_IROTH  00004 <span class="comment">// others have read permission</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> S_IWOTH  00002 <span class="comment">// others have write permission</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> S_IXOTH  00001 <span class="comment">// others have execute permission</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* 使用示例，判断是否具有执行权限 */</span></span><br><span class="line"><span class="keyword">if</span> ((st.st_mode &amp; S_IXUSR) || (st.st_mode &amp; S_IXGRP) || (st.st_mode &amp; S_IXOTH)) &#123; &#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>参考资料</p>
+<ol>
+<li><a target="_blank" rel="noopener" href="https://rgb-24bit.github.io/blog/2018/linux-file-permission.html">https://rgb-24bit.github.io/blog/2018/linux-file-permission.html</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.guru99.com/file-permissions.html">https://www.guru99.com/file-permissions.html</a></li>
+<li><a target="_blank" rel="noopener" href="https://cloud.tencent.com/developer/article/1726535">https://cloud.tencent.com/developer/article/1726535</a></li>
+</ol>
+</blockquote>
+
+</div>
+
+
+  <div class="book-comments">
+    
+
+
+
+
+  </div>
+
+
+
+<script src="/js/book-post.js"></script>
+
+
+            </div>
+          </div>
+          <div class="column col-2 hide-lg">
+            <div class="book-post-info">
+  
+    <div class="book-post-meta">
+
+  <div class="author">
+
+    <!-- Author image -->
+    <div class="author-img">
+      
+        <figure
+          class="avatar avatar-lg"
+          data-initial="A"
+          style="background-color: #3b4351;">
+        </figure>
+      
+    </div>
+
+    <!-- Author title -->
+    <div class="author-title">
+      <div>aha</div>
+      <div>2024-04-17</div>
+    </div>
+  </div>
+
+  
+    <div class="divider"></div>
+
+    <div class="link">
+      <a class="category-link" href="/categories/Linux%E5%91%BD%E4%BB%A4/">Linux命令</a>
+
+      <a class="tag-none-link" href="/tags/%E6%96%87%E4%BB%B6%E6%9D%83%E9%99%90/" rel="tag">#文件权限</a>
+    </div>
+    
+  
+
+  <div class="divider"></div>
+</div>
+  
+
+  <div class="book-tocbot">
+</div>
+<div class="book-tocbot-menu">
+  <a class="book-toc-expand" onclick="expand_toc()">Expand all</a>
+  <a onclick="go_top()">Back to top</a>
+  <a onclick="go_bottom()">Go to bottom</a>
+  <a onclick="toggleSearch()">Search in blogs</a> <!-- 添加搜索文字的点击事件 -->
+</div>
+
+<div id="search-overlay" class="search-overlay" style="display: none;"> <!-- 初始状态为隐藏 -->
+  <div class="search-box">
+    <input type="text" id="search-input" placeholder="Search in all blogs...">
+    <button onclick="closeSearch()">Close</button> <!-- 添加关闭按钮 -->
+    <div id="search-results" class="search-results"></div>
+  </div>
+</div>
+
+<script>
+  function performSearch(query) {
+    if (!query.trim()) {
+      return;
+    }
+
+    fetch('/search.xml')
+      .then(response => response.text())
+      .then(data => {
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(data, "text/xml");
+        const entries = xmlDoc.getElementsByTagName('entry');
+        let results = '';
+
+        for (let i = 0; i < entries.length; i++) {
+          const title = entries[i].getElementsByTagName('title')[0].textContent;
+          const content = entries[i].getElementsByTagName('content')[0].textContent;
+          const url = entries[i].getElementsByTagName('url')[0].textContent;
+
+          let count = (title.match(new RegExp(query, "gi")) || []).length; // 统计查询词出现的次数
+          count += (content.match(new RegExp(query, "gi")) || []).length;
+
+          if (count > 0) { // title.includes(query) || content.includes(query)
+            results += `
+              <div class="search-result-item">
+                <a href="${url}">${title}</a> (${count})
+              </div>`;
+          }
+        }
+
+        const searchResultsElement = document.getElementById('search-results');
+        searchResultsElement.innerHTML = results;
+        searchResultsElement.classList.add('active');
+      });
+  }
+
+  function toggleSearch() {
+    const searchOverlay = document.getElementById('search-overlay');
+    searchOverlay.style.display = searchOverlay.style.display === 'none' ? 'flex' : 'none';
+  }
+
+  function closeSearch() {
+    document.getElementById('search-overlay').style.display = 'none';
+  }
+
+  document.getElementById('search-input').addEventListener('input', function() {
+    const query = this.value;
+    performSearch(query);
+  });
+</script>
+
+<style>
+  .search-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  .search-box {
+    background: white;
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+    width: 80%;
+    max-width: 500px;
+  }
+
+  .search-results {
+    margin-top: 10px;
+    max-height: 300px;
+    overflow-y: auto;
+    background: white;
+    padding: 10px;
+    border-radius: 5px;
+    width: 100%;
+  }
+
+  .search-result-item {
+    margin: 10px 0;
+  }
+
+  .search-result-item a {
+    color: blue; /* 设置链接颜色为蓝色 */
+    text-decoration: none;
+  }
+
+  .search-result-item a:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+<script src="/js/book-toc.js"></script>
+
+
+</div>
+          </div>
+        </div>
+      </div>
+
+      <a class="off-canvas-overlay" onclick="hide_canvas()"></a>
+
+      <button class="floating-button" onclick="toggleDropdownMenu()"></button>
+
+      <div class="dropdown-menu">
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FFFFFF', '#000000')">银河白</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#C7EDCC', '#000000')">豆沙绿</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FAF9DE', '#000000')">杏仁黄</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#E3EDCD', '#000000')">青草绿</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FFF2E2', '#000000')">秋叶褐</div>
+      </div>
+  </div>
+
+  <script>
+    function toggleDropdownMenu() {
+      document.querySelector('.floating-button').classList.toggle('active');
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      var storedBackgroundColor = localStorage.getItem('blogBackgroundColor');
+      var storedColor = localStorage.getItem('blogColor');
+
+      if (storedBackgroundColor && storedColor) {
+        document.body.style.backgroundColor = storedBackgroundColor;
+        document.body.style.color = storedColor;
+      }
+    });
+
+    function changeBackgroundColor(backgroundColor, color) {
+      document.body.style.backgroundColor = backgroundColor;
+      document.body.style.color = color;
+
+      localStorage.setItem('blogBackgroundColor', backgroundColor);
+      localStorage.setItem('blogColor', color);
+
+      document.querySelector('.floating-button').classList.remove('active');
+    }
+  </script>
+</body>
+
+</html>
+
+
+<script src="/js/book.js"></script>

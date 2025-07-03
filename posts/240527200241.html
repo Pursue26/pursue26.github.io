@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
+
+    
+      <link rel="icon" href="/favicon.png" />
+    
+
+    <title>
+        
+          Unix 网络编程卷一阅读随笔 - aha&#39;s book
+        
+    </title>
+
+    <!-- Spectre.css framework -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre-exp.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre-icons.min.css">
+
+    <!-- theme css & js -->
+    
+<link rel="stylesheet" href="/css/book.css">
+
+    
+<script src="/js/book.js"></script>
+
+
+    <!-- tocbot -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.css">
+    
+    <!-- katex -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/zooming/2.1.1/zooming.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const zooming = new Zooming()
+    zooming.listen('.book-content img')
+})
+</script>
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+    <style>
+      body {
+        background-color: #FFFFFF;
+        /* color: #000000; */
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+
+      /* Floating Button Styles */
+      .floating-button {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 999;
+        background-color: #000000;
+        color: #ffffff;
+        padding: 12px;
+        border-radius: 50%;
+        cursor: pointer;
+        border: 2px solid #000000;
+      }
+
+      .floating-button:hover {
+        background-color: #FFFFFF;
+      }
+
+      /* Dropdown Menu Styles */
+      .dropdown-menu {
+        position: fixed;
+        bottom: 60px;
+        right: 10px;
+        display: none;
+        min-width: 60px;
+        padding: 2px;
+        background-color: #fff;
+        /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
+        z-index: 1000;
+      }
+
+      .floating-button.active+.dropdown-menu {
+        display: block;
+      }
+
+      .dropdown-item {
+        display: block;
+        padding: 8px 16px;
+        cursor: pointer;
+      }
+
+      .dropdown-item:hover {
+        background-color: #f5f5f5;
+      }
+    </style>
+<style>.darkmode--activated{--body-bg-color:#282828;--content-bg-color:#333;--card-bg-color:#555;--text-color:#ccc;--blockquote-color:#bbb;--link-color:#ccc;--link-hover-color:#eee;--brand-color:#ddd;--brand-hover-color:#ddd;--table-row-odd-bg-color:#282828;--table-row-hover-bg-color:#363636;--menu-item-bg-color:#555;--btn-default-bg:#222;--btn-default-color:#ccc;--btn-default-border-color:#555;--btn-default-hover-bg:#666;--btn-default-hover-color:#ccc;--btn-default-hover-border-color:#666;--highlight-background:#282b2e;--highlight-foreground:#a9b7c6;--highlight-gutter-background:#34393d;--highlight-gutter-foreground:#9ca9b6}.darkmode--activated img{opacity:.75}.darkmode--activated img:hover{opacity:.9}.darkmode--activated code{color:#69dbdc;background:0 0}button.darkmode-toggle{z-index:9999}.darkmode-ignore,img{display:flex!important}.beian img{display:inline-block!important}</style></head>
+
+<body>
+  <div class="book-container">
+    <div class="book-sidebar">
+      <div class="book-brand">
+  <a href="/">
+    <img src="/favicon.png">
+    <span>AHA&#39;S BOOK</span>
+  </a>
+</div>
+        <div id="menu" class="book-menu hide">
+  <h2 id="基础知识"> 基础知识 </h2>
+<ul>
+<li><a href="/posts/231010144856.html"> 模运算 </a></li>
+<li><a href="/posts/231014105311.html"> 异或运算 </a></li>
+<li><a href="/posts/231210181853.html"> 计算机中的寄存器 </a></li>
+<li><a href="/posts/231213183051.html"> 正则表达式基础 </a></li>
+</ul>
+<h2 id="C 语言">C 语言 </h2>
+<ul>
+<li><a href="/posts/230916171929.html">main 函数参数 </a></li>
+<li><a href="/posts/231214192113.html"> 关键字与专有名词 </a></li>
+<li><a href="/posts/240103180653.html"> 输出打印函数 </a></li>
+<li><a href="/posts/230922143003.html"> 多维数组 </a></li>
+<li><a href="/posts/230913200729.html">const 关键字 </a></li>
+<li><a href="/posts/230918174223.html">typedef 类型基础 </a></li>
+<li><a href="/posts/230920172849.html">typedef 类型实践 </a></li>
+<li><a href="/posts/240224193217.html"> 二级指针 </a></li>
+<li><a href="/posts/240307195203.html"> 代码 TOP-K 问题 </a></li>
+<li><a href="/posts/230922172626.html">uthash 哈希表基础 </a></li>
+<li><a href="/posts/230918114841.html"> 大小端知识 </a></li>
+</ul>
+<h2 id="Golang 语言">Golang 语言 </h2>
+<ul>
+<li><a href="/posts/230907162612.html"> 变量与常量 </a></li>
+<li><a href="/posts/230909120145.html"> 函数 &amp; 包 &amp; 判断 &amp; 循环 </a></li>
+<li><a href="/posts/230912152800.html"> 数组与切片 </a></li>
+<li><a href="/posts/230913161326.html"> 可变参数函数与 Map 集合 </a></li>
+<li><a href="/posts/230915155105.html"> 字符串和指针 </a></li>
+</ul>
+<h2 id="数据结构"> 数据结构 </h2>
+<ul>
+<li><a href="/posts/231007174854.html"> 链表（数组实现）</a></li>
+<li><a href="/posts/231008213450.html"> 链表（链式实现）</a></li>
+<li><a href="/posts/231016161508.html"> 堆栈（数组实现）</a></li>
+<li><a href="/posts/231016184406.html"> 堆栈（链表实现）</a></li>
+<li><a href="/posts/231127185207.html"> 单调栈 </a></li>
+<li><a href="/posts/231017105123.html"> 队列（链表实现）</a></li>
+<li><a href="/posts/231017154121.html"> 双端队列（链表实现）</a></li>
+<li><a href="/posts/231018102559.html"> 堆基础与堆结构（数组实现）</a></li>
+<li><a href="/posts/231019102311.html"> 优先队列（堆实现）</a></li>
+<li><a href="/posts/230905224335.html"> 二叉树的遍历 </a></li>
+<li><a href="/posts/231020174358.html"> 二叉搜索树 </a></li>
+<li><a href="/posts/230916094606.html"> 拓扑排序 </a></li>
+<li><a href="/posts/230925185057.html">Trie 字典树 </a></li>
+<li><a href="/posts/231023164532.html"> 并查集（数组实现）</a></li>
+<li><a href="/posts/240702200642.html">Linux 数据结构之队列 </a></li>
+</ul>
+<h2 id="数据结构算法"> 数据结构算法 </h2>
+<ul>
+<li><a href="/posts/231218181635.html"> 归并排序 </a></li>
+<li><a href="/posts/231108163339.html"> 快速排序 </a></li>
+<li><a href="/posts/231107171607.html"> 堆排序 </a></li>
+<li><a href="/posts/231124181658.html"> 二分查找 </a></li>
+<li><a href="/posts/231227190828.html"> 哈希表实现 </a></li>
+<li><a href="/posts/240313193201.html"> 字符串哈希函数 </a></li>
+<li><a href="/posts/231116150205.html">Floyd 多源最短路径 </a></li>
+<li><a href="/posts/231117095232.html">Dijkstra 单源最短路径（原理部分）</a></li>
+<li><a href="/posts/231121152713.html">Dijkstra 单源最短路径（实现部分）</a></li>
+</ul>
+<h2 id="数据库"> 数据库 </h2>
+<ul>
+<li><a href="/posts/250605180332.html">MySQL 基础 </a></li>
+</ul>
+<h2 id="计算机网络"> 计算机网络 </h2>
+<ul>
+<li><a href="/posts/231011192359.html">OSI 参考模型 </a></li>
+<li><a href="/posts/240329202000.html"> 计网 CyC2018 之概述 </a></li>
+<li><a href="/posts/240329202004.html"> 计网 CyC2018 之链路层 </a></li>
+<li><a href="/posts/240329202003.html"> 计网 CyC2018 之网络层 </a></li>
+<li><a href="/posts/240329202002.html"> 计网 CyC2018 之传输层 </a></li>
+<li><a href="/posts/240329202001.html"> 计网 CyC2018 之应用层 </a></li>
+<li><a href="/posts/240306203742.html">ACL 访问控制列表 </a></li>
+<li><a href="/posts/240130190208.html"> 路由表、转发表与快速转发工作原理 </a></li>
+<li><a href="/posts/231221200716.html">VXLAN 网络虚拟化技术 </a></li>
+<li><a href="/posts/240903191243.html">TCP/IP checksum 计算 </a></li>
+<li><a href="/posts/240911185603.html"> 抓包分析 TCP 三次握手与四次挥手过程 </a></li>
+</ul>
+<h2 id="操作系统"> 操作系统 </h2>
+<ul>
+<li><a href="/posts/230921190726.html"> 概述 </a></li>
+<li><a href="/posts/230924172528.html"> 中断 &amp; 异常 &amp; 系统调用 </a></li>
+<li><a href="/posts/231017195157.html"> 内存分层体系与地址空间生成 </a></li>
+<li><a href="/posts/231108195351.html"> 连续内存分配 </a></li>
+<li><a href="/posts/231111172507.html"> 非连续内存分配之分段与分页 </a></li>
+<li><a href="/posts/231119170537.html"> 非连续内存分配之页表 </a></li>
+<li><a href="/posts/231123184526.html"> 内存管理之覆盖技术与交换技术 </a></li>
+<li><a href="/posts/231127193658.html"> 内存管理之虚存技术 </a></li>
+<li><a href="/posts/231129182631.html"> 局部页面置换算法 </a></li>
+<li><a href="/posts/231207184239.html"> 全局页面置换算法 </a></li>
+<li><a href="/posts/231207204958.html"> 进程描述 </a></li>
+<li><a href="/posts/231210211306.html"> 进程状态 </a></li>
+<li><a href="/posts/231215213932.html"> 线程 </a></li>
+<li><a href="/posts/231218220813.html"> 进程控制 </a></li>
+<li><a href="/posts/231228193143.html"> 调度 </a></li>
+<li><a href="/posts/240104202828.html"> 同步与互斥 </a></li>
+<li><a href="/posts/240113115605.html"> 信号量与管程 </a></li>
+<li><a href="/posts/240205182643.html"> 经典同步问题 </a></li>
+<li><a href="/posts/240310162231.html"> 死锁 </a></li>
+</ul>
+<h2 id="系统与网络编程"> 系统与网络编程 </h2>
+<ul>
+<li><a href="/posts/230911151334.html">pthread 库 </a></li>
+<li><a href="/posts/230921094127.html"> 锁与原子操作 </a></li>
+<li><a href="/posts/240319195609.html"> 读者写者问题 </a></li>
+<li><a href="/posts/240527200241.html"> 网络编程卷一阅读随笔 </a></li>
+<li><a href="/posts/240414190410.html"> 进程间通信 IPC 机制 </a></li>
+<li><a href="/posts/240424200123.html"> 多进程相关练习 </a></li>
+<li><a href="/posts/240516221527.html">I/O 模式与 I/O 多路复用 </a></li>
+<li><a href="/posts/240626192803.html">Linux 内核 kfifo 环形队列 </a></li>
+<li><a href="/posts/241009203126.html">Linux 内核等待队列 </a></li>
+<li><a href="/posts/240627210637.html">DPDK 无锁环形队列 </a></li>
+<li><a href="/posts/240919200410.html"> 解密内存屏障 </a></li>
+<li><a href="/posts/240927202500.html"> 内核线程的创建 </a></li>
+<li><a href="/posts/241015195205.html">Linux 网络数据包接收过程 </a></li>
+<li><a href="/posts/2410232111015.html"> 源码解读 epoll 实现原理 </a></li>
+<li><a href="/posts/241106182619.html">Linux 文件系统 </a></li>
+<li><a href="/posts/250619154429.html">Libevent 高性能 IO 事件驱动库 </a></li>
+</ul>
+<h2 id="工具与命令"> 工具与命令 </h2>
+<ul>
+<li><a href="/posts/240207180410.html">GCC 编译过程分解 </a></li>
+<li><a href="/posts/240312184132.html">GDB 调试入门 </a></li>
+<li><a href="/posts/240512184921.html">Makefile 学习 </a></li>
+<li><a href="/posts/250629214430.html">CMake 学习 </a></li>
+<li><a href="/posts/240417193754.html">Linux 命令之文件权限 </a></li>
+</ul>
+<h2 id="开源项目"> 开源项目 </h2>
+<ul>
+<li><a href="/posts/240303201855.html"> 线程池原理与实现 </a></li>
+<li><a href="/posts/240507194549.html">HTTP 服务器实现 </a></li>
+<li><a href="/posts/240904203605.html"> 聊天服务器实现 </a></li>
+<li><a href="/posts/241119182636.html">Linux 文件系统 </a></li>
+</ul>
+<h2 id="Docker">Docker</h2>
+<ul>
+<li><a href="/posts/230909171809.html">Docker 学习笔记 </a></li>
+</ul>
+<h1 id="LeetCode 刷题">LeetCode 刷题 </h1>
+<h2 id="链表相关"> 链表相关 </h2>
+<ul>
+<li><a href="/posts/231025143947.html">160 相交链表 </a></li>
+<li><a href="/posts/231025185947.html">206 反转链表 </a></li>
+<li><a href="/posts/231026101239.html">21 合并两个有序链表 </a></li>
+<li><a href="/posts/231026184514.html">83 删除排序链表中的重复元素 </a></li>
+<li><a href="/posts/231027150243.html">19 删除链表的倒数第 N 个节点 </a></li>
+<li><a href="/posts/231031120718.html">2 两数相加 </a></li>
+<li><a href="/posts/231031163133.html">445 两数相加 II</a></li>
+<li><a href="/posts/231101094219.html">234 回文链表 </a></li>
+<li><a href="/posts/231101135228.html">725 分隔链表 </a></li>
+<li><a href="/posts/231102120708.html">328 奇偶链表 </a></li>
+<li><a href="/posts/231102165703.html">142 环形链表 II</a></li>
+</ul>
+<h2 id="设计"> 设计 </h2>
+<ul>
+<li><a href="/posts/231201184542.html">146 LRU 缓存 </a></li>
+</ul>
+<h2 id="贪心算法"> 贪心算法 </h2>
+<ul>
+<li><a href="/posts/231107094652.html">1029 两地调度 </a></li>
+<li><a href="/posts/231109150855.html">435 无重叠区间 </a></li>
+</ul>
+<h2 id="哈希表"> 哈希表 </h2>
+<ul>
+<li><a href="/posts/231123181539.html">1410 实体解析器 </a></li>
+</ul>
+<h2 id="树的遍历"> 树的遍历 </h2>
+<ul>
+<li><a href="/posts/231103121209.html">117 填充每个节点的下一个右侧节点指针 II</a></li>
+</ul>
+<h2 id="深度优先搜索（递归）"> 深度优先搜索（递归）</h2>
+<ul>
+<li><a href="/posts/231206201243.html">2477 达到首都的最少油耗 </a></li>
+</ul>
+<h2 id="图或路径问题"> 图或路径问题 </h2>
+<ul>
+<li><a href="/posts/231211184652.html">1631 最小体力消耗路径 </a></li>
+</ul>
+<h2 id="其它"> 其它 </h2>
+<ul>
+<li><a href="/posts/230101120000.html"> 备忘录 </a></li>
+</ul>
+
+</div>
+
+
+<script src="/js/book-menu.js"></script>
+
+    </div>
+    <div class="sidebar-toggle" onclick="sidebar_toggle()" onmouseover="add_inner()" onmouseleave="remove_inner()">
+  <div class="sidebar-toggle-inner"></div>
+</div>
+
+<script>
+function add_inner() {
+  let inner = document.querySelector('.sidebar-toggle-inner')
+  inner.classList.add('show')  
+}
+
+function remove_inner() {
+  let inner = document.querySelector('.sidebar-toggle-inner')
+  inner.classList.remove('show')
+}
+
+function sidebar_toggle() {
+    let sidebar_toggle = document.querySelector('.sidebar-toggle')
+    let sidebar = document.querySelector('.book-sidebar')
+    let content = document.querySelector('.off-canvas-content')
+    if (sidebar_toggle.classList.contains('extend')) { // show
+        sidebar_toggle.classList.remove('extend')
+        sidebar.classList.remove('hide')
+        content.classList.remove('extend')
+    }
+    else { // hide
+        sidebar_toggle.classList.add('extend')
+        sidebar.classList.add('hide')
+        content.classList.add('extend')
+    }
+}
+</script>
+
+      <div class="off-canvas-content">
+        <div class="columns">
+          <div class="column col-10 col-lg-12">
+            <div class="book-navbar">
+              <!-- For Responsive Layout -->
+
+<header class="navbar">
+  <section class="navbar-section">
+    <a onclick="open_sidebar()">
+      <i class="icon icon-menu"></i>
+    </a>
+  </section>
+</header>
+
+            </div>
+            <div class="book-content">
+              <div class="book-post">
+  <p>Unix 网络编程卷一阅读随笔。</p>
+<span id="more"></span>
+<h1 id="TCP 与 socket 系统调用">TCP 与 socket 系统调用</h1>
+<p>[C2.4, 35] TCP 客户先与某个给定服务器建立一个连接（三次握手），再跨该连接与那个服务器交换数据，然后终止这个连接（四次挥手）。</p>
+<p>[C2.4, 37-39] 结合 socket 网络编程接口，TCP 的三次握手与四次挥手：</p>
+<ol>
+<li>
+<p><strong>服务器被动打开 </strong>：服务器首先调用<code>socket()</code> 函数创建一个套接字，然后调用 <code>bind()</code> 函数将该套接字绑定到一个本地地址和端口。接着，服务器调用 <code>listen()</code> 函数使该套接字进入监听状态，准备好接受外来的连接。</p>
+</li>
+<li>
+<p><strong>服务器调用 <code>accept()</code></strong>：服务器调用<code>accept()</code> 函数，该函数阻塞等待客户端的连接请求。当有客户端请求连接时，<code>accept()</code>返回一个新的套接字描述符，用于与客户端进行通信。原来的监听套接字继续保持监听状态。</p>
+</li>
+<li>
+<p><strong>客户端发起主动打开 </strong>：客户端调用<code>socket()</code> 函数创建一个套接字，然后调用 <code>connect()</code> 函数向服务器发起连接请求。此时，客户端和服务器进行 TCP 的三次握手：</p>
+<ul>
+<li>客户端发送 SYN 包（第一次握手）。</li>
+<li>服务器收到 SYN 包，回复 SYN+ACK 包（第二次握手）。</li>
+<li>客户端收到 SYN+ACK 包，回复 ACK 包（第三次握手），连接建立。</li>
+</ul>
+</li>
+<li>
+<p><strong>服务器 accept 返回 </strong>：当服务器收到客户端的连接请求（即 SYN 包）后，<code>accept()</code> 函数返回，提供一个新的套接字描述符用于与客户端通信。此时，三次握手完成，客户端和服务器可以开始通信。</p>
+</li>
+<li>
+<p><strong>数据传输</strong>：连接建立后，客户端和服务器可以通过套接字进行数据传输。服务器一般调用<code>read()</code>（或<code>recv()</code>）函数阻塞等待接收数据，客户端调用<code>write()</code>（或<code>send()</code>）函数发送数据。</p>
+</li>
+<li>
+<p><strong>连接关闭 </strong>：数据传输完成后，<em> 通常 </em> 由客户端调用 <code>close()</code> 函数发起主动关闭连接，进行四次挥手：</p>
+<ul>
+<li>客户端发送 FIN 包，表示主动关闭连接（第一次挥手）。</li>
+<li>服务器收到 FIN 包，回复 ACK 包（第二次挥手），此时服务器进入 CLOSE_WAIT 状态。</li>
+<li>服务器调用 <code>close()</code> 函数，发送 FIN 包（第三次挥手），表示准备关闭连接。</li>
+<li>客户端收到服务器的 FIN 包，回复 ACK 包（第四次挥手），此时连接关闭。</li>
+</ul>
+<p>客户端进入 TIME_WAIT 状态，等待一定时间后彻底关闭连接，确保服务器收到 ACK 包。</p>
+</li>
+</ol>
+<blockquote>
+<p>无论是客户端还是服务器，任何一端都可以调用 <code>close()</code> 执行主动关闭。通常情况是客户端执行主动关闭，但是某些协议（比如 HTTP/1.0）却是由服务器执行主动关闭。</p>
+</blockquote>
+<img src="/images/unix-socket/unix-2-tcp-1.png" alt="TCP 状态转移图" width="80%" height="80%">
+<p>结合 <a href="https://pursue26.github.io/posts/240329202002.html"> 这篇文章 </a> 的 TCP 三次握手和四次挥手一起理解上图和下图。</p>
+<img src="/images/unix-socket/unix-2-tcp-2.png" alt="TCP 连接的分组交换（包括连接建立、数据传输和连接终止）" width="80%" height="80%">
+<blockquote>
+<p>上图中，<strong>服务器对客户端请求的 ACK 确认是伴随着其应答消息一起发送的</strong>，这种做法称为捎带（piggybacking）。它通常在服务器处理请求并产生应答的时间少于 200ms 时发生。如果处理耗时更长，如 1s，那么我们看到的将先是 ACK 确认，后是应答。</p>
+</blockquote>
+<h1 id="socket 基本结构">socket 基本结构</h1>
+<h2 id="socket 地址">socket 地址</h2>
+<p>IPv4 套接字地址：struct sockaddr_in {}</p>
+<p>IPv6 套接字地址：struct sockaddr_in6 {}</p>
+<p>通用套接字地址：struct sockaddr {}</p>
+<p>当某种套接字地址作为一个参数传递给任何套接字函数时，套接字总是以引用的形式来传递，且 <strong> 这些套接字函数必须能处理任意协议族的套接字地址结构 </strong>。故此，需要将它们强转转换成通用套接字地址，传递给这些函数。这些函数有：bind(), connect(), accept() 等。</p>
+<p>[C3.3, 73-74] 有时候，应用进程需要告诉内核套接字地址的长度（内核就知道从进程复制多少数据进来了，这样内核在操作该结构时不至于越界），且内核需要告诉应用进程套接字地址的长度（它告诉进程内核在该结构中究竟存储了多少数据）。这就需要值 - 结果类型的参数，传入指向地址长度的指针、返回地址长度的结果再存储在这个指针中，供应用进程使用。</p>
+<h2 id="IP 地址转换">IP 地址转换</h2>
+<p>[C3.6, 81-83]</p>
+<p>ASCII 字符串格式的 IP 与二进制格式的网络地址相互转换：</p>
+<p>IPv4 ASCII 到 Network 地址：inet_aton(), <s>inet_addr()</s><br>
+Network 地址到 IPv4 ASCII：inet_ntoa()</p>
+<p>使用于 IPv4 和 IPv6 的新的转换函数，p=presentation, n=numeric：</p>
+<p>ASCII 到 Network 地址：inet_pton()<br>
+Network 地址到 ASCII：inet_ntop()</p>
+<h2 id="输入输出字节比实际少">输入输出字节比实际少</h2>
+<p>[C3.9, 88-89]</p>
+<p>对于字节流套接字（如 TCP 套接字）上的 read()和 write()函数所表现的行为不同于通常的文件 I/O。字节流套接字上调用 read()或 write()，<strong>输入或输出的字节数可能比实际请求的数量少</strong>，但这不表示发生了错误。</p>
+<p>这个现象的原因是：内核中用于套接字的缓冲区可能已达到了极限。此时需要调用者再次调用 read()或 write()函数，以输入或输出剩余的字节。</p>
+<p>你是否有印象，好多 read()都在 whlie 循环下执行，除了由于网络的不确定性和延迟，也有上述原因（个人理解）。</p>
+<h1 id="socket 基本编程">socket 基本编程</h1>
+<h2 id="socket-C-S 通信">socket C/S 通信</h2>
+<img src="/images/unix-socket/unix-4-socket-1.png" alt="基本 TCP 客户 / 服务器程序的 socket 函数" width="80%" height="80%">
+<h2 id="connect">connect()</h2>
+<p>[C4.3, 99-100]</p>
+<p>在客户端调用 connect()函数前不必非得调用 bind()函数——因为如果需要的话，内核会确定源 IP 地址，并选择一个临时端口作为源端口。</p>
+<h2 id="bind">bind()</h2>
+<p>[C4.4, 100-102]</p>
+<p>调用 connect()函数将触发 TCP 三次握手，而且仅在连接建立成功或出错时才返回。</p>
+<p>bind()函数把一个本地协议地址赋予一个套接字。</p>
+<ul>
+<li>对于 IP 协议，协议地址是 32 位 IPv4 地址或 128 位 IPv6 地址与 TCP/UDP 端口号的组合。</li>
+<li>对于 TCP，调用 bind()函数可以指定一个端口号、或指定一个 IP 地址、也可以两者都指定或都不指定。</li>
+<li>一般服务器会绑定一个众所周知的端口号，以便被大家（客户）认识。</li>
+<li>如果不绑定端口号，不管服务器还是客户端，当调用 listen()或 connect()时，内核就要为相应的套接字分配一个临时端口。</li>
+</ul>
+<p>如果客户端或服务器不绑定 IP 地址，会怎么处理？</p>
+<ul>
+<li>一般地，客户端通常不把 IP 地址绑定到它的套接字上。当连接（服务器）套接字时，内核将根据所用外出网路接口来选择源 IP 地址。</li>
+<li>一般地，服务器通常需要把 IP 地址绑定到它的套接字上。当未绑定时，内核就把客户端在三次握手中发送的 SYN 报文的目的 IP 地址作为服务器的源 IP 地址。</li>
+<li>使用通配地址时，一般为 htonl(INADDR_ANY) / htonl(in6addr_any)，表示让内核指定 IP 地址。</li>
+<li>指定端口为 0 时，表示让内核选择一个临时端口——要查看分配的端口，使用 getsockname()函数返回协议地址，进而获取端口。</li>
+</ul>
+<h2 id="listen">listen()</h2>
+<p>listen()函数仅由 TCP 服务器调用。</p>
+<p>当 socket()函数创建一个套接字时，它被假设为一个主动套接字。也就是说，它被假设为是一个将调用 connect()发起连接的客户套接字。但是，在服务端没有 connect()调用，listen()将一个未 connect 的套接字转换成一个被动套接字，指示内核应该接收指向该套接字的连接请求。</p>
+<p>listen()监听最大 backlog 个连接，其中 backlog 是未完成连接队列个数（未完成 TCP 三次握手的分节在此队列）和已完成连接队列（已完成 TCP 三次握手的分节在此队列）个数之和。若分节完成三次握手，则将被转移至已完成连接队列的队尾。</p>
+<img src="/images/unix-socket/unix-4-socket-2.png" alt="TCP 为监听套接字维护的两个队列" width="80%" height="80%">
+<h2 id="accept">accept()</h2>
+<p>accept()函数仅由 TCP 服务器调用，用于从已完成连接队列的队头返回下一个已完成连接的客户套接字（返回值称为已连接套接字，accept 第一个参数称为监听套接字）。</p>
+<ul>
+<li>监听套接字：一个服务器通常仅仅创建一个监听套接字，它在该服务器的生命周期内一直存在。</li>
+<li>已连接套接字：随着 TCP 三次握手的完成而由内核创建的客户套接字，并在服务器完成对该客户的服务时，被关闭。</li>
+</ul>
+<h2 id="fork">fork()</h2>
+<p>Unix 系统中派生新进程的唯一方法——fork()及其变体。</p>
+<p>在进程中调用一次 fork()，它却返回两次：</p>
+<ul>
+<li>在父进程中返回一次，返回值是新派生的子进程的 PID；</li>
+<li>在子进程中返回一次，返回值是 0。</li>
+</ul>
+<p>子进程的返回值是 0，是因为子进程的父进程唯一，它可以通过 getpid()获取父进程的 PID。而父进程只能通过记录返回值来存储多个子进程的 PID。</p>
+<p><strong>父进程中调用 fork()之前打开的所有描述符，在 fork()返回之后，可在父进程与子进程之间共享</strong>。</p>
+<p>利用这个特性，在网络服务器中，可在 accept()返回客户套接字后，fork()一个子进程，由子进程处理这个客户的请求，而父进程可关闭这个客户套接字，从而可以再次 accept()其它连接请求。</p>
+<p><strong>对于“父进程可关闭这个客户套接字”，那么为什么子进程中还能使用这个客户套接字</strong>？</p>
+<p>这是因为描述符（文件或套接字）都有一个引用计数。引用计数在文件表项中维护，它是当前打开着的描述符的个数。</p>
+<p>当 fork()返回后，父进程中先前打开的所有描述符，会在父进程与子进程间共享（也就是被复制），即每个描述符的引用计数都会加 1。因此，一个描述符真正的清理和资源释放要等到其引用计数值达到 0 时才发生。</p>
+<h2 id="getsockname">getsockname()</h2>
+<p>使用 name 一词令人误解，getsockname()和 getpeername()函数返回是本端或对端的协议地址——对于 IP 协议来说，就是 IP 地址和端口号。</p>
+<p>需要这两个函数理由：</p>
+<ul>
+<li>在没有调用 bind()的客户端上，connect()成功返回后，getsockname()用于返回由内核赋予该连接的本地 IP 地址和端口号。</li>
+<li>在以端口号 0 调用 bind()时，getsockname()用于返回由内核动态赋予的本地端口号。</li>
+<li>getsockname()可用于获取某个套接字的地址族。</li>
+<li>在服务端，可以使用 getsockname()返回已连接套接字（客户套接字）的本地 IP 地址和端口号。</li>
+</ul>
+
+</div>
+
+
+  <div class="book-comments">
+    
+
+
+
+
+  </div>
+
+
+
+<script src="/js/book-post.js"></script>
+
+
+            </div>
+          </div>
+          <div class="column col-2 hide-lg">
+            <div class="book-post-info">
+  
+    <div class="book-post-meta">
+
+  <div class="author">
+
+    <!-- Author image -->
+    <div class="author-img">
+      
+        <figure
+          class="avatar avatar-lg"
+          data-initial="A"
+          style="background-color: #3b4351;">
+        </figure>
+      
+    </div>
+
+    <!-- Author title -->
+    <div class="author-title">
+      <div>aha</div>
+      <div>2024-05-27</div>
+    </div>
+  </div>
+
+  
+    <div class="divider"></div>
+
+    <div class="link">
+      <a class="category-link" href="/categories/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/">网络编程</a>
+
+      <a class="tag-none-link" href="/tags/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/" rel="tag">#网络编程</a>
+    </div>
+    
+  
+
+  <div class="divider"></div>
+</div>
+  
+
+  <div class="book-tocbot">
+</div>
+<div class="book-tocbot-menu">
+  <a class="book-toc-expand" onclick="expand_toc()">Expand all</a>
+  <a onclick="go_top()">Back to top</a>
+  <a onclick="go_bottom()">Go to bottom</a>
+  <a onclick="toggleSearch()">Search in blogs</a> <!-- 添加搜索文字的点击事件 -->
+</div>
+
+<div id="search-overlay" class="search-overlay" style="display: none;"> <!-- 初始状态为隐藏 -->
+  <div class="search-box">
+    <input type="text" id="search-input" placeholder="Search in all blogs...">
+    <button onclick="closeSearch()">Close</button> <!-- 添加关闭按钮 -->
+    <div id="search-results" class="search-results"></div>
+  </div>
+</div>
+
+<script>
+  function performSearch(query) {
+    if (!query.trim()) {
+      return;
+    }
+
+    fetch('/search.xml')
+      .then(response => response.text())
+      .then(data => {
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(data, "text/xml");
+        const entries = xmlDoc.getElementsByTagName('entry');
+        let results = '';
+
+        for (let i = 0; i < entries.length; i++) {
+          const title = entries[i].getElementsByTagName('title')[0].textContent;
+          const content = entries[i].getElementsByTagName('content')[0].textContent;
+          const url = entries[i].getElementsByTagName('url')[0].textContent;
+
+          let count = (title.match(new RegExp(query, "gi")) || []).length; // 统计查询词出现的次数
+          count += (content.match(new RegExp(query, "gi")) || []).length;
+
+          if (count > 0) { // title.includes(query) || content.includes(query)
+            results += `
+              <div class="search-result-item">
+                <a href="${url}">${title}</a> (${count})
+              </div>`;
+          }
+        }
+
+        const searchResultsElement = document.getElementById('search-results');
+        searchResultsElement.innerHTML = results;
+        searchResultsElement.classList.add('active');
+      });
+  }
+
+  function toggleSearch() {
+    const searchOverlay = document.getElementById('search-overlay');
+    searchOverlay.style.display = searchOverlay.style.display === 'none' ? 'flex' : 'none';
+  }
+
+  function closeSearch() {
+    document.getElementById('search-overlay').style.display = 'none';
+  }
+
+  document.getElementById('search-input').addEventListener('input', function() {
+    const query = this.value;
+    performSearch(query);
+  });
+</script>
+
+<style>
+  .search-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  .search-box {
+    background: white;
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+    width: 80%;
+    max-width: 500px;
+  }
+
+  .search-results {
+    margin-top: 10px;
+    max-height: 300px;
+    overflow-y: auto;
+    background: white;
+    padding: 10px;
+    border-radius: 5px;
+    width: 100%;
+  }
+
+  .search-result-item {
+    margin: 10px 0;
+  }
+
+  .search-result-item a {
+    color: blue; /* 设置链接颜色为蓝色 */
+    text-decoration: none;
+  }
+
+  .search-result-item a:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+<script src="/js/book-toc.js"></script>
+
+
+</div>
+          </div>
+        </div>
+      </div>
+
+      <a class="off-canvas-overlay" onclick="hide_canvas()"></a>
+
+      <button class="floating-button" onclick="toggleDropdownMenu()"></button>
+
+      <div class="dropdown-menu">
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FFFFFF', '#000000')">银河白</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#C7EDCC', '#000000')">豆沙绿</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FAF9DE', '#000000')">杏仁黄</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#E3EDCD', '#000000')">青草绿</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FFF2E2', '#000000')">秋叶褐</div>
+      </div>
+  </div>
+
+  <script>
+    function toggleDropdownMenu() {
+      document.querySelector('.floating-button').classList.toggle('active');
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      var storedBackgroundColor = localStorage.getItem('blogBackgroundColor');
+      var storedColor = localStorage.getItem('blogColor');
+
+      if (storedBackgroundColor && storedColor) {
+        document.body.style.backgroundColor = storedBackgroundColor;
+        document.body.style.color = storedColor;
+      }
+    });
+
+    function changeBackgroundColor(backgroundColor, color) {
+      document.body.style.backgroundColor = backgroundColor;
+      document.body.style.color = color;
+
+      localStorage.setItem('blogBackgroundColor', backgroundColor);
+      localStorage.setItem('blogColor', color);
+
+      document.querySelector('.floating-button').classList.remove('active');
+    }
+  </script>
+</body>
+
+</html>
+
+
+<script src="/js/book.js"></script>

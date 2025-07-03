@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
+
+    
+      <link rel="icon" href="/favicon.png" />
+    
+
+    <title>
+        
+          数据结构算法之 Dijkstra 单源最短路径（原理部分） - aha&#39;s book
+        
+    </title>
+
+    <!-- Spectre.css framework -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre-exp.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre-icons.min.css">
+
+    <!-- theme css & js -->
+    
+<link rel="stylesheet" href="/css/book.css">
+
+    
+<script src="/js/book.js"></script>
+
+
+    <!-- tocbot -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.css">
+    
+    <!-- katex -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/zooming/2.1.1/zooming.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const zooming = new Zooming()
+    zooming.listen('.book-content img')
+})
+</script>
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+    <style>
+      body {
+        background-color: #FFFFFF;
+        /* color: #000000; */
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+
+      /* Floating Button Styles */
+      .floating-button {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 999;
+        background-color: #000000;
+        color: #ffffff;
+        padding: 12px;
+        border-radius: 50%;
+        cursor: pointer;
+        border: 2px solid #000000;
+      }
+
+      .floating-button:hover {
+        background-color: #FFFFFF;
+      }
+
+      /* Dropdown Menu Styles */
+      .dropdown-menu {
+        position: fixed;
+        bottom: 60px;
+        right: 10px;
+        display: none;
+        min-width: 60px;
+        padding: 2px;
+        background-color: #fff;
+        /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
+        z-index: 1000;
+      }
+
+      .floating-button.active+.dropdown-menu {
+        display: block;
+      }
+
+      .dropdown-item {
+        display: block;
+        padding: 8px 16px;
+        cursor: pointer;
+      }
+
+      .dropdown-item:hover {
+        background-color: #f5f5f5;
+      }
+    </style>
+<style>.darkmode--activated{--body-bg-color:#282828;--content-bg-color:#333;--card-bg-color:#555;--text-color:#ccc;--blockquote-color:#bbb;--link-color:#ccc;--link-hover-color:#eee;--brand-color:#ddd;--brand-hover-color:#ddd;--table-row-odd-bg-color:#282828;--table-row-hover-bg-color:#363636;--menu-item-bg-color:#555;--btn-default-bg:#222;--btn-default-color:#ccc;--btn-default-border-color:#555;--btn-default-hover-bg:#666;--btn-default-hover-color:#ccc;--btn-default-hover-border-color:#666;--highlight-background:#282b2e;--highlight-foreground:#a9b7c6;--highlight-gutter-background:#34393d;--highlight-gutter-foreground:#9ca9b6}.darkmode--activated img{opacity:.75}.darkmode--activated img:hover{opacity:.9}.darkmode--activated code{color:#69dbdc;background:0 0}button.darkmode-toggle{z-index:9999}.darkmode-ignore,img{display:flex!important}.beian img{display:inline-block!important}</style></head>
+
+<body>
+  <div class="book-container">
+    <div class="book-sidebar">
+      <div class="book-brand">
+  <a href="/">
+    <img src="/favicon.png">
+    <span>AHA&#39;S BOOK</span>
+  </a>
+</div>
+        <div id="menu" class="book-menu hide">
+  <h2 id="基础知识"> 基础知识 </h2>
+<ul>
+<li><a href="/posts/231010144856.html"> 模运算 </a></li>
+<li><a href="/posts/231014105311.html"> 异或运算 </a></li>
+<li><a href="/posts/231210181853.html"> 计算机中的寄存器 </a></li>
+<li><a href="/posts/231213183051.html"> 正则表达式基础 </a></li>
+</ul>
+<h2 id="C 语言">C 语言 </h2>
+<ul>
+<li><a href="/posts/230916171929.html">main 函数参数 </a></li>
+<li><a href="/posts/231214192113.html"> 关键字与专有名词 </a></li>
+<li><a href="/posts/240103180653.html"> 输出打印函数 </a></li>
+<li><a href="/posts/230922143003.html"> 多维数组 </a></li>
+<li><a href="/posts/230913200729.html">const 关键字 </a></li>
+<li><a href="/posts/230918174223.html">typedef 类型基础 </a></li>
+<li><a href="/posts/230920172849.html">typedef 类型实践 </a></li>
+<li><a href="/posts/240224193217.html"> 二级指针 </a></li>
+<li><a href="/posts/240307195203.html"> 代码 TOP-K 问题 </a></li>
+<li><a href="/posts/230922172626.html">uthash 哈希表基础 </a></li>
+<li><a href="/posts/230918114841.html"> 大小端知识 </a></li>
+</ul>
+<h2 id="Golang 语言">Golang 语言 </h2>
+<ul>
+<li><a href="/posts/230907162612.html"> 变量与常量 </a></li>
+<li><a href="/posts/230909120145.html"> 函数 &amp; 包 &amp; 判断 &amp; 循环 </a></li>
+<li><a href="/posts/230912152800.html"> 数组与切片 </a></li>
+<li><a href="/posts/230913161326.html"> 可变参数函数与 Map 集合 </a></li>
+<li><a href="/posts/230915155105.html"> 字符串和指针 </a></li>
+</ul>
+<h2 id="数据结构"> 数据结构 </h2>
+<ul>
+<li><a href="/posts/231007174854.html"> 链表（数组实现）</a></li>
+<li><a href="/posts/231008213450.html"> 链表（链式实现）</a></li>
+<li><a href="/posts/231016161508.html"> 堆栈（数组实现）</a></li>
+<li><a href="/posts/231016184406.html"> 堆栈（链表实现）</a></li>
+<li><a href="/posts/231127185207.html"> 单调栈 </a></li>
+<li><a href="/posts/231017105123.html"> 队列（链表实现）</a></li>
+<li><a href="/posts/231017154121.html"> 双端队列（链表实现）</a></li>
+<li><a href="/posts/231018102559.html"> 堆基础与堆结构（数组实现）</a></li>
+<li><a href="/posts/231019102311.html"> 优先队列（堆实现）</a></li>
+<li><a href="/posts/230905224335.html"> 二叉树的遍历 </a></li>
+<li><a href="/posts/231020174358.html"> 二叉搜索树 </a></li>
+<li><a href="/posts/230916094606.html"> 拓扑排序 </a></li>
+<li><a href="/posts/230925185057.html">Trie 字典树 </a></li>
+<li><a href="/posts/231023164532.html"> 并查集（数组实现）</a></li>
+<li><a href="/posts/240702200642.html">Linux 数据结构之队列 </a></li>
+</ul>
+<h2 id="数据结构算法"> 数据结构算法 </h2>
+<ul>
+<li><a href="/posts/231218181635.html"> 归并排序 </a></li>
+<li><a href="/posts/231108163339.html"> 快速排序 </a></li>
+<li><a href="/posts/231107171607.html"> 堆排序 </a></li>
+<li><a href="/posts/231124181658.html"> 二分查找 </a></li>
+<li><a href="/posts/231227190828.html"> 哈希表实现 </a></li>
+<li><a href="/posts/240313193201.html"> 字符串哈希函数 </a></li>
+<li><a href="/posts/231116150205.html">Floyd 多源最短路径 </a></li>
+<li><a href="/posts/231117095232.html">Dijkstra 单源最短路径（原理部分）</a></li>
+<li><a href="/posts/231121152713.html">Dijkstra 单源最短路径（实现部分）</a></li>
+</ul>
+<h2 id="数据库"> 数据库 </h2>
+<ul>
+<li><a href="/posts/250605180332.html">MySQL 基础 </a></li>
+</ul>
+<h2 id="计算机网络"> 计算机网络 </h2>
+<ul>
+<li><a href="/posts/231011192359.html">OSI 参考模型 </a></li>
+<li><a href="/posts/240329202000.html"> 计网 CyC2018 之概述 </a></li>
+<li><a href="/posts/240329202004.html"> 计网 CyC2018 之链路层 </a></li>
+<li><a href="/posts/240329202003.html"> 计网 CyC2018 之网络层 </a></li>
+<li><a href="/posts/240329202002.html"> 计网 CyC2018 之传输层 </a></li>
+<li><a href="/posts/240329202001.html"> 计网 CyC2018 之应用层 </a></li>
+<li><a href="/posts/240306203742.html">ACL 访问控制列表 </a></li>
+<li><a href="/posts/240130190208.html"> 路由表、转发表与快速转发工作原理 </a></li>
+<li><a href="/posts/231221200716.html">VXLAN 网络虚拟化技术 </a></li>
+<li><a href="/posts/240903191243.html">TCP/IP checksum 计算 </a></li>
+<li><a href="/posts/240911185603.html"> 抓包分析 TCP 三次握手与四次挥手过程 </a></li>
+</ul>
+<h2 id="操作系统"> 操作系统 </h2>
+<ul>
+<li><a href="/posts/230921190726.html"> 概述 </a></li>
+<li><a href="/posts/230924172528.html"> 中断 &amp; 异常 &amp; 系统调用 </a></li>
+<li><a href="/posts/231017195157.html"> 内存分层体系与地址空间生成 </a></li>
+<li><a href="/posts/231108195351.html"> 连续内存分配 </a></li>
+<li><a href="/posts/231111172507.html"> 非连续内存分配之分段与分页 </a></li>
+<li><a href="/posts/231119170537.html"> 非连续内存分配之页表 </a></li>
+<li><a href="/posts/231123184526.html"> 内存管理之覆盖技术与交换技术 </a></li>
+<li><a href="/posts/231127193658.html"> 内存管理之虚存技术 </a></li>
+<li><a href="/posts/231129182631.html"> 局部页面置换算法 </a></li>
+<li><a href="/posts/231207184239.html"> 全局页面置换算法 </a></li>
+<li><a href="/posts/231207204958.html"> 进程描述 </a></li>
+<li><a href="/posts/231210211306.html"> 进程状态 </a></li>
+<li><a href="/posts/231215213932.html"> 线程 </a></li>
+<li><a href="/posts/231218220813.html"> 进程控制 </a></li>
+<li><a href="/posts/231228193143.html"> 调度 </a></li>
+<li><a href="/posts/240104202828.html"> 同步与互斥 </a></li>
+<li><a href="/posts/240113115605.html"> 信号量与管程 </a></li>
+<li><a href="/posts/240205182643.html"> 经典同步问题 </a></li>
+<li><a href="/posts/240310162231.html"> 死锁 </a></li>
+</ul>
+<h2 id="系统与网络编程"> 系统与网络编程 </h2>
+<ul>
+<li><a href="/posts/230911151334.html">pthread 库 </a></li>
+<li><a href="/posts/230921094127.html"> 锁与原子操作 </a></li>
+<li><a href="/posts/240319195609.html"> 读者写者问题 </a></li>
+<li><a href="/posts/240527200241.html"> 网络编程卷一阅读随笔 </a></li>
+<li><a href="/posts/240414190410.html"> 进程间通信 IPC 机制 </a></li>
+<li><a href="/posts/240424200123.html"> 多进程相关练习 </a></li>
+<li><a href="/posts/240516221527.html">I/O 模式与 I/O 多路复用 </a></li>
+<li><a href="/posts/240626192803.html">Linux 内核 kfifo 环形队列 </a></li>
+<li><a href="/posts/241009203126.html">Linux 内核等待队列 </a></li>
+<li><a href="/posts/240627210637.html">DPDK 无锁环形队列 </a></li>
+<li><a href="/posts/240919200410.html"> 解密内存屏障 </a></li>
+<li><a href="/posts/240927202500.html"> 内核线程的创建 </a></li>
+<li><a href="/posts/241015195205.html">Linux 网络数据包接收过程 </a></li>
+<li><a href="/posts/2410232111015.html"> 源码解读 epoll 实现原理 </a></li>
+<li><a href="/posts/241106182619.html">Linux 文件系统 </a></li>
+<li><a href="/posts/250619154429.html">Libevent 高性能 IO 事件驱动库 </a></li>
+</ul>
+<h2 id="工具与命令"> 工具与命令 </h2>
+<ul>
+<li><a href="/posts/240207180410.html">GCC 编译过程分解 </a></li>
+<li><a href="/posts/240312184132.html">GDB 调试入门 </a></li>
+<li><a href="/posts/240512184921.html">Makefile 学习 </a></li>
+<li><a href="/posts/250629214430.html">CMake 学习 </a></li>
+<li><a href="/posts/240417193754.html">Linux 命令之文件权限 </a></li>
+</ul>
+<h2 id="开源项目"> 开源项目 </h2>
+<ul>
+<li><a href="/posts/240303201855.html"> 线程池原理与实现 </a></li>
+<li><a href="/posts/240507194549.html">HTTP 服务器实现 </a></li>
+<li><a href="/posts/240904203605.html"> 聊天服务器实现 </a></li>
+<li><a href="/posts/241119182636.html">Linux 文件系统 </a></li>
+</ul>
+<h2 id="Docker">Docker</h2>
+<ul>
+<li><a href="/posts/230909171809.html">Docker 学习笔记 </a></li>
+</ul>
+<h1 id="LeetCode 刷题">LeetCode 刷题 </h1>
+<h2 id="链表相关"> 链表相关 </h2>
+<ul>
+<li><a href="/posts/231025143947.html">160 相交链表 </a></li>
+<li><a href="/posts/231025185947.html">206 反转链表 </a></li>
+<li><a href="/posts/231026101239.html">21 合并两个有序链表 </a></li>
+<li><a href="/posts/231026184514.html">83 删除排序链表中的重复元素 </a></li>
+<li><a href="/posts/231027150243.html">19 删除链表的倒数第 N 个节点 </a></li>
+<li><a href="/posts/231031120718.html">2 两数相加 </a></li>
+<li><a href="/posts/231031163133.html">445 两数相加 II</a></li>
+<li><a href="/posts/231101094219.html">234 回文链表 </a></li>
+<li><a href="/posts/231101135228.html">725 分隔链表 </a></li>
+<li><a href="/posts/231102120708.html">328 奇偶链表 </a></li>
+<li><a href="/posts/231102165703.html">142 环形链表 II</a></li>
+</ul>
+<h2 id="设计"> 设计 </h2>
+<ul>
+<li><a href="/posts/231201184542.html">146 LRU 缓存 </a></li>
+</ul>
+<h2 id="贪心算法"> 贪心算法 </h2>
+<ul>
+<li><a href="/posts/231107094652.html">1029 两地调度 </a></li>
+<li><a href="/posts/231109150855.html">435 无重叠区间 </a></li>
+</ul>
+<h2 id="哈希表"> 哈希表 </h2>
+<ul>
+<li><a href="/posts/231123181539.html">1410 实体解析器 </a></li>
+</ul>
+<h2 id="树的遍历"> 树的遍历 </h2>
+<ul>
+<li><a href="/posts/231103121209.html">117 填充每个节点的下一个右侧节点指针 II</a></li>
+</ul>
+<h2 id="深度优先搜索（递归）"> 深度优先搜索（递归）</h2>
+<ul>
+<li><a href="/posts/231206201243.html">2477 达到首都的最少油耗 </a></li>
+</ul>
+<h2 id="图或路径问题"> 图或路径问题 </h2>
+<ul>
+<li><a href="/posts/231211184652.html">1631 最小体力消耗路径 </a></li>
+</ul>
+<h2 id="其它"> 其它 </h2>
+<ul>
+<li><a href="/posts/230101120000.html"> 备忘录 </a></li>
+</ul>
+
+</div>
+
+
+<script src="/js/book-menu.js"></script>
+
+    </div>
+    <div class="sidebar-toggle" onclick="sidebar_toggle()" onmouseover="add_inner()" onmouseleave="remove_inner()">
+  <div class="sidebar-toggle-inner"></div>
+</div>
+
+<script>
+function add_inner() {
+  let inner = document.querySelector('.sidebar-toggle-inner')
+  inner.classList.add('show')  
+}
+
+function remove_inner() {
+  let inner = document.querySelector('.sidebar-toggle-inner')
+  inner.classList.remove('show')
+}
+
+function sidebar_toggle() {
+    let sidebar_toggle = document.querySelector('.sidebar-toggle')
+    let sidebar = document.querySelector('.book-sidebar')
+    let content = document.querySelector('.off-canvas-content')
+    if (sidebar_toggle.classList.contains('extend')) { // show
+        sidebar_toggle.classList.remove('extend')
+        sidebar.classList.remove('hide')
+        content.classList.remove('extend')
+    }
+    else { // hide
+        sidebar_toggle.classList.add('extend')
+        sidebar.classList.add('hide')
+        content.classList.add('extend')
+    }
+}
+</script>
+
+      <div class="off-canvas-content">
+        <div class="columns">
+          <div class="column col-10 col-lg-12">
+            <div class="book-navbar">
+              <!-- For Responsive Layout -->
+
+<header class="navbar">
+  <section class="navbar-section">
+    <a onclick="open_sidebar()">
+      <i class="icon icon-menu"></i>
+    </a>
+  </section>
+</header>
+
+            </div>
+            <div class="book-content">
+              <div class="book-post">
+  <p>戴克斯特拉算法（Dijkstra’s algorithm），又称迪杰斯特拉算法、Dijkstra 算法，是由荷兰计算机科学家艾兹赫尔·戴克斯特拉在 1956 年发现的算法。戴克斯特拉算法使用类似广度优先搜索的方法解决赋权图的 <strong> 单源 </strong> 最短路径问题。它可以应用于有向图和无向图，常被应用于网络路由、交通规划等领域。但对于带有负权边的图，Dijkstra 算法无法正确计算最短路径，需要使用其他算法，如 Bellman-Ford 算法。</p>
+<span id="more"></span>
+<h2 id="Dijkstra 基本思想">Dijkstra 基本思想</h2>
+<p>Dijkstra 算法可以计算从图中的一个节点出发到其他所有节点的最短路径。它的基本思想是从源节点开始，通过选择当前距离源节点最近的未访问节点，不断更新和调整节点的最短路径和距离值，直到找到所有节点的最短路径为止。</p>
+<blockquote>
+<p>Dijkstra 算法属于贪心策略（算法执行完后，才能得到全局最优解）。</p>
+</blockquote>
+<h2 id="Dijkstra 具体步骤">Dijkstra 具体步骤</h2>
+<h3 id="Dijkstra 步骤描述">Dijkstra 步骤描述</h3>
+<p>Dijkstra 算法的具体步骤如下：</p>
+<ol>
+<li>创建一个距离数组<code>dist[]</code>，用于存储源节点到各个节点的最短路径长度。初始时，将源节点的距离设为 0，与源节点直接相连的节点的距离设为边的权重，其他节点的距离设为无穷大。</li>
+<li>创建一个标记数组<code>visited[]</code>，用于标记是否已经访问过该节点。初始时，将源节点标记为已访问，其他节点标记为未访问。</li>
+<li>以源节点为基准，遍历所有与其相邻的、未访问过的节点，计算「源节点」到这些相邻节点的距离，并从未访问的节点中选择距离「源节点」最近的节点，作为基准节点。</li>
+<li>以这个基准节点为中间节点，更新从源节点经过中间节点到达其它节点的距离到 <code>dist[]</code> 数组中，并将这个基准节点标记为已访问。
+<ul>
+<li>更新的方式是：如果「从新的中间节点」到「该节点」的距离小于原本到它的距离，则更新它的值（你要从这个节点走才更近哦），并将这个中间节点作为它的前驱节点。</li>
+</ul>
+</li>
+<li>重复步骤 3 和步骤 4，直到所有节点都被访问过。</li>
+<li>最终，<code>dist[]</code>数组中存储的就是源节点到其他所有节点的最短路径长度。</li>
+</ol>
+<blockquote>
+<p>步骤三中的「相邻」节点包括直接与源节点相邻、通过已访问的节点间接与源节点相邻这两大类。换句话说，也就是 <code>dist[]</code> 数组中只要不是无穷大，就与源节点直接或间接相邻。</p>
+</blockquote>
+<h3 id="Dijkstra 复杂度">Dijkstra 复杂度</h3>
+<p>Dijkstra 算法的时间复杂度为 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false">(</mo><mi mathvariant="normal">∣</mi><mi>V</mi><msup><mi mathvariant="normal">∣</mi><mn>2</mn></msup><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">O(|V|^{2})</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.064108em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord">∣</span><span class="mord mathnormal" style="margin-right:0.22222em;">V</span><span class="mord"><span class="mord">∣</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span>，空间复杂度为<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false">(</mo><mi mathvariant="normal">∣</mi><mi>V</mi><msup><mi mathvariant="normal">∣</mi><mn>2</mn></msup><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">O(|V|^{2})</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.064108em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord">∣</span><span class="mord mathnormal" style="margin-right:0.22222em;">V</span><span class="mord"><span class="mord">∣</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span>，主要为二维邻接矩阵、一维的距离矩阵、访问矩阵、前驱矩阵，其中 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>V</mi></mrow><annotation encoding="application/x-tex">V</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathnormal" style="margin-right:0.22222em;">V</span></span></span></span> 是点集。</p>
+<h2 id="Dijkstra 算法图解">Dijkstra 算法图解</h2>
+<p>假设有下面这个图：<br>
+<img src="../images/algorithm/dijkstra-0.png" alt=""></p>
+<p>Dijkstra 算法将会寻找出图中节点 <code>0</code> 到所有其他节点的最短路径。</p>
+<h3 id="初始化 dist 数组">初始化 dist 数组</h3>
+<p>创建一个距离数组<code>dist[]</code>，用于存储源节点到各个节点的最短路径长度。初始时，源节点到自己的距离为 0，与源节点直接相连的节点的距离设为边的权重，到其它节点的距离还没有确定，所以先标记为无穷大。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">node:   [0, 1, 2, 3, 4, 5, 6]</span><br><span class="line">dist:   [0, 2, 6, ∞, ∞, ∞, ∞]</span><br></pre></td></tr></table></figure>
+<h3 id="初始化 visited 数组">初始化 visited 数组</h3>
+<p>创建一个标记数组<code>visited[]</code>，用于标记是否已经访问过该节点。初始时，将源节点标记为已访问，其他节点标记为未访问。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">node:   [0, 1, 2, 3, 4, 5, 6]</span><br><span class="line">dist:   [0, 2, 6, ∞, ∞, ∞, ∞]</span><br><span class="line">visted: [1, 0, 0, 0, 0, 0, 0]</span><br></pre></td></tr></table></figure>
+<h3 id="初始化 prev 数组">初始化 prev 数组</h3>
+<p>创建一个前驱数组<code>prev[]</code>，用于存储到达该节点的最短路径上的倒数第二个节点（通过哪个节点到达的该节点）。初始时，与源节点直接相连的节点的前驱节点就是源节点，其它节点的前驱节点无法确定，先标记为无效节点（源节点到源节点的路径，没有倒数第二个节点，也标记为无效节点）。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">node:   [0, 1, 2, 3, 4, 5, 6]</span><br><span class="line">dist:   [0, 2, 6, ∞, ∞, ∞, ∞]</span><br><span class="line">visted: [1, 0, 0, 0, 0, 0, 0]</span><br><span class="line">prev:  [-1, 0, 0,-1,-1,-1,-1]</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>记住，当所有节点都被标记为已访问（被添加到路径中）时，算法的计算过程就完成了。</p>
+</blockquote>
+<h3 id="遍历相邻节点">遍历相邻节点</h3>
+<p>我们选择了从节点 <code>0</code> 出发，可以直接将它标记为「已访问」，并在图中给它加上红色的边框：</p>
+<p><img src="../images/algorithm/dijkstra-1.png" alt=""></p>
+<hr>
+<p>以源节点 <code>0</code> 为基准，遍历所有与其相邻的、未访问过的节点（节点 <code>1</code> 和 <code>2</code>），计算源节点到这些相邻节点的距离，并更新 <code>dist[]</code> 数组中的值。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">node:   [0, 1, 2, 3, 4, 5, 6]</span><br><span class="line">dist:   [0, 2, 6, ∞, ∞, ∞, ∞]</span><br><span class="line">visted: [1, 0, 0, 0, 0, 0, 0]</span><br><span class="line">prev:  [-1, 0, 0,-1,-1,-1,-1]</span><br></pre></td></tr></table></figure>
+<p>从表格中可以看出，当前：</p>
+<ul>
+<li>从源节点 <code>0</code> 到节点 <code>1</code> 的最短距离为 2（通过源节点 <code>0</code> 到达节点 <code>1</code>）；</li>
+<li>从源节点 <code>0</code> 到节点 <code>2</code> 的最短距离为 6（通过源节点 <code>0</code> 到达节点 <code>2</code>）。</li>
+</ul>
+<p>然后，我们 <strong> 从未访问的节点（节点 <code>1</code> 和节点 <code>2</code>）中选择距离源节点最近的节点（节点 <code>1</code>），作为下一个基准节点，并将其标记为已访问</strong>。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">node:   [0, 1, 2, 3, 4, 5, 6]</span><br><span class="line">dist:   [0, 2, 6, ∞, ∞, ∞, ∞]</span><br><span class="line">visted: [1, 1, 0, 0, 0, 0, 0]</span><br><span class="line">prev:  [-1, 0, 0,-1,-1,-1,-1]</span><br></pre></td></tr></table></figure>
+<p>因此，节点 <code>1</code> 标记为已访问（节点 <code>2</code> 不标记为已访问），并更新节点 <code>1</code> 的上一个节点为节点 <code>0</code>。</p>
+<p>图中给已访问的节点 <code>1</code> 加上红色的边框，上一个节点 <code>0</code> 到该节点 <code>1</code> 的路径（边）被染红：</p>
+<p><img src="../images/algorithm/dijkstra-2.png" alt=""></p>
+<p>然后，节点 <code>1</code> 将作为下一个基准节点，重复上述遍历相邻节点的操作。</p>
+<hr>
+<p>以节点 <code>1</code> 为基准，遍历所有与其相邻的、未访问过的节点（节点 <code>3</code>），计算源节点到这些相邻节点的距离，并更新 <code>dist[]</code> 数组中的值。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">node:   [0, 1, 2, 3, 4, 5, 6]</span><br><span class="line">dist:   [0, 2, 6, 7, ∞, ∞, ∞]</span><br><span class="line">visted: [1, 1, 0, 0, 0, 0, 0]</span><br><span class="line">prev:  [-1, 0, 0,-1,-1,-1,-1]</span><br></pre></td></tr></table></figure>
+<p>从表格中可以看出，当前：</p>
+<ul>
+<li>从源节点 <code>0</code> 到节点 <code>3</code> 的最短距离为 7（通过中间节点 <code>1</code> 到达节点 <code>3</code>）。</li>
+<li>从源节点 <code>0</code> 到节点 <code>2</code> 的最短距离为 6（通过源节点 <code>0</code> 到达节点 <code>2</code>）。</li>
+</ul>
+<blockquote>
+<p>注意，往轮遍历中未被标记为已访问的节点（这里是节点 <code>2</code>）也需要参与距离比较、也可作为下一个基准节点哦！</p>
+</blockquote>
+<p>然后，我们 <strong> 从未访问的节点（节点 <code>2</code> 和节点 <code>3</code>）中选择距离源节点 <code>0</code> 最近的节点（节点 <code>2</code>），作为下一个基准节点，并将其标记为已访问</strong>。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">node:   [0, 1, 2, 3, 4, 5, 6]</span><br><span class="line">dist:   [0, 2, 6, 7, ∞, ∞, ∞]</span><br><span class="line">visted: [1, 1, 1, 0, 0, 0, 0]</span><br><span class="line">prev:  [-1, 0, 0,-1,-1,-1,-1]</span><br></pre></td></tr></table></figure>
+<p>因此，节点 <code>2</code> 标记为已访问（节点 <code>3</code> 不标记为已访问），并更新节点 <code>2</code> 的上一个节点为节点 <code>0</code>。</p>
+<p>图中给已访问的节点 <code>2</code> 加上红色的边框，上一个节点 <code>0</code> 到该节点 <code>2</code> 的路径（边）被染红：</p>
+<p><img src="../images/algorithm/dijkstra-3.png" alt=""></p>
+<p>然后，节点 <code>2</code> 将作为下一个基准节点，重复上述遍历相邻节点的操作。</p>
+<hr>
+<p>以节点 <code>2</code> 为基准，遍历所有与其相邻的、未访问过的节点（节点 <code>3</code>），计算源节点到这些相邻节点的距离，并更新 <code>dist[]</code> 数组中的值。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">node:   [0, 1, 2, 3, 4, 5, 6]</span><br><span class="line">dist:   [0, 2, 6, 7, ∞, ∞, ∞]</span><br><span class="line">visted: [1, 1, 1, 0, 0, 0, 0]</span><br><span class="line">prev:  [-1, 0, 0,-1,-1,-1,-1]</span><br></pre></td></tr></table></figure>
+<p>从表格中可以看出，当前：</p>
+<ul>
+<li>从源节点 <code>0</code> 到节点 <code>3</code> 的最短距离为 14（通过中间节点 <code>2</code> 到达节点 <code>3</code>）。</li>
+<li>从源节点 <code>0</code> 到节点 <code>3</code> 的最短距离为 7（通过另一个中间节点 <code>1</code> 到达节点 <code>3</code>）。</li>
+</ul>
+<p>然后，我们 <strong> 从未访问的节点（节点 <code>3</code>）中选择距离源节点 <code>0</code> 最近的节点（节点 <code>3</code>），作为下一个基准节点，并将其标记为已访问</strong>。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">node:   [0, 1, 2, 3, 4, 5, 6]</span><br><span class="line">dist:   [0, 2, 6, 7, ∞, ∞, ∞]</span><br><span class="line">visted: [1, 1, 1, 1, 0, 0, 0]</span><br><span class="line">prev:  [-1, 0, 0, 1,-1,-1,-1]</span><br></pre></td></tr></table></figure>
+<p>因此，节点 <code>3</code> 标记为已访问，并更新节点 <code>3</code> 的 <strong> 上一个节点为节点 <code>1</code></strong>（而不是节点 <code>2</code>）。</p>
+<p>图中给已访问的节点 <code>3</code> 加上红色的边框，上一个节点 <code>1</code> 到该节点 <code>3</code> 的路径（边）被染红：</p>
+<p><img src="../images/algorithm/dijkstra-4.png" alt=""></p>
+<p>然后，节点 <code>3</code> 将作为下一个基准节点，重复上述遍历相邻节点的操作。</p>
+<hr>
+<p>经过多次选择新的基准节点，并进行遍历相邻节点的操作后，所有节点都被标记为已访问（被添加到路径中），算法的计算过程就完成了。现在，<code>dist[]</code>数组中存储的就是源节点到其他所有节点的最短路径长度。</p>
+<p>最终的表格为：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">node:   [0,  1,  2,  3,  4,  5,  6]</span><br><span class="line">dist:   [0,  2,  6,  7, 17, 22, 19]</span><br><span class="line">visted: [1,  1,  1,  1,  1,  1,  1]</span><br><span class="line">prev:  [-1,  0,  0,  1,  3,  3,  4]</span><br></pre></td></tr></table></figure>
+<p>最终表格对应的可视化图：</p>
+<p><img src="../images/algorithm/dijkstra-n.png" alt=""></p>
+<p>从表格或图中可以看出：</p>
+<ul>
+<li>源节点 <code>0</code> 到节点 <code>1, 2, 3, 4, 5, 6</code> 的最短距离分别为 <code>2, 6, 7, 17, 22, 19</code>；</li>
+<li>源节点 <code>0</code> 到节点 <code>6</code> 的最短路径为 <code>0-&gt;1-&gt;3-&gt;4-&gt;6</code>，这可以通过表格中的 <code>prev[]</code> 数组得出最短路径：节点 <code>6</code> 的上一个节点为 <code>4</code>，节点 <code>4</code> 的上一个节点为 <code>3</code>，节点 <code>3</code> 的上一个节点为 <code>1</code>，节点 <code>1</code> 的上一个节点为 <code>0</code>。</li>
+</ul>
+<p>最后，再回顾一下本文开头的《具体步骤》吧~</p>
+<blockquote>
+<p>参考资料 &amp; 图源：</p>
+<ol>
+<li><a target="_blank" rel="noopener" href="https://www.freecodecamp.org/chinese/news/dijkstras-shortest-path-algorithm-visual-introduction/">https://www.freecodecamp.org/chinese/news/dijkstras-shortest-path-algorithm-visual-introduction/</a></li>
+<li><a target="_blank" rel="noopener" href="https://b23.tv/XWF7K0p">https://b23.tv/XWF7K0p</a></li>
+</ol>
+</blockquote>
+
+</div>
+
+
+  <div class="book-comments">
+    
+
+
+
+
+  </div>
+
+
+
+<script src="/js/book-post.js"></script>
+
+
+            </div>
+          </div>
+          <div class="column col-2 hide-lg">
+            <div class="book-post-info">
+  
+    <div class="book-post-meta">
+
+  <div class="author">
+
+    <!-- Author image -->
+    <div class="author-img">
+      
+        <figure
+          class="avatar avatar-lg"
+          data-initial="A"
+          style="background-color: #3b4351;">
+        </figure>
+      
+    </div>
+
+    <!-- Author title -->
+    <div class="author-title">
+      <div>aha</div>
+      <div>2023-11-17</div>
+    </div>
+  </div>
+
+  
+    <div class="divider"></div>
+
+    <div class="link">
+      <a class="category-link" href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/">数据结构</a> <a class="category-link" href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/%E5%9B%BE%E7%AE%97%E6%B3%95/">图算法</a>
+
+      <a class="tag-none-link" href="/tags/Dijkstra%E7%AE%97%E6%B3%95/" rel="tag">#Dijkstra算法</a> <a class="tag-none-link" href="/tags/%E5%8D%95%E6%BA%90%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84/" rel="tag">#单源最短路径</a>
+    </div>
+    
+  
+
+  <div class="divider"></div>
+</div>
+  
+
+  <div class="book-tocbot">
+</div>
+<div class="book-tocbot-menu">
+  <a class="book-toc-expand" onclick="expand_toc()">Expand all</a>
+  <a onclick="go_top()">Back to top</a>
+  <a onclick="go_bottom()">Go to bottom</a>
+  <a onclick="toggleSearch()">Search in blogs</a> <!-- 添加搜索文字的点击事件 -->
+</div>
+
+<div id="search-overlay" class="search-overlay" style="display: none;"> <!-- 初始状态为隐藏 -->
+  <div class="search-box">
+    <input type="text" id="search-input" placeholder="Search in all blogs...">
+    <button onclick="closeSearch()">Close</button> <!-- 添加关闭按钮 -->
+    <div id="search-results" class="search-results"></div>
+  </div>
+</div>
+
+<script>
+  function performSearch(query) {
+    if (!query.trim()) {
+      return;
+    }
+
+    fetch('/search.xml')
+      .then(response => response.text())
+      .then(data => {
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(data, "text/xml");
+        const entries = xmlDoc.getElementsByTagName('entry');
+        let results = '';
+
+        for (let i = 0; i < entries.length; i++) {
+          const title = entries[i].getElementsByTagName('title')[0].textContent;
+          const content = entries[i].getElementsByTagName('content')[0].textContent;
+          const url = entries[i].getElementsByTagName('url')[0].textContent;
+
+          let count = (title.match(new RegExp(query, "gi")) || []).length; // 统计查询词出现的次数
+          count += (content.match(new RegExp(query, "gi")) || []).length;
+
+          if (count > 0) { // title.includes(query) || content.includes(query)
+            results += `
+              <div class="search-result-item">
+                <a href="${url}">${title}</a> (${count})
+              </div>`;
+          }
+        }
+
+        const searchResultsElement = document.getElementById('search-results');
+        searchResultsElement.innerHTML = results;
+        searchResultsElement.classList.add('active');
+      });
+  }
+
+  function toggleSearch() {
+    const searchOverlay = document.getElementById('search-overlay');
+    searchOverlay.style.display = searchOverlay.style.display === 'none' ? 'flex' : 'none';
+  }
+
+  function closeSearch() {
+    document.getElementById('search-overlay').style.display = 'none';
+  }
+
+  document.getElementById('search-input').addEventListener('input', function() {
+    const query = this.value;
+    performSearch(query);
+  });
+</script>
+
+<style>
+  .search-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  .search-box {
+    background: white;
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+    width: 80%;
+    max-width: 500px;
+  }
+
+  .search-results {
+    margin-top: 10px;
+    max-height: 300px;
+    overflow-y: auto;
+    background: white;
+    padding: 10px;
+    border-radius: 5px;
+    width: 100%;
+  }
+
+  .search-result-item {
+    margin: 10px 0;
+  }
+
+  .search-result-item a {
+    color: blue; /* 设置链接颜色为蓝色 */
+    text-decoration: none;
+  }
+
+  .search-result-item a:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+<script src="/js/book-toc.js"></script>
+
+
+</div>
+          </div>
+        </div>
+      </div>
+
+      <a class="off-canvas-overlay" onclick="hide_canvas()"></a>
+
+      <button class="floating-button" onclick="toggleDropdownMenu()"></button>
+
+      <div class="dropdown-menu">
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FFFFFF', '#000000')">银河白</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#C7EDCC', '#000000')">豆沙绿</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FAF9DE', '#000000')">杏仁黄</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#E3EDCD', '#000000')">青草绿</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FFF2E2', '#000000')">秋叶褐</div>
+      </div>
+  </div>
+
+  <script>
+    function toggleDropdownMenu() {
+      document.querySelector('.floating-button').classList.toggle('active');
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      var storedBackgroundColor = localStorage.getItem('blogBackgroundColor');
+      var storedColor = localStorage.getItem('blogColor');
+
+      if (storedBackgroundColor && storedColor) {
+        document.body.style.backgroundColor = storedBackgroundColor;
+        document.body.style.color = storedColor;
+      }
+    });
+
+    function changeBackgroundColor(backgroundColor, color) {
+      document.body.style.backgroundColor = backgroundColor;
+      document.body.style.color = color;
+
+      localStorage.setItem('blogBackgroundColor', backgroundColor);
+      localStorage.setItem('blogColor', color);
+
+      document.querySelector('.floating-button').classList.remove('active');
+    }
+  </script>
+</body>
+
+</html>
+
+
+<script src="/js/book.js"></script>

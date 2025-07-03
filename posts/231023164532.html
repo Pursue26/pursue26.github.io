@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
+
+    
+      <link rel="icon" href="/favicon.png" />
+    
+
+    <title>
+        
+          数据结构之并查集（数组实现） - aha&#39;s book
+        
+    </title>
+
+    <!-- Spectre.css framework -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre-exp.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre-icons.min.css">
+
+    <!-- theme css & js -->
+    
+<link rel="stylesheet" href="/css/book.css">
+
+    
+<script src="/js/book.js"></script>
+
+
+    <!-- tocbot -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.css">
+    
+    <!-- katex -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/zooming/2.1.1/zooming.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const zooming = new Zooming()
+    zooming.listen('.book-content img')
+})
+</script>
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+    <style>
+      body {
+        background-color: #FFFFFF;
+        /* color: #000000; */
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+
+      /* Floating Button Styles */
+      .floating-button {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 999;
+        background-color: #000000;
+        color: #ffffff;
+        padding: 12px;
+        border-radius: 50%;
+        cursor: pointer;
+        border: 2px solid #000000;
+      }
+
+      .floating-button:hover {
+        background-color: #FFFFFF;
+      }
+
+      /* Dropdown Menu Styles */
+      .dropdown-menu {
+        position: fixed;
+        bottom: 60px;
+        right: 10px;
+        display: none;
+        min-width: 60px;
+        padding: 2px;
+        background-color: #fff;
+        /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
+        z-index: 1000;
+      }
+
+      .floating-button.active+.dropdown-menu {
+        display: block;
+      }
+
+      .dropdown-item {
+        display: block;
+        padding: 8px 16px;
+        cursor: pointer;
+      }
+
+      .dropdown-item:hover {
+        background-color: #f5f5f5;
+      }
+    </style>
+<style>.darkmode--activated{--body-bg-color:#282828;--content-bg-color:#333;--card-bg-color:#555;--text-color:#ccc;--blockquote-color:#bbb;--link-color:#ccc;--link-hover-color:#eee;--brand-color:#ddd;--brand-hover-color:#ddd;--table-row-odd-bg-color:#282828;--table-row-hover-bg-color:#363636;--menu-item-bg-color:#555;--btn-default-bg:#222;--btn-default-color:#ccc;--btn-default-border-color:#555;--btn-default-hover-bg:#666;--btn-default-hover-color:#ccc;--btn-default-hover-border-color:#666;--highlight-background:#282b2e;--highlight-foreground:#a9b7c6;--highlight-gutter-background:#34393d;--highlight-gutter-foreground:#9ca9b6}.darkmode--activated img{opacity:.75}.darkmode--activated img:hover{opacity:.9}.darkmode--activated code{color:#69dbdc;background:0 0}button.darkmode-toggle{z-index:9999}.darkmode-ignore,img{display:flex!important}.beian img{display:inline-block!important}</style></head>
+
+<body>
+  <div class="book-container">
+    <div class="book-sidebar">
+      <div class="book-brand">
+  <a href="/">
+    <img src="/favicon.png">
+    <span>AHA&#39;S BOOK</span>
+  </a>
+</div>
+        <div id="menu" class="book-menu hide">
+  <h2 id="基础知识"> 基础知识 </h2>
+<ul>
+<li><a href="/posts/231010144856.html"> 模运算 </a></li>
+<li><a href="/posts/231014105311.html"> 异或运算 </a></li>
+<li><a href="/posts/231210181853.html"> 计算机中的寄存器 </a></li>
+<li><a href="/posts/231213183051.html"> 正则表达式基础 </a></li>
+</ul>
+<h2 id="C 语言">C 语言 </h2>
+<ul>
+<li><a href="/posts/230916171929.html">main 函数参数 </a></li>
+<li><a href="/posts/231214192113.html"> 关键字与专有名词 </a></li>
+<li><a href="/posts/240103180653.html"> 输出打印函数 </a></li>
+<li><a href="/posts/230922143003.html"> 多维数组 </a></li>
+<li><a href="/posts/230913200729.html">const 关键字 </a></li>
+<li><a href="/posts/230918174223.html">typedef 类型基础 </a></li>
+<li><a href="/posts/230920172849.html">typedef 类型实践 </a></li>
+<li><a href="/posts/240224193217.html"> 二级指针 </a></li>
+<li><a href="/posts/240307195203.html"> 代码 TOP-K 问题 </a></li>
+<li><a href="/posts/230922172626.html">uthash 哈希表基础 </a></li>
+<li><a href="/posts/230918114841.html"> 大小端知识 </a></li>
+</ul>
+<h2 id="Golang 语言">Golang 语言 </h2>
+<ul>
+<li><a href="/posts/230907162612.html"> 变量与常量 </a></li>
+<li><a href="/posts/230909120145.html"> 函数 &amp; 包 &amp; 判断 &amp; 循环 </a></li>
+<li><a href="/posts/230912152800.html"> 数组与切片 </a></li>
+<li><a href="/posts/230913161326.html"> 可变参数函数与 Map 集合 </a></li>
+<li><a href="/posts/230915155105.html"> 字符串和指针 </a></li>
+</ul>
+<h2 id="数据结构"> 数据结构 </h2>
+<ul>
+<li><a href="/posts/231007174854.html"> 链表（数组实现）</a></li>
+<li><a href="/posts/231008213450.html"> 链表（链式实现）</a></li>
+<li><a href="/posts/231016161508.html"> 堆栈（数组实现）</a></li>
+<li><a href="/posts/231016184406.html"> 堆栈（链表实现）</a></li>
+<li><a href="/posts/231127185207.html"> 单调栈 </a></li>
+<li><a href="/posts/231017105123.html"> 队列（链表实现）</a></li>
+<li><a href="/posts/231017154121.html"> 双端队列（链表实现）</a></li>
+<li><a href="/posts/231018102559.html"> 堆基础与堆结构（数组实现）</a></li>
+<li><a href="/posts/231019102311.html"> 优先队列（堆实现）</a></li>
+<li><a href="/posts/230905224335.html"> 二叉树的遍历 </a></li>
+<li><a href="/posts/231020174358.html"> 二叉搜索树 </a></li>
+<li><a href="/posts/230916094606.html"> 拓扑排序 </a></li>
+<li><a href="/posts/230925185057.html">Trie 字典树 </a></li>
+<li><a href="/posts/231023164532.html"> 并查集（数组实现）</a></li>
+<li><a href="/posts/240702200642.html">Linux 数据结构之队列 </a></li>
+</ul>
+<h2 id="数据结构算法"> 数据结构算法 </h2>
+<ul>
+<li><a href="/posts/231218181635.html"> 归并排序 </a></li>
+<li><a href="/posts/231108163339.html"> 快速排序 </a></li>
+<li><a href="/posts/231107171607.html"> 堆排序 </a></li>
+<li><a href="/posts/231124181658.html"> 二分查找 </a></li>
+<li><a href="/posts/231227190828.html"> 哈希表实现 </a></li>
+<li><a href="/posts/240313193201.html"> 字符串哈希函数 </a></li>
+<li><a href="/posts/231116150205.html">Floyd 多源最短路径 </a></li>
+<li><a href="/posts/231117095232.html">Dijkstra 单源最短路径（原理部分）</a></li>
+<li><a href="/posts/231121152713.html">Dijkstra 单源最短路径（实现部分）</a></li>
+</ul>
+<h2 id="数据库"> 数据库 </h2>
+<ul>
+<li><a href="/posts/250605180332.html">MySQL 基础 </a></li>
+</ul>
+<h2 id="计算机网络"> 计算机网络 </h2>
+<ul>
+<li><a href="/posts/231011192359.html">OSI 参考模型 </a></li>
+<li><a href="/posts/240329202000.html"> 计网 CyC2018 之概述 </a></li>
+<li><a href="/posts/240329202004.html"> 计网 CyC2018 之链路层 </a></li>
+<li><a href="/posts/240329202003.html"> 计网 CyC2018 之网络层 </a></li>
+<li><a href="/posts/240329202002.html"> 计网 CyC2018 之传输层 </a></li>
+<li><a href="/posts/240329202001.html"> 计网 CyC2018 之应用层 </a></li>
+<li><a href="/posts/240306203742.html">ACL 访问控制列表 </a></li>
+<li><a href="/posts/240130190208.html"> 路由表、转发表与快速转发工作原理 </a></li>
+<li><a href="/posts/231221200716.html">VXLAN 网络虚拟化技术 </a></li>
+<li><a href="/posts/240903191243.html">TCP/IP checksum 计算 </a></li>
+<li><a href="/posts/240911185603.html"> 抓包分析 TCP 三次握手与四次挥手过程 </a></li>
+</ul>
+<h2 id="操作系统"> 操作系统 </h2>
+<ul>
+<li><a href="/posts/230921190726.html"> 概述 </a></li>
+<li><a href="/posts/230924172528.html"> 中断 &amp; 异常 &amp; 系统调用 </a></li>
+<li><a href="/posts/231017195157.html"> 内存分层体系与地址空间生成 </a></li>
+<li><a href="/posts/231108195351.html"> 连续内存分配 </a></li>
+<li><a href="/posts/231111172507.html"> 非连续内存分配之分段与分页 </a></li>
+<li><a href="/posts/231119170537.html"> 非连续内存分配之页表 </a></li>
+<li><a href="/posts/231123184526.html"> 内存管理之覆盖技术与交换技术 </a></li>
+<li><a href="/posts/231127193658.html"> 内存管理之虚存技术 </a></li>
+<li><a href="/posts/231129182631.html"> 局部页面置换算法 </a></li>
+<li><a href="/posts/231207184239.html"> 全局页面置换算法 </a></li>
+<li><a href="/posts/231207204958.html"> 进程描述 </a></li>
+<li><a href="/posts/231210211306.html"> 进程状态 </a></li>
+<li><a href="/posts/231215213932.html"> 线程 </a></li>
+<li><a href="/posts/231218220813.html"> 进程控制 </a></li>
+<li><a href="/posts/231228193143.html"> 调度 </a></li>
+<li><a href="/posts/240104202828.html"> 同步与互斥 </a></li>
+<li><a href="/posts/240113115605.html"> 信号量与管程 </a></li>
+<li><a href="/posts/240205182643.html"> 经典同步问题 </a></li>
+<li><a href="/posts/240310162231.html"> 死锁 </a></li>
+</ul>
+<h2 id="系统与网络编程"> 系统与网络编程 </h2>
+<ul>
+<li><a href="/posts/230911151334.html">pthread 库 </a></li>
+<li><a href="/posts/230921094127.html"> 锁与原子操作 </a></li>
+<li><a href="/posts/240319195609.html"> 读者写者问题 </a></li>
+<li><a href="/posts/240527200241.html"> 网络编程卷一阅读随笔 </a></li>
+<li><a href="/posts/240414190410.html"> 进程间通信 IPC 机制 </a></li>
+<li><a href="/posts/240424200123.html"> 多进程相关练习 </a></li>
+<li><a href="/posts/240516221527.html">I/O 模式与 I/O 多路复用 </a></li>
+<li><a href="/posts/240626192803.html">Linux 内核 kfifo 环形队列 </a></li>
+<li><a href="/posts/241009203126.html">Linux 内核等待队列 </a></li>
+<li><a href="/posts/240627210637.html">DPDK 无锁环形队列 </a></li>
+<li><a href="/posts/240919200410.html"> 解密内存屏障 </a></li>
+<li><a href="/posts/240927202500.html"> 内核线程的创建 </a></li>
+<li><a href="/posts/241015195205.html">Linux 网络数据包接收过程 </a></li>
+<li><a href="/posts/2410232111015.html"> 源码解读 epoll 实现原理 </a></li>
+<li><a href="/posts/241106182619.html">Linux 文件系统 </a></li>
+<li><a href="/posts/250619154429.html">Libevent 高性能 IO 事件驱动库 </a></li>
+</ul>
+<h2 id="工具与命令"> 工具与命令 </h2>
+<ul>
+<li><a href="/posts/240207180410.html">GCC 编译过程分解 </a></li>
+<li><a href="/posts/240312184132.html">GDB 调试入门 </a></li>
+<li><a href="/posts/240512184921.html">Makefile 学习 </a></li>
+<li><a href="/posts/250629214430.html">CMake 学习 </a></li>
+<li><a href="/posts/240417193754.html">Linux 命令之文件权限 </a></li>
+</ul>
+<h2 id="开源项目"> 开源项目 </h2>
+<ul>
+<li><a href="/posts/240303201855.html"> 线程池原理与实现 </a></li>
+<li><a href="/posts/240507194549.html">HTTP 服务器实现 </a></li>
+<li><a href="/posts/240904203605.html"> 聊天服务器实现 </a></li>
+<li><a href="/posts/241119182636.html">Linux 文件系统 </a></li>
+</ul>
+<h2 id="Docker">Docker</h2>
+<ul>
+<li><a href="/posts/230909171809.html">Docker 学习笔记 </a></li>
+</ul>
+<h1 id="LeetCode 刷题">LeetCode 刷题 </h1>
+<h2 id="链表相关"> 链表相关 </h2>
+<ul>
+<li><a href="/posts/231025143947.html">160 相交链表 </a></li>
+<li><a href="/posts/231025185947.html">206 反转链表 </a></li>
+<li><a href="/posts/231026101239.html">21 合并两个有序链表 </a></li>
+<li><a href="/posts/231026184514.html">83 删除排序链表中的重复元素 </a></li>
+<li><a href="/posts/231027150243.html">19 删除链表的倒数第 N 个节点 </a></li>
+<li><a href="/posts/231031120718.html">2 两数相加 </a></li>
+<li><a href="/posts/231031163133.html">445 两数相加 II</a></li>
+<li><a href="/posts/231101094219.html">234 回文链表 </a></li>
+<li><a href="/posts/231101135228.html">725 分隔链表 </a></li>
+<li><a href="/posts/231102120708.html">328 奇偶链表 </a></li>
+<li><a href="/posts/231102165703.html">142 环形链表 II</a></li>
+</ul>
+<h2 id="设计"> 设计 </h2>
+<ul>
+<li><a href="/posts/231201184542.html">146 LRU 缓存 </a></li>
+</ul>
+<h2 id="贪心算法"> 贪心算法 </h2>
+<ul>
+<li><a href="/posts/231107094652.html">1029 两地调度 </a></li>
+<li><a href="/posts/231109150855.html">435 无重叠区间 </a></li>
+</ul>
+<h2 id="哈希表"> 哈希表 </h2>
+<ul>
+<li><a href="/posts/231123181539.html">1410 实体解析器 </a></li>
+</ul>
+<h2 id="树的遍历"> 树的遍历 </h2>
+<ul>
+<li><a href="/posts/231103121209.html">117 填充每个节点的下一个右侧节点指针 II</a></li>
+</ul>
+<h2 id="深度优先搜索（递归）"> 深度优先搜索（递归）</h2>
+<ul>
+<li><a href="/posts/231206201243.html">2477 达到首都的最少油耗 </a></li>
+</ul>
+<h2 id="图或路径问题"> 图或路径问题 </h2>
+<ul>
+<li><a href="/posts/231211184652.html">1631 最小体力消耗路径 </a></li>
+</ul>
+<h2 id="其它"> 其它 </h2>
+<ul>
+<li><a href="/posts/230101120000.html"> 备忘录 </a></li>
+</ul>
+
+</div>
+
+
+<script src="/js/book-menu.js"></script>
+
+    </div>
+    <div class="sidebar-toggle" onclick="sidebar_toggle()" onmouseover="add_inner()" onmouseleave="remove_inner()">
+  <div class="sidebar-toggle-inner"></div>
+</div>
+
+<script>
+function add_inner() {
+  let inner = document.querySelector('.sidebar-toggle-inner')
+  inner.classList.add('show')  
+}
+
+function remove_inner() {
+  let inner = document.querySelector('.sidebar-toggle-inner')
+  inner.classList.remove('show')
+}
+
+function sidebar_toggle() {
+    let sidebar_toggle = document.querySelector('.sidebar-toggle')
+    let sidebar = document.querySelector('.book-sidebar')
+    let content = document.querySelector('.off-canvas-content')
+    if (sidebar_toggle.classList.contains('extend')) { // show
+        sidebar_toggle.classList.remove('extend')
+        sidebar.classList.remove('hide')
+        content.classList.remove('extend')
+    }
+    else { // hide
+        sidebar_toggle.classList.add('extend')
+        sidebar.classList.add('hide')
+        content.classList.add('extend')
+    }
+}
+</script>
+
+      <div class="off-canvas-content">
+        <div class="columns">
+          <div class="column col-10 col-lg-12">
+            <div class="book-navbar">
+              <!-- For Responsive Layout -->
+
+<header class="navbar">
+  <section class="navbar-section">
+    <a onclick="open_sidebar()">
+      <i class="icon icon-menu"></i>
+    </a>
+  </section>
+</header>
+
+            </div>
+            <div class="book-content">
+              <div class="book-post">
+  <p>并查集（Union-Find Disjoint Sets, UFDS）是一种用于处理一些不相交集合的数据结构，实现为一个森林，其中的每棵树表示一个集合，树中的节点表示对应集合中的元素。</p>
+<p>顾名思义，并查集支持两种操作：</p>
+<ul>
+<li>合并（Union）：合并两个元素所属集合（合并对应的树），通常是将两个集合的根节点连接在一起。</li>
+<li>查找（Find）：查找某个元素所属集合，通常是找到该元素所在集合的根节点，这可以用于判断两个元素是否属于同一集合。</li>
+</ul>
+<span id="more"></span>
+<p>下图是一个具有四个不相交集合的树构成的森林。</p>
+<p><img src="../images/data-structure/UFDS-demo3.png" alt=""></p>
+<h2 id="并查集应用场景">并查集应用场景</h2>
+<p>并查集数据结构最常见的应用是跟踪无向图的连接组件。它还用于实现 Kruskal 算法的高效版本，以查找图的最小生成树。</p>
+<p>关于并查集的应用，后面的学习中再做整理~</p>
+<h2 id="并查集实现">并查集实现</h2>
+<p>上面介绍了什么是并查集，并给出了并查集支持的一些操作。下面开始，逐步实现基于数组的并查集。</p>
+<h3 id="初始化">初始化</h3>
+<p><strong>并查集的实现可以使用数组来表示每个元素所属的集合</strong>，其中：</p>
+<ul>
+<li>数组的索引表示元素的值；</li>
+<li>数组的值表示该元素所属的集合的代表元素。</li>
+</ul>
+<blockquote>
+<p>一般用树的根节点作为该集合的代表元素。</p>
+</blockquote>
+<p>初始时，每个元素都是独立的集合，它属于它自己（表示为一棵只有根节点的树），即每个元素的值和索引相同（将根节点的父亲设为自己）。</p>
+<p>初始化时，就像这样，自己指向自己，树的高度为 0。</p>
+<p><img src="../images/data-structure/UFDS-init.png" alt=""></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 初始化并查集</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">init</span><span class="params">(<span class="type">int</span> parent[], <span class="type">int</span> rank[], <span class="type">int</span> size)</span> &#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; size; ++i) &#123;</span><br><span class="line">        parent[i] = i;</span><br><span class="line">        rank[i] = <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>这里 <code>rank[i]</code> 的值是以顶点 <code>i</code> 为根的子树高度的上限，它用作后面 <code>UnionSet(i, j)</code> 操作的引导启发式。先不用管 <code>rank[i]</code> 了，后面还会遇到。</p>
+</blockquote>
+<h3 id="查找">查找</h3>
+<p>就像文章一开头说的那样，并查集的查找操作，是查找某个元素所属集合，通常是找到该元素所在集合的根节点。具体地，</p>
+<ul>
+<li>查找当前元素的父元素，若父元素不是自己，则更新它为当前元素，并查找它的父元素，直到当前元素的父元素是自己为止。</li>
+</ul>
+<h4 id="并查集查找（迭代实现）">并查集查找（迭代实现）</h4>
+<p>朴素的并查集查找操作（迭代实现）：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 查找元素所属的集合</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">findSet</span><span class="params">(<span class="type">int</span> parent[], <span class="type">int</span> x)</span> &#123;</span><br><span class="line">    <span class="keyword">while</span> (parent[x] != x) &#123;</span><br><span class="line">        x = parent[x];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> x;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="并查集查找（递归实现）">并查集查找（递归实现）</h4>
+<p>朴素的并查集查找操作（递归实现）：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 查找元素所属的集合</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">findSet</span><span class="params">(<span class="type">int</span> parent[], <span class="type">int</span> x)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (parent[x] == x) &#123;</span><br><span class="line">        <span class="keyword">return</span> x;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> findSet(parent, parent[x]);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="并查集查找（带路径压缩）">并查集查找（带路径压缩）</h4>
+<p>想一想，一个集合中的所有元素，虽然有共同的代表元素，但是这棵树可能呈现不同的形状。</p>
+<p><img src="../images/data-structure/UFDS-same-set.png" alt=""></p>
+<p>上面这张图中，左边与右边集合中的元素一致，且代表元素都是 1，<strong>但是树的形状不同</strong>。这样的话，对于同一个元素（比如 4），查找到其代表元素 1 的迭代（递归）次数是不一样的，左边需要 3 次才能完成，而右边只需要 1 次就能完成。</p>
+<p>因此，<strong>为了提高效率，就需要尽可能降低迭代（递归）次数。这就需要进行「路径压缩」</strong>。</p>
+<p>想一想，上面递归方式实现的查找操作 <code>findSet(int parent[], int x)</code> 中，是查找元素 <code>x</code> 的代表元素并返回。在这个函数内部，如果当前元素的父元素不是代表元素，函数会递归的查找其父元素的代表元素（我们被划分在同一个集合中了，假如我的代表元素是 R，那么我的父元素的代表元素也是 R 呀）。</p>
+<p>因此，我们可以 <strong> 在递归的过程中，更新当前元素的代表元素，从而实现「路径压缩」</strong>，以加快后续查找。</p>
+<p>并查集查找操作（带路径压缩的递归实现）：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 查找元素所属的集合</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">findSet</span><span class="params">(<span class="type">int</span> parent[], <span class="type">int</span> x)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (parent[x] == x) &#123;</span><br><span class="line">        <span class="keyword">return</span> x;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// 路径压缩，findSet() 返回的就是参数 2 的最终代表元素，</span></span><br><span class="line">        <span class="comment">// 所以，在递归过程中传入的不同参数 2 的最终代表元素都是 findSet() 的返回值</span></span><br><span class="line">        parent[x] = findSet(parent, parent[x]);</span><br><span class="line">        <span class="keyword">return</span> parent[x];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>并查集查找操作（带路径压缩的迭代实现）：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 查找元素所属的集合</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">findSet</span><span class="params">(<span class="type">int</span> parent[], <span class="type">int</span> x)</span> &#123;</span><br><span class="line">    <span class="type">int</span> rootOfx = x;  <span class="comment">// 初始时，暂定 x 的代表元素是自己</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 寻找 x 的代表元素，存储在 rootOfx 中</span></span><br><span class="line">    <span class="keyword">while</span> (parent[rootOfx] != rootOfx) &#123;</span><br><span class="line">        rootOfx = parent[rootOfx];</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 现在 rootOfx 已经是 x 真正的代表元素了</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 迭代地进行路径压缩</span></span><br><span class="line">    <span class="keyword">while</span> (parent[x] != x) &#123;</span><br><span class="line">        x = parent[x];</span><br><span class="line">        <span class="comment">// 逐级更新路径上的节点，它们有共同的最终代表元素 rootOfx</span></span><br><span class="line">        parent[x] = rootOfx;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> rootOfx;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="路径压缩查找示例">路径压缩查找示例</h4>
+<p>假如，我们有如下的不相交集合：</p>
+<p><img src="../images/data-structure/UFDS-demo1.png" alt=""></p>
+<p>现在，我们使用带路径压缩的并查集查找函数，查找元素 1 的代表元素，这一过程可以可视化为下面的动画。</p>
+<p><img src="../images/data-structure/UFDS-demo2.gif" alt=""></p>
+<blockquote>
+<p>图中 <code>r</code> 就是 <code>rank</code> 的缩写，<code>s</code> 代表的是元素的数量。</p>
+</blockquote>
+<h3 id="合并">合并</h3>
+<p>要合并两棵树（集合），我们只需要将一棵树的根节点连到另一棵树的根节点。要完成这一操作，我们需要：</p>
+<ol>
+<li>查找一个元素 <code>x</code> 的代表元素；</li>
+<li>查找另一个元素 <code>y</code> 的代表元素；</li>
+<li>若两者的代表元素不同，则将其中一棵树的根节点连接到另一棵树的根节点上；若两者的代表元素相同，则无需合并。</li>
+</ol>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 合并两个集合</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">unionSet</span><span class="params">(<span class="type">int</span> parent[], <span class="type">int</span> x, <span class="type">int</span> y)</span> &#123;</span><br><span class="line">    <span class="type">int</span> rootX = findSet(parent, x);</span><br><span class="line">    <span class="type">int</span> rootY = findSet(parent, y);</span><br><span class="line">    <span class="comment">// 属于不同集合</span></span><br><span class="line">    <span class="keyword">if</span> (rootX != rootY) &#123;</span><br><span class="line">        <span class="comment">// 将前者所在的树的根节点连接到后者所在的树的根节点上</span></span><br><span class="line">        parent[rootX] = rootY;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="启发式合并">启发式合并</h3>
+<p>合并时，选择哪棵树的根节点作为新树的根节点会影响未来操作的复杂度。我们可以 <strong> 将节点较少或深度（树高）较小的树连接到另一棵</strong>，以免发生退化。</p>
+<blockquote>
+<p>这样做的目的是尽量避免将较大的树作为子树合并到较小的树上，从而保持树的平衡，减小树的高度。</p>
+<p>在并查集中，「退化」指的是树结构变得非常不平衡，即树的高度非常大，接近于线性结构（如链表）。</p>
+</blockquote>
+<p>因此，在初始化小节中，数组 <code>rank[i]</code> 就是用来维护以顶点 <code>i</code> 为根的子树高度的上限，它就是在这里被使用的啦。</p>
+<h4 id="启发式合并（以树高为标准）">启发式合并（以树高为标准）</h4>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">unionSet</span><span class="params">(<span class="type">int</span> parent[], <span class="type">int</span> rank[], <span class="type">int</span> x, <span class="type">int</span> y)</span> &#123;</span><br><span class="line">    <span class="type">int</span> rootX = findSet(parent, x);</span><br><span class="line">    <span class="type">int</span> rootY = findSet(parent, y);</span><br><span class="line">    <span class="comment">// 属于不同集合</span></span><br><span class="line">    <span class="keyword">if</span> (rootX != rootY) &#123;</span><br><span class="line">        <span class="comment">// 将深度较小的树连到另一棵树</span></span><br><span class="line">        <span class="keyword">if</span> (rank[rootX] &lt; rank[rootY]) &#123;</span><br><span class="line">            parent[rootX] = rootY;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (rank[rootX] &gt; rank[rootY]) &#123;</span><br><span class="line">            parent[rootY] = rootX;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">// 将前者所在的树的根节点连接到后者所在的树的根节点上</span></span><br><span class="line">            <span class="comment">// 被连接的树的高度将会加一, 对应的 rank 值加一</span></span><br><span class="line">            parent[rootX] = rootY;</span><br><span class="line">            rank[rootY]++;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在初始化时，每个元素都是一个独立的集合，每个树的高度都为 0：</p>
+<ul>
+<li>在进行第一次集合合并时（比如元素 1 和元素 3），则 <code>unionSet(parent, rank, 1, 3)</code> 操作，会合并为一棵 <code>3-&gt;1</code> 的树，其中 3 为根节点，这棵新树会长高一个单位；</li>
+<li>在进行第二次集合合并时（比如元素 1 和元素 4），则 <code>unionSet(parent, rank, 1, 4)</code> 操作，会合并为一棵 <code>4&lt;-3-&gt;1</code> 的树，其中 3 为根节点，由于 1 所在的树高大于 4 所在的树高，因此在合并后，树高不会变得更高，因此不会更新 <code>rank</code> 值。</li>
+</ul>
+<blockquote>
+<p><strong>注意：在启发式合并的过程中，只能保证根节点对应 <code>rank</code> 值是正确的，不能保证其它位置的 <code>rank</code> 值的正确性</strong>。</p>
+</blockquote>
+<h4 id="启发式合并示例">启发式合并示例</h4>
+<p>假如，我们有如下几个不相交集合：</p>
+<p><img src="../images/data-structure/UFDS-demo3.png" alt=""></p>
+<p>现在，我们使用以树高为标准的启发式合并，执行 <code>unionSet(parent, rank, 10, 8)</code>，这一过程可以可视化为下面的动画。</p>
+<p><img src="../images/data-structure/UFDS-demo4.gif" alt=""></p>
+<p>这里 <code>x = 10, y = 8</code> 与 <code>x = 8, y = 10</code> 执行后，得到的树是不一样的哦。</p>
+<blockquote>
+<p>你可能已经发现了：在执行合并的过程中，树也会被路径压缩，这是因为并查集的合并接口调用了查找接口。</p>
+</blockquote>
+<h3 id="相同集合">相同集合</h3>
+<p>判断两个元素是否属于同一集合。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">isSameSet</span><span class="params">(<span class="type">int</span> parent[], <span class="type">int</span> x, <span class="type">int</span> y)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> findSet(parent, x) == findSet(parent, y);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="并查集复杂度">并查集复杂度</h2>
+<p>时间复杂度：</p>
+<ul>
+<li>初始化：<code>O(n)</code></li>
+<li>朴素查找：<code>O(n)</code></li>
+<li>带路径压缩的查找：<code>O(h)</code>，可以优化至 <code>O(α(n))</code>，其中 <code>h</code> 是树的高度，足够平衡时 <code>h = log(n)</code>，<code>α</code> 是阿克曼函数</li>
+<li>带路径压缩的合并：<code>O(h)</code>，可以优化至 <code>O(α(n))</code></li>
+</ul>
+<p>空间复杂度：<code>O(n)</code></p>
+<blockquote>
+<p>这里的并查集数据结构的实现，是采用的 Quick Union 方式，而不是 Quick Find 方式。</p>
+</blockquote>
+<h2 id="并查集完整代码测试">并查集完整代码测试</h2>
+<h3 id="完整代码">完整代码</h3>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">init</span><span class="params">(<span class="type">int</span> parent[], <span class="type">int</span> rank[], <span class="type">int</span> size)</span> &#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; size; ++i) &#123;</span><br><span class="line">        parent[i] = i;</span><br><span class="line">        rank[i] = <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">findSet</span><span class="params">(<span class="type">int</span> parent[], <span class="type">int</span> x)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (parent[x] == x) &#123;</span><br><span class="line">        <span class="keyword">return</span> x;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// 路径压缩</span></span><br><span class="line">        parent[x] = findSet(parent, parent[x]);</span><br><span class="line">        <span class="keyword">return</span> parent[x];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">unionSet</span><span class="params">(<span class="type">int</span> parent[], <span class="type">int</span> rank[], <span class="type">int</span> x, <span class="type">int</span> y)</span> &#123;</span><br><span class="line">    <span class="type">int</span> rootX = findSet(parent, x);</span><br><span class="line">    <span class="type">int</span> rootY = findSet(parent, y);</span><br><span class="line">    <span class="comment">// 属于不同集合</span></span><br><span class="line">    <span class="keyword">if</span> (rootX != rootY) &#123;</span><br><span class="line">        <span class="comment">// 将深度较小的树连到另一棵树</span></span><br><span class="line">        <span class="keyword">if</span> (rank[rootX] &lt; rank[rootY]) &#123;</span><br><span class="line">            parent[rootX] = rootY;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (rank[rootX] &gt; rank[rootY]) &#123;</span><br><span class="line">            parent[rootY] = rootX;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">// 将前者所在的树的根节点连接到后者所在的树的根节点上</span></span><br><span class="line">            <span class="comment">// 被连接的树的高度将会加一, 对应的 rank 值加一</span></span><br><span class="line">            parent[rootX] = rootY;</span><br><span class="line">            rank[rootY]++;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">isSameSet</span><span class="params">(<span class="type">int</span> parent[], <span class="type">int</span> x, <span class="type">int</span> y)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> findSet(parent, x) == findSet(parent, y);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="测试代码">测试代码</h3>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> MAX_SIZE (101)</span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">init</span><span class="params">(<span class="type">int</span> parent[], <span class="type">int</span> rank[], <span class="type">int</span> size)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">findSet</span><span class="params">(<span class="type">int</span> parent[], <span class="type">int</span> x)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">unionSet</span><span class="params">(<span class="type">int</span> parent[], <span class="type">int</span> rank[], <span class="type">int</span> x, <span class="type">int</span> y)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">isSameSet</span><span class="params">(<span class="type">int</span> parent[], <span class="type">int</span> x, <span class="type">int</span> y)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">int</span> parent[MAX_SIZE];</span><br><span class="line">    <span class="type">int</span> rank[MAX_SIZE];</span><br><span class="line">    <span class="type">int</span> size = <span class="number">10</span>; <span class="comment">// 假设有 10 个元素，从 0 到 9 编号</span></span><br><span class="line"></span><br><span class="line">    init(parent, rank, size);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 测试 findSet 函数</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;findSet(0): %d\n&quot;</span>, findSet(parent, <span class="number">0</span>));</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;findSet(1): %d\n&quot;</span>, findSet(parent, <span class="number">1</span>));</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;findSet(2): %d\n&quot;</span>, findSet(parent, <span class="number">2</span>));</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 测试 unionSet 函数</span></span><br><span class="line">    unionSet(parent, rank, <span class="number">0</span>, <span class="number">1</span>);</span><br><span class="line">    unionSet(parent, rank, <span class="number">2</span>, <span class="number">3</span>);</span><br><span class="line">    unionSet(parent, rank, <span class="number">4</span>, <span class="number">5</span>);</span><br><span class="line">    unionSet(parent, rank, <span class="number">6</span>, <span class="number">7</span>);</span><br><span class="line">    unionSet(parent, rank, <span class="number">8</span>, <span class="number">9</span>);</span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;findSet(0): %d\n&quot;</span>, findSet(parent, <span class="number">0</span>));</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;findSet(1): %d\n&quot;</span>, findSet(parent, <span class="number">1</span>));</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;findSet(2): %d\n&quot;</span>, findSet(parent, <span class="number">2</span>));</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;findSet(3): %d\n&quot;</span>, findSet(parent, <span class="number">3</span>));</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;findSet(4): %d\n&quot;</span>, findSet(parent, <span class="number">4</span>));</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;findSet(5): %d\n&quot;</span>, findSet(parent, <span class="number">5</span>));</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;findSet(6): %d\n&quot;</span>, findSet(parent, <span class="number">6</span>));</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;findSet(7): %d\n&quot;</span>, findSet(parent, <span class="number">7</span>));</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;findSet(8): %d\n&quot;</span>, findSet(parent, <span class="number">8</span>));</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;findSet(9): %d\n&quot;</span>, findSet(parent, <span class="number">9</span>));</span><br><span class="line"></span><br><span class="line">    unionSet(parent, rank, <span class="number">6</span>, <span class="number">8</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;findSet(6): %d\n&quot;</span>, findSet(parent, <span class="number">6</span>));</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;findSet(8): %d\n&quot;</span>, findSet(parent, <span class="number">8</span>));</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 测试 isSameSet 函数</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;isSameSet(0, 1): %d\n&quot;</span>, isSameSet(parent, <span class="number">0</span>, <span class="number">1</span>));</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;isSameSet(2, 3): %d\n&quot;</span>, isSameSet(parent, <span class="number">2</span>, <span class="number">3</span>));</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;isSameSet(1, 3): %d\n&quot;</span>, isSameSet(parent, <span class="number">1</span>, <span class="number">3</span>));</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;isSameSet(6, 9): %d\n&quot;</span>, isSameSet(parent, <span class="number">6</span>, <span class="number">9</span>));</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="测试结果">测试结果</h3>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">findSet(0): 0</span><br><span class="line">findSet(1): 1</span><br><span class="line">findSet(2): 2</span><br><span class="line">findSet(0): 1</span><br><span class="line">findSet(1): 1</span><br><span class="line">findSet(2): 3</span><br><span class="line">findSet(3): 3</span><br><span class="line">findSet(4): 5</span><br><span class="line">findSet(5): 5</span><br><span class="line">findSet(6): 7</span><br><span class="line">findSet(7): 7</span><br><span class="line">findSet(8): 9</span><br><span class="line">findSet(9): 9</span><br><span class="line">findSet(6): 9</span><br><span class="line">findSet(8): 9</span><br><span class="line">isSameSet(0, 1): 1</span><br><span class="line">isSameSet(2, 3): 1</span><br><span class="line">isSameSet(1, 3): 0</span><br><span class="line">isSameSet(6, 9): 1</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>参考资料：</p>
+<ol>
+<li><a target="_blank" rel="noopener" href="https://visualgo.net/en/ufds">https://visualgo.net/en/ufds</a></li>
+<li><a target="_blank" rel="noopener" href="https://oi-wiki.org/ds/dsu">https://oi-wiki.org/ds/dsu</a></li>
+</ol>
+</blockquote>
+
+</div>
+
+
+  <div class="book-comments">
+    
+
+
+
+
+  </div>
+
+
+
+<script src="/js/book-post.js"></script>
+
+
+            </div>
+          </div>
+          <div class="column col-2 hide-lg">
+            <div class="book-post-info">
+  
+    <div class="book-post-meta">
+
+  <div class="author">
+
+    <!-- Author image -->
+    <div class="author-img">
+      
+        <figure
+          class="avatar avatar-lg"
+          data-initial="A"
+          style="background-color: #3b4351;">
+        </figure>
+      
+    </div>
+
+    <!-- Author title -->
+    <div class="author-title">
+      <div>aha</div>
+      <div>2023-10-23</div>
+    </div>
+  </div>
+
+  
+    <div class="divider"></div>
+
+    <div class="link">
+      <a class="category-link" href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/">数据结构</a> <a class="category-link" href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/%E5%B9%B6%E6%9F%A5%E9%9B%86/">并查集</a>
+
+      <a class="tag-none-link" href="/tags/Disjoint-Set/" rel="tag">#Disjoint-Set</a> <a class="tag-none-link" href="/tags/Union-Find/" rel="tag">#Union-Find</a> <a class="tag-none-link" href="/tags/%E5%B9%B6%E6%9F%A5%E9%9B%86/" rel="tag">#并查集</a>
+    </div>
+    
+  
+
+  <div class="divider"></div>
+</div>
+  
+
+  <div class="book-tocbot">
+</div>
+<div class="book-tocbot-menu">
+  <a class="book-toc-expand" onclick="expand_toc()">Expand all</a>
+  <a onclick="go_top()">Back to top</a>
+  <a onclick="go_bottom()">Go to bottom</a>
+  <a onclick="toggleSearch()">Search in blogs</a> <!-- 添加搜索文字的点击事件 -->
+</div>
+
+<div id="search-overlay" class="search-overlay" style="display: none;"> <!-- 初始状态为隐藏 -->
+  <div class="search-box">
+    <input type="text" id="search-input" placeholder="Search in all blogs...">
+    <button onclick="closeSearch()">Close</button> <!-- 添加关闭按钮 -->
+    <div id="search-results" class="search-results"></div>
+  </div>
+</div>
+
+<script>
+  function performSearch(query) {
+    if (!query.trim()) {
+      return;
+    }
+
+    fetch('/search.xml')
+      .then(response => response.text())
+      .then(data => {
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(data, "text/xml");
+        const entries = xmlDoc.getElementsByTagName('entry');
+        let results = '';
+
+        for (let i = 0; i < entries.length; i++) {
+          const title = entries[i].getElementsByTagName('title')[0].textContent;
+          const content = entries[i].getElementsByTagName('content')[0].textContent;
+          const url = entries[i].getElementsByTagName('url')[0].textContent;
+
+          let count = (title.match(new RegExp(query, "gi")) || []).length; // 统计查询词出现的次数
+          count += (content.match(new RegExp(query, "gi")) || []).length;
+
+          if (count > 0) { // title.includes(query) || content.includes(query)
+            results += `
+              <div class="search-result-item">
+                <a href="${url}">${title}</a> (${count})
+              </div>`;
+          }
+        }
+
+        const searchResultsElement = document.getElementById('search-results');
+        searchResultsElement.innerHTML = results;
+        searchResultsElement.classList.add('active');
+      });
+  }
+
+  function toggleSearch() {
+    const searchOverlay = document.getElementById('search-overlay');
+    searchOverlay.style.display = searchOverlay.style.display === 'none' ? 'flex' : 'none';
+  }
+
+  function closeSearch() {
+    document.getElementById('search-overlay').style.display = 'none';
+  }
+
+  document.getElementById('search-input').addEventListener('input', function() {
+    const query = this.value;
+    performSearch(query);
+  });
+</script>
+
+<style>
+  .search-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  .search-box {
+    background: white;
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+    width: 80%;
+    max-width: 500px;
+  }
+
+  .search-results {
+    margin-top: 10px;
+    max-height: 300px;
+    overflow-y: auto;
+    background: white;
+    padding: 10px;
+    border-radius: 5px;
+    width: 100%;
+  }
+
+  .search-result-item {
+    margin: 10px 0;
+  }
+
+  .search-result-item a {
+    color: blue; /* 设置链接颜色为蓝色 */
+    text-decoration: none;
+  }
+
+  .search-result-item a:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+<script src="/js/book-toc.js"></script>
+
+
+</div>
+          </div>
+        </div>
+      </div>
+
+      <a class="off-canvas-overlay" onclick="hide_canvas()"></a>
+
+      <button class="floating-button" onclick="toggleDropdownMenu()"></button>
+
+      <div class="dropdown-menu">
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FFFFFF', '#000000')">银河白</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#C7EDCC', '#000000')">豆沙绿</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FAF9DE', '#000000')">杏仁黄</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#E3EDCD', '#000000')">青草绿</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FFF2E2', '#000000')">秋叶褐</div>
+      </div>
+  </div>
+
+  <script>
+    function toggleDropdownMenu() {
+      document.querySelector('.floating-button').classList.toggle('active');
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      var storedBackgroundColor = localStorage.getItem('blogBackgroundColor');
+      var storedColor = localStorage.getItem('blogColor');
+
+      if (storedBackgroundColor && storedColor) {
+        document.body.style.backgroundColor = storedBackgroundColor;
+        document.body.style.color = storedColor;
+      }
+    });
+
+    function changeBackgroundColor(backgroundColor, color) {
+      document.body.style.backgroundColor = backgroundColor;
+      document.body.style.color = color;
+
+      localStorage.setItem('blogBackgroundColor', backgroundColor);
+      localStorage.setItem('blogColor', color);
+
+      document.querySelector('.floating-button').classList.remove('active');
+    }
+  </script>
+</body>
+
+</html>
+
+
+<script src="/js/book.js"></script>

@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
+
+    
+      <link rel="icon" href="/favicon.png" />
+    
+
+    <title>
+        
+          解密内存屏障 - aha&#39;s book
+        
+    </title>
+
+    <!-- Spectre.css framework -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre-exp.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre-icons.min.css">
+
+    <!-- theme css & js -->
+    
+<link rel="stylesheet" href="/css/book.css">
+
+    
+<script src="/js/book.js"></script>
+
+
+    <!-- tocbot -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.css">
+    
+    <!-- katex -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/zooming/2.1.1/zooming.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const zooming = new Zooming()
+    zooming.listen('.book-content img')
+})
+</script>
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+    <style>
+      body {
+        background-color: #FFFFFF;
+        /* color: #000000; */
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+
+      /* Floating Button Styles */
+      .floating-button {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 999;
+        background-color: #000000;
+        color: #ffffff;
+        padding: 12px;
+        border-radius: 50%;
+        cursor: pointer;
+        border: 2px solid #000000;
+      }
+
+      .floating-button:hover {
+        background-color: #FFFFFF;
+      }
+
+      /* Dropdown Menu Styles */
+      .dropdown-menu {
+        position: fixed;
+        bottom: 60px;
+        right: 10px;
+        display: none;
+        min-width: 60px;
+        padding: 2px;
+        background-color: #fff;
+        /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
+        z-index: 1000;
+      }
+
+      .floating-button.active+.dropdown-menu {
+        display: block;
+      }
+
+      .dropdown-item {
+        display: block;
+        padding: 8px 16px;
+        cursor: pointer;
+      }
+
+      .dropdown-item:hover {
+        background-color: #f5f5f5;
+      }
+    </style>
+<style>.darkmode--activated{--body-bg-color:#282828;--content-bg-color:#333;--card-bg-color:#555;--text-color:#ccc;--blockquote-color:#bbb;--link-color:#ccc;--link-hover-color:#eee;--brand-color:#ddd;--brand-hover-color:#ddd;--table-row-odd-bg-color:#282828;--table-row-hover-bg-color:#363636;--menu-item-bg-color:#555;--btn-default-bg:#222;--btn-default-color:#ccc;--btn-default-border-color:#555;--btn-default-hover-bg:#666;--btn-default-hover-color:#ccc;--btn-default-hover-border-color:#666;--highlight-background:#282b2e;--highlight-foreground:#a9b7c6;--highlight-gutter-background:#34393d;--highlight-gutter-foreground:#9ca9b6}.darkmode--activated img{opacity:.75}.darkmode--activated img:hover{opacity:.9}.darkmode--activated code{color:#69dbdc;background:0 0}button.darkmode-toggle{z-index:9999}.darkmode-ignore,img{display:flex!important}.beian img{display:inline-block!important}</style></head>
+
+<body>
+  <div class="book-container">
+    <div class="book-sidebar">
+      <div class="book-brand">
+  <a href="/">
+    <img src="/favicon.png">
+    <span>AHA&#39;S BOOK</span>
+  </a>
+</div>
+        <div id="menu" class="book-menu hide">
+  <h2 id="基础知识"> 基础知识 </h2>
+<ul>
+<li><a href="/posts/231010144856.html"> 模运算 </a></li>
+<li><a href="/posts/231014105311.html"> 异或运算 </a></li>
+<li><a href="/posts/231210181853.html"> 计算机中的寄存器 </a></li>
+<li><a href="/posts/231213183051.html"> 正则表达式基础 </a></li>
+</ul>
+<h2 id="C 语言">C 语言 </h2>
+<ul>
+<li><a href="/posts/230916171929.html">main 函数参数 </a></li>
+<li><a href="/posts/231214192113.html"> 关键字与专有名词 </a></li>
+<li><a href="/posts/240103180653.html"> 输出打印函数 </a></li>
+<li><a href="/posts/230922143003.html"> 多维数组 </a></li>
+<li><a href="/posts/230913200729.html">const 关键字 </a></li>
+<li><a href="/posts/230918174223.html">typedef 类型基础 </a></li>
+<li><a href="/posts/230920172849.html">typedef 类型实践 </a></li>
+<li><a href="/posts/240224193217.html"> 二级指针 </a></li>
+<li><a href="/posts/240307195203.html"> 代码 TOP-K 问题 </a></li>
+<li><a href="/posts/230922172626.html">uthash 哈希表基础 </a></li>
+<li><a href="/posts/230918114841.html"> 大小端知识 </a></li>
+</ul>
+<h2 id="Golang 语言">Golang 语言 </h2>
+<ul>
+<li><a href="/posts/230907162612.html"> 变量与常量 </a></li>
+<li><a href="/posts/230909120145.html"> 函数 &amp; 包 &amp; 判断 &amp; 循环 </a></li>
+<li><a href="/posts/230912152800.html"> 数组与切片 </a></li>
+<li><a href="/posts/230913161326.html"> 可变参数函数与 Map 集合 </a></li>
+<li><a href="/posts/230915155105.html"> 字符串和指针 </a></li>
+</ul>
+<h2 id="数据结构"> 数据结构 </h2>
+<ul>
+<li><a href="/posts/231007174854.html"> 链表（数组实现）</a></li>
+<li><a href="/posts/231008213450.html"> 链表（链式实现）</a></li>
+<li><a href="/posts/231016161508.html"> 堆栈（数组实现）</a></li>
+<li><a href="/posts/231016184406.html"> 堆栈（链表实现）</a></li>
+<li><a href="/posts/231127185207.html"> 单调栈 </a></li>
+<li><a href="/posts/231017105123.html"> 队列（链表实现）</a></li>
+<li><a href="/posts/231017154121.html"> 双端队列（链表实现）</a></li>
+<li><a href="/posts/231018102559.html"> 堆基础与堆结构（数组实现）</a></li>
+<li><a href="/posts/231019102311.html"> 优先队列（堆实现）</a></li>
+<li><a href="/posts/230905224335.html"> 二叉树的遍历 </a></li>
+<li><a href="/posts/231020174358.html"> 二叉搜索树 </a></li>
+<li><a href="/posts/230916094606.html"> 拓扑排序 </a></li>
+<li><a href="/posts/230925185057.html">Trie 字典树 </a></li>
+<li><a href="/posts/231023164532.html"> 并查集（数组实现）</a></li>
+<li><a href="/posts/240702200642.html">Linux 数据结构之队列 </a></li>
+</ul>
+<h2 id="数据结构算法"> 数据结构算法 </h2>
+<ul>
+<li><a href="/posts/231218181635.html"> 归并排序 </a></li>
+<li><a href="/posts/231108163339.html"> 快速排序 </a></li>
+<li><a href="/posts/231107171607.html"> 堆排序 </a></li>
+<li><a href="/posts/231124181658.html"> 二分查找 </a></li>
+<li><a href="/posts/231227190828.html"> 哈希表实现 </a></li>
+<li><a href="/posts/240313193201.html"> 字符串哈希函数 </a></li>
+<li><a href="/posts/231116150205.html">Floyd 多源最短路径 </a></li>
+<li><a href="/posts/231117095232.html">Dijkstra 单源最短路径（原理部分）</a></li>
+<li><a href="/posts/231121152713.html">Dijkstra 单源最短路径（实现部分）</a></li>
+</ul>
+<h2 id="数据库"> 数据库 </h2>
+<ul>
+<li><a href="/posts/250605180332.html">MySQL 基础 </a></li>
+</ul>
+<h2 id="计算机网络"> 计算机网络 </h2>
+<ul>
+<li><a href="/posts/231011192359.html">OSI 参考模型 </a></li>
+<li><a href="/posts/240329202000.html"> 计网 CyC2018 之概述 </a></li>
+<li><a href="/posts/240329202004.html"> 计网 CyC2018 之链路层 </a></li>
+<li><a href="/posts/240329202003.html"> 计网 CyC2018 之网络层 </a></li>
+<li><a href="/posts/240329202002.html"> 计网 CyC2018 之传输层 </a></li>
+<li><a href="/posts/240329202001.html"> 计网 CyC2018 之应用层 </a></li>
+<li><a href="/posts/240306203742.html">ACL 访问控制列表 </a></li>
+<li><a href="/posts/240130190208.html"> 路由表、转发表与快速转发工作原理 </a></li>
+<li><a href="/posts/231221200716.html">VXLAN 网络虚拟化技术 </a></li>
+<li><a href="/posts/240903191243.html">TCP/IP checksum 计算 </a></li>
+<li><a href="/posts/240911185603.html"> 抓包分析 TCP 三次握手与四次挥手过程 </a></li>
+</ul>
+<h2 id="操作系统"> 操作系统 </h2>
+<ul>
+<li><a href="/posts/230921190726.html"> 概述 </a></li>
+<li><a href="/posts/230924172528.html"> 中断 &amp; 异常 &amp; 系统调用 </a></li>
+<li><a href="/posts/231017195157.html"> 内存分层体系与地址空间生成 </a></li>
+<li><a href="/posts/231108195351.html"> 连续内存分配 </a></li>
+<li><a href="/posts/231111172507.html"> 非连续内存分配之分段与分页 </a></li>
+<li><a href="/posts/231119170537.html"> 非连续内存分配之页表 </a></li>
+<li><a href="/posts/231123184526.html"> 内存管理之覆盖技术与交换技术 </a></li>
+<li><a href="/posts/231127193658.html"> 内存管理之虚存技术 </a></li>
+<li><a href="/posts/231129182631.html"> 局部页面置换算法 </a></li>
+<li><a href="/posts/231207184239.html"> 全局页面置换算法 </a></li>
+<li><a href="/posts/231207204958.html"> 进程描述 </a></li>
+<li><a href="/posts/231210211306.html"> 进程状态 </a></li>
+<li><a href="/posts/231215213932.html"> 线程 </a></li>
+<li><a href="/posts/231218220813.html"> 进程控制 </a></li>
+<li><a href="/posts/231228193143.html"> 调度 </a></li>
+<li><a href="/posts/240104202828.html"> 同步与互斥 </a></li>
+<li><a href="/posts/240113115605.html"> 信号量与管程 </a></li>
+<li><a href="/posts/240205182643.html"> 经典同步问题 </a></li>
+<li><a href="/posts/240310162231.html"> 死锁 </a></li>
+</ul>
+<h2 id="系统与网络编程"> 系统与网络编程 </h2>
+<ul>
+<li><a href="/posts/230911151334.html">pthread 库 </a></li>
+<li><a href="/posts/230921094127.html"> 锁与原子操作 </a></li>
+<li><a href="/posts/240319195609.html"> 读者写者问题 </a></li>
+<li><a href="/posts/240527200241.html"> 网络编程卷一阅读随笔 </a></li>
+<li><a href="/posts/240414190410.html"> 进程间通信 IPC 机制 </a></li>
+<li><a href="/posts/240424200123.html"> 多进程相关练习 </a></li>
+<li><a href="/posts/240516221527.html">I/O 模式与 I/O 多路复用 </a></li>
+<li><a href="/posts/240626192803.html">Linux 内核 kfifo 环形队列 </a></li>
+<li><a href="/posts/241009203126.html">Linux 内核等待队列 </a></li>
+<li><a href="/posts/240627210637.html">DPDK 无锁环形队列 </a></li>
+<li><a href="/posts/240919200410.html"> 解密内存屏障 </a></li>
+<li><a href="/posts/240927202500.html"> 内核线程的创建 </a></li>
+<li><a href="/posts/241015195205.html">Linux 网络数据包接收过程 </a></li>
+<li><a href="/posts/2410232111015.html"> 源码解读 epoll 实现原理 </a></li>
+<li><a href="/posts/241106182619.html">Linux 文件系统 </a></li>
+<li><a href="/posts/250619154429.html">Libevent 高性能 IO 事件驱动库 </a></li>
+</ul>
+<h2 id="工具与命令"> 工具与命令 </h2>
+<ul>
+<li><a href="/posts/240207180410.html">GCC 编译过程分解 </a></li>
+<li><a href="/posts/240312184132.html">GDB 调试入门 </a></li>
+<li><a href="/posts/240512184921.html">Makefile 学习 </a></li>
+<li><a href="/posts/250629214430.html">CMake 学习 </a></li>
+<li><a href="/posts/240417193754.html">Linux 命令之文件权限 </a></li>
+</ul>
+<h2 id="开源项目"> 开源项目 </h2>
+<ul>
+<li><a href="/posts/240303201855.html"> 线程池原理与实现 </a></li>
+<li><a href="/posts/240507194549.html">HTTP 服务器实现 </a></li>
+<li><a href="/posts/240904203605.html"> 聊天服务器实现 </a></li>
+<li><a href="/posts/241119182636.html">Linux 文件系统 </a></li>
+</ul>
+<h2 id="Docker">Docker</h2>
+<ul>
+<li><a href="/posts/230909171809.html">Docker 学习笔记 </a></li>
+</ul>
+<h1 id="LeetCode 刷题">LeetCode 刷题 </h1>
+<h2 id="链表相关"> 链表相关 </h2>
+<ul>
+<li><a href="/posts/231025143947.html">160 相交链表 </a></li>
+<li><a href="/posts/231025185947.html">206 反转链表 </a></li>
+<li><a href="/posts/231026101239.html">21 合并两个有序链表 </a></li>
+<li><a href="/posts/231026184514.html">83 删除排序链表中的重复元素 </a></li>
+<li><a href="/posts/231027150243.html">19 删除链表的倒数第 N 个节点 </a></li>
+<li><a href="/posts/231031120718.html">2 两数相加 </a></li>
+<li><a href="/posts/231031163133.html">445 两数相加 II</a></li>
+<li><a href="/posts/231101094219.html">234 回文链表 </a></li>
+<li><a href="/posts/231101135228.html">725 分隔链表 </a></li>
+<li><a href="/posts/231102120708.html">328 奇偶链表 </a></li>
+<li><a href="/posts/231102165703.html">142 环形链表 II</a></li>
+</ul>
+<h2 id="设计"> 设计 </h2>
+<ul>
+<li><a href="/posts/231201184542.html">146 LRU 缓存 </a></li>
+</ul>
+<h2 id="贪心算法"> 贪心算法 </h2>
+<ul>
+<li><a href="/posts/231107094652.html">1029 两地调度 </a></li>
+<li><a href="/posts/231109150855.html">435 无重叠区间 </a></li>
+</ul>
+<h2 id="哈希表"> 哈希表 </h2>
+<ul>
+<li><a href="/posts/231123181539.html">1410 实体解析器 </a></li>
+</ul>
+<h2 id="树的遍历"> 树的遍历 </h2>
+<ul>
+<li><a href="/posts/231103121209.html">117 填充每个节点的下一个右侧节点指针 II</a></li>
+</ul>
+<h2 id="深度优先搜索（递归）"> 深度优先搜索（递归）</h2>
+<ul>
+<li><a href="/posts/231206201243.html">2477 达到首都的最少油耗 </a></li>
+</ul>
+<h2 id="图或路径问题"> 图或路径问题 </h2>
+<ul>
+<li><a href="/posts/231211184652.html">1631 最小体力消耗路径 </a></li>
+</ul>
+<h2 id="其它"> 其它 </h2>
+<ul>
+<li><a href="/posts/230101120000.html"> 备忘录 </a></li>
+</ul>
+
+</div>
+
+
+<script src="/js/book-menu.js"></script>
+
+    </div>
+    <div class="sidebar-toggle" onclick="sidebar_toggle()" onmouseover="add_inner()" onmouseleave="remove_inner()">
+  <div class="sidebar-toggle-inner"></div>
+</div>
+
+<script>
+function add_inner() {
+  let inner = document.querySelector('.sidebar-toggle-inner')
+  inner.classList.add('show')  
+}
+
+function remove_inner() {
+  let inner = document.querySelector('.sidebar-toggle-inner')
+  inner.classList.remove('show')
+}
+
+function sidebar_toggle() {
+    let sidebar_toggle = document.querySelector('.sidebar-toggle')
+    let sidebar = document.querySelector('.book-sidebar')
+    let content = document.querySelector('.off-canvas-content')
+    if (sidebar_toggle.classList.contains('extend')) { // show
+        sidebar_toggle.classList.remove('extend')
+        sidebar.classList.remove('hide')
+        content.classList.remove('extend')
+    }
+    else { // hide
+        sidebar_toggle.classList.add('extend')
+        sidebar.classList.add('hide')
+        content.classList.add('extend')
+    }
+}
+</script>
+
+      <div class="off-canvas-content">
+        <div class="columns">
+          <div class="column col-10 col-lg-12">
+            <div class="book-navbar">
+              <!-- For Responsive Layout -->
+
+<header class="navbar">
+  <section class="navbar-section">
+    <a onclick="open_sidebar()">
+      <i class="icon icon-menu"></i>
+    </a>
+  </section>
+</header>
+
+            </div>
+            <div class="book-content">
+              <div class="book-post">
+  <p>内存屏障（Memory Barrier）是 <strong> 一种同步机制，用于保证多线程编程中内存操作顺序的正确性 </strong>。这在多核处理器和现代复杂架构中尤为重要。内存屏障通过限制或重排序内存操作，<strong> 防止编译器或处理器对指令的重排序，以确保某些特定顺序的操作被严格按照程序员所指定的顺序执行</strong>。</p>
+<span id="more"></span>
+<p>内存屏障是一种底层原语，在不同计算机架构下有不同的实现细节。本文主要在 x86_64 处理器下，通过 Linux 及其内核代码来分析和使用内存屏障。</p>
+<p>对大多数应用层开发者来说，“内存屏障”（Memory Barrier）是一种陌生，甚至有些诡异的技术。实际上，它常被用在操作系统内核中，<strong>用于实现同步机制 </strong>、驱动程序等。<strong> 利用它，能实现高效的无锁数据结构，提高多线程程序的性能表现</strong>。</p>
+<p>本文首先探讨了内存屏障的必要性，之后介绍如何使用内存屏障实现一个无锁环形缓冲区（队列），用于在多个线程间进行高效的数据交换。</p>
+<h2 id="理解内存屏障">理解内存屏障</h2>
+<p>不少开发者并不理解一个事实——<u>程序实际运行时很可能并不完全按照开发者编写的顺序访问内存</u>。例如：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">x = r;</span><br><span class="line">y = <span class="number">1</span>;</span><br></pre></td></tr></table></figure>
+<p>这里，y = 1 很可能先于 x = r 执行。这就是内存乱序访问。</p>
+<p>内存乱序访问行为出现的理由是为了提升程序运行时的性能。<strong>编译器和 CPU 都可能引起内存乱序访问</strong>：</p>
+<ul>
+<li>编译时，编译器优化进行指令重排而导致内存乱序访问；</li>
+<li>运行时，多 CPU 间交互引入内存乱序访问。</li>
+</ul>
+<p>编译器和 CPU 引入内存乱序访问通常不会带来什么问题，但在一些特殊情况下（主要是多线程程序中），逻辑的正确性依赖于内存访问顺序。这时，内存乱序访问会带来逻辑上的错误，例如：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// thread 0</span></span><br><span class="line"><span class="keyword">while</span> (!ok);</span><br><span class="line"><span class="keyword">do</span>(x);</span><br><span class="line"> </span><br><span class="line"><span class="comment">// thread 1</span></span><br><span class="line">x = <span class="number">42</span>;</span><br><span class="line">ok = <span class="number">1</span>;</span><br></pre></td></tr></table></figure>
+<p>ok 初始化为 0，线程 0 等待 ok 被设置为 1 后执行 do 函数。</p>
+<p>假如，线程 1 对内存的写操作乱序执行，也就是 x 赋值晚于 ok 赋值完成，那么 do 函数接受的实参很有可能出乎开发者的意料，不为 42。</p>
+<p>我们可以引入内存屏障来避免上述问题的出现。内存屏障能让 CPU 或者编译器在内存访问上有序。<strong>一个内存屏障之前的内存访问操作必定先于其之后的完成</strong>。</p>
+<p>内存屏障包括两类：编译器屏障和 CPU 内存屏障。</p>
+<h2 id="编译时内存乱序访问">编译时内存乱序访问</h2>
+<h3 id="优化前">优化前</h3>
+<p>编译器对代码做出优化时，可能改变实际执行指令的顺序（例如 gcc 下 -O2 或 -O3 都可能会改变实际执行指令的顺序），看一个例子：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// example.c</span></span><br><span class="line"><span class="type">int</span> x, y, r;</span><br><span class="line"><span class="type">void</span> <span class="title function_">f</span><span class="params">()</span> &#123;</span><br><span class="line">    x = r;</span><br><span class="line">    y = <span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>使用 <a target="_blank" rel="noopener" href="https://godbolt.org/">Compiler Explorer</a> 直接编译源文件：<em>gcc -g -o output.s -masm=intel -fno-verbose-asm -S -fdiagnostics-color=always example.c</em>。我们得到相关的汇编代码如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">x:</span><br><span class="line">        .zero   4                       ; 定义全局变量，占用 4 字节，初值为 0</span><br><span class="line">y:</span><br><span class="line">        .zero   4</span><br><span class="line">r:</span><br><span class="line">        .zero   4</span><br><span class="line">f:</span><br><span class="line">        push    rbp                     ; 保存当前栈基指针 (rbp) 到栈中。</span><br><span class="line">        mov     rbp, rsp                ; 更新 rbp 为当前栈顶指针(rsp)，便于函数内部的栈帧管理</span><br><span class="line">        mov     eax, DWORD PTR r[rip]   ; 更新 eax 为读取的全局变量 r 的值</span><br><span class="line">        mov     DWORD PTR x[rip], eax   ; 更新全局变量 x 为 eax 寄存器的值</span><br><span class="line">        mov     DWORD PTR y[rip], 1     ; 更新全局变量 y 为值 1</span><br><span class="line">        nop                             ; 空指令</span><br><span class="line">        pop     rbp                     ; 函数退出序列：从栈中恢复之前保存的栈基指针</span><br><span class="line">        ret                             ; 返回到函数调用，使用栈上的返回地址</span><br></pre></td></tr></table></figure>
+<p>这里我们可以看到，x = r 和 y = 1 并没有乱序执行。现使用优化选项 -O2/-O3 编译上面的代码（gcc -O2 …），生成汇编代码如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">f:</span><br><span class="line">        mov     DWORD PTR y[rip], 1     ; y = 1</span><br><span class="line">        mov     eax, DWORD PTR r[rip]</span><br><span class="line">        mov     DWORD PTR x[rip], eax   ; x = r</span><br><span class="line">        ret</span><br><span class="line">r:</span><br><span class="line">        .zero   4</span><br><span class="line">y:</span><br><span class="line">        .zero   4</span><br><span class="line">x:</span><br><span class="line">        .zero   4</span><br></pre></td></tr></table></figure>
+<p>我们可以清楚地看到经过编译器优化之后，y = 1 先于 x = r 执行，这意味着，编译器优化导致了内存乱序访问。</p>
+<p><strong>避免内存乱序行为的办法就是使用编译器屏障（又叫优化屏障）。Linux 内核提供了函数 barrier()，用于让编译器保证其之前的内存访问先于其之后的内存访问完成</strong>。</p>
+<blockquote>
+<p>这个强制保证顺序的需求在哪里？换句话说乱序会带来什么问题？一个线程执行了 y = 1 , 但实际上 x = r 还没有执行完成，此时被另一个线程抢占，另一个线程执行，发现 y=1，以为此时 x 必定等于 r，执行相应逻辑，造成错误。</p>
+</blockquote>
+<h3 id="内核 barrier">内核 barrier()</h3>
+<p>内核实现的编译器屏障 barrier()如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> barrier() __asm__ __volatile__(<span class="string">&quot;&quot;</span>: : :<span class="string">&quot;memory&quot;</span>)</span></span><br></pre></td></tr></table></figure>
+<p>这是一个宏定义，在嵌入式编程或内核编程中经常使用。这个宏用于创建一个编译器内存屏障。</p>
+<ul>
+<li><code>__asm__</code>: 在 GCC 中，<code>__asm__</code> 是用来插入内联汇编代码的关键字。</li>
+<li><code>__volatile__</code>: 该关键字表明所插入的汇编代码是 “volatile” 的，告诉编译器不要优化这段代码，即使它看起来没有做任何有用的事情。</li>
+<li><code>&quot;&quot;</code>: 空字符串，表示没有实际的汇编指令。</li>
+</ul>
+<p>输入和输出操作数：</p>
+<p><code>: : : &quot;memory&quot;</code>: 这是内联汇编语法中用来指定输入、输出、和被修改的寄存器或内存位置的部分。</p>
+<ul>
+<li>第一个冒号后面为空，表示没有输出操作数。</li>
+<li>第二个冒号后面为空，表示没有输入操作数。</li>
+<li>第三个冒号后面是 “memory”，表示这段内联汇编代码可能会影响内存。</li>
+</ul>
+<p>标记 <code>&quot;memory&quot;</code> 有以下几个主要作用：</p>
+<ol>
+<li><strong>内存屏障</strong>：它告诉编译器，这段汇编代码可能会访问或修改内存。因此，编译器在优化时不能对这段代码前后的内存访问进行重排序。</li>
+<li><strong>确保代码顺序</strong>：编译器在遇到这段代码时，不会将这段代码前后的内存操作优化到其它位置。它会严格保持内存操作的顺序。</li>
+</ol>
+<p>这样做的原因是为了确保某些关键内存操作在修改和访问内存时不会被编译器的优化机制打乱顺序。特别是在多线程编程和操作系统开发中，内存屏障非常重要，以确保内存访问的一致性和正确性。</p>
+<h3 id="优化后">优化后</h3>
+<p>现在把此编译器屏障 barrier()加入代码中：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> barrier() __asm__ __volatile__(<span class="string">&quot;&quot;</span>: : :<span class="string">&quot;memory&quot;</span>)</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> x, y, r;</span><br><span class="line"><span class="type">void</span> <span class="title function_">f</span><span class="params">()</span> &#123;</span><br><span class="line">    x = r;</span><br><span class="line">    barrier();</span><br><span class="line">    y = <span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>再编译（使用优化选项 -O2 或 -O3），就会发现内存乱序访问已经不存在了。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">f:</span><br><span class="line">        mov     eax, DWORD PTR r[rip]</span><br><span class="line">        mov     DWORD PTR x[rip], eax   ; x = r</span><br><span class="line">        mov     DWORD PTR y[rip], 1     ; y = 1</span><br><span class="line">        ret</span><br><span class="line">r:</span><br><span class="line">        .zero   4</span><br><span class="line">y:</span><br><span class="line">        .zero   4</span><br><span class="line">x:</span><br><span class="line">        .zero   4</span><br></pre></td></tr></table></figure>
+<p>除了 barrier()函数外，本例还可以使用 volatile 这个关键字来避免编译时内存乱序访问（且仅能避免编译时的乱序访问），为什么呢？</p>
+<p>可以参考前面部分的说明，编译器对于 volatile 声明究竟做了什么。<strong>volatile 关键字对于编译器而言，是开发者告诉编译器，这个变量内存的修改，可能不在你的可视范围内（比如被硬件或其他线程修改），不要对这个变量相关的代码进行优化，必须每次都从内存中实际读取或写入</strong>。</p>
+<p>volatile 关键字能让 volatile 变量之间的内存访问上有序（仅指编译器行为保证的有序，不包括处理器行为导致的乱序），这里可以修改 x 和 y 的定义来解决问题：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">volatile</span> <span class="type">int</span> x, y, r;</span><br><span class="line"><span class="type">void</span> <span class="title function_">f</span><span class="params">()</span> &#123;</span><br><span class="line">    x = r;</span><br><span class="line">    y = <span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>通过 volatile 关键字，使得 x 相对 y、y 相对 x 在内存访问上是有序的。</p>
+<p>实际上，在 Linux 内核中，ACCESS_ONCE 宏就是通过 volatile 使得编译器在对连续使用 ACCESS_ONCE 访问一些变量时，避免对这些访问进行指令重排。它通过类型转换和解引用的方式，将变量视为 volatile，确保从内存中直接读取或写入。</p>
+<p>避免编译器指令重排的第三个修改方案：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> ACCESS_ONCE(x) (*(volatile typeof(x) *)&amp;(x))</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> x, y, r;</span><br><span class="line"><span class="type">void</span> <span class="title function_">f</span><span class="params">()</span> &#123;</span><br><span class="line">    ACCESS_ONCE(x) = r;</span><br><span class="line">    ACCESS_ONCE(y) = <span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>到此，基本上就阐述完成了编译时内存乱序访问的问题。下面看看 CPU 会有怎样的行为。</p>
+<h2 id="运行时内存乱序访问">运行时内存乱序访问</h2>
+<h3 id="乱序处理器">乱序处理器</h3>
+<p>运行时，CPU 本身是会乱序执行指令的。</p>
+<p>早期的处理器为有序处理器（in-order processors），总是按开发者编写的顺序执行指令，如果指令的输入操作对象（input operands）不可用（通常由于需要从内存中获取），那么处理器不会转而执行那些输入操作对象可用的指令，而是等待当前输入操作对象可用。相比之下，乱序处理器（out-of-order processors）会先处理那些有可用输入操作对象的指令（而非顺序执行）从而避免了等待，提高了效率。</p>
+<p>现代计算机上，<strong>处理器运行的速度比内存访问快很多</strong>，有序处理器花在等待可用数据的时间里已可处理大量指令了。</p>
+<p>即便现代处理器会乱序执行，但在单个 CPU 上，指令能通过指令队列顺序地获取并执行，结果利用队列顺序返回寄存器堆（详情可参考 <a target="_blank" rel="noopener" href="http://en.wikipedia.org/wiki/Out-of-order_execution"> 这里</a>），这使得程序执行时所有的内存访问操作看起来像是按程序代码编写的顺序执行的。因此，内存屏障是没有必要使用的（前提是不考虑编译器优化的情况下）。</p>
+<h3 id="SMP 架构">SMP 架构</h3>
+<p>SMP（对称多处理，Symmetric Multiprocessing）是一种计算机体系结构，旨在提高系统的处理能力和容错性。<strong>这种架构中的多个处理器共享同一个内存以及 I/O 系统</strong>，每个处理器都能对称且并行地运行操作系统和应用程序。</p>
+<p><strong>SMP 架构需要内存屏障的进一步解释</strong>：</p>
+<p>从体系结构上来看，首先在 SMP 架构下，每个 CPU 与内存之间，都配有自己的高速缓存（Cache），以减少访问内存时的冲突。</p>
+<img src="../images/sys-net-program/smp-arch.png" alt="SMP 架构" width="50%" height="50%">
+<p>采用高速缓存（Cache）的写操作有两种模式：</p>
+<ol>
+<li>穿透（Write through）模式：每次写时，都直接将数据写回内存中，效率相对较低。</li>
+<li>回写（Write back）模式：写的时候先写回 Cache，然后由 Cache 的硬件在周转复用缓冲线 (Cache Line) 时自动将数据写回内存，或者由软件主动地“冲刷”有关的缓冲线。</li>
+</ol>
+<p>出于性能的考虑，系统往往采用的是 Write back 模式来完成数据写入。正是由于存在 Cache 这一层，正是由于采用了 Write back 模式的数据写入，才导致 <strong> 在 SMP 架构下，对 Cache 的运用可能改变对内存操作的顺序</strong>。</p>
+<p>以上面的一个简短代码为例：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// thread 0 - 在 CPU0 上运行</span></span><br><span class="line">x = <span class="number">42</span>;</span><br><span class="line">ok = <span class="number">1</span>;</span><br><span class="line"> </span><br><span class="line"><span class="comment">// thread 1 – 在 CPU1 上运行</span></span><br><span class="line"><span class="keyword">while</span>(!ok);</span><br><span class="line">print(x);</span><br></pre></td></tr></table></figure>
+<p>这里 CPU1 执行时， x 一定是打印出 42 吗？让我们来看看以下图为例的说明：</p>
+<img src="../images/sys-net-program/smp-multithread.png" alt="SMP 架构多线程访问共享内存" width="50%" height="50%">
+<p>假设，正好 CPU0 的 Cache 中有 x，此时 CPU0 仅仅是将 x=42 写入到了 Cache 中，另外一个 ok 也在 Cache 中，但由于周转复用高速缓冲线（Cache Line）而导致将 ok=1 刷回到了内存中。此时 CPU1 首先执行对 ok 内存的读取操作，他读到了 ok 为 1 的结果，进而跳出循环，读取 x 的内容，但此时，由于实际写入的 x(42)还只在 CPU0 的 Cache 中，导致 CPU1 读到的数据为 x(17)。</p>
+<p><strong>程序中编排好的内存访问顺序（指令序：program ordering）是先写入 x，再写入 ok。而实际上出现在该 CPU 外部，即系统总线上的次序（处理器序：processor ordering）却是先写入 ok，再写入 x（这个例子中 x(42)还未写入）</strong>。</p>
+<p><strong>在 SMP 架构中，每个 CPU 都只知道自己何时会改变内存的内容，但是都不知道其它 CPU 会在什么时候改变内存的内容，也不知道自己本地的 Cache 中的内容是否与内存中的内容不一致。反过来，每个 CPU 都可能因为改变了内存内容，而使得其与其它 CPU 的 Cache 的内容不一致了</strong>。</p>
+<p>在 SMP 架构下，由于 Cache 的存在而导致的内存访问次序（读或写都有可能顺序被改变）的改变很有可能影响到 CPU 间的同步与互斥。因此需要有一种手段，使得在某些操作之前，把这种“欠下”的内存操作（本例中的 x=42 的内存写入）全都最终地、物理地完成，就好像把欠下的债都结清，然后再开始新的（通常是比较重要的）活动一样。这种手段就是 <strong> 内存屏障，其本质原理就是对系统总线加锁</strong>。</p>
+<h3 id="非 SMP 架构">非 SMP 架构</h3>
+<p>回过头来，我们再来看看为什么非 SMP 架构（UP 架构）下，运行时内存乱序访问不存在。</p>
+<p>在单处理器架构下，各个进程在宏观上是并行的，但是在微观上却是串行的，因为在同一时间点上，只有一个进程真正在运行（系统中只有一个处理器）。在这种情况下，我们再来看看上面提到的例子：</p>
+<img src="../images/sys-net-program/non-smp-arch-multithread.png" alt="非 SMP 架构多线程访问共享内存" width="50%" height="50%">
+<p>thread 0 和 thread 1 的指令都将在 CPU0 上按照指令序执行。thread 0 通过 CPU0 完成 x=42 的 Cache 写入后，再将 ok=1 写入内存，此后串行的将 thread 0 换出，thread 1 换入，即使此时 x=42 并未写入内存，但由于 thread 1 的执行仍然是在 CPU0 上执行，他仍然访问的是 CPU0 的 Cache。因此，即使 x=42 还未写回到内存中，thread 1 势必还是先从 Cache 中读到 x=42，再从内存中读到 ok=1。</p>
+<p>综上所述，在单 CPU 上，多线程执行不存在运行时内存乱序访问，我们从内核源码也可得到类似结论（代码不完全摘录）。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> barrier() __asm__ __volatile__(<span class="string">&quot;&quot;</span>: : :<span class="string">&quot;memory&quot;</span>) </span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> mb() alternative(<span class="string">&quot;lock; addl $0,0(%%esp)&quot;</span>, <span class="string">&quot;mfence&quot;</span>, X86_FEATURE_XMM2) </span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> rmb() alternative(<span class="string">&quot;lock; addl $0,0(%%esp)&quot;</span>, <span class="string">&quot;lfence&quot;</span>, X86_FEATURE_XMM2)</span></span><br><span class="line"> </span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> CONFIG_SMP       <span class="comment">// 是 SMP 架构</span></span></span><br><span class="line">    <span class="meta">#<span class="keyword">define</span> smp_mb() mb() </span></span><br><span class="line">    <span class="meta">#<span class="keyword">define</span> smp_rmb() rmb() </span></span><br><span class="line">    <span class="meta">#<span class="keyword">define</span> smp_wmb() wmb() </span></span><br><span class="line">    <span class="meta">#<span class="keyword">define</span> smp_read_barrier_depends() read_barrier_depends() </span></span><br><span class="line">    <span class="meta">#<span class="keyword">define</span> set_mb(var, value) do &#123; (void) xchg(&amp;var, value); &#125; while (0) </span></span><br><span class="line"><span class="meta">#<span class="keyword">else</span>                  <span class="comment">// 非 SMP 架构：即仅使用编译器屏障即可保证内存访问顺序</span></span></span><br><span class="line">    <span class="meta">#<span class="keyword">define</span> smp_mb() barrier() </span></span><br><span class="line">    <span class="meta">#<span class="keyword">define</span> smp_rmb() barrier() </span></span><br><span class="line">    <span class="meta">#<span class="keyword">define</span> smp_wmb() barrier() </span></span><br><span class="line">    <span class="meta">#<span class="keyword">define</span> smp_read_barrier_depends() do &#123; &#125; while(0) </span></span><br><span class="line">    <span class="meta">#<span class="keyword">define</span> set_mb(var, value) do &#123; var = value; barrier(); &#125; while (0) </span></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br></pre></td></tr></table></figure>
+<p>这里可看到对内存屏障的定义，如果是 SMP 架构，smp_mb 定义为 mb()，mb()为 CPU 内存屏障（接下来要谈的），而非 SMP 架构时（也就是 UP 架构），直接使用编译器屏障 barrier，运行时内存乱序访问并不存在。</p>
+<h3 id="多 CPU 乱序原因">多 CPU 乱序原因</h3>
+<p>为什么多 CPU 情况下会存在内存乱序访问？</p>
+<p>我们知道每个 CPU 都存在 Cache，当一个特定数据第一次被其它 CPU 获取时，此数据显然不在对应 CPU 的 Cache 中（这就是 Cache Miss）。</p>
+<p>这意味着 CPU 要从内存中获取数据（这个过程需要 CPU 等待数百个周期），此数据将被加载到 CPU 的 Cache 中，这样后续就能直接从 Cache 上快速访问。</p>
+<p>当某个 CPU 进行写操作时，他必须确保其它 CPU 已将此数据从他们的 Cache 中移除（以便保证一致性），只有在移除操作完成后，此 CPU 才能安全地修改数据。</p>
+<p>显然，存在多个 Cache 时，必须通过一个 Cache 一致性协议来避免数据不一致的问题，而这个通信的过程就可能导致乱序访问的出现，也就是运行时内存乱序访问。</p>
+<p>受篇幅所限，这里不再深入讨论整个细节，有兴趣的读者可以研究《Memory Barriers: a Hardware View for Software Hackers》这篇文章，它详细地分析了整个过程。</p>
+<p>现在通过一个例子来直观地说明多 CPU 下内存乱序访问的问题：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">volatile</span> <span class="type">int</span> x, y, r1, r2;</span><br><span class="line"><span class="comment">// thread 0</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">run0</span><span class="params">()</span> &#123;</span><br><span class="line">    x = <span class="number">1</span>;</span><br><span class="line">    r1 = y;</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"><span class="comment">// thread 1</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">run1</span><span class="params">()</span> &#123;</span><br><span class="line">    y = <span class="number">1</span>;</span><br><span class="line">    r2 = x;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>变量均被初始化为 0，run0 和 run1 运行在不同的线程中。如果 run0 和 run1 在同一个 cpu 下执行完成，那么就如我们所料，r1 和 r2 的值不会同时为 0（原因见 <a href="/posts/240919200410.html#%E9%9D%9E%20SMP%20%E6%9E%B6%E6%9E%84"> 非 SMP 架构小节</a>）。如果 run0 和 run1 在不同的 CPU 下执行完成后，内存访问可以被 CPU 或编译器重排序，导致不同的执行顺序，这时 r1 和 r2 可能同时为 0。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// r1=0, r2=0</span></span><br><span class="line">Thread <span class="number">1</span>:   r1 = y;         x = <span class="number">1</span>;</span><br><span class="line">Thread <span class="number">2</span>:           r2 = x;         y = <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// r1=0, r2=0</span></span><br><span class="line">Thread <span class="number">1</span>:           r1 = y;         x = <span class="number">1</span>;</span><br><span class="line">Thread <span class="number">2</span>:   r2 = x;         y = <span class="number">1</span>;</span><br></pre></td></tr></table></figure>
+<p>我们可以 <strong> 使用 CPU 内存屏障来避免运行时内存乱序访问</strong>（x86_64）：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// thread 0</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">run0</span><span class="params">()</span> &#123;</span><br><span class="line">    x = <span class="number">1</span>;</span><br><span class="line">    <span class="comment">// CPU 内存屏障，保证 x=1 在 r1=y 之前执行</span></span><br><span class="line">    __asm__ __volatile__(<span class="string">&quot;mfence&quot;</span>:::<span class="string">&quot;memory&quot;</span>);</span><br><span class="line">    r1 = y;</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"><span class="comment">// thread 1</span></span><br><span class="line"><span class="type">void</span> run1 &#123;</span><br><span class="line">    y = <span class="number">1</span>;</span><br><span class="line">    <span class="comment">// CPU 内存屏障，保证 y=1 在 r2=x 之前执行</span></span><br><span class="line">    __asm__ __volatile__(<span class="string">&quot;mfence&quot;</span>:::<span class="string">&quot;memory&quot;</span>);</span><br><span class="line">    r2 = x;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="sfence-lfence-mfence">sfence/lfence/mfence</h3>
+<p>在 x86-64 系统架构中，内存屏障（Memory Fence）是用于控制 CPU 指令和内存访问顺序的关键指令。这些指令在并发编程和多线程环境中尤为重要，以确保内存操作按预期的顺序执行。x86-64 系统架构提供了三种主要的内存屏障指令：<code>sfence</code>、<code>lfence</code> 和 <code>mfence</code>。以下是对这三种内存屏障的详细介绍（根据 GPT 的回复整理）：</p>
+<p><code>sfence</code>（Store Fence）：</p>
+<p>功能：</p>
+<ul>
+<li>确保所有在 <code>sfence</code> 之前的 <strong> 存储操作</strong>（写操作）在所有后续的存储操作之前完成。</li>
+<li>注意：<strong>sfence 不会强制将数据立即写回内存（可以在 cache 中）</strong>，只是确保写操作的顺序性。</li>
+</ul>
+<p>用途：</p>
+<ul>
+<li><code>sfence</code> 通常用于确保写入顺序的一致性，特别是在写入不同处理器或内存区域时。</li>
+<li>常用于需要强制将缓冲区中的写入操作同步到共享内存或 I/O 设备上。</li>
+</ul>
+<p>示例：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 写入共享变量</span></span><br><span class="line">shared_var1 = <span class="number">1</span>;</span><br><span class="line">shared_var2 = <span class="number">2</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 插入 sfence，确保 shared_var1 和 shared_var2 的写入操作完成</span></span><br><span class="line">__asm__ __volatile__(<span class="string">&quot;sfence&quot;</span> ::: <span class="string">&quot;memory&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 此时，可以进行依赖于前述写入操作的其他操作</span></span><br><span class="line">perform_other_operations();</span><br></pre></td></tr></table></figure>
+<p><code>lfence</code>（Load Fence）：</p>
+<p>功能：</p>
+<ul>
+<li>确保所有在 <code>lfence</code> 之前的 <strong> 加载操作</strong>（读操作）在所有后续的加载操作之前完成。</li>
+<li>在加载（读取）指定数据时防止内存访问重排序（比如正常应该按 A-&gt;B-&gt;C 的顺序读取，使用 lfence 可以保证按 A-&gt;B-&gt;C 的顺序读取）。</li>
+<li>注意：<strong>lfence 不会强制从内存中读取数据（可以在 cache 中）</strong>，只是确保读取操作的顺序性。</li>
+</ul>
+<p>用途：</p>
+<ul>
+<li><code>lfence</code> 通常用于执行内存读操作的序列控制。</li>
+<li>用于防止 CPU 在提前读取数据时造成的潜在数据一致性问题，特别是在读取敏感数据或具备安全隐患的场景下。</li>
+</ul>
+<p>示例：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 读取共享变量之前插入 lfence，确保之前的所有内存读取操作已完成</span></span><br><span class="line">__asm__ __volatile__(<span class="string">&quot;lfence&quot;</span> ::: <span class="string">&quot;memory&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 读取共享变量</span></span><br><span class="line"><span class="type">int</span> val1 = shared_var1;</span><br><span class="line"><span class="type">int</span> val2 = shared_var2;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用读取到的值进行后续操作</span></span><br><span class="line">process_values(val1, val2);</span><br></pre></td></tr></table></figure>
+<p><code>mfence</code>（Memory Fence）：</p>
+<p>功能：</p>
+<ul>
+<li>确保所有在 <code>mfence</code> 之前的 <strong> 加载和存储操作 </strong> 在所有后续的加载和存储操作之前完成。它起到的是全内存屏障的作用。</li>
+<li>注意：<strong>mfence 不会强制从内存中读取数据、或写回数据到内存（可以在 cache 中）</strong>，只是确保读取、写入操作的顺序性，即它能保证在其之前的写入操作对其他 CPU 可见（它可以确保一个线程对变量的更新在另一个线程读取时是最新的）。</li>
+</ul>
+<p>用途：</p>
+<ul>
+<li><code>mfence</code> 是在需要同时控制读写操作顺序的情况下使用的。</li>
+<li>在多线程程序中，我们可以 <strong> 用 <code>mfence</code> 来确保跨多个 CPU 的内存访问顺序的一致性</strong>。</li>
+</ul>
+<p>示例：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 执行一些读写操作</span></span><br><span class="line">shared_var1 = <span class="number">1</span>;        <span class="comment">// read</span></span><br><span class="line"><span class="type">int</span> val = shared_var2;  <span class="comment">// write</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 插入 mfence，确保以上读写操作在下一步操作之前完成</span></span><br><span class="line">__asm__ __volatile__(<span class="string">&quot;mfence&quot;</span> ::: <span class="string">&quot;memory&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 此时，可以进行依赖于前述读写操作的其他操作</span></span><br><span class="line">perform_other_operations();</span><br></pre></td></tr></table></figure>
+<h3 id="多线程下的运行时乱序">多线程下的运行时乱序</h3>
+<p>为什么仅通过保证了写者的写入顺序（sfence），还是有可能有问题？还是之前的例子</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// thread 0</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">run0</span><span class="params">()</span> &#123;</span><br><span class="line">    x = <span class="number">1</span>;</span><br><span class="line">    <span class="comment">// CPU 内存屏障，保证 x=1 在 r1=y 之前执行</span></span><br><span class="line">    __asm__ __volatile__(<span class="string">&quot;sfence&quot;</span>:::<span class="string">&quot;memory&quot;</span>); <span class="comment">// mfence</span></span><br><span class="line">    r1 = y;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// thread 1</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">run1</span><span class="params">()</span> &#123;</span><br><span class="line">    y = <span class="number">1</span>;</span><br><span class="line">    <span class="comment">// CPU 内存屏障，保证 y=1 在 r2=x 之前执行</span></span><br><span class="line">    __asm__ __volatile__(<span class="string">&quot;sfence&quot;</span>:::<span class="string">&quot;memory&quot;</span>); <span class="comment">// mfence</span></span><br><span class="line">    r2 = x;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如果仅仅是对“写入”操作进行顺序化，实际上，还是有可能使的上面的代码出现 r1，r2 同时为 0（初始值）的场景：</p>
+<img src="../images/sys-net-program/sfence-1.png" alt="sfence 下的乱序访问" width="50%" height="50%">
+<p>当 CPU0 上的 thread 0 执行时，x 被先行写回到内存中，但如果此时 y 在 CPU0 的 Cache 中，这时 y 从缓存中读出，并被赋予 r1 写回内存，此时 r1 为 0。同理，CPU1 上的 thread 1 执行时，y 被先行写回到内存中，如果此时 x 在 CPU1 的 Cache 中存在，则此时 r2 被赋予了 x 的（过时）值 0，同样存在了 r1, r2 同时为 0。【这里的写回到内存：可能是主存也能是 cache】</p>
+<p>这个现象实际上就是所谓的 r1=y 的读顺序与 x=1 的写顺序存在逻辑上的乱序所致（或者是 r2=x 与 y=1 存在乱序）——读操作与写操作之间存在乱序。而 mfence 就是将这类乱序也屏蔽掉。</p>
+<p>如果是通过 mfence，是怎样解决该问题的呢？</p>
+<img src="../images/sys-net-program/mfence-1.png" alt="mfence 下的顺序访问" width="50%" height="50%">
+<p>当 thread 0 在 CPU0 上对 x=1 进行写入时，x=1 被刷新到内存中，由于是 mfence，他要求 r1 的读取操作从内存读取数据，而不是从缓存中读取数据。因此，此时如果 y 更新为 1，则 r1=1；如果 y 没有更新为 1，则 r1=0。同时，此时由于 x 更新为 1， r2 必须从内存中读取数据，则此时 r2=1。总而言之，r1 和 r2 一个为 0、一个为 1。【mfence 能保证在其之前的写入操作对其他 CPU 可见】</p>
+<h2 id="内存屏障补充">内存屏障补充</h2>
+<p>关于内存屏障的一些补充：</p>
+<p>在实际的应用程序开发中，开发者可能完全不知道内存屏障就写出了正确的多线程程序，这主要是因为各种同步机制中已隐含了内存屏障（但和实际的内存屏障有细微差别），使得不直接使用内存屏障也不会存在任何问题。但如果你希望编写诸如无锁数据结构，那么内存屏障意义重大。</p>
+<p>在 Linux 内核中，除了前面说到的编译器屏障 barrier()和 ACESS_ONCE()，还有 CPU 内存屏障：</p>
+<ul>
+<li>通用屏障，保证读写操作有序，包括 mb()和 smp_mb();</li>
+<li>写操作屏障，仅保证写操作有序，包括 wmb()和 smp_wmb();</li>
+<li>读操作屏障，仅保证读操作有序，包括 rmb()和 smp_rmb();</li>
+</ul>
+<p>注意，所有的 CPU 内存屏障（除了数据依赖屏障外）都隐含了编译器屏障（也就是使用 CPU 内存屏障后就无需再额外添加编译器屏障了）。</p>
+<p>这里，在单处理器上 smp_x()直接使用编译器屏障（即 barrier()），而在 SMP 架构上才使用 CPU 内存屏障（即 mb()、wmb()、rmb()）。</p>
+<p>还需要注意一点是，CPU 内存屏障中某些类型的屏障需要成对使用，否则会出错。详细来说就是：一个写操作屏障需要和读操作（或者数据依赖）屏障一起使用（当然，通用屏障也是可以的），反之亦然。</p>
+<p>通常，我们是希望在写屏障之前出现的 STORE 操作，总是匹配读屏障或者数据依赖屏障之后出现的 LOAD 操作。以之前的代码示例：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// thread 0</span></span><br><span class="line">x = <span class="number">42</span>;</span><br><span class="line">smb_wmb();</span><br><span class="line">ok = <span class="number">1</span>;</span><br><span class="line"> </span><br><span class="line"><span class="comment">// thread 1</span></span><br><span class="line"><span class="keyword">while</span>(!ok);</span><br><span class="line">smb_rmb();</span><br><span class="line"><span class="keyword">do</span>(x);</span><br></pre></td></tr></table></figure>
+<p>我们这么做，是希望在 thread 1 执行到 do(x)时（在 ok 验证的确 =1 时），x=42 的确是有效的（写屏障之前出现的 STORE 操作），此时 do(x)，的确是在执行 do(42)（读屏障之后出现的 LOAD 操作）。</p>
+<p>最后，以一个使用内存屏障实现的无锁环形缓冲区来结束本文：<a href="/posts/240627210637.html">DPDK 无锁环形队列</a>。</p>
+<blockquote>
+<p>参考资料：</p>
+<ol>
+<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/mysky007/p/12901776.html">https://www.cnblogs.com/mysky007/p/12901776.html</a></li>
+</ol>
+</blockquote>
+
+</div>
+
+
+  <div class="book-comments">
+    
+
+
+
+
+  </div>
+
+
+
+<script src="/js/book-post.js"></script>
+
+
+            </div>
+          </div>
+          <div class="column col-2 hide-lg">
+            <div class="book-post-info">
+  
+    <div class="book-post-meta">
+
+  <div class="author">
+
+    <!-- Author image -->
+    <div class="author-img">
+      
+        <figure
+          class="avatar avatar-lg"
+          data-initial="A"
+          style="background-color: #3b4351;">
+        </figure>
+      
+    </div>
+
+    <!-- Author title -->
+    <div class="author-title">
+      <div>aha</div>
+      <div>2024-09-19</div>
+    </div>
+  </div>
+
+  
+    <div class="divider"></div>
+
+    <div class="link">
+      <a class="category-link" href="/categories/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/">并发编程</a>
+
+      <a class="tag-none-link" href="/tags/%E5%86%85%E5%AD%98%E5%B1%8F%E9%9A%9C/" rel="tag">#内存屏障</a>
+    </div>
+    
+  
+
+  <div class="divider"></div>
+</div>
+  
+
+  <div class="book-tocbot">
+</div>
+<div class="book-tocbot-menu">
+  <a class="book-toc-expand" onclick="expand_toc()">Expand all</a>
+  <a onclick="go_top()">Back to top</a>
+  <a onclick="go_bottom()">Go to bottom</a>
+  <a onclick="toggleSearch()">Search in blogs</a> <!-- 添加搜索文字的点击事件 -->
+</div>
+
+<div id="search-overlay" class="search-overlay" style="display: none;"> <!-- 初始状态为隐藏 -->
+  <div class="search-box">
+    <input type="text" id="search-input" placeholder="Search in all blogs...">
+    <button onclick="closeSearch()">Close</button> <!-- 添加关闭按钮 -->
+    <div id="search-results" class="search-results"></div>
+  </div>
+</div>
+
+<script>
+  function performSearch(query) {
+    if (!query.trim()) {
+      return;
+    }
+
+    fetch('/search.xml')
+      .then(response => response.text())
+      .then(data => {
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(data, "text/xml");
+        const entries = xmlDoc.getElementsByTagName('entry');
+        let results = '';
+
+        for (let i = 0; i < entries.length; i++) {
+          const title = entries[i].getElementsByTagName('title')[0].textContent;
+          const content = entries[i].getElementsByTagName('content')[0].textContent;
+          const url = entries[i].getElementsByTagName('url')[0].textContent;
+
+          let count = (title.match(new RegExp(query, "gi")) || []).length; // 统计查询词出现的次数
+          count += (content.match(new RegExp(query, "gi")) || []).length;
+
+          if (count > 0) { // title.includes(query) || content.includes(query)
+            results += `
+              <div class="search-result-item">
+                <a href="${url}">${title}</a> (${count})
+              </div>`;
+          }
+        }
+
+        const searchResultsElement = document.getElementById('search-results');
+        searchResultsElement.innerHTML = results;
+        searchResultsElement.classList.add('active');
+      });
+  }
+
+  function toggleSearch() {
+    const searchOverlay = document.getElementById('search-overlay');
+    searchOverlay.style.display = searchOverlay.style.display === 'none' ? 'flex' : 'none';
+  }
+
+  function closeSearch() {
+    document.getElementById('search-overlay').style.display = 'none';
+  }
+
+  document.getElementById('search-input').addEventListener('input', function() {
+    const query = this.value;
+    performSearch(query);
+  });
+</script>
+
+<style>
+  .search-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  .search-box {
+    background: white;
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+    width: 80%;
+    max-width: 500px;
+  }
+
+  .search-results {
+    margin-top: 10px;
+    max-height: 300px;
+    overflow-y: auto;
+    background: white;
+    padding: 10px;
+    border-radius: 5px;
+    width: 100%;
+  }
+
+  .search-result-item {
+    margin: 10px 0;
+  }
+
+  .search-result-item a {
+    color: blue; /* 设置链接颜色为蓝色 */
+    text-decoration: none;
+  }
+
+  .search-result-item a:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+<script src="/js/book-toc.js"></script>
+
+
+</div>
+          </div>
+        </div>
+      </div>
+
+      <a class="off-canvas-overlay" onclick="hide_canvas()"></a>
+
+      <button class="floating-button" onclick="toggleDropdownMenu()"></button>
+
+      <div class="dropdown-menu">
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FFFFFF', '#000000')">银河白</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#C7EDCC', '#000000')">豆沙绿</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FAF9DE', '#000000')">杏仁黄</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#E3EDCD', '#000000')">青草绿</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FFF2E2', '#000000')">秋叶褐</div>
+      </div>
+  </div>
+
+  <script>
+    function toggleDropdownMenu() {
+      document.querySelector('.floating-button').classList.toggle('active');
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      var storedBackgroundColor = localStorage.getItem('blogBackgroundColor');
+      var storedColor = localStorage.getItem('blogColor');
+
+      if (storedBackgroundColor && storedColor) {
+        document.body.style.backgroundColor = storedBackgroundColor;
+        document.body.style.color = storedColor;
+      }
+    });
+
+    function changeBackgroundColor(backgroundColor, color) {
+      document.body.style.backgroundColor = backgroundColor;
+      document.body.style.color = color;
+
+      localStorage.setItem('blogBackgroundColor', backgroundColor);
+      localStorage.setItem('blogColor', color);
+
+      document.querySelector('.floating-button').classList.remove('active');
+    }
+  </script>
+</body>
+
+</html>
+
+
+<script src="/js/book.js"></script>

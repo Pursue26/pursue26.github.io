@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
+
+    
+      <link rel="icon" href="/favicon.png" />
+    
+
+    <title>
+        
+          Linux 内核 kfifo 环形队列 - aha&#39;s book
+        
+    </title>
+
+    <!-- Spectre.css framework -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre-exp.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre-icons.min.css">
+
+    <!-- theme css & js -->
+    
+<link rel="stylesheet" href="/css/book.css">
+
+    
+<script src="/js/book.js"></script>
+
+
+    <!-- tocbot -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.css">
+    
+    <!-- katex -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/zooming/2.1.1/zooming.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const zooming = new Zooming()
+    zooming.listen('.book-content img')
+})
+</script>
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+    <style>
+      body {
+        background-color: #FFFFFF;
+        /* color: #000000; */
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+
+      /* Floating Button Styles */
+      .floating-button {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 999;
+        background-color: #000000;
+        color: #ffffff;
+        padding: 12px;
+        border-radius: 50%;
+        cursor: pointer;
+        border: 2px solid #000000;
+      }
+
+      .floating-button:hover {
+        background-color: #FFFFFF;
+      }
+
+      /* Dropdown Menu Styles */
+      .dropdown-menu {
+        position: fixed;
+        bottom: 60px;
+        right: 10px;
+        display: none;
+        min-width: 60px;
+        padding: 2px;
+        background-color: #fff;
+        /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
+        z-index: 1000;
+      }
+
+      .floating-button.active+.dropdown-menu {
+        display: block;
+      }
+
+      .dropdown-item {
+        display: block;
+        padding: 8px 16px;
+        cursor: pointer;
+      }
+
+      .dropdown-item:hover {
+        background-color: #f5f5f5;
+      }
+    </style>
+<style>.darkmode--activated{--body-bg-color:#282828;--content-bg-color:#333;--card-bg-color:#555;--text-color:#ccc;--blockquote-color:#bbb;--link-color:#ccc;--link-hover-color:#eee;--brand-color:#ddd;--brand-hover-color:#ddd;--table-row-odd-bg-color:#282828;--table-row-hover-bg-color:#363636;--menu-item-bg-color:#555;--btn-default-bg:#222;--btn-default-color:#ccc;--btn-default-border-color:#555;--btn-default-hover-bg:#666;--btn-default-hover-color:#ccc;--btn-default-hover-border-color:#666;--highlight-background:#282b2e;--highlight-foreground:#a9b7c6;--highlight-gutter-background:#34393d;--highlight-gutter-foreground:#9ca9b6}.darkmode--activated img{opacity:.75}.darkmode--activated img:hover{opacity:.9}.darkmode--activated code{color:#69dbdc;background:0 0}button.darkmode-toggle{z-index:9999}.darkmode-ignore,img{display:flex!important}.beian img{display:inline-block!important}</style></head>
+
+<body>
+  <div class="book-container">
+    <div class="book-sidebar">
+      <div class="book-brand">
+  <a href="/">
+    <img src="/favicon.png">
+    <span>AHA&#39;S BOOK</span>
+  </a>
+</div>
+        <div id="menu" class="book-menu hide">
+  <h2 id="基础知识"> 基础知识 </h2>
+<ul>
+<li><a href="/posts/231010144856.html"> 模运算 </a></li>
+<li><a href="/posts/231014105311.html"> 异或运算 </a></li>
+<li><a href="/posts/231210181853.html"> 计算机中的寄存器 </a></li>
+<li><a href="/posts/231213183051.html"> 正则表达式基础 </a></li>
+</ul>
+<h2 id="C 语言">C 语言 </h2>
+<ul>
+<li><a href="/posts/230916171929.html">main 函数参数 </a></li>
+<li><a href="/posts/231214192113.html"> 关键字与专有名词 </a></li>
+<li><a href="/posts/240103180653.html"> 输出打印函数 </a></li>
+<li><a href="/posts/230922143003.html"> 多维数组 </a></li>
+<li><a href="/posts/230913200729.html">const 关键字 </a></li>
+<li><a href="/posts/230918174223.html">typedef 类型基础 </a></li>
+<li><a href="/posts/230920172849.html">typedef 类型实践 </a></li>
+<li><a href="/posts/240224193217.html"> 二级指针 </a></li>
+<li><a href="/posts/240307195203.html"> 代码 TOP-K 问题 </a></li>
+<li><a href="/posts/230922172626.html">uthash 哈希表基础 </a></li>
+<li><a href="/posts/230918114841.html"> 大小端知识 </a></li>
+</ul>
+<h2 id="Golang 语言">Golang 语言 </h2>
+<ul>
+<li><a href="/posts/230907162612.html"> 变量与常量 </a></li>
+<li><a href="/posts/230909120145.html"> 函数 &amp; 包 &amp; 判断 &amp; 循环 </a></li>
+<li><a href="/posts/230912152800.html"> 数组与切片 </a></li>
+<li><a href="/posts/230913161326.html"> 可变参数函数与 Map 集合 </a></li>
+<li><a href="/posts/230915155105.html"> 字符串和指针 </a></li>
+</ul>
+<h2 id="数据结构"> 数据结构 </h2>
+<ul>
+<li><a href="/posts/231007174854.html"> 链表（数组实现）</a></li>
+<li><a href="/posts/231008213450.html"> 链表（链式实现）</a></li>
+<li><a href="/posts/231016161508.html"> 堆栈（数组实现）</a></li>
+<li><a href="/posts/231016184406.html"> 堆栈（链表实现）</a></li>
+<li><a href="/posts/231127185207.html"> 单调栈 </a></li>
+<li><a href="/posts/231017105123.html"> 队列（链表实现）</a></li>
+<li><a href="/posts/231017154121.html"> 双端队列（链表实现）</a></li>
+<li><a href="/posts/231018102559.html"> 堆基础与堆结构（数组实现）</a></li>
+<li><a href="/posts/231019102311.html"> 优先队列（堆实现）</a></li>
+<li><a href="/posts/230905224335.html"> 二叉树的遍历 </a></li>
+<li><a href="/posts/231020174358.html"> 二叉搜索树 </a></li>
+<li><a href="/posts/230916094606.html"> 拓扑排序 </a></li>
+<li><a href="/posts/230925185057.html">Trie 字典树 </a></li>
+<li><a href="/posts/231023164532.html"> 并查集（数组实现）</a></li>
+<li><a href="/posts/240702200642.html">Linux 数据结构之队列 </a></li>
+</ul>
+<h2 id="数据结构算法"> 数据结构算法 </h2>
+<ul>
+<li><a href="/posts/231218181635.html"> 归并排序 </a></li>
+<li><a href="/posts/231108163339.html"> 快速排序 </a></li>
+<li><a href="/posts/231107171607.html"> 堆排序 </a></li>
+<li><a href="/posts/231124181658.html"> 二分查找 </a></li>
+<li><a href="/posts/231227190828.html"> 哈希表实现 </a></li>
+<li><a href="/posts/240313193201.html"> 字符串哈希函数 </a></li>
+<li><a href="/posts/231116150205.html">Floyd 多源最短路径 </a></li>
+<li><a href="/posts/231117095232.html">Dijkstra 单源最短路径（原理部分）</a></li>
+<li><a href="/posts/231121152713.html">Dijkstra 单源最短路径（实现部分）</a></li>
+</ul>
+<h2 id="数据库"> 数据库 </h2>
+<ul>
+<li><a href="/posts/250605180332.html">MySQL 基础 </a></li>
+</ul>
+<h2 id="计算机网络"> 计算机网络 </h2>
+<ul>
+<li><a href="/posts/231011192359.html">OSI 参考模型 </a></li>
+<li><a href="/posts/240329202000.html"> 计网 CyC2018 之概述 </a></li>
+<li><a href="/posts/240329202004.html"> 计网 CyC2018 之链路层 </a></li>
+<li><a href="/posts/240329202003.html"> 计网 CyC2018 之网络层 </a></li>
+<li><a href="/posts/240329202002.html"> 计网 CyC2018 之传输层 </a></li>
+<li><a href="/posts/240329202001.html"> 计网 CyC2018 之应用层 </a></li>
+<li><a href="/posts/240306203742.html">ACL 访问控制列表 </a></li>
+<li><a href="/posts/240130190208.html"> 路由表、转发表与快速转发工作原理 </a></li>
+<li><a href="/posts/231221200716.html">VXLAN 网络虚拟化技术 </a></li>
+<li><a href="/posts/240903191243.html">TCP/IP checksum 计算 </a></li>
+<li><a href="/posts/240911185603.html"> 抓包分析 TCP 三次握手与四次挥手过程 </a></li>
+</ul>
+<h2 id="操作系统"> 操作系统 </h2>
+<ul>
+<li><a href="/posts/230921190726.html"> 概述 </a></li>
+<li><a href="/posts/230924172528.html"> 中断 &amp; 异常 &amp; 系统调用 </a></li>
+<li><a href="/posts/231017195157.html"> 内存分层体系与地址空间生成 </a></li>
+<li><a href="/posts/231108195351.html"> 连续内存分配 </a></li>
+<li><a href="/posts/231111172507.html"> 非连续内存分配之分段与分页 </a></li>
+<li><a href="/posts/231119170537.html"> 非连续内存分配之页表 </a></li>
+<li><a href="/posts/231123184526.html"> 内存管理之覆盖技术与交换技术 </a></li>
+<li><a href="/posts/231127193658.html"> 内存管理之虚存技术 </a></li>
+<li><a href="/posts/231129182631.html"> 局部页面置换算法 </a></li>
+<li><a href="/posts/231207184239.html"> 全局页面置换算法 </a></li>
+<li><a href="/posts/231207204958.html"> 进程描述 </a></li>
+<li><a href="/posts/231210211306.html"> 进程状态 </a></li>
+<li><a href="/posts/231215213932.html"> 线程 </a></li>
+<li><a href="/posts/231218220813.html"> 进程控制 </a></li>
+<li><a href="/posts/231228193143.html"> 调度 </a></li>
+<li><a href="/posts/240104202828.html"> 同步与互斥 </a></li>
+<li><a href="/posts/240113115605.html"> 信号量与管程 </a></li>
+<li><a href="/posts/240205182643.html"> 经典同步问题 </a></li>
+<li><a href="/posts/240310162231.html"> 死锁 </a></li>
+</ul>
+<h2 id="系统与网络编程"> 系统与网络编程 </h2>
+<ul>
+<li><a href="/posts/230911151334.html">pthread 库 </a></li>
+<li><a href="/posts/230921094127.html"> 锁与原子操作 </a></li>
+<li><a href="/posts/240319195609.html"> 读者写者问题 </a></li>
+<li><a href="/posts/240527200241.html"> 网络编程卷一阅读随笔 </a></li>
+<li><a href="/posts/240414190410.html"> 进程间通信 IPC 机制 </a></li>
+<li><a href="/posts/240424200123.html"> 多进程相关练习 </a></li>
+<li><a href="/posts/240516221527.html">I/O 模式与 I/O 多路复用 </a></li>
+<li><a href="/posts/240626192803.html">Linux 内核 kfifo 环形队列 </a></li>
+<li><a href="/posts/241009203126.html">Linux 内核等待队列 </a></li>
+<li><a href="/posts/240627210637.html">DPDK 无锁环形队列 </a></li>
+<li><a href="/posts/240919200410.html"> 解密内存屏障 </a></li>
+<li><a href="/posts/240927202500.html"> 内核线程的创建 </a></li>
+<li><a href="/posts/241015195205.html">Linux 网络数据包接收过程 </a></li>
+<li><a href="/posts/2410232111015.html"> 源码解读 epoll 实现原理 </a></li>
+<li><a href="/posts/241106182619.html">Linux 文件系统 </a></li>
+<li><a href="/posts/250619154429.html">Libevent 高性能 IO 事件驱动库 </a></li>
+</ul>
+<h2 id="工具与命令"> 工具与命令 </h2>
+<ul>
+<li><a href="/posts/240207180410.html">GCC 编译过程分解 </a></li>
+<li><a href="/posts/240312184132.html">GDB 调试入门 </a></li>
+<li><a href="/posts/240512184921.html">Makefile 学习 </a></li>
+<li><a href="/posts/250629214430.html">CMake 学习 </a></li>
+<li><a href="/posts/240417193754.html">Linux 命令之文件权限 </a></li>
+</ul>
+<h2 id="开源项目"> 开源项目 </h2>
+<ul>
+<li><a href="/posts/240303201855.html"> 线程池原理与实现 </a></li>
+<li><a href="/posts/240507194549.html">HTTP 服务器实现 </a></li>
+<li><a href="/posts/240904203605.html"> 聊天服务器实现 </a></li>
+<li><a href="/posts/241119182636.html">Linux 文件系统 </a></li>
+</ul>
+<h2 id="Docker">Docker</h2>
+<ul>
+<li><a href="/posts/230909171809.html">Docker 学习笔记 </a></li>
+</ul>
+<h1 id="LeetCode 刷题">LeetCode 刷题 </h1>
+<h2 id="链表相关"> 链表相关 </h2>
+<ul>
+<li><a href="/posts/231025143947.html">160 相交链表 </a></li>
+<li><a href="/posts/231025185947.html">206 反转链表 </a></li>
+<li><a href="/posts/231026101239.html">21 合并两个有序链表 </a></li>
+<li><a href="/posts/231026184514.html">83 删除排序链表中的重复元素 </a></li>
+<li><a href="/posts/231027150243.html">19 删除链表的倒数第 N 个节点 </a></li>
+<li><a href="/posts/231031120718.html">2 两数相加 </a></li>
+<li><a href="/posts/231031163133.html">445 两数相加 II</a></li>
+<li><a href="/posts/231101094219.html">234 回文链表 </a></li>
+<li><a href="/posts/231101135228.html">725 分隔链表 </a></li>
+<li><a href="/posts/231102120708.html">328 奇偶链表 </a></li>
+<li><a href="/posts/231102165703.html">142 环形链表 II</a></li>
+</ul>
+<h2 id="设计"> 设计 </h2>
+<ul>
+<li><a href="/posts/231201184542.html">146 LRU 缓存 </a></li>
+</ul>
+<h2 id="贪心算法"> 贪心算法 </h2>
+<ul>
+<li><a href="/posts/231107094652.html">1029 两地调度 </a></li>
+<li><a href="/posts/231109150855.html">435 无重叠区间 </a></li>
+</ul>
+<h2 id="哈希表"> 哈希表 </h2>
+<ul>
+<li><a href="/posts/231123181539.html">1410 实体解析器 </a></li>
+</ul>
+<h2 id="树的遍历"> 树的遍历 </h2>
+<ul>
+<li><a href="/posts/231103121209.html">117 填充每个节点的下一个右侧节点指针 II</a></li>
+</ul>
+<h2 id="深度优先搜索（递归）"> 深度优先搜索（递归）</h2>
+<ul>
+<li><a href="/posts/231206201243.html">2477 达到首都的最少油耗 </a></li>
+</ul>
+<h2 id="图或路径问题"> 图或路径问题 </h2>
+<ul>
+<li><a href="/posts/231211184652.html">1631 最小体力消耗路径 </a></li>
+</ul>
+<h2 id="其它"> 其它 </h2>
+<ul>
+<li><a href="/posts/230101120000.html"> 备忘录 </a></li>
+</ul>
+
+</div>
+
+
+<script src="/js/book-menu.js"></script>
+
+    </div>
+    <div class="sidebar-toggle" onclick="sidebar_toggle()" onmouseover="add_inner()" onmouseleave="remove_inner()">
+  <div class="sidebar-toggle-inner"></div>
+</div>
+
+<script>
+function add_inner() {
+  let inner = document.querySelector('.sidebar-toggle-inner')
+  inner.classList.add('show')  
+}
+
+function remove_inner() {
+  let inner = document.querySelector('.sidebar-toggle-inner')
+  inner.classList.remove('show')
+}
+
+function sidebar_toggle() {
+    let sidebar_toggle = document.querySelector('.sidebar-toggle')
+    let sidebar = document.querySelector('.book-sidebar')
+    let content = document.querySelector('.off-canvas-content')
+    if (sidebar_toggle.classList.contains('extend')) { // show
+        sidebar_toggle.classList.remove('extend')
+        sidebar.classList.remove('hide')
+        content.classList.remove('extend')
+    }
+    else { // hide
+        sidebar_toggle.classList.add('extend')
+        sidebar.classList.add('hide')
+        content.classList.add('extend')
+    }
+}
+</script>
+
+      <div class="off-canvas-content">
+        <div class="columns">
+          <div class="column col-10 col-lg-12">
+            <div class="book-navbar">
+              <!-- For Responsive Layout -->
+
+<header class="navbar">
+  <section class="navbar-section">
+    <a onclick="open_sidebar()">
+      <i class="icon icon-menu"></i>
+    </a>
+  </section>
+</header>
+
+            </div>
+            <div class="book-content">
+              <div class="book-post">
+  <p>Linux 内核 kfifo 环形队列。</p>
+<span id="more"></span>
+<h1 id="前置知识">前置知识</h1>
+<h2 id="2 的幂次方数">2 的幂次方数</h2>
+<p>在二进制中，2 的幂次方很容易表示：一个数只有最高 bit 位是 1，其余全为 0。</p>
+<p><strong>如何判断某个数是否是 2 的幂次方，如果不是，则更新该数为大于该数的最小的 2 的幂次方的数</strong>。</p>
+<ul>
+<li><strong>判断一个数是不是 2 的幂次方</strong>：判断 <code>n &amp; (n - 1)</code> 是否非零，非零则不是 2 的幂次方。如 3 不是（0b11 &amp; 0b10）、4 是（0b100 &amp; 0b011）。</li>
+<li><strong>大于等于某数的最小的 2 的幂次方的数</strong>：<code>1UL &lt;&lt; fls(n - 1)</code>。</li>
+</ul>
+<p>fls(x) 即找到 x 的二进制表示中最高置 1 位的索引（索引从 1 开始），如 fls(0b101) = 3，则 <code>1UL &lt;&lt; fls(6 - 1) = 0b1000</code>。fls 函数如何实现？</p>
+<p>fls 即 find the last bit set，查找最后一个置 1 的 bit 位。32 位数则从 bit31 开始找，64 位数则从 bit63 开始找。检查完 bit0 后停止。</p>
+<p>可以假想一下，第一个置 1bit 的前面 bit 都是 0 的，而第一个置 1bit 后面的位是不关心的（不管是 0 还是 1），就可以 <strong> 转化为查找一堆 bit 中是否有置 1 的 bit 位，所以这里是可以使用二分法查找</strong>。</p>
+<p>以 32 位数 fls 为例，首先看前 16bit 是否是全 0，是全 0 就把后 16bit 移到前面，此时第一个置 1 的 bit 不在前 16bit，所以 n 要减去 16。如果前 16bit 非 0，那就说明置 1 的 bit 包含在前面 16bit 里了，继续下一步，即在包含 1 的那 16bit 中使用二分查找。</p>
+<p>32 位数，按照二分法查找算法步骤需要 log(32)=5 步。64 位数，log(64)=6 步。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">// find last bit set, binary search</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">fls</span><span class="params">(<span class="type">unsigned</span> <span class="type">int</span> v)</span> &#123;</span><br><span class="line">    <span class="type">int</span> n = <span class="number">32</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (!v) <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    <span class="keyword">if</span> (!(v &amp; <span class="number">0xFFFF0000</span>)) &#123; v &lt;&lt;= <span class="number">16</span>; n -= <span class="number">16</span>; &#125; <span class="comment">// 确定在不在 32bits 数中的高 16bits 位</span></span><br><span class="line">    <span class="keyword">if</span> (!(v &amp; <span class="number">0xFF000000</span>)) &#123; v &lt;&lt;=  <span class="number">8</span>; n -= <span class="number">8</span>;  &#125; <span class="comment">// 确定在不在过滤后的 16bits 数中的高 8bits 位</span></span><br><span class="line">    <span class="keyword">if</span> (!(v &amp; <span class="number">0xF0000000</span>)) &#123; v &lt;&lt;=  <span class="number">4</span>; n -= <span class="number">4</span>;  &#125; <span class="comment">// 确定在不在过滤后的 8bits 数中的高 4bits 位</span></span><br><span class="line">    <span class="keyword">if</span> (!(v &amp; <span class="number">0xC0000000</span>)) &#123; v &lt;&lt;=  <span class="number">2</span>; n -= <span class="number">2</span>;  &#125; <span class="comment">// 确定在不在过滤后的 4bits 数中的高 2bits 位</span></span><br><span class="line">    <span class="keyword">if</span> (!(v &amp; <span class="number">0x80000000</span>)) &#123; v &lt;&lt;=  <span class="number">1</span>; n -= <span class="number">1</span>;  &#125; <span class="comment">// 确定在不在过滤后的 2bits 数中的高 1bits 位</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> n;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> size = <span class="number">1000</span>;</span><br><span class="line">    <span class="keyword">if</span> (size &amp; (size - <span class="number">1</span>)) &#123;</span><br><span class="line">        <span class="comment">// roundup_pow_of_two(): 向上取大于等于某数的最小的 2 的幂次方的数</span></span><br><span class="line">        size = (<span class="number">1UL</span> &lt;&lt; fls(size - <span class="number">1</span>));  <span class="comment">// 减一是避免传进来的数本就是 2 的幂次方数，达到返回结果还是这个数（而不是乘一倍）</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;size = 0x%x\r\n&quot;</span>, size);  <span class="comment">// 0x400 = 1024</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="对 2 的幂次方取模">对 2 的幂次方取模</h2>
+<p><strong>假设 size 等于 2 的幂次方（前置条件），则表达式 <code>in &amp; (size - 1)</code> 的作用相当于 <code>in % size</code></strong>。</p>
+<p>解释：</p>
+<p>考虑 size 等于 2 的幂次方，那么 size 的二进制可以表示为 1 后面跟着 n 个 0 的形式。例如：size = 2^3 表示为 1000，size = 2^4 表示为 10000。则 size - 1 的二进制可以表示为 n 个 1。</p>
+<p>对任何整数 in 进行 <code>in &amp; (size - 1)</code> 按位与操作会 <strong> 保留 in 的二进制表示中的最低的 n 位，而将其余的高位置为 0。也就是运算后的结果在 0~size-1 之间</strong>。</p>
+<p>模运算 <code>in % size</code> 也是保留 in 对 size 的余数，<strong>这个余数正好是 in 二进制表示中的最低的 n 位 </strong>。因此表达式 <code>in &amp; (size - 1)</code> 与 <code>in % size</code> 等价，但是前者的位运算效率更高。</p>
+<h2 id="原码反码补码">原码反码补码</h2>
+<p>在计算机科学中，原码、反码和补码是三种用于表示整数的方法，<strong>特别是有符号整数 </strong>。它们主要<strong> 用于二进制系统中</strong>。无符号数不涉及补码的概念。</p>
+<h3 id="原码">原码</h3>
+<p>原码是最直接的一种表示方法，<strong>它使用一个符号位和一个数值位来表示整数。最高位（最左边一位）表示符号，剩余位表示数值</strong>。</p>
+<ul>
+<li>符号位：<strong>0 表示正数，1 表示负数</strong>。</li>
+<li>数值位：直接表示数值的大小。</li>
+</ul>
+<p><strong>示例（char 类型数据）</strong>：</p>
+<ul>
+<li><code>+5</code> 的原码表示为：<code>0 0000101</code></li>
+<li><code>-5</code> 的原码表示为：<code>1 0000101</code></li>
+</ul>
+<p>原码表示的一个问题是存在两个零（正零和负零），即 <code>0 0000000</code> 和 <code>1 0000000</code>。</p>
+<h3 id="反码">反码</h3>
+<p>反码通过对原码的数值位取反来表示负数。正数的反码与其原码相同，负数的反码则是将其原码的数值位逐位取反。</p>
+<p><strong>示例（char 类型数据）</strong>：</p>
+<ul>
+<li><code>+5</code> 的反码表示为：<code>0 0000101</code></li>
+<li><code>-5</code> 的反码表示为：<code>1 1111010</code></li>
+</ul>
+<p>反码表示也存在两个零：<code>0 0000000</code>（正零）和 <code>1 1111111</code>（负零）。</p>
+<h3 id="补码">补码</h3>
+<p>补码是现代计算机中 <strong> 最常用 </strong> 的有符号整数表示方法，<strong>负数在计算机中是以补码形式表示 </strong>。它通过将数值按二进制加法计算机的模数（通常是 2 的幂）进行减法来表示负数。具体来说，<strong> 负数的补码表示为原码数值位取反并加 1</strong>。</p>
+<p><strong>示例（char 类型数据）</strong>：</p>
+<ul>
+<li><code>+5</code> 的补码表示为：<code>0 0000101</code></li>
+<li><code>-5</code> 的补码表示为：<code>1 1111011</code>（将 <code>0 0000101</code> 取反为 <code>1 1111010</code>，然后加 1）</li>
+</ul>
+<p>补码表示的优点是只有一个零（<code>0 0000000</code>），且在硬件电路中，加法和减法运算可以使用相同的电路实现，这使得运算更加高效。</p>
+<h3 id="总结和比较">总结和比较</h3>
+<ol>
+<li>
+<p><strong>原码</strong>：</p>
+<ul>
+<li>符号位表示正负，数值位表示大小。</li>
+<li>存在两个零（正零和负零）。</li>
+</ul>
+</li>
+<li>
+<p><strong>反码</strong>：</p>
+<ul>
+<li>正数与原码相同，负数取原码数值位的反。</li>
+<li>存在两个零（正零和负零）。</li>
+</ul>
+</li>
+<li>
+<p><strong>补码</strong>：</p>
+<ul>
+<li>正数与原码相同，负数取（负数）原码数值位的反 <strong> 并加 1</strong>。</li>
+<li>只有一个零，运算更高效。</li>
+</ul>
+</li>
+</ol>
+<p><strong>示例对比</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">值       原码      反码      补码</span><br><span class="line">+5     00000101  00000101  00000101</span><br><span class="line">-5     10000101  11111010  11111011</span><br><span class="line">+0     00000000  00000000  00000000</span><br><span class="line">-0     10000000  11111111  00000000 （注意：补码没有负零）</span><br></pre></td></tr></table></figure>
+<p><mark><strong>正数的原码、反码与补码表示都一样。负数的补码表示是其对应的（负数）原码的数值位取反并加 1，或者是（正数）原码的符号位和数值位均取反并加 1</strong></mark>。</p>
+<p>计算有符号数 <code>3 - 5 = -2</code> 的过程：</p>
+<ul>
+<li>正数 3 在计算机中的表示：补码，其值为 0000 0011</li>
+<li>负数 -5 在计算机中的表示：补码，其值为 <strong> 正数的原码的符号位和数值位均取反 </strong> 并加 1，即 5 的原码 0000 0101，均取反 1111 1010，加一 1111 1011</li>
+<li>3-5 等于 +3 的补码 + (-5 的补码)，即 0000 0011 + 1111 1011 = 1111 1110，减一得到反码 1111 1101，取反得到原码 1000 0010 = (-2)</li>
+</ul>
+<h2 id="无符号整数溢出回绕">无符号整数溢出回绕</h2>
+<p>在 C 语言中，无符号整数的溢出行为是 <strong> 定义良好的 </strong>（最大值 +1 后必定是 0）。当一个无符号整数在加法、减法、乘法或其他操作中超过其表示范围时，它会发生<strong> 溢出回绕（也称为模数回绕）</strong>。具体来说，结果会被截断为适合该类型的最大值，并从零重新开始。这种行为基于二进制算术模数。</p>
+<p><strong>何为溢出回绕行为</strong>：当无符号整数的运算结果超过其表示范围时，结果会模数化。例如，对于一个 8 位的 unsigned char 类型，它的范围是 0 到 255。如果结果大于 255，它会回绕到从 0 开始的值。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> a = <span class="number">0xfffffffa</span>;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> b = a + <span class="number">10</span>;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> c = <span class="number">4</span>;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;a = %u, 0x%08x\n&quot;</span>, a, a);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;b = %u, 0x%08x\n&quot;</span>, b, b);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;b - a = %u, 0x%08x\n&quot;</span>, b - a, b - a);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;c - a = %u, 0x%08x\n&quot;</span>, c - a, c - a);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">a = 4294967290, 0xfffffffa</span></span><br><span class="line"><span class="comment">b = 4, 0x00000004</span></span><br><span class="line"><span class="comment">    -&gt;  a + 10 = 0x1 00 00 00 04 溢出</span></span><br><span class="line"><span class="comment">    因为 uint32 共计 32 位，溢出时的最高位无法获取，只能获取低 32 位，即 0x00000004</span></span><br><span class="line"><span class="comment">b - a = 10, 0x0000000a</span></span><br><span class="line"><span class="comment">    -&gt; b - a = 4 + (-4294967290 的补码) = 0x04 + (~(0xfffffffa)+1)</span></span><br><span class="line"><span class="comment">             = 0x04 + 0x00000006 = 0x0a = 10</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">    -&gt; b - a = 0x04 - 0xfffffffa = -4294967286 + 2^32 = 0x0000000a = 10</span></span><br><span class="line"><span class="comment">    因为 4 - 4294967290 将变成一个负值，这在无符号整数表示中是不允许的。</span></span><br><span class="line"><span class="comment">    为了处理这种情况，结果会被加上一个模数（即 2^32），以得到正确的无符号结果。</span></span><br><span class="line"><span class="comment">c - a = 10, 0x0000000a</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+<h1 id="Linux 内核 kfifo 环形队列">Linux 内核 kfifo 环形队列</h1>
+<p>Linux 内核中有一个先进先出的数据结构，采用环形队列的数据结构来实现，提供一个无边界的字节流服务。最重要的是，这个队列采用的是无锁的方式来实现。<strong>即当它用于只有一个入队线程和一个出队线程的场景时，两个线程可以并发操作，而不需要任何加锁行为，就可以保证 kfifo 的线程安全</strong>。这个队列名为 kfifo。</p>
+<h2 id="数据结构">数据结构</h2>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">kfifo</span> &#123;</span></span><br><span class="line">	<span class="type">unsigned</span> <span class="type">char</span> *buffer;	<span class="comment">/* the buffer holding the data */</span></span><br><span class="line">	<span class="type">unsigned</span> <span class="type">int</span> size;	<span class="comment">/* the size of the allocated buffer */</span></span><br><span class="line">	<span class="type">unsigned</span> <span class="type">int</span> in;	<span class="comment">/* data is added at offset (in % size) */</span></span><br><span class="line">	<span class="type">unsigned</span> <span class="type">int</span> out;	<span class="comment">/* data is extracted from off. (out % size) */</span></span><br><span class="line">	<span class="type">spinlock_t</span> *lock;	<span class="comment">/* protects concurrent modifications */</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>buffer: 存放数据的缓存表</li>
+<li>size: 缓存空间的大小，<strong>要求为 2 的幂次方</strong></li>
+<li>in: 指向 buffer 队列的队头，代码中计数持续增长（未取模）</li>
+<li>out: 指向 buffer 队列的队尾，代码中计数持续增长（未取模）</li>
+<li>lock: 多生产者 / 多消费者场景中用于同步互斥的锁</li>
+</ul>
+<h2 id="注意事项">注意事项</h2>
+<p>对于 Linux 内核 kfifo 环形队列：</p>
+<ul>
+<li class="checkbox-item"><input type="checkbox" id="checkbox0" checked="true"><label for="checkbox0">单生产者、单消费者无需使用锁进行同步</label></li>
+<li class="checkbox-item"><input type="checkbox" id="checkbox1" checked="true"><label for="checkbox1">未使用加锁的 kfifo_reset()函数</label></li>
+<li class="checkbox-item"><input type="checkbox" id="checkbox2" checked="true"><label for="checkbox2">只在消费者端使用了 kfifo_reset_out()函数</label></li>
+</ul>
+<p>以上三种条件都满足的情况下，可以使用 kfifo 无锁队列。相反，如果存在多个生产者或多个消费者，则需要通过锁来进行同步：</p>
+<ul>
+<li class="checkbox-item"><input type="checkbox" id="checkbox3" checked="true"><label for="checkbox3">多个生产者、单个消费者模式，生产者端加锁同步</label></li>
+<li class="checkbox-item"><input type="checkbox" id="checkbox4" checked="true"><label for="checkbox4">单个生产者、多个消费者模式，消费者端加锁同步</label></li>
+</ul>
+<h2 id="buffer 大小为 2 的幂次方">buffer 大小为 2 的幂次方</h2>
+<p>为什么 buffer 大小要求为 2 的幂次方？为了使用位运算，达到快、快、不择手段的快。</p>
+<p>如果用户给定的 size 大小不是 2 的幂次方会怎么样？程序会自动向上取到大于它的 2 的幂次方数作为 size。</p>
+<h2 id="kfifo-alloc 初始化">kfifo_alloc 初始化</h2>
+<p>kfifo 的初始化是指为 kfifo 分配空间、初始化 kfifo 中的各项参数等操作。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * kfifo_alloc - allocates a new FIFO and its internal buffer</span></span><br><span class="line"><span class="comment"> * @size: the size of the internal buffer to be allocated.</span></span><br><span class="line"><span class="comment"> * @gfp_mask: get_free_pages mask, passed to kmalloc()</span></span><br><span class="line"><span class="comment"> * @lock: the lock to be used to protect the fifo buffer</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * The size will be rounded-up to a power of 2.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">struct</span> kfifo *<span class="title function_">kfifo_alloc</span><span class="params">(<span class="type">unsigned</span> <span class="type">int</span> size, <span class="type">unsigned</span> <span class="type">int</span> __nocast gfp_mask, <span class="type">spinlock_t</span> *lock)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">char</span> *buffer;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">kfifo</span> *<span class="title">ret</span>;</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">/*</span></span><br><span class="line"><span class="comment">	 * round up to the next power of 2, since our &#x27;let the indices</span></span><br><span class="line"><span class="comment">	 * wrap&#x27; tachnique works only in this case.</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="keyword">if</span> (size &amp; (size - <span class="number">1</span>)) &#123;  <span class="comment">// 如果不是 2 的幂次方，则向上取到 2 的幂次方</span></span><br><span class="line">		BUG_ON(size &gt; <span class="number">0x80000000</span>);</span><br><span class="line">		size = roundup_pow_of_two(size);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	buffer = kmalloc(size, gfp_mask);</span><br><span class="line">	<span class="keyword">if</span> (!buffer)</span><br><span class="line">		<span class="keyword">return</span> ERR_PTR(-ENOMEM);</span><br><span class="line"></span><br><span class="line">	ret = kfifo_init(buffer, size, gfp_mask, lock);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (IS_ERR(ret))</span><br><span class="line">		kfree(buffer);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> ret;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * kfifo_init - allocates a new FIFO using a preallocated buffer</span></span><br><span class="line"><span class="comment"> * @buffer: the preallocated buffer to be used.</span></span><br><span class="line"><span class="comment"> * @size: the size of the internal buffer, this have to be a power of 2.</span></span><br><span class="line"><span class="comment"> * @gfp_mask: get_free_pages mask, passed to kmalloc()</span></span><br><span class="line"><span class="comment"> * @lock: the lock to be used to protect the fifo buffer</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * Do NOT pass the kfifo to kfifo_free() after use ! Simply free the</span></span><br><span class="line"><span class="comment"> * struct kfifo with kfree().</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">struct</span> kfifo *<span class="title function_">kfifo_init</span><span class="params">(<span class="type">unsigned</span> <span class="type">char</span> *buffer, <span class="type">unsigned</span> <span class="type">int</span> size,</span></span><br><span class="line"><span class="params">			 <span class="type">unsigned</span> <span class="type">int</span> __nocast gfp_mask, <span class="type">spinlock_t</span> *lock)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">kfifo</span> *<span class="title">fifo</span>;</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">/* size must be a power of 2 */</span></span><br><span class="line">	BUG_ON(size &amp; (size - <span class="number">1</span>));</span><br><span class="line"></span><br><span class="line">	fifo = kmalloc(<span class="keyword">sizeof</span>(<span class="keyword">struct</span> kfifo), gfp_mask);</span><br><span class="line">	<span class="keyword">if</span> (!fifo)</span><br><span class="line">		<span class="keyword">return</span> ERR_PTR(-ENOMEM);</span><br><span class="line"></span><br><span class="line">	fifo-&gt;buffer = buffer;</span><br><span class="line">	fifo-&gt;size = size;</span><br><span class="line">	fifo-&gt;in = fifo-&gt;out = <span class="number">0</span>;</span><br><span class="line">	fifo-&gt;lock = lock;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> fifo;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="kfifo-put 入队（无锁）">__kfifo_put 入队（无锁）</h2>
+<p><code>__kfifo_put()</code>是 kfifo 的入队函数（无锁版本），源码实现如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * __kfifo_put - puts some data into the FIFO, no locking version</span></span><br><span class="line"><span class="comment"> * @fifo: the fifo to be used.</span></span><br><span class="line"><span class="comment"> * @buffer: the data to be added.</span></span><br><span class="line"><span class="comment"> * @len: the length of the data to be added.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * This function copies at most &#x27;len&#x27; bytes from the &#x27;buffer&#x27; into</span></span><br><span class="line"><span class="comment"> * the FIFO depending on the free space, and returns the number of</span></span><br><span class="line"><span class="comment"> * bytes copied.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * Note that with only one concurrent reader and one concurrent</span></span><br><span class="line"><span class="comment"> * writer, you don&#x27;t need extra locking to use these functions.</span></span><br><span class="line"><span class="comment"> * 注意，对于仅一个并发的读者和写者，使用这些功能不需要额外的锁 </span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="type">unsigned</span> <span class="type">int</span> __kfifo_put(<span class="keyword">struct</span> kfifo *fifo,</span><br><span class="line">			 <span class="type">unsigned</span> <span class="type">char</span> *buffer, <span class="type">unsigned</span> <span class="type">int</span> len)</span><br><span class="line">&#123;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">int</span> l;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/* (in-out) 表示已使用的空间，size-(in-out)表示剩余的空间。通过 min 来防止写越界 */</span></span><br><span class="line">	len = min(len, fifo-&gt;size - fifo-&gt;in + fifo-&gt;out);</span><br><span class="line"></span><br><span class="line">	<span class="comment">/* 下面的设计考虑了：从队列尾部填充一部分、从队列首部填充剩余的部分的情况 */</span></span><br><span class="line">	<span class="comment">/* first put the data starting from fifo-&gt;in to buffer end */</span></span><br><span class="line">	<span class="comment">/* fifo-&gt;buffer = |0........in....size-1| 首先将前半部分数据缓存放在 in~size-1 所在的区间 */</span></span><br><span class="line">	l = min(len, fifo-&gt;size - (fifo-&gt;in &amp; (fifo-&gt;size - <span class="number">1</span>)));</span><br><span class="line">	<span class="built_in">memcpy</span>(fifo-&gt;buffer + (fifo-&gt;in &amp; (fifo-&gt;size - <span class="number">1</span>)), buffer, l);</span><br><span class="line"></span><br><span class="line">	<span class="comment">/* then put the rest (if any) at the beginning of the buffer */</span></span><br><span class="line">	<span class="comment">/* 若 l&lt;len，则表明上面 in~size-1 区间不够放下 len 长度，此时要将剩余后半部分数据从环的开始端继续放 */</span></span><br><span class="line">	<span class="built_in">memcpy</span>(fifo-&gt;buffer, buffer + l, len - l);</span><br><span class="line"></span><br><span class="line">	fifo-&gt;in += len; <span class="comment">/* 从这里可以说明，指针 in 一直在增加，其值未曾对 size 取模 */</span></span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> len;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>根据前面的《无符号整数溢出回绕》小节可知，无符号数 in 相当于 b，无符号数 out 相当于 a，当 out 很大、in 溢出回绕时，in-out(b-a) 的距离仍为正确值。无论何时，即使发生整数回绕，kfifo 中的指针都有如下关系：</p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>k</mi><mi>f</mi><mi>i</mi><mi>f</mi><mi>o</mi><mi mathvariant="normal">.</mi><mi>i</mi><mi>n</mi><mo>−</mo><mi>k</mi><mi>f</mi><mi>i</mi><mi>f</mi><mi>o</mi><mi mathvariant="normal">.</mi><mi>o</mi><mi>u</mi><mi>t</mi><mo>&lt;</mo><mo>=</mo><mi>k</mi><mi>f</mi><mi>i</mi><mi>f</mi><mi>o</mi><mi mathvariant="normal">.</mi><mi>s</mi><mi>i</mi><mi>z</mi><mi>e</mi></mrow><annotation encoding="application/x-tex">kfifo.in - kfifo.out &lt;= kfifo.size
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8888799999999999em;vertical-align:-0.19444em;"></span><span class="mord mathnormal" style="margin-right:0.03148em;">k</span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mord mathnormal">i</span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mord mathnormal">o</span><span class="mord">.</span><span class="mord mathnormal">i</span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.8888799999999999em;vertical-align:-0.19444em;"></span><span class="mord mathnormal" style="margin-right:0.03148em;">k</span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mord mathnormal">i</span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mord mathnormal">o</span><span class="mord">.</span><span class="mord mathnormal">o</span><span class="mord mathnormal">u</span><span class="mord mathnormal">t</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">&lt;</span></span><span class="base"><span class="strut" style="height:0.36687em;vertical-align:0em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.8888799999999999em;vertical-align:-0.19444em;"></span><span class="mord mathnormal" style="margin-right:0.03148em;">k</span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mord mathnormal">i</span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mord mathnormal">o</span><span class="mord">.</span><span class="mord mathnormal">s</span><span class="mord mathnormal">i</span><span class="mord mathnormal" style="margin-right:0.04398em;">z</span><span class="mord mathnormal">e</span></span></span></span></span></p>
+<h2 id="kfifo-get 出队（无锁）">__kfifo_get 出队（无锁）</h2>
+<p><code>__kfifo_get()</code>是 kfifo 的出队函数（无锁版本），源码实现如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * __kfifo_get - gets some data from the FIFO, no locking version</span></span><br><span class="line"><span class="comment"> * @fifo: the fifo to be used.</span></span><br><span class="line"><span class="comment"> * @buffer: where the data must be copied.</span></span><br><span class="line"><span class="comment"> * @len: the size of the destination buffer.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * This function copies at most &#x27;len&#x27; bytes from the FIFO into the</span></span><br><span class="line"><span class="comment"> * &#x27;buffer&#x27; and returns the number of copied bytes.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * Note that with only one concurrent reader and one concurrent</span></span><br><span class="line"><span class="comment"> * writer, you don&#x27;t need extra locking to use these functions.</span></span><br><span class="line"><span class="comment"> * 注意，对于仅一个并发的读者和写者，使用这些功能不需要额外的锁</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="type">unsigned</span> <span class="type">int</span> __kfifo_get(<span class="keyword">struct</span> kfifo *fifo,</span><br><span class="line">			 <span class="type">unsigned</span> <span class="type">char</span> *buffer, <span class="type">unsigned</span> <span class="type">int</span> len)</span><br><span class="line">&#123;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">int</span> l;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/* 这里 in-out 可能会发生整数溢出回绕，如 in-out=0x04-0xfffffffa，</span></span><br><span class="line"><span class="comment">	 * 但不影响正确性，其结果为正确值 10，正好对应 abcdef0123 十处 */</span></span><br><span class="line">	len = min(len, fifo-&gt;in - fifo-&gt;out);</span><br><span class="line"></span><br><span class="line">	<span class="comment">/* 后面的原理跟__kfifo_put 的原理一致 */</span></span><br><span class="line">	<span class="comment">/* first get the data from fifo-&gt;out until the end of the buffer */</span></span><br><span class="line">	l = min(len, fifo-&gt;size - (fifo-&gt;out &amp; (fifo-&gt;size - <span class="number">1</span>)));</span><br><span class="line">	<span class="built_in">memcpy</span>(buffer, fifo-&gt;buffer + (fifo-&gt;out &amp; (fifo-&gt;size - <span class="number">1</span>)), l);</span><br><span class="line"></span><br><span class="line">	<span class="comment">/* then get the rest (if any) from the beginning of the buffer */</span></span><br><span class="line">	<span class="built_in">memcpy</span>(buffer + l, fifo-&gt;buffer, len - l);</span><br><span class="line"></span><br><span class="line">	fifo-&gt;out += len; <span class="comment">/* 从这里可以说明，指针 out 一直在增加，其值未曾对 size 取模 */</span></span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> len;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="kfifio-reset 重置队列">__kfifio_reset 重置队列</h2>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * __kfifo_reset - removes the entire FIFO contents, no locking version</span></span><br><span class="line"><span class="comment"> * @fifo: the fifo to be emptied.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">void</span> __kfifo_reset(<span class="keyword">struct</span> kfifo *fifo)</span><br><span class="line">&#123;</span><br><span class="line">	fifo-&gt;in = fifo-&gt;out = <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="入队出队加锁版本">入队出队加锁版本</h2>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * kfifo_reset - removes the entire FIFO contents</span></span><br><span class="line"><span class="comment"> * @fifo: the fifo to be emptied.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">void</span> <span class="title function_">kfifo_reset</span><span class="params">(<span class="keyword">struct</span> kfifo *fifo)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">long</span> flags;</span><br><span class="line"></span><br><span class="line">	spin_lock_irqsave(fifo-&gt;lock, flags);</span><br><span class="line">	__kfifo_reset(fifo);</span><br><span class="line">	spin_unlock_irqrestore(fifo-&gt;lock, flags);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * kfifo_put - puts some data into the FIFO</span></span><br><span class="line"><span class="comment"> * @fifo: the fifo to be used.</span></span><br><span class="line"><span class="comment"> * @buffer: the data to be added.</span></span><br><span class="line"><span class="comment"> * @len: the length of the data to be added.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * This function copies at most &#x27;len&#x27; bytes from the &#x27;buffer&#x27; into</span></span><br><span class="line"><span class="comment"> * the FIFO depending on the free space, and returns the number of</span></span><br><span class="line"><span class="comment"> * bytes copied.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">unsigned</span> <span class="type">int</span> <span class="title function_">kfifo_put</span><span class="params">(<span class="keyword">struct</span> kfifo *fifo,</span></span><br><span class="line"><span class="params">				     <span class="type">unsigned</span> <span class="type">char</span> *buffer, <span class="type">unsigned</span> <span class="type">int</span> len)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">long</span> flags;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">int</span> ret;</span><br><span class="line"></span><br><span class="line">	spin_lock_irqsave(fifo-&gt;lock, flags);</span><br><span class="line">	ret = __kfifo_put(fifo, buffer, len);</span><br><span class="line">	spin_unlock_irqrestore(fifo-&gt;lock, flags);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> ret;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * kfifo_get - gets some data from the FIFO</span></span><br><span class="line"><span class="comment"> * @fifo: the fifo to be used.</span></span><br><span class="line"><span class="comment"> * @buffer: where the data must be copied.</span></span><br><span class="line"><span class="comment"> * @len: the size of the destination buffer.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * This function copies at most &#x27;len&#x27; bytes from the FIFO into the</span></span><br><span class="line"><span class="comment"> * &#x27;buffer&#x27; and returns the number of copied bytes.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">unsigned</span> <span class="type">int</span> <span class="title function_">kfifo_get</span><span class="params">(<span class="keyword">struct</span> kfifo *fifo,</span></span><br><span class="line"><span class="params">				     <span class="type">unsigned</span> <span class="type">char</span> *buffer, <span class="type">unsigned</span> <span class="type">int</span> len)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">long</span> flags;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">int</span> ret;</span><br><span class="line"></span><br><span class="line">	spin_lock_irqsave(fifo-&gt;lock, flags);</span><br><span class="line">	ret = __kfifo_get(fifo, buffer, len);</span><br><span class="line"></span><br><span class="line">	<span class="comment">/*</span></span><br><span class="line"><span class="comment">	 * optimization: if the FIFO is empty, set the indices to 0</span></span><br><span class="line"><span class="comment">	 * so we don&#x27;t wrap the next time</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="keyword">if</span> (fifo-&gt;in == fifo-&gt;out)</span><br><span class="line">		fifo-&gt;in = fifo-&gt;out = <span class="number">0</span>;</span><br><span class="line">	spin_unlock_irqrestore(fifo-&gt;lock, flags);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> ret;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>参考资料：</p>
+<ol>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/suz_cheney/article/details/112456368">https://blog.csdn.net/suz_cheney/article/details/112456368</a></li>
+<li><a target="_blank" rel="noopener" href="https://juejin.cn/post/6983865054147903518">https://juejin.cn/post/6983865054147903518</a></li>
+<li><a target="_blank" rel="noopener" href="https://elixir.bootlin.com/linux/v2.6.12/source/kernel/kfifo.c">https://elixir.bootlin.com/linux/v2.6.12/source/kernel/kfifo.c</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/u012630961/article/details/80974857">https://blog.csdn.net/u012630961/article/details/80974857</a></li>
+</ol>
+</blockquote>
+
+</div>
+
+
+  <div class="book-comments">
+    
+
+
+
+
+  </div>
+
+
+
+<script src="/js/book-post.js"></script>
+
+
+            </div>
+          </div>
+          <div class="column col-2 hide-lg">
+            <div class="book-post-info">
+  
+    <div class="book-post-meta">
+
+  <div class="author">
+
+    <!-- Author image -->
+    <div class="author-img">
+      
+        <figure
+          class="avatar avatar-lg"
+          data-initial="A"
+          style="background-color: #3b4351;">
+        </figure>
+      
+    </div>
+
+    <!-- Author title -->
+    <div class="author-title">
+      <div>aha</div>
+      <div>2024-06-26</div>
+    </div>
+  </div>
+
+  
+    <div class="divider"></div>
+
+    <div class="link">
+      <a class="category-link" href="/categories/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/">并发编程</a>
+
+      <a class="tag-none-link" href="/tags/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/" rel="tag">#并发编程</a>
+    </div>
+    
+  
+
+  <div class="divider"></div>
+</div>
+  
+
+  <div class="book-tocbot">
+</div>
+<div class="book-tocbot-menu">
+  <a class="book-toc-expand" onclick="expand_toc()">Expand all</a>
+  <a onclick="go_top()">Back to top</a>
+  <a onclick="go_bottom()">Go to bottom</a>
+  <a onclick="toggleSearch()">Search in blogs</a> <!-- 添加搜索文字的点击事件 -->
+</div>
+
+<div id="search-overlay" class="search-overlay" style="display: none;"> <!-- 初始状态为隐藏 -->
+  <div class="search-box">
+    <input type="text" id="search-input" placeholder="Search in all blogs...">
+    <button onclick="closeSearch()">Close</button> <!-- 添加关闭按钮 -->
+    <div id="search-results" class="search-results"></div>
+  </div>
+</div>
+
+<script>
+  function performSearch(query) {
+    if (!query.trim()) {
+      return;
+    }
+
+    fetch('/search.xml')
+      .then(response => response.text())
+      .then(data => {
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(data, "text/xml");
+        const entries = xmlDoc.getElementsByTagName('entry');
+        let results = '';
+
+        for (let i = 0; i < entries.length; i++) {
+          const title = entries[i].getElementsByTagName('title')[0].textContent;
+          const content = entries[i].getElementsByTagName('content')[0].textContent;
+          const url = entries[i].getElementsByTagName('url')[0].textContent;
+
+          let count = (title.match(new RegExp(query, "gi")) || []).length; // 统计查询词出现的次数
+          count += (content.match(new RegExp(query, "gi")) || []).length;
+
+          if (count > 0) { // title.includes(query) || content.includes(query)
+            results += `
+              <div class="search-result-item">
+                <a href="${url}">${title}</a> (${count})
+              </div>`;
+          }
+        }
+
+        const searchResultsElement = document.getElementById('search-results');
+        searchResultsElement.innerHTML = results;
+        searchResultsElement.classList.add('active');
+      });
+  }
+
+  function toggleSearch() {
+    const searchOverlay = document.getElementById('search-overlay');
+    searchOverlay.style.display = searchOverlay.style.display === 'none' ? 'flex' : 'none';
+  }
+
+  function closeSearch() {
+    document.getElementById('search-overlay').style.display = 'none';
+  }
+
+  document.getElementById('search-input').addEventListener('input', function() {
+    const query = this.value;
+    performSearch(query);
+  });
+</script>
+
+<style>
+  .search-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  .search-box {
+    background: white;
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+    width: 80%;
+    max-width: 500px;
+  }
+
+  .search-results {
+    margin-top: 10px;
+    max-height: 300px;
+    overflow-y: auto;
+    background: white;
+    padding: 10px;
+    border-radius: 5px;
+    width: 100%;
+  }
+
+  .search-result-item {
+    margin: 10px 0;
+  }
+
+  .search-result-item a {
+    color: blue; /* 设置链接颜色为蓝色 */
+    text-decoration: none;
+  }
+
+  .search-result-item a:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+<script src="/js/book-toc.js"></script>
+
+
+</div>
+          </div>
+        </div>
+      </div>
+
+      <a class="off-canvas-overlay" onclick="hide_canvas()"></a>
+
+      <button class="floating-button" onclick="toggleDropdownMenu()"></button>
+
+      <div class="dropdown-menu">
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FFFFFF', '#000000')">银河白</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#C7EDCC', '#000000')">豆沙绿</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FAF9DE', '#000000')">杏仁黄</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#E3EDCD', '#000000')">青草绿</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FFF2E2', '#000000')">秋叶褐</div>
+      </div>
+  </div>
+
+  <script>
+    function toggleDropdownMenu() {
+      document.querySelector('.floating-button').classList.toggle('active');
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      var storedBackgroundColor = localStorage.getItem('blogBackgroundColor');
+      var storedColor = localStorage.getItem('blogColor');
+
+      if (storedBackgroundColor && storedColor) {
+        document.body.style.backgroundColor = storedBackgroundColor;
+        document.body.style.color = storedColor;
+      }
+    });
+
+    function changeBackgroundColor(backgroundColor, color) {
+      document.body.style.backgroundColor = backgroundColor;
+      document.body.style.color = color;
+
+      localStorage.setItem('blogBackgroundColor', backgroundColor);
+      localStorage.setItem('blogColor', color);
+
+      document.querySelector('.floating-button').classList.remove('active');
+    }
+  </script>
+</body>
+
+</html>
+
+
+<script src="/js/book.js"></script>

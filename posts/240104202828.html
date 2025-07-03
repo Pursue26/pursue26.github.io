@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
+
+    
+      <link rel="icon" href="/favicon.png" />
+    
+
+    <title>
+        
+          操作系统之 chapter9 同步与互斥 - aha&#39;s book
+        
+    </title>
+
+    <!-- Spectre.css framework -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre-exp.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre-icons.min.css">
+
+    <!-- theme css & js -->
+    
+<link rel="stylesheet" href="/css/book.css">
+
+    
+<script src="/js/book.js"></script>
+
+
+    <!-- tocbot -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.css">
+    
+    <!-- katex -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/zooming/2.1.1/zooming.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const zooming = new Zooming()
+    zooming.listen('.book-content img')
+})
+</script>
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+    <style>
+      body {
+        background-color: #FFFFFF;
+        /* color: #000000; */
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+
+      /* Floating Button Styles */
+      .floating-button {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 999;
+        background-color: #000000;
+        color: #ffffff;
+        padding: 12px;
+        border-radius: 50%;
+        cursor: pointer;
+        border: 2px solid #000000;
+      }
+
+      .floating-button:hover {
+        background-color: #FFFFFF;
+      }
+
+      /* Dropdown Menu Styles */
+      .dropdown-menu {
+        position: fixed;
+        bottom: 60px;
+        right: 10px;
+        display: none;
+        min-width: 60px;
+        padding: 2px;
+        background-color: #fff;
+        /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
+        z-index: 1000;
+      }
+
+      .floating-button.active+.dropdown-menu {
+        display: block;
+      }
+
+      .dropdown-item {
+        display: block;
+        padding: 8px 16px;
+        cursor: pointer;
+      }
+
+      .dropdown-item:hover {
+        background-color: #f5f5f5;
+      }
+    </style>
+<style>.darkmode--activated{--body-bg-color:#282828;--content-bg-color:#333;--card-bg-color:#555;--text-color:#ccc;--blockquote-color:#bbb;--link-color:#ccc;--link-hover-color:#eee;--brand-color:#ddd;--brand-hover-color:#ddd;--table-row-odd-bg-color:#282828;--table-row-hover-bg-color:#363636;--menu-item-bg-color:#555;--btn-default-bg:#222;--btn-default-color:#ccc;--btn-default-border-color:#555;--btn-default-hover-bg:#666;--btn-default-hover-color:#ccc;--btn-default-hover-border-color:#666;--highlight-background:#282b2e;--highlight-foreground:#a9b7c6;--highlight-gutter-background:#34393d;--highlight-gutter-foreground:#9ca9b6}.darkmode--activated img{opacity:.75}.darkmode--activated img:hover{opacity:.9}.darkmode--activated code{color:#69dbdc;background:0 0}button.darkmode-toggle{z-index:9999}.darkmode-ignore,img{display:flex!important}.beian img{display:inline-block!important}</style></head>
+
+<body>
+  <div class="book-container">
+    <div class="book-sidebar">
+      <div class="book-brand">
+  <a href="/">
+    <img src="/favicon.png">
+    <span>AHA&#39;S BOOK</span>
+  </a>
+</div>
+        <div id="menu" class="book-menu hide">
+  <h2 id="基础知识"> 基础知识 </h2>
+<ul>
+<li><a href="/posts/231010144856.html"> 模运算 </a></li>
+<li><a href="/posts/231014105311.html"> 异或运算 </a></li>
+<li><a href="/posts/231210181853.html"> 计算机中的寄存器 </a></li>
+<li><a href="/posts/231213183051.html"> 正则表达式基础 </a></li>
+</ul>
+<h2 id="C 语言">C 语言 </h2>
+<ul>
+<li><a href="/posts/230916171929.html">main 函数参数 </a></li>
+<li><a href="/posts/231214192113.html"> 关键字与专有名词 </a></li>
+<li><a href="/posts/240103180653.html"> 输出打印函数 </a></li>
+<li><a href="/posts/230922143003.html"> 多维数组 </a></li>
+<li><a href="/posts/230913200729.html">const 关键字 </a></li>
+<li><a href="/posts/230918174223.html">typedef 类型基础 </a></li>
+<li><a href="/posts/230920172849.html">typedef 类型实践 </a></li>
+<li><a href="/posts/240224193217.html"> 二级指针 </a></li>
+<li><a href="/posts/240307195203.html"> 代码 TOP-K 问题 </a></li>
+<li><a href="/posts/230922172626.html">uthash 哈希表基础 </a></li>
+<li><a href="/posts/230918114841.html"> 大小端知识 </a></li>
+</ul>
+<h2 id="Golang 语言">Golang 语言 </h2>
+<ul>
+<li><a href="/posts/230907162612.html"> 变量与常量 </a></li>
+<li><a href="/posts/230909120145.html"> 函数 &amp; 包 &amp; 判断 &amp; 循环 </a></li>
+<li><a href="/posts/230912152800.html"> 数组与切片 </a></li>
+<li><a href="/posts/230913161326.html"> 可变参数函数与 Map 集合 </a></li>
+<li><a href="/posts/230915155105.html"> 字符串和指针 </a></li>
+</ul>
+<h2 id="数据结构"> 数据结构 </h2>
+<ul>
+<li><a href="/posts/231007174854.html"> 链表（数组实现）</a></li>
+<li><a href="/posts/231008213450.html"> 链表（链式实现）</a></li>
+<li><a href="/posts/231016161508.html"> 堆栈（数组实现）</a></li>
+<li><a href="/posts/231016184406.html"> 堆栈（链表实现）</a></li>
+<li><a href="/posts/231127185207.html"> 单调栈 </a></li>
+<li><a href="/posts/231017105123.html"> 队列（链表实现）</a></li>
+<li><a href="/posts/231017154121.html"> 双端队列（链表实现）</a></li>
+<li><a href="/posts/231018102559.html"> 堆基础与堆结构（数组实现）</a></li>
+<li><a href="/posts/231019102311.html"> 优先队列（堆实现）</a></li>
+<li><a href="/posts/230905224335.html"> 二叉树的遍历 </a></li>
+<li><a href="/posts/231020174358.html"> 二叉搜索树 </a></li>
+<li><a href="/posts/230916094606.html"> 拓扑排序 </a></li>
+<li><a href="/posts/230925185057.html">Trie 字典树 </a></li>
+<li><a href="/posts/231023164532.html"> 并查集（数组实现）</a></li>
+<li><a href="/posts/240702200642.html">Linux 数据结构之队列 </a></li>
+</ul>
+<h2 id="数据结构算法"> 数据结构算法 </h2>
+<ul>
+<li><a href="/posts/231218181635.html"> 归并排序 </a></li>
+<li><a href="/posts/231108163339.html"> 快速排序 </a></li>
+<li><a href="/posts/231107171607.html"> 堆排序 </a></li>
+<li><a href="/posts/231124181658.html"> 二分查找 </a></li>
+<li><a href="/posts/231227190828.html"> 哈希表实现 </a></li>
+<li><a href="/posts/240313193201.html"> 字符串哈希函数 </a></li>
+<li><a href="/posts/231116150205.html">Floyd 多源最短路径 </a></li>
+<li><a href="/posts/231117095232.html">Dijkstra 单源最短路径（原理部分）</a></li>
+<li><a href="/posts/231121152713.html">Dijkstra 单源最短路径（实现部分）</a></li>
+</ul>
+<h2 id="数据库"> 数据库 </h2>
+<ul>
+<li><a href="/posts/250605180332.html">MySQL 基础 </a></li>
+</ul>
+<h2 id="计算机网络"> 计算机网络 </h2>
+<ul>
+<li><a href="/posts/231011192359.html">OSI 参考模型 </a></li>
+<li><a href="/posts/240329202000.html"> 计网 CyC2018 之概述 </a></li>
+<li><a href="/posts/240329202004.html"> 计网 CyC2018 之链路层 </a></li>
+<li><a href="/posts/240329202003.html"> 计网 CyC2018 之网络层 </a></li>
+<li><a href="/posts/240329202002.html"> 计网 CyC2018 之传输层 </a></li>
+<li><a href="/posts/240329202001.html"> 计网 CyC2018 之应用层 </a></li>
+<li><a href="/posts/240306203742.html">ACL 访问控制列表 </a></li>
+<li><a href="/posts/240130190208.html"> 路由表、转发表与快速转发工作原理 </a></li>
+<li><a href="/posts/231221200716.html">VXLAN 网络虚拟化技术 </a></li>
+<li><a href="/posts/240903191243.html">TCP/IP checksum 计算 </a></li>
+<li><a href="/posts/240911185603.html"> 抓包分析 TCP 三次握手与四次挥手过程 </a></li>
+</ul>
+<h2 id="操作系统"> 操作系统 </h2>
+<ul>
+<li><a href="/posts/230921190726.html"> 概述 </a></li>
+<li><a href="/posts/230924172528.html"> 中断 &amp; 异常 &amp; 系统调用 </a></li>
+<li><a href="/posts/231017195157.html"> 内存分层体系与地址空间生成 </a></li>
+<li><a href="/posts/231108195351.html"> 连续内存分配 </a></li>
+<li><a href="/posts/231111172507.html"> 非连续内存分配之分段与分页 </a></li>
+<li><a href="/posts/231119170537.html"> 非连续内存分配之页表 </a></li>
+<li><a href="/posts/231123184526.html"> 内存管理之覆盖技术与交换技术 </a></li>
+<li><a href="/posts/231127193658.html"> 内存管理之虚存技术 </a></li>
+<li><a href="/posts/231129182631.html"> 局部页面置换算法 </a></li>
+<li><a href="/posts/231207184239.html"> 全局页面置换算法 </a></li>
+<li><a href="/posts/231207204958.html"> 进程描述 </a></li>
+<li><a href="/posts/231210211306.html"> 进程状态 </a></li>
+<li><a href="/posts/231215213932.html"> 线程 </a></li>
+<li><a href="/posts/231218220813.html"> 进程控制 </a></li>
+<li><a href="/posts/231228193143.html"> 调度 </a></li>
+<li><a href="/posts/240104202828.html"> 同步与互斥 </a></li>
+<li><a href="/posts/240113115605.html"> 信号量与管程 </a></li>
+<li><a href="/posts/240205182643.html"> 经典同步问题 </a></li>
+<li><a href="/posts/240310162231.html"> 死锁 </a></li>
+</ul>
+<h2 id="系统与网络编程"> 系统与网络编程 </h2>
+<ul>
+<li><a href="/posts/230911151334.html">pthread 库 </a></li>
+<li><a href="/posts/230921094127.html"> 锁与原子操作 </a></li>
+<li><a href="/posts/240319195609.html"> 读者写者问题 </a></li>
+<li><a href="/posts/240527200241.html"> 网络编程卷一阅读随笔 </a></li>
+<li><a href="/posts/240414190410.html"> 进程间通信 IPC 机制 </a></li>
+<li><a href="/posts/240424200123.html"> 多进程相关练习 </a></li>
+<li><a href="/posts/240516221527.html">I/O 模式与 I/O 多路复用 </a></li>
+<li><a href="/posts/240626192803.html">Linux 内核 kfifo 环形队列 </a></li>
+<li><a href="/posts/241009203126.html">Linux 内核等待队列 </a></li>
+<li><a href="/posts/240627210637.html">DPDK 无锁环形队列 </a></li>
+<li><a href="/posts/240919200410.html"> 解密内存屏障 </a></li>
+<li><a href="/posts/240927202500.html"> 内核线程的创建 </a></li>
+<li><a href="/posts/241015195205.html">Linux 网络数据包接收过程 </a></li>
+<li><a href="/posts/2410232111015.html"> 源码解读 epoll 实现原理 </a></li>
+<li><a href="/posts/241106182619.html">Linux 文件系统 </a></li>
+<li><a href="/posts/250619154429.html">Libevent 高性能 IO 事件驱动库 </a></li>
+</ul>
+<h2 id="工具与命令"> 工具与命令 </h2>
+<ul>
+<li><a href="/posts/240207180410.html">GCC 编译过程分解 </a></li>
+<li><a href="/posts/240312184132.html">GDB 调试入门 </a></li>
+<li><a href="/posts/240512184921.html">Makefile 学习 </a></li>
+<li><a href="/posts/250629214430.html">CMake 学习 </a></li>
+<li><a href="/posts/240417193754.html">Linux 命令之文件权限 </a></li>
+</ul>
+<h2 id="开源项目"> 开源项目 </h2>
+<ul>
+<li><a href="/posts/240303201855.html"> 线程池原理与实现 </a></li>
+<li><a href="/posts/240507194549.html">HTTP 服务器实现 </a></li>
+<li><a href="/posts/240904203605.html"> 聊天服务器实现 </a></li>
+<li><a href="/posts/241119182636.html">Linux 文件系统 </a></li>
+</ul>
+<h2 id="Docker">Docker</h2>
+<ul>
+<li><a href="/posts/230909171809.html">Docker 学习笔记 </a></li>
+</ul>
+<h1 id="LeetCode 刷题">LeetCode 刷题 </h1>
+<h2 id="链表相关"> 链表相关 </h2>
+<ul>
+<li><a href="/posts/231025143947.html">160 相交链表 </a></li>
+<li><a href="/posts/231025185947.html">206 反转链表 </a></li>
+<li><a href="/posts/231026101239.html">21 合并两个有序链表 </a></li>
+<li><a href="/posts/231026184514.html">83 删除排序链表中的重复元素 </a></li>
+<li><a href="/posts/231027150243.html">19 删除链表的倒数第 N 个节点 </a></li>
+<li><a href="/posts/231031120718.html">2 两数相加 </a></li>
+<li><a href="/posts/231031163133.html">445 两数相加 II</a></li>
+<li><a href="/posts/231101094219.html">234 回文链表 </a></li>
+<li><a href="/posts/231101135228.html">725 分隔链表 </a></li>
+<li><a href="/posts/231102120708.html">328 奇偶链表 </a></li>
+<li><a href="/posts/231102165703.html">142 环形链表 II</a></li>
+</ul>
+<h2 id="设计"> 设计 </h2>
+<ul>
+<li><a href="/posts/231201184542.html">146 LRU 缓存 </a></li>
+</ul>
+<h2 id="贪心算法"> 贪心算法 </h2>
+<ul>
+<li><a href="/posts/231107094652.html">1029 两地调度 </a></li>
+<li><a href="/posts/231109150855.html">435 无重叠区间 </a></li>
+</ul>
+<h2 id="哈希表"> 哈希表 </h2>
+<ul>
+<li><a href="/posts/231123181539.html">1410 实体解析器 </a></li>
+</ul>
+<h2 id="树的遍历"> 树的遍历 </h2>
+<ul>
+<li><a href="/posts/231103121209.html">117 填充每个节点的下一个右侧节点指针 II</a></li>
+</ul>
+<h2 id="深度优先搜索（递归）"> 深度优先搜索（递归）</h2>
+<ul>
+<li><a href="/posts/231206201243.html">2477 达到首都的最少油耗 </a></li>
+</ul>
+<h2 id="图或路径问题"> 图或路径问题 </h2>
+<ul>
+<li><a href="/posts/231211184652.html">1631 最小体力消耗路径 </a></li>
+</ul>
+<h2 id="其它"> 其它 </h2>
+<ul>
+<li><a href="/posts/230101120000.html"> 备忘录 </a></li>
+</ul>
+
+</div>
+
+
+<script src="/js/book-menu.js"></script>
+
+    </div>
+    <div class="sidebar-toggle" onclick="sidebar_toggle()" onmouseover="add_inner()" onmouseleave="remove_inner()">
+  <div class="sidebar-toggle-inner"></div>
+</div>
+
+<script>
+function add_inner() {
+  let inner = document.querySelector('.sidebar-toggle-inner')
+  inner.classList.add('show')  
+}
+
+function remove_inner() {
+  let inner = document.querySelector('.sidebar-toggle-inner')
+  inner.classList.remove('show')
+}
+
+function sidebar_toggle() {
+    let sidebar_toggle = document.querySelector('.sidebar-toggle')
+    let sidebar = document.querySelector('.book-sidebar')
+    let content = document.querySelector('.off-canvas-content')
+    if (sidebar_toggle.classList.contains('extend')) { // show
+        sidebar_toggle.classList.remove('extend')
+        sidebar.classList.remove('hide')
+        content.classList.remove('extend')
+    }
+    else { // hide
+        sidebar_toggle.classList.add('extend')
+        sidebar.classList.add('hide')
+        content.classList.add('extend')
+    }
+}
+</script>
+
+      <div class="off-canvas-content">
+        <div class="columns">
+          <div class="column col-10 col-lg-12">
+            <div class="book-navbar">
+              <!-- For Responsive Layout -->
+
+<header class="navbar">
+  <section class="navbar-section">
+    <a onclick="open_sidebar()">
+      <i class="icon icon-menu"></i>
+    </a>
+  </section>
+</header>
+
+            </div>
+            <div class="book-content">
+              <div class="book-post">
+  <p>本文介绍同步与互斥，主要包括相关背景，竞态条件、原子操作、临界区 &amp; 互斥 &amp; 死锁 &amp; 饥饿等相关概念，临界区的属性以及如何实现临界区的互斥访问等。</p>
+<span id="more"></span>
+<h1 id="背景">背景</h1>
+<p>第一章到第八章内容，到目前为止：</p>
+<ul>
+<li>多道程序设计：现代操作系统的重要特性。</li>
+<li>并行很有用（为什么？）提示——多个并发实体：CPU、I/O、用户等。</li>
+<li>进程 &amp; 线程：操作系统抽象出来用于支持多道程序设计。</li>
+<li>CPU 调度：实现多道程序设计的机制。</li>
+<li>调度算法：选择进程 &amp; 线程不同的策略。</li>
+</ul>
+<p><strong>独立线程</strong>：</p>
+<ul>
+<li>不和其它线程共享资源或状态；</li>
+<li>确定性：输入状态决定结果；</li>
+<li>可重现：能够重现起始条件、I/O；</li>
+<li>调度顺序不重要。</li>
+</ul>
+<p><strong>合作线程</strong>：</p>
+<ul>
+<li>在多个线程中共享状态；</li>
+<li>不确定性；</li>
+<li>不可重现；</li>
+</ul>
+<p>不确定性和不可重现意味着 BUG 可能是间歇性发生的。</p>
+<p>虽然如此，但进程 &amp; 线程、计算机、设备需要合作。</p>
+<p><strong>合作的优点</strong>：</p>
+<ol>
+<li>共享资源：
+<ul>
+<li>一台电脑，多个用户；</li>
+<li>一个银行存款余额，多台 ATM 机；</li>
+<li>嵌入式系统（机器人控制：手臂和手的协调）。</li>
+</ul>
+</li>
+<li>加速：
+<ul>
+<li>I/O 操作和计算可以重叠；</li>
+<li>多处理器：将程序分成多个部分并行执行。</li>
+</ul>
+</li>
+<li>模块化：
+<ul>
+<li>将大程序分解成小程序——以编译为例，gcc 会调用 cpp, cc1, cc2, as, ld；</li>
+<li>使系统易于扩展。</li>
+</ul>
+</li>
+</ol>
+<p><strong>程序调用 <code>fork()</code> 创建新进程的过程</strong>：</p>
+<ul>
+<li>操作系统需要分配新的进程 ID，并保证其唯一性。</li>
+<li>在内核中，<code>fork()</code>系统调用会运行 <code>new_pid = next_pid++</code>：
+<ul>
+<li><code>LOAD next_pid Reg1</code></li>
+<li><code>STORE Reg1 new_pid</code> ——&gt; 假设发生了上下文切换，转去执行另一个程序的 <code>fork()</code> 操作</li>
+<li><code>INC Reg1</code></li>
+<li><code>STORE Reg1 next_pid</code></li>
+</ul>
+</li>
+<li>假设有两个进程并发执行该过程：
+<ul>
+<li>正常情况下，如果 <code>next_pid</code> 的值为 <code>100</code>，那么其中一个进程将获得<code>new_pid=100</code> 的新进程 ID，另一个进程将获得 <code>new_pid=101</code> 的新进程 ID，同时 <code>next_pid</code> 的值将增加到<code>102</code>。</li>
+<li><strong>但是，由于可能在自增操作之前发生了上下文切换 </strong>，最终导致两个进程都获得了<code>new_pid=100</code> 的新进程 ID，而 <code>next_pid</code> 的值也变成了<code>101</code>。</li>
+</ul>
+</li>
+</ul>
+<p>多线程程序具有不确定性和不可重现的特点，但 <strong> 无论多个线程的指令序列怎么交替执行，程序都必须正常工作</strong>。</p>
+<p>因此，我们必须要有一些新的机制来保证能够 <strong> 达到最终确定的结果</strong>，后面会引入同步互斥机制来解决这种不确定性的问题。</p>
+<h1 id="一些概念">一些概念</h1>
+<h2 id="竞态条件（Race-Condition）">竞态条件（Race Condition）</h2>
+<p>竞态条件是指在多个线程或进程并发执行的情况下，<strong>对共享资源的访问顺序不确定</strong>，从而导致程序的行为出现不可预测的结果。</p>
+<ul>
+<li>系统缺陷：结果依赖于并发执行（或者时间）的顺序、时间。
+<ul>
+<li>不确定性</li>
+<li>不可重现</li>
+</ul>
+</li>
+<li>怎么样避免竞态？</li>
+</ul>
+<h2 id="原子操作（Atomic-Operator）">原子操作（Atomic Operator）</h2>
+<p>原子操作是指在并发环境下，<strong>不能被中断的一系列操作，要么全部执行成功，要么全部不执行</strong>。原子操作能够保证在多线程或多进程同时访问共享资源时的数据一致性。</p>
+<p>原子操作的特点包括：</p>
+<ol>
+<li>不可中断性：原子操作在执行期间不能被其他线程或进程中断，保证了操作的完整性。</li>
+<li>互斥性：原子操作在同一时间只能被一个线程或进程执行，避免了竞态条件的发生。</li>
+<li>原子性：原子操作要么全部执行成功，要么全部不执行，不会出现部分执行的情况。</li>
+</ol>
+<blockquote>
+<p>原子操作通常是由硬件提供的特殊指令或者操作系统提供的原子操作函数来实现的。</p>
+</blockquote>
+<p>实际上的操作往往不是原子的：</p>
+<ul>
+<li>有些看上去是原子操作，实际上不是；</li>
+<li>连 <code>i++</code> 这样的简单语句，实际上是由三条指令构成的。</li>
+</ul>
+<h2 id="临界区 - 互斥 - 死锁 - 饥饿">临界区 &amp; 互斥 &amp; 死锁 &amp; 饥饿</h2>
+<p><strong>临界区</strong>（Critical Section）是指进程中的一段需要访问共享资源，并且当另一个进程处于相应代码区域时便不会被执行的代码区域。</p>
+<p><strong>互斥</strong>（Mutual Exclusion）是指当一个进程处于临界区并访问共享资源时，没有其他进程会处于临界区并访问任何相同的共享资源。</p>
+<p><strong>死锁</strong>（Dead Lock）是指两个或以上进程，在相互等待完成特定任务，而最终没法将自身任务进行下去，形成循环等待。</p>
+<p><strong>饥饿</strong>（Starvation）是指一个可执行的进程，被调度器持续忽略，以至于虽然处于可执行状态却不能被执行。</p>
+<h1 id="临界区（Critical-Section）">临界区（Critical Section）</h1>
+<h2 id="临界区的属性">临界区的属性</h2>
+<p>要设计实现临界区，临界区必须满足以下属性：</p>
+<ul>
+<li><strong>互斥</strong>：同一时间临界区中最多存在一个线程。</li>
+<li><strong>前进</strong>（Progress）：如果一个线程想要进入临界区，那么它最终会成功。</li>
+<li><strong>有限等待</strong>：如果一个线程 <code>thread</code> 处于入口区，那么在 <code>thread</code> 的请求被接受前，其它线程进入临界区的时间是有限制的（否则线程 <code>thread</code> 可能会饥饿）。</li>
+<li><strong>无忙等待</strong>（可选）：如果一个进程在等待进入临界区，那么在它可以进入之前会被挂起。</li>
+</ul>
+<h2 id="临界区的实现方法">临界区的实现方法</h2>
+<p>实现临界区的互斥访问的方法：</p>
+<ul>
+<li>禁用硬件中断；</li>
+<li>基于软件方法；</li>
+<li>更高级的抽象方法。</li>
+</ul>
+<h1 id="禁用硬件中断（方法一）">禁用硬件中断（方法一）</h1>
+<p>中断是指在程序执行过程中，由硬件或软件触发的一种特殊事件，<strong>它会打断当前正在执行的程序</strong>，并跳转到预定义的中断处理程序中执行。</p>
+<p>上面说，中断会打断当前正在执行的程序，也正是因为这个中断，才导致了进程 / 线程的上下文切换——执行其它进程 / 线程。如果没有这个中断，是不是就可以让一个进程 / 线程顺利地执行完临界区代码呢？是的！</p>
+<h2 id="方法">方法</h2>
+<p>禁用硬件中断，实现临界区的互斥访问：</p>
+<ul>
+<li>没有中断机制，也就没有上下文切换，因此没有并发。
+<ul>
+<li>硬件将中断处理 延迟到 中断被启用之后。</li>
+<li>大多数现代计算机体系结构都提供指令来完成这一操作。</li>
+</ul>
+</li>
+<li>进入临界区：禁用中断。</li>
+<li>离开临界区：启用中断。</li>
+</ul>
+<h2 id="特点">特点</h2>
+<p>禁用硬件中断确实可以解决多个进程 / 线程同时访问临界区共享资源，但它有一些缺点：</p>
+<ul>
+<li>一旦中断被禁用，线程就无法被停止：
+<ul>
+<li>整个系统都会为你停下来！</li>
+<li>可能导致其它线程处于饥饿状态！</li>
+</ul>
+</li>
+<li>要是临界区可以任意长，会怎么样？
+<ul>
+<li>将无法限制响应中断所需的时间（可能存在硬件影响，如如无法及时响应网卡中断、输入设备中断）。</li>
+</ul>
+</li>
+<li>要小心使用：
+<ul>
+<li>适用于临界区很小的情况。</li>
+</ul>
+</li>
+<li>在多 CPU 的情况下，禁用硬件中断无法解决互斥问题：
+<ul>
+<li>每个 CPU 都有自己的中断控制器，禁用一个 CPU 的中断不会影响在其它 CPU 上的进程 / 线程产生中断，因此无法实现对临界区的互斥控制。</li>
+</ul>
+</li>
+</ul>
+<h1 id="基于软件的解决方案（方法二）">基于软件的解决方案（方法二）</h1>
+<p>对于两个线程 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>T</mi><mn>0</mn></msub><mo separator="true">,</mo><msub><mi>T</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">T_{0}, T_{1}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8777699999999999em;vertical-align:-0.19444em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">0</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 的临界区的互斥访问：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* T_i 的通常结构 */</span></span><br><span class="line"><span class="keyword">do</span> &#123;</span><br><span class="line">    <span class="comment">/* enter section, 进入区域 */</span></span><br><span class="line">        <span class="comment">/* critical section, 临界区域 */</span></span><br><span class="line">    <span class="comment">/* exit section, 离开区域 */</span></span><br><span class="line">        <span class="comment">/* reminder section, 提醒区域 */</span></span><br><span class="line">&#125; <span class="keyword">while</span> (<span class="number">1</span>);</span><br></pre></td></tr></table></figure>
+<h2 id="单标志法（失败）">单标志法（失败）</h2>
+<p>使用一个共享变量 <code>turn</code>：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* 声明并初始化共享变量 */</span></span><br><span class="line"><span class="type">int</span> turn = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* Thread T_i (i = 0, j = 1) */</span></span><br><span class="line"><span class="keyword">do</span> &#123;</span><br><span class="line">    <span class="comment">/* enter section */</span></span><br><span class="line">    <span class="keyword">while</span> (turn != i);</span><br><span class="line">        <span class="comment">/* critical section */</span></span><br><span class="line">    <span class="comment">/* exit section */</span></span><br><span class="line">    turn = j;</span><br><span class="line">    <span class="comment">/* reminder section */</span></span><br><span class="line">&#125; <span class="keyword">while</span> (<span class="number">1</span>);</span><br></pre></td></tr></table></figure>
+<p>代码分析：</p>
+<ul>
+<li>该代码尝试实现 <strong> 两个 </strong> 线程对临界区的互斥访问；</li>
+<li>该代码中 <code>turn</code> 的值只能是 <code>0/1</code>——线程 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>T</mi><mn>0</mn></msub><mi mathvariant="normal">/</mi><msub><mi>T</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">T_{0}/T_{1}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">0</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord">/</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 会在执行完临界区代码后，将 <code>turn</code> 设置为 <code>1/0</code>；</li>
+<li>如果 <code>turn</code> 的值不是自己（<code>while (turn != i)</code>），则会一直忙等待，等待另一个线程将 <code>turn</code> 值设置为它的对方（<code>turn=j</code>）。</li>
+</ul>
+<p>存在的问题（是否满足临界区属性）：</p>
+<ul>
+<li><strong>满足互斥访问，但有时不满足前进</strong>（满足「忙则等待」，但不满足「空闲则入」）：如果线程 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>T</mi><mn>0</mn></msub></mrow><annotation encoding="application/x-tex">T_{0}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.83333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">0</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 在访问了一次临界区后（此时 <code>turn=1</code>），下次能访问临界区的只能是线程 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>T</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">T_{1}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.83333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>，如果 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>T</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">T_{1}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.83333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 一直不访问临界区（不去设置 <code>turn=0</code>），那么 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>T</mi><mn>0</mn></msub></mrow><annotation encoding="application/x-tex">T_{0}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.83333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">0</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 便无法再次访问临界区。</li>
+</ul>
+<p>因此，该设计满足互斥访问，但 <strong> 只能在两个进程交替的访问临界区 </strong> 的情况下满足前进。</p>
+<h2 id="双标志先检查（失败）">双标志先检查（失败）</h2>
+<p>使用一个共享数组变量 <code>flag[2]</code>，先检查是否可以进入临界区：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* 声明并初始化共享变量 */</span></span><br><span class="line"><span class="type">int</span> flag[<span class="number">2</span>] = &#123;<span class="number">0</span>, <span class="number">0</span>&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* Thread T_i (i = 0, j = 1) */</span></span><br><span class="line"><span class="keyword">do</span> &#123;</span><br><span class="line">    <span class="comment">/* enter section */</span></span><br><span class="line">    <span class="keyword">while</span> (flag[j] == <span class="number">1</span>);</span><br><span class="line">    flag[i] = <span class="number">1</span>;</span><br><span class="line">        <span class="comment">/* critical section */</span></span><br><span class="line">    <span class="comment">/* exit section */</span></span><br><span class="line">    flag[i] = <span class="number">0</span>;</span><br><span class="line">    <span class="comment">/* reminder section */</span></span><br><span class="line">&#125; <span class="keyword">while</span> (<span class="number">1</span>);</span><br></pre></td></tr></table></figure>
+<p>代码分析：</p>
+<ul>
+<li>该代码尝试实现 <strong> 两个 </strong> 线程对临界区的互斥访问；</li>
+<li>该代码中 <code>flag[]</code> 数组的每个位置值只能是 <code>0/1</code>——线程 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>T</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">T_{i}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.83333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.31166399999999994em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 会在执行临界区代码前（后），将 <code>flag[i]</code> 的标志设置为 <code>1</code>（<code>0</code>）；</li>
+<li>进入临界区前，如果对方的标志是真，则会一直忙等待，等待另一个线程将它的标志设置为假。</li>
+</ul>
+<p>存在的问题（是否满足临界区属性）：</p>
+<ul>
+<li><strong>不满足互斥访问</strong>（不满足「忙则等待」）：初始化时，两个线程的 <code>flag</code> 都被置为 <code>0</code>；然后向下执行 <code>while</code>，都会发现对方的 <code>flag</code> 不为 <code>1</code>，则会进入临界区，无法实现对临界区的互斥访问。</li>
+</ul>
+<h2 id="双标志后检查（失败）">双标志后检查（失败）</h2>
+<p>使用一个共享数组变量 <code>flag[2]</code>，先置位标志，后检查是否可以进入临界区：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* 声明并初始化共享变量 */</span></span><br><span class="line"><span class="type">int</span> flag[<span class="number">2</span>] = &#123;<span class="number">0</span>, <span class="number">0</span>&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* Thread T_i (i = 0, j = 1) */</span></span><br><span class="line"><span class="keyword">do</span> &#123;</span><br><span class="line">    <span class="comment">/* enter section */</span></span><br><span class="line">    flag[i] = <span class="number">1</span>;  <span class="comment">// 先置位标志</span></span><br><span class="line">    <span class="keyword">while</span> (flag[j] == <span class="number">1</span>);</span><br><span class="line">        <span class="comment">/* critical section */</span></span><br><span class="line">    <span class="comment">/* exit section */</span></span><br><span class="line">    flag[i] = <span class="number">0</span>;</span><br><span class="line">    <span class="comment">/* reminder section */</span></span><br><span class="line">&#125; <span class="keyword">while</span> (<span class="number">1</span>);</span><br></pre></td></tr></table></figure>
+<p>代码分析：</p>
+<ul>
+<li>该代码尝试实现 <strong> 两个 </strong> 线程对临界区的互斥访问；</li>
+<li>该代码中 <code>flag[]</code> 数组的每个位置值只能是 <code>0/1</code>——线程 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>T</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">T_{i}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.83333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.31166399999999994em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 会在 enter section 前将 <code>flag[i]</code> 的标志设置为 <code>1</code>、在执行完 critical section 代码后，将 <code>flag[i]</code> 的标志设置为 <code>0</code>；</li>
+<li><strong>先置位标志，后尝试进入临界区</strong>：如果对方的标志是真，则会一直忙等待，等待另一个线程将它的标志设置为假。</li>
+</ul>
+<p>存在的问题（是否满足临界区属性）：</p>
+<ul>
+<li><strong>满足互斥访问，但存在死锁 </strong>（满足「忙则等待」，但不满足「空闲则入」）：初始化时，两个线程的 <code>flag</code> 都被置为 <code>0</code>，并向下执行。当线程 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>T</mi><mn>0</mn></msub></mrow><annotation encoding="application/x-tex">T_{0}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.83333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">0</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 将其 <code>flag[0]</code> 设置为 <code>1</code> 后，发生了上下文切换；然后，线程 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>T</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">T_{1}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.83333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.30110799999999993em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 也会将其 <code>flag[1]</code> 设置为 <code>1</code>；至此，不管哪个线程执行 enter section 代码，都会等待，从而发生死锁。</li>
+</ul>
+<h2 id="Peterson 算法（成功）">Peterson 算法（成功）</h2>
+<p>算法思想：在双标志后检查法中，两个进程都争着想进入临界区，但是谁也不让谁，最后谁都无法进入临界区。而 Peterson 算法，在双方都争着想进入临界区时，让进程尝试“孔融让梨”，主动让对方先使用临界区。</p>
+<p>Peterson 算法是满足进程 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>T</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">T_{i}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.83333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.31166399999999994em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 和 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>T</mi><mi>j</mi></msub></mrow><annotation encoding="application/x-tex">T_{j}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.969438em;vertical-align:-0.286108em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.311664em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.05724em;">j</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span></span></span></span> 之间互斥的经典的基于软件的解决方法（1981 年）。</p>
+<p>它使用两个共享数据项（Use two shared data items）：</p>
+<ul>
+<li><code>int turn</code> 指示该谁进入临界区</li>
+<li><code>bool flag[]</code> 指示进程是否准备好进入临界区</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* 声明并初始化共享变量 */</span></span><br><span class="line"><span class="type">int</span> turn = <span class="number">0</span>;</span><br><span class="line"><span class="type">bool</span> flag[<span class="number">2</span>] = &#123;<span class="literal">false</span>, <span class="literal">false</span>&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* Thread T_i (i = 0, j = 1) */</span></span><br><span class="line"><span class="keyword">do</span> &#123;</span><br><span class="line">    <span class="comment">/* enter section */</span></span><br><span class="line">    flag[i] = <span class="literal">true</span>;  <span class="comment">// 我想进入临界区</span></span><br><span class="line">    turn = j;  <span class="comment">// 孔融让梨</span></span><br><span class="line">    <span class="keyword">while</span> (flag[j] &amp;&amp; turn == j);</span><br><span class="line">        <span class="comment">/* critical section */</span></span><br><span class="line">    <span class="comment">/* exit section */</span></span><br><span class="line">    flag[i] = <span class="literal">false</span>;</span><br><span class="line">    <span class="comment">/* reminder section */</span></span><br><span class="line">&#125; <span class="keyword">while</span> (<span class="number">1</span>);</span><br></pre></td></tr></table></figure>
+<p>代码分析：</p>
+<ul>
+<li>该代码尝试实现 <strong> 两个 </strong> 线程对临界区的互斥访问；</li>
+<li>如果自己想进入临界区，便将标志置为真 <code>flag[i] = true</code>、并谦让着让对方先进入 <code>turn=j</code>，然后自己做好忙等待的心理准备——但是会检查两个共享数据项，如果对方想进入临界区（<code>flag[j] == true</code>），这时自己便忙等待；否则，自己可以成功进入临界区。</li>
+</ul>
+<p>可以证明（用反证法），Peterson 算法能够满足互斥、前进、有限等待三种特性。</p>
+<h2 id="Dekker 算法（成功）">Dekker 算法（成功）</h2>
+<p>Dekker 算法是第一个针对双线程的基于软件的解决方法（1965 年）。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* 声明并初始化共享变量 */</span></span><br><span class="line"><span class="type">int</span> turn = <span class="number">0</span>;</span><br><span class="line"><span class="type">bool</span> flag[<span class="number">2</span>] = &#123;<span class="literal">false</span>, <span class="literal">false</span>&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* Thread T_i (i = 0, j = 1) */</span></span><br><span class="line"><span class="keyword">do</span> &#123;</span><br><span class="line">    <span class="comment">/* enter section */</span></span><br><span class="line">    flag[i] = <span class="literal">true</span>;  <span class="comment">// 我想进入临界区</span></span><br><span class="line">    <span class="keyword">while</span> (flag[j] == <span class="literal">true</span>) &#123;  <span class="comment">// 对方想进入临界区</span></span><br><span class="line">        <span class="keyword">if</span> (turn != i) &#123;  <span class="comment">// 没有轮到我</span></span><br><span class="line">            flag[i] = flase;  <span class="comment">// 孔融让梨，放弃进入临界区</span></span><br><span class="line">            <span class="keyword">while</span> (turn != i); <span class="comment">// 等待，直到把资格给到自己</span></span><br><span class="line">            flag[i] = <span class="literal">true</span>;  <span class="comment">// 你退出我则示意想要进入</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">        <span class="comment">/* critical section */</span></span><br><span class="line">    <span class="comment">/* exit section */</span></span><br><span class="line">    turn = j;  <span class="comment">// 轮到你了</span></span><br><span class="line">    flag[i] = <span class="literal">false</span>;  <span class="comment">// 我不想进入临界区了</span></span><br><span class="line">    <span class="comment">/* reminder section */</span></span><br><span class="line">&#125; <span class="keyword">while</span> (<span class="number">1</span>);</span><br></pre></td></tr></table></figure>
+<p>代码分析：</p>
+<ul>
+<li>该代码尝试实现 <strong> 两个 </strong> 线程对临界区的互斥访问；</li>
+<li><code>flag</code> 为真，表示想进入临界区（只是想，不代表能进入）；<code>turn</code> 为自己，表示自己可以进入临界区（对方不可以）；</li>
+<li>假设只有 <code>flag[]</code> 共享变量：那就像「双标志后检查」一样，会发生死锁；<code>turn</code> 的使用，解决了死锁的问题。</li>
+</ul>
+<p>可以证明，Dekker 算法能够满足互斥、前进、有限等待三种特性。</p>
+<h2 id="Eisenberg-and-McGuire 算法（N 进程）">Eisenberg and McGuire 算法（N 进程）</h2>
+<p>有机会再补充。</p>
+<h2 id="Bakery 算法（N 进程）">Bakery 算法（N 进程）</h2>
+<p>解决 N 个进程的临界区互斥访问：</p>
+<ul>
+<li>进入临界区之前，进程接收一个数字，得到的数字最小的进入临界区；</li>
+<li>如果进程 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>P</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">P_{i}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.83333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.31166399999999994em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 和 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>P</mi><mi>j</mi></msub></mrow><annotation encoding="application/x-tex">P_{j}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.969438em;vertical-align:-0.286108em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.311664em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.05724em;">j</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span></span></span></span> 收到相同的数字，那么如果 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi><mo>&lt;</mo><mi>j</mi></mrow><annotation encoding="application/x-tex">i &lt; j</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.69862em;vertical-align:-0.0391em;"></span><span class="mord mathnormal">i</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">&lt;</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.85396em;vertical-align:-0.19444em;"></span><span class="mord mathnormal" style="margin-right:0.05724em;">j</span></span></span></span>，则 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>P</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">P_{i}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.83333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.31166399999999994em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 先进入临界区，否则 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>P</mi><mi>j</mi></msub></mrow><annotation encoding="application/x-tex">P_{j}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.969438em;vertical-align:-0.286108em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.311664em;"><span style="top:-2.5500000000000003em;margin-left:-0.13889em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.05724em;">j</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span></span></span></span> 先进入临界区；</li>
+<li>编号方案总是按照枚举的增加顺序生成数字。</li>
+</ul>
+<h2 id="总结">总结</h2>
+<p>这些算法有以下特点：</p>
+<ul>
+<li>复杂：需要两个进程的共享数据项；</li>
+<li>需要忙等待：浪费 CPU 时间；</li>
+<li>没有硬件保证的情况下，无真正的软件解决方案。
+<ul>
+<li>Peterson 算法需要原子的 <code>LOAD</code> 和<code>STORE</code>指令。</li>
+</ul>
+</li>
+</ul>
+<h1 id="更高级的抽象（方法三）">更高级的抽象（方法三）</h1>
+<h2 id="一些解决方案">一些解决方案</h2>
+<p>硬件提供一些原语：</p>
+<ul>
+<li>像中断禁用、原子操作指令等（大多数现代体系结构都这样）。</li>
+</ul>
+<p>操作系统提供更高级的编程抽象来简化并行编程：</p>
+<ul>
+<li>例如，锁、信号量；</li>
+<li>从硬件原语中构建。</li>
+</ul>
+<p>锁是一个抽象数据结构，用于控制并发访问共享资源的机制：</p>
+<ul>
+<li>它具有一个二进制状态：锁定（locked）和解锁（unlocked）；</li>
+<li>两种方法：
+<ul>
+<li><code>Lock::Acquire()</code>：锁被释放前一直等待，然后得到锁；</li>
+<li><code>Lock::Release()</code>：锁释放，唤醒任何等待的进程。</li>
+</ul>
+</li>
+</ul>
+<p>使用锁来编写临界区：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">lock_next_pid-&gt;<span class="built_in">Acquire</span>();</span><br><span class="line">new_pid = next_pid++;</span><br><span class="line">lock_next_pid-&gt;<span class="built_in">Release</span>();</span><br></pre></td></tr></table></figure>
+<p>前面（背景小节）的例子变得简单起来，<code>lock_next_pid-&gt;Acquire()</code> 加锁后，临界区中的代码 <code>next_pid++</code>，在同一时间（从读、执行加一再到写回内存），只有一个进程对其操作，确保对 <code>next_pid</code> 的操作是原子的。</p>
+<p>大多数现代体系结构都提供特殊的原子操作指令：</p>
+<ul>
+<li>通过特殊的内存访问电路；</li>
+<li>针对单处理器和多处理器。</li>
+</ul>
+<h2 id="Test-And-Set 指令">Test-And-Set 指令</h2>
+<p><strong>测试和置位（Test-And-Set, TAS）指令 </strong> 把给定的内存地址设置为 1，然后返回之前的旧值：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">bool</span> <span class="title function_">TestAndSet</span><span class="params">(<span class="type">bool</span> *target)</span> &#123;</span><br><span class="line">    <span class="type">bool</span> rv = *target;</span><br><span class="line">    *target = <span class="literal">true</span>;</span><br><span class="line">    <span class="keyword">return</span> rv;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>还有一个 Compare And Swap (CAS) 指令。</p>
+</blockquote>
+<h2 id="Exchange 指令">Exchange 指令</h2>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">Exchange</span><span class="params">(<span class="type">bool</span> *<span class="type">bool</span> *b)</span> &#123;</span><br><span class="line">    <span class="type">bool</span> tmp = *a;</span><br><span class="line">    *a = *b;</span><br><span class="line">    *b = tmp;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>Test-And-Set 和 Exchange 在硬件上实现为一个原子操作，执行期间不会被其他处理器打断。</p>
+</blockquote>
+<h2 id="基于 TAS 指令实现自旋锁（spinlock）">基于 TAS 指令实现自旋锁（spinlock）</h2>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Lock</span> &#123;</span><br><span class="line">    <span class="type">int</span> value = <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Lock::<span class="built_in">Acquire</span>() &#123;</span><br><span class="line">    <span class="keyword">while</span> (<span class="built_in">TestAndSet</span>(value)) &#123;</span><br><span class="line">        ; <span class="comment">// spin 自旋锁，忙等待</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Lock::<span class="built_in">Release</span>() &#123;</span><br><span class="line">    value = <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>Lock::Acquire()</code> 代码分析：</p>
+<ul>
+<li>如果锁被释放，那么 TAS 指令读取 0 并将值设置为 1（即锁被设置为忙，并且需要等待完成）；</li>
+<li>如果锁处于忙等待，那么 TAS 指令读取 1 并将值设置为 1（即不改变锁的状态，并且需要循环 TAS 指令）。</li>
+</ul>
+<blockquote>
+<p>上面方法，线程在等待的时候是忙等待，消耗 CPU 时间，自旋锁采用这种设计（因为它适用于持有锁的时间很短的情况下）。</p>
+</blockquote>
+<h2 id="无忙等待锁">无忙等待锁</h2>
+<p>无忙等待锁，使处于忙等的进程睡眠，在临界区执行完的进程会将睡眠的进程唤醒。</p>
+<img src="../images/os-kernel/chapter9/with-or-without-busy-waiting.png" alt="有无忙等待" width="80%" height="80%">
+<p>如果临界区执行时间短，选择忙等方式（如自旋锁）；如果临界区执行时间长，选择无忙等待方式（如互斥锁、信号量、条件变量）。</p>
+<h2 id="基于 Exchange 指令实现自旋锁（spinlock）">基于 Exchange 指令实现自旋锁（spinlock）</h2>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* 声明并初始化共享变量 */</span></span><br><span class="line"><span class="type">int</span> lock = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> key;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* Thread T_i (i = 0, j = 1) */</span></span><br><span class="line"><span class="keyword">do</span> &#123;</span><br><span class="line">    <span class="comment">/* enter section */</span></span><br><span class="line">    key = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">while</span> (key == <span class="number">1</span>) &#123;</span><br><span class="line">        Exchange(lock, key);</span><br><span class="line">    &#125;</span><br><span class="line">        <span class="comment">/* critical section */</span></span><br><span class="line">    <span class="comment">/* exit section */</span></span><br><span class="line">    lock = <span class="number">0</span>;</span><br><span class="line">    <span class="comment">/* reminder section */</span></span><br><span class="line">&#125; <span class="keyword">while</span> (<span class="number">1</span>);</span><br></pre></td></tr></table></figure>
+<p>代码分析：</p>
+<ul>
+<li>当 <code>key==1, lock==1</code> 时，交换两数后，不会影响两数的值，即无法退出循环、无法获取锁；</li>
+<li>当 <code>key==1, lock==0</code> 时，交换两数后，有 <code>key==0, lock==1</code>，即立即获取锁、退出循环。</li>
+</ul>
+<h2 id="原子操作的特征">原子操作的特征</h2>
+<p>优点：</p>
+<ul>
+<li>适用于单处理器或者共享主存的多处理器中 <strong> 任意数量的进程同步</strong>；</li>
+<li>简单并且容易证明；</li>
+<li>支持多临界区。</li>
+</ul>
+<p>缺点：</p>
+<ul>
+<li>忙等待消耗处理器时间；</li>
+<li>可能导致饥饿（如进程离开临界区时，有多个等待进程的情况）；</li>
+<li><strong>死锁</strong>：拥有临界区的低优先级进程，遇到上下文中断，高优先级进程获得处理器，并请求访问临界区，这时会忙等待，高优先级进程向进入临界区，低优先级进程由于无法占用处理器，导致无法退出临界区（解决方案：优先级反转）。</li>
+</ul>
+<h1 id="总结 -v2">总结</h1>
+<p>锁是更高等级的编程抽象：</p>
+<ul>
+<li>互斥可以使用锁来实现</li>
+<li>通常需要一定等级的硬件支持（比如原子操作指令）</li>
+</ul>
+<p>常用的三种实现方法：</p>
+<ul>
+<li>禁用中断（仅限于单处理器）</li>
+<li>软件方法（复杂）</li>
+<li>原子操作指令（单处理器或多处理器均可）</li>
+</ul>
+<p>可选的实现内容:</p>
+<ul>
+<li>有忙等待</li>
+<li>无忙等待</li>
+</ul>
+<blockquote>
+<p>参考资料：<br>
+1：<a target="_blank" rel="noopener" href="https://github.com/OXygenMoon/OperatingSystemInDepth">https://github.com/OXygenMoon/OperatingSystemInDepth</a><br>
+2：<a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_53407527/article/details/125088864">https://blog.csdn.net/weixin_53407527/article/details/125088864</a></p>
+</blockquote>
+
+</div>
+
+
+  <div class="book-comments">
+    
+
+
+
+
+  </div>
+
+
+
+<script src="/js/book-post.js"></script>
+
+
+            </div>
+          </div>
+          <div class="column col-2 hide-lg">
+            <div class="book-post-info">
+  
+    <div class="book-post-meta">
+
+  <div class="author">
+
+    <!-- Author image -->
+    <div class="author-img">
+      
+        <figure
+          class="avatar avatar-lg"
+          data-initial="A"
+          style="background-color: #3b4351;">
+        </figure>
+      
+    </div>
+
+    <!-- Author title -->
+    <div class="author-title">
+      <div>aha</div>
+      <div>2024-01-04</div>
+    </div>
+  </div>
+
+  
+    <div class="divider"></div>
+
+    <div class="link">
+      <a class="category-link" href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">操作系统</a> <a class="category-link" href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E5%90%8C%E6%AD%A5%E4%B8%8E%E4%BA%92%E6%96%A5/">同步与互斥</a>
+
+      <a class="tag-none-link" href="/tags/%E4%B8%B4%E7%95%8C%E5%8C%BA/" rel="tag">#临界区</a> <a class="tag-none-link" href="/tags/%E5%90%8C%E6%AD%A5%E4%B8%8E%E4%BA%92%E6%96%A5/" rel="tag">#同步与互斥</a> <a class="tag-none-link" href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" rel="tag">#操作系统</a>
+    </div>
+    
+  
+
+  <div class="divider"></div>
+</div>
+  
+
+  <div class="book-tocbot">
+</div>
+<div class="book-tocbot-menu">
+  <a class="book-toc-expand" onclick="expand_toc()">Expand all</a>
+  <a onclick="go_top()">Back to top</a>
+  <a onclick="go_bottom()">Go to bottom</a>
+  <a onclick="toggleSearch()">Search in blogs</a> <!-- 添加搜索文字的点击事件 -->
+</div>
+
+<div id="search-overlay" class="search-overlay" style="display: none;"> <!-- 初始状态为隐藏 -->
+  <div class="search-box">
+    <input type="text" id="search-input" placeholder="Search in all blogs...">
+    <button onclick="closeSearch()">Close</button> <!-- 添加关闭按钮 -->
+    <div id="search-results" class="search-results"></div>
+  </div>
+</div>
+
+<script>
+  function performSearch(query) {
+    if (!query.trim()) {
+      return;
+    }
+
+    fetch('/search.xml')
+      .then(response => response.text())
+      .then(data => {
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(data, "text/xml");
+        const entries = xmlDoc.getElementsByTagName('entry');
+        let results = '';
+
+        for (let i = 0; i < entries.length; i++) {
+          const title = entries[i].getElementsByTagName('title')[0].textContent;
+          const content = entries[i].getElementsByTagName('content')[0].textContent;
+          const url = entries[i].getElementsByTagName('url')[0].textContent;
+
+          let count = (title.match(new RegExp(query, "gi")) || []).length; // 统计查询词出现的次数
+          count += (content.match(new RegExp(query, "gi")) || []).length;
+
+          if (count > 0) { // title.includes(query) || content.includes(query)
+            results += `
+              <div class="search-result-item">
+                <a href="${url}">${title}</a> (${count})
+              </div>`;
+          }
+        }
+
+        const searchResultsElement = document.getElementById('search-results');
+        searchResultsElement.innerHTML = results;
+        searchResultsElement.classList.add('active');
+      });
+  }
+
+  function toggleSearch() {
+    const searchOverlay = document.getElementById('search-overlay');
+    searchOverlay.style.display = searchOverlay.style.display === 'none' ? 'flex' : 'none';
+  }
+
+  function closeSearch() {
+    document.getElementById('search-overlay').style.display = 'none';
+  }
+
+  document.getElementById('search-input').addEventListener('input', function() {
+    const query = this.value;
+    performSearch(query);
+  });
+</script>
+
+<style>
+  .search-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  .search-box {
+    background: white;
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+    width: 80%;
+    max-width: 500px;
+  }
+
+  .search-results {
+    margin-top: 10px;
+    max-height: 300px;
+    overflow-y: auto;
+    background: white;
+    padding: 10px;
+    border-radius: 5px;
+    width: 100%;
+  }
+
+  .search-result-item {
+    margin: 10px 0;
+  }
+
+  .search-result-item a {
+    color: blue; /* 设置链接颜色为蓝色 */
+    text-decoration: none;
+  }
+
+  .search-result-item a:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+<script src="/js/book-toc.js"></script>
+
+
+</div>
+          </div>
+        </div>
+      </div>
+
+      <a class="off-canvas-overlay" onclick="hide_canvas()"></a>
+
+      <button class="floating-button" onclick="toggleDropdownMenu()"></button>
+
+      <div class="dropdown-menu">
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FFFFFF', '#000000')">银河白</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#C7EDCC', '#000000')">豆沙绿</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FAF9DE', '#000000')">杏仁黄</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#E3EDCD', '#000000')">青草绿</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FFF2E2', '#000000')">秋叶褐</div>
+      </div>
+  </div>
+
+  <script>
+    function toggleDropdownMenu() {
+      document.querySelector('.floating-button').classList.toggle('active');
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      var storedBackgroundColor = localStorage.getItem('blogBackgroundColor');
+      var storedColor = localStorage.getItem('blogColor');
+
+      if (storedBackgroundColor && storedColor) {
+        document.body.style.backgroundColor = storedBackgroundColor;
+        document.body.style.color = storedColor;
+      }
+    });
+
+    function changeBackgroundColor(backgroundColor, color) {
+      document.body.style.backgroundColor = backgroundColor;
+      document.body.style.color = color;
+
+      localStorage.setItem('blogBackgroundColor', backgroundColor);
+      localStorage.setItem('blogColor', color);
+
+      document.querySelector('.floating-button').classList.remove('active');
+    }
+  </script>
+</body>
+
+</html>
+
+
+<script src="/js/book.js"></script>

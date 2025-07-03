@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
+
+    
+      <link rel="icon" href="/favicon.png" />
+    
+
+    <title>
+        
+          aha&#39;s book
+        
+    </title>
+
+    <!-- Spectre.css framework -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre-exp.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre-icons.min.css">
+
+    <!-- theme css & js -->
+    
+<link rel="stylesheet" href="/css/book.css">
+
+    
+<script src="/js/book.js"></script>
+
+
+    <!-- tocbot -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.css">
+    
+    <!-- katex -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/zooming/2.1.1/zooming.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const zooming = new Zooming()
+    zooming.listen('.book-content img')
+})
+</script>
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+    <style>
+      body {
+        background-color: #FFFFFF;
+        /* color: #000000; */
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+
+      /* Floating Button Styles */
+      .floating-button {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 999;
+        background-color: #000000;
+        color: #ffffff;
+        padding: 12px;
+        border-radius: 50%;
+        cursor: pointer;
+        border: 2px solid #000000;
+      }
+
+      .floating-button:hover {
+        background-color: #FFFFFF;
+      }
+
+      /* Dropdown Menu Styles */
+      .dropdown-menu {
+        position: fixed;
+        bottom: 60px;
+        right: 10px;
+        display: none;
+        min-width: 60px;
+        padding: 2px;
+        background-color: #fff;
+        /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
+        z-index: 1000;
+      }
+
+      .floating-button.active+.dropdown-menu {
+        display: block;
+      }
+
+      .dropdown-item {
+        display: block;
+        padding: 8px 16px;
+        cursor: pointer;
+      }
+
+      .dropdown-item:hover {
+        background-color: #f5f5f5;
+      }
+    </style>
+</head>
+
+<body>
+  <div class="book-container">
+    <div class="book-sidebar">
+      <div class="book-brand">
+  <a href="/">
+    <img src="/favicon.png">
+    <span>AHA&#39;S BOOK</span>
+  </a>
+</div>
+        <div id="menu" class="book-menu hide">
+  <h2 id="基础知识"> 基础知识 </h2>
+<ul>
+<li><a href="/posts/231010144856.html"> 模运算 </a></li>
+<li><a href="/posts/231014105311.html"> 异或运算 </a></li>
+<li><a href="/posts/231210181853.html"> 计算机中的寄存器 </a></li>
+<li><a href="/posts/231213183051.html"> 正则表达式基础 </a></li>
+</ul>
+<h2 id="C 语言">C 语言 </h2>
+<ul>
+<li><a href="/posts/230916171929.html">main 函数参数 </a></li>
+<li><a href="/posts/231214192113.html"> 关键字与专有名词 </a></li>
+<li><a href="/posts/240103180653.html"> 输出打印函数 </a></li>
+<li><a href="/posts/230922143003.html"> 多维数组 </a></li>
+<li><a href="/posts/230913200729.html">const 关键字 </a></li>
+<li><a href="/posts/230918174223.html">typedef 类型基础 </a></li>
+<li><a href="/posts/230920172849.html">typedef 类型实践 </a></li>
+<li><a href="/posts/240224193217.html"> 二级指针 </a></li>
+<li><a href="/posts/240307195203.html"> 代码 TOP-K 问题 </a></li>
+<li><a href="/posts/230922172626.html">uthash 哈希表基础 </a></li>
+<li><a href="/posts/230918114841.html"> 大小端知识 </a></li>
+</ul>
+<h2 id="Golang 语言">Golang 语言 </h2>
+<ul>
+<li><a href="/posts/230907162612.html"> 变量与常量 </a></li>
+<li><a href="/posts/230909120145.html"> 函数 &amp; 包 &amp; 判断 &amp; 循环 </a></li>
+<li><a href="/posts/230912152800.html"> 数组与切片 </a></li>
+<li><a href="/posts/230913161326.html"> 可变参数函数与 Map 集合 </a></li>
+<li><a href="/posts/230915155105.html"> 字符串和指针 </a></li>
+</ul>
+<h2 id="数据结构"> 数据结构 </h2>
+<ul>
+<li><a href="/posts/231007174854.html"> 链表（数组实现）</a></li>
+<li><a href="/posts/231008213450.html"> 链表（链式实现）</a></li>
+<li><a href="/posts/231016161508.html"> 堆栈（数组实现）</a></li>
+<li><a href="/posts/231016184406.html"> 堆栈（链表实现）</a></li>
+<li><a href="/posts/231127185207.html"> 单调栈 </a></li>
+<li><a href="/posts/231017105123.html"> 队列（链表实现）</a></li>
+<li><a href="/posts/231017154121.html"> 双端队列（链表实现）</a></li>
+<li><a href="/posts/231018102559.html"> 堆基础与堆结构（数组实现）</a></li>
+<li><a href="/posts/231019102311.html"> 优先队列（堆实现）</a></li>
+<li><a href="/posts/230905224335.html"> 二叉树的遍历 </a></li>
+<li><a href="/posts/231020174358.html"> 二叉搜索树 </a></li>
+<li><a href="/posts/230916094606.html"> 拓扑排序 </a></li>
+<li><a href="/posts/230925185057.html">Trie 字典树 </a></li>
+<li><a href="/posts/231023164532.html"> 并查集（数组实现）</a></li>
+<li><a href="/posts/240702200642.html">Linux 数据结构之队列 </a></li>
+</ul>
+<h2 id="数据结构算法"> 数据结构算法 </h2>
+<ul>
+<li><a href="/posts/231218181635.html"> 归并排序 </a></li>
+<li><a href="/posts/231108163339.html"> 快速排序 </a></li>
+<li><a href="/posts/231107171607.html"> 堆排序 </a></li>
+<li><a href="/posts/231124181658.html"> 二分查找 </a></li>
+<li><a href="/posts/231227190828.html"> 哈希表实现 </a></li>
+<li><a href="/posts/240313193201.html"> 字符串哈希函数 </a></li>
+<li><a href="/posts/231116150205.html">Floyd 多源最短路径 </a></li>
+<li><a href="/posts/231117095232.html">Dijkstra 单源最短路径（原理部分）</a></li>
+<li><a href="/posts/231121152713.html">Dijkstra 单源最短路径（实现部分）</a></li>
+</ul>
+<h2 id="数据库"> 数据库 </h2>
+<ul>
+<li><a href="/posts/250605180332.html">MySQL 基础 </a></li>
+</ul>
+<h2 id="计算机网络"> 计算机网络 </h2>
+<ul>
+<li><a href="/posts/231011192359.html">OSI 参考模型 </a></li>
+<li><a href="/posts/240329202000.html"> 计网 CyC2018 之概述 </a></li>
+<li><a href="/posts/240329202004.html"> 计网 CyC2018 之链路层 </a></li>
+<li><a href="/posts/240329202003.html"> 计网 CyC2018 之网络层 </a></li>
+<li><a href="/posts/240329202002.html"> 计网 CyC2018 之传输层 </a></li>
+<li><a href="/posts/240329202001.html"> 计网 CyC2018 之应用层 </a></li>
+<li><a href="/posts/240306203742.html">ACL 访问控制列表 </a></li>
+<li><a href="/posts/240130190208.html"> 路由表、转发表与快速转发工作原理 </a></li>
+<li><a href="/posts/231221200716.html">VXLAN 网络虚拟化技术 </a></li>
+<li><a href="/posts/240903191243.html">TCP/IP checksum 计算 </a></li>
+<li><a href="/posts/240911185603.html"> 抓包分析 TCP 三次握手与四次挥手过程 </a></li>
+</ul>
+<h2 id="操作系统"> 操作系统 </h2>
+<ul>
+<li><a href="/posts/230921190726.html"> 概述 </a></li>
+<li><a href="/posts/230924172528.html"> 中断 &amp; 异常 &amp; 系统调用 </a></li>
+<li><a href="/posts/231017195157.html"> 内存分层体系与地址空间生成 </a></li>
+<li><a href="/posts/231108195351.html"> 连续内存分配 </a></li>
+<li><a href="/posts/231111172507.html"> 非连续内存分配之分段与分页 </a></li>
+<li><a href="/posts/231119170537.html"> 非连续内存分配之页表 </a></li>
+<li><a href="/posts/231123184526.html"> 内存管理之覆盖技术与交换技术 </a></li>
+<li><a href="/posts/231127193658.html"> 内存管理之虚存技术 </a></li>
+<li><a href="/posts/231129182631.html"> 局部页面置换算法 </a></li>
+<li><a href="/posts/231207184239.html"> 全局页面置换算法 </a></li>
+<li><a href="/posts/231207204958.html"> 进程描述 </a></li>
+<li><a href="/posts/231210211306.html"> 进程状态 </a></li>
+<li><a href="/posts/231215213932.html"> 线程 </a></li>
+<li><a href="/posts/231218220813.html"> 进程控制 </a></li>
+<li><a href="/posts/231228193143.html"> 调度 </a></li>
+<li><a href="/posts/240104202828.html"> 同步与互斥 </a></li>
+<li><a href="/posts/240113115605.html"> 信号量与管程 </a></li>
+<li><a href="/posts/240205182643.html"> 经典同步问题 </a></li>
+<li><a href="/posts/240310162231.html"> 死锁 </a></li>
+</ul>
+<h2 id="系统与网络编程"> 系统与网络编程 </h2>
+<ul>
+<li><a href="/posts/230911151334.html">pthread 库 </a></li>
+<li><a href="/posts/230921094127.html"> 锁与原子操作 </a></li>
+<li><a href="/posts/240319195609.html"> 读者写者问题 </a></li>
+<li><a href="/posts/240527200241.html"> 网络编程卷一阅读随笔 </a></li>
+<li><a href="/posts/240414190410.html"> 进程间通信 IPC 机制 </a></li>
+<li><a href="/posts/240424200123.html"> 多进程相关练习 </a></li>
+<li><a href="/posts/240516221527.html">I/O 模式与 I/O 多路复用 </a></li>
+<li><a href="/posts/240626192803.html">Linux 内核 kfifo 环形队列 </a></li>
+<li><a href="/posts/241009203126.html">Linux 内核等待队列 </a></li>
+<li><a href="/posts/240627210637.html">DPDK 无锁环形队列 </a></li>
+<li><a href="/posts/240919200410.html"> 解密内存屏障 </a></li>
+<li><a href="/posts/240927202500.html"> 内核线程的创建 </a></li>
+<li><a href="/posts/241015195205.html">Linux 网络数据包接收过程 </a></li>
+<li><a href="/posts/2410232111015.html"> 源码解读 epoll 实现原理 </a></li>
+<li><a href="/posts/241106182619.html">Linux 文件系统 </a></li>
+<li><a href="/posts/250619154429.html">Libevent 高性能 IO 事件驱动库 </a></li>
+</ul>
+<h2 id="工具与命令"> 工具与命令 </h2>
+<ul>
+<li><a href="/posts/240207180410.html">GCC 编译过程分解 </a></li>
+<li><a href="/posts/240312184132.html">GDB 调试入门 </a></li>
+<li><a href="/posts/240512184921.html">Makefile 学习 </a></li>
+<li><a href="/posts/250629214430.html">CMake 学习 </a></li>
+<li><a href="/posts/240417193754.html">Linux 命令之文件权限 </a></li>
+</ul>
+<h2 id="开源项目"> 开源项目 </h2>
+<ul>
+<li><a href="/posts/240303201855.html"> 线程池原理与实现 </a></li>
+<li><a href="/posts/240507194549.html">HTTP 服务器实现 </a></li>
+<li><a href="/posts/240904203605.html"> 聊天服务器实现 </a></li>
+<li><a href="/posts/241119182636.html">Linux 文件系统 </a></li>
+</ul>
+<h2 id="Docker">Docker</h2>
+<ul>
+<li><a href="/posts/230909171809.html">Docker 学习笔记 </a></li>
+</ul>
+<h1 id="LeetCode 刷题">LeetCode 刷题 </h1>
+<h2 id="链表相关"> 链表相关 </h2>
+<ul>
+<li><a href="/posts/231025143947.html">160 相交链表 </a></li>
+<li><a href="/posts/231025185947.html">206 反转链表 </a></li>
+<li><a href="/posts/231026101239.html">21 合并两个有序链表 </a></li>
+<li><a href="/posts/231026184514.html">83 删除排序链表中的重复元素 </a></li>
+<li><a href="/posts/231027150243.html">19 删除链表的倒数第 N 个节点 </a></li>
+<li><a href="/posts/231031120718.html">2 两数相加 </a></li>
+<li><a href="/posts/231031163133.html">445 两数相加 II</a></li>
+<li><a href="/posts/231101094219.html">234 回文链表 </a></li>
+<li><a href="/posts/231101135228.html">725 分隔链表 </a></li>
+<li><a href="/posts/231102120708.html">328 奇偶链表 </a></li>
+<li><a href="/posts/231102165703.html">142 环形链表 II</a></li>
+</ul>
+<h2 id="设计"> 设计 </h2>
+<ul>
+<li><a href="/posts/231201184542.html">146 LRU 缓存 </a></li>
+</ul>
+<h2 id="贪心算法"> 贪心算法 </h2>
+<ul>
+<li><a href="/posts/231107094652.html">1029 两地调度 </a></li>
+<li><a href="/posts/231109150855.html">435 无重叠区间 </a></li>
+</ul>
+<h2 id="哈希表"> 哈希表 </h2>
+<ul>
+<li><a href="/posts/231123181539.html">1410 实体解析器 </a></li>
+</ul>
+<h2 id="树的遍历"> 树的遍历 </h2>
+<ul>
+<li><a href="/posts/231103121209.html">117 填充每个节点的下一个右侧节点指针 II</a></li>
+</ul>
+<h2 id="深度优先搜索（递归）"> 深度优先搜索（递归）</h2>
+<ul>
+<li><a href="/posts/231206201243.html">2477 达到首都的最少油耗 </a></li>
+</ul>
+<h2 id="图或路径问题"> 图或路径问题 </h2>
+<ul>
+<li><a href="/posts/231211184652.html">1631 最小体力消耗路径 </a></li>
+</ul>
+<h2 id="其它"> 其它 </h2>
+<ul>
+<li><a href="/posts/230101120000.html"> 备忘录 </a></li>
+</ul>
+
+</div>
+
+
+<script src="/js/book-menu.js"></script>
+
+    </div>
+    <div class="sidebar-toggle" onclick="sidebar_toggle()" onmouseover="add_inner()" onmouseleave="remove_inner()">
+  <div class="sidebar-toggle-inner"></div>
+</div>
+
+<script>
+function add_inner() {
+  let inner = document.querySelector('.sidebar-toggle-inner')
+  inner.classList.add('show')  
+}
+
+function remove_inner() {
+  let inner = document.querySelector('.sidebar-toggle-inner')
+  inner.classList.remove('show')
+}
+
+function sidebar_toggle() {
+    let sidebar_toggle = document.querySelector('.sidebar-toggle')
+    let sidebar = document.querySelector('.book-sidebar')
+    let content = document.querySelector('.off-canvas-content')
+    if (sidebar_toggle.classList.contains('extend')) { // show
+        sidebar_toggle.classList.remove('extend')
+        sidebar.classList.remove('hide')
+        content.classList.remove('extend')
+    }
+    else { // hide
+        sidebar_toggle.classList.add('extend')
+        sidebar.classList.add('hide')
+        content.classList.add('extend')
+    }
+}
+</script>
+
+      <div class="off-canvas-content">
+        <div class="columns">
+          <div class="column col-10 col-lg-12">
+            <div class="book-navbar">
+              <!-- For Responsive Layout -->
+
+<header class="navbar">
+  <section class="navbar-section">
+    <a onclick="open_sidebar()">
+      <i class="icon icon-menu"></i>
+    </a>
+  </section>
+</header>
+
+            </div>
+            <div class="book-content">
+              
+<article id="page">
+  <h1></h1>
+  <!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<title>Markmap</title>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+}
+#mindmap {
+  display: block;
+  width: 100vw;
+  height: 100vh;
+}
+</style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/markmap-toolbar@0.14.4/dist/style.css">
+<style>.darkmode--activated{--body-bg-color:#282828;--content-bg-color:#333;--card-bg-color:#555;--text-color:#ccc;--blockquote-color:#bbb;--link-color:#ccc;--link-hover-color:#eee;--brand-color:#ddd;--brand-hover-color:#ddd;--table-row-odd-bg-color:#282828;--table-row-hover-bg-color:#363636;--menu-item-bg-color:#555;--btn-default-bg:#222;--btn-default-color:#ccc;--btn-default-border-color:#555;--btn-default-hover-bg:#666;--btn-default-hover-color:#ccc;--btn-default-hover-border-color:#666;--highlight-background:#282b2e;--highlight-foreground:#a9b7c6;--highlight-gutter-background:#34393d;--highlight-gutter-foreground:#9ca9b6}.darkmode--activated img{opacity:.75}.darkmode--activated img:hover{opacity:.9}.darkmode--activated code{color:#69dbdc;background:0 0}button.darkmode-toggle{z-index:9999}.darkmode-ignore,img{display:flex!important}.beian img{display:inline-block!important}</style></head>
+<body>
+<svg id="mindmap"></svg>
+<script src="https://cdn.jsdelivr.net/npm/d3@6.7.0"></script><script src="https://cdn.jsdelivr.net/npm/markmap-view@0.14.4"></script><script>(getMarkmap => {
+        window.WebFontConfig = {
+          custom: {families: ['KaTeX_AMS', 'KaTeX_Caligraphic:n4,n7', 'KaTeX_Fraktur:n4,n7', 'KaTeX_Main:n4,n7,i4,i7', 'KaTeX_Math:i4,i7', 'KaTeX_Script', 'KaTeX_SansSerif:n4,n7,i4', 'KaTeX_Size1', 'KaTeX_Size2', 'KaTeX_Size3', 'KaTeX_Size4', 'KaTeX_Typewriter']
+          },
+          active: () => {getMarkmap().refreshHook.call();}
+        };
+      })(() => window.markmap)</script><script src="https://cdn.jsdelivr.net/npm/webfontloader@1.6.28/webfontloader.js" defer></script><script src="https://cdn.jsdelivr.net/npm/markmap-toolbar@0.14.4/dist/index.umd.min.js"></script><script>(r => {setTimeout(r);
+              })(() => {
+  const {
+    markmap,
+    mm
+  } = window;
+  const toolbar = new markmap.Toolbar();
+  toolbar.attach(mm);
+  const el = toolbar.render();
+  el.setAttribute('style', 'position:absolute;bottom:20px;right:20px');
+  document.body.append(el);
+})</script><script>((getMarkmap, getOptions, root, jsonOptions) => {const markmap = getMarkmap();
+        window.mm = markmap.Markmap.create('svg#mindmap', (getOptions || markmap.deriveOptions)(jsonOptions), root);
+      })(() => window.markmap,null,{"type":"root","depth":0,"content":"","children":[{"type":"heading","depth":1,"payload":{"lines":[1,2]},"content":"SRv6 基础 ","children":[{"type":"heading","depth":2,"payload":{"lines":[3,4]},"content":" 简介 ","children":[{"type":"heading","depth":3,"payload":{"lines":[5,6]},"content":"SR","children":[{"type":"list_item","depth":4,"payload":{"lines":[7,9]},"content":"SR 采用源节点路径选择机制，预先在源节点封装好转发路径经过 SR 节点的 SID，<br>\n 当报文经过 SR 节点时，该节点根据报文的 SID 对报文进行转发 "}]},{"type":"heading","depth":3,"payload":{"lines":[10,11]},"content":"SRv6","children":[{"type":"list_item","depth":4,"payload":{"lines":[12,13]},"content":"SRv6 是指在 IPv6 网络中使用 SR、 将 IPv6 地址作为 SID 对报文进行转发 "}]}]},{"type":"heading","depth":2,"payload":{"lines":[14,15]},"content":"SR 节点 ","children":[{"type":"list_item","depth":3,"payload":{"lines":[16,17]},"content":"SR 节点：支持 SRv6 功能的设备 "},{"type":"list_item","depth":3,"payload":{"lines":[17,18]},"content":" 源节点：负责路径选择、封装有序 SID 列表的节点 "},{"type":"list_item","depth":3,"payload":{"lines":[18,19]},"content":" 中间节点：负责传输封装报文的节点 "},{"type":"list_item","depth":3,"payload":{"lines":[19,20]},"content":" 尾节点：负责剥离封装的扩展头、转发报文至出口节点的节点 "}]},{"type":"heading","depth":2,"payload":{"lines":[21,22]},"content":"SID","children":[{"type":"heading","depth":3,"payload":{"lines":[23,24]},"content":" 地址形式 ","children":[{"type":"list_item","depth":4,"payload":{"lines":[25,26]},"content":"SID 采用 IPv6 地址形式，但 <strong> 不与任何设备的接口地址对应 </strong>"}]},{"type":"heading","depth":3,"payload":{"lines":[27,28]},"content":" 字段构成 ","children":[{"type":"list_item","depth":4,"payload":{"lines":[29,30]},"content":"Locator：标识 SID 所属的网段 "},{"type":"list_item","depth":4,"payload":{"lines":[30,31]},"content":"Function：标识与 SID 绑定的本地操作指令 "},{"type":"list_item","depth":4,"payload":{"lines":[31,32]},"content":"Arguments：报文的流和服务信息，可选字段 "},{"type":"list_item","depth":4,"payload":{"lines":[32,33]},"content":"MBZ：补 0 位，使 SID 固定为 128 位 "},{"type":"list_item","depth":4,"payload":{"lines":[33,34]},"content":" 例如 Locator=2001:DB80:A::/64, Func=0x111，则 SID = 2001:DB80:A::111"}]},{"type":"heading","depth":3,"payload":{"lines":[35,36]},"content":" 分类 ","children":[{"type":"heading","depth":4,"payload":{"lines":[37,38]},"content":" 路径 SID","children":[{"type":"list_item","depth":5,"payload":{"lines":[39,40]},"content":"End SID：Function 作用在本节点上，标识某个目的地址前缀 "},{"type":"list_item","depth":5,"payload":{"lines":[40,41]},"content":"End.X SID：Function 作用在本节点的各个出接口上，标识网络中的某条链路 "}]},{"type":"heading","depth":4,"payload":{"lines":[42,43]},"content":" 业务 SID","children":[{"type":"list_item","depth":5,"payload":{"lines":[44,45]},"content":"End.DT4 SID：标识某个 IPv4 VPN，转发动作为解封装、查找 IPv4 VPN 路由表转发 "},{"type":"list_item","depth":5,"payload":{"lines":[45,46]},"content":"End.DT6 SID：标识某个 IPv6 VPN，转发动作为解封装、查找 IPv6 VPN 路由表转发 "},{"type":"list_item","depth":5,"payload":{"lines":[46,47]},"content":"End.DT46 SID：标识某个 IPv4 VPN 或 IPv6 VPN"},{"type":"list_item","depth":5,"payload":{"lines":[47,48]},"content":"End.DX4 SID：标识某个 IPv4 下一跳，转发动作为解封装、从该 SID 绑定的三层接口转发出去 "},{"type":"list_item","depth":5,"payload":{"lines":[48,49]},"content":"End.DX6 SID：标识某个 IPv6 下一跳，转发动作为解封装、从该 SID 绑定的三层接口转发出去 "}]},{"type":"heading","depth":4,"payload":{"lines":[50,51]},"content":" 业务场景 ","children":[{"type":"list_item","depth":5,"payload":{"lines":[52,53]},"content":"End.DT4 SID：IP L3VPN、EVPN L3VPN 场景 "},{"type":"list_item","depth":5,"payload":{"lines":[53,54]},"content":"End.DT6 SID：IPv6 L3VPN、IPv6 EVPN L3VPN 场景 "},{"type":"list_item","depth":5,"payload":{"lines":[54,55]},"content":"End.DX4 SID：IP L3VPN over SRv6、EVPN L3VPN over SRv6 和公网 IPv4 over SRv6 场景 "},{"type":"list_item","depth":5,"payload":{"lines":[55,56]},"content":"End.DX6 SID：IPv6 L3VPN over SRv6、IPv6 EVPN L3VPN over SRv6 和公网 IPv6 over SRv6 场景 "},{"type":"list_item","depth":5,"payload":{"lines":[56,57]},"content":"End.OP SID：SRv6 OAM 场景 "}]}]},{"type":"heading","depth":3,"payload":{"lines":[58,59]},"content":" 对外发布 ","children":[{"type":"bullet_list","depth":4,"payload":{"lines":[60,62]},"content":"","children":[{"type":"list_item","depth":5,"payload":{"lines":[60,61]},"content":"SID 信息包括路径 SID 和业务 SID，都是全局可见、本地有效的"}]},{"type":"heading","depth":4,"payload":{"lines":[62,63]},"content":"路径 SID","children":[{"type":"list_item","depth":5,"payload":{"lines":[64,65]},"content":"在 AS 域内，通过 IGP 扩展协议 IS-IS 泛洪通告 SID 的 locator 路由及 SID 类型"}]},{"type":"heading","depth":4,"payload":{"lines":[66,67]},"content":"业务 SID","children":[{"type":"list_item","depth":5,"payload":{"lines":[68,69]},"content":"在 AS 域间，通过 BGP 扩展协议的 Update 报文发布 SID"}]}]},{"type":"heading","depth":3,"payload":{"lines":[70,71]},"content":"附加行为","children":[{"type":"list_item","depth":4,"payload":{"lines":[72,73]},"content":"作用：改变 SRv6 SID 的转发行为"},{"type":"list_item","depth":4,"payload":{"lines":[73,74]},"content":"PSP：倒数第二个 SRv6 节点执行 SRH 剥离操作，以提高 SRv6 尾节点的转发性能"},{"type":"list_item","depth":4,"payload":{"lines":[74,75]},"content":"NO PSP：尾节点执行 SRH 剥离操作"}]},{"type":"heading","depth":3,"payload":{"lines":[76,77]},"content":"本地 SID 表","children":[{"type":"list_item","depth":4,"payload":{"lines":[78,79]},"content":"各节点本地维护的 SID 表，记录在本节点生成的所有 SRv6 SID 信息"},{"type":"list_item","depth":4,"payload":{"lines":[79,80]},"content":"作用：生成 SRv6 FIB 表，用于转发、特定操作指令"}]}]},{"type":"heading","depth":2,"payload":{"lines":[81,82]},"content":"Segment List","children":[{"type":"list_item","depth":3,"payload":{"lines":[83,84]},"content":"包含报文转发路径信息的 SID 列表，长度为路径上 SR 节点数减 1"}]},{"type":"heading","depth":2,"payload":{"lines":[85,86]},"content":"三重编程空间","children":[{"type":"list_item","depth":3,"payload":{"lines":[87,88]},"content":"SID 可以自由组合进行路径编程"},{"type":"list_item","depth":3,"payload":{"lines":[88,89]},"content":"Function 和 Arguments 字段可以自定义功能"},{"type":"list_item","depth":3,"payload":{"lines":[89,90]},"content":"SRH 里的 TLV 可用于进一步自定义功能"}]},{"type":"heading","depth":2,"payload":{"lines":[91,92]},"content":"SRv6 隧道","children":[{"type":"list_item","depth":3,"payload":{"lines":[93,94]},"content":"定义：封装后的数据报文在网络中传输的路径"},{"type":"list_item","depth":3,"payload":{"lines":[94,95]},"content":"特点：SRv6 隧道是从源节点到尾节点的<strong> 虚拟 </strong>（私网地址）点对点连接"},{"type":"list_item","depth":3,"payload":{"lines":[95,96]},"content":"动作：隧道两端 SR 设备负责封装与解封装报文"},{"type":"list_item","depth":3,"payload":{"lines":[96,97]},"content":"规划：规划 SRv6 隧道的源节点、中间节点、尾节点，规划各节点 IP 地址"}]},{"type":"heading","depth":2,"payload":{"lines":[98,99]},"content":"SRv6 报文","children":[{"type":"heading","depth":3,"payload":{"lines":[100,101]},"content":"SRv6 结构","children":[{"type":"list_item","depth":4,"payload":{"lines":[102,103]},"content":"结构：新的 IPv6 基本头 | SRH | 原始 IP 头"},{"type":"list_item","depth":4,"payload":{"lines":[103,104]},"content":"提醒：新的 IPv6 基本头中的 DIP 为 SID[SL] 存储的地址"}]},{"type":"heading","depth":3,"payload":{"lines":[105,106]},"content":"SRH 扩展","children":[{"type":"list_item","depth":4,"payload":{"lines":[107,108]},"content":"Segment Routing Header：指定一个 IPv6 显示路径（SID 列表）"},{"type":"list_item","depth":4,"payload":{"lines":[108,109]},"content":"Routing Type (RT)：值为 4 表示携带的是 SRH"},{"type":"list_item","depth":4,"payload":{"lines":[109,110]},"content":"Segment Left (SL)：要查看的下一个 SID 列表索引号，每经过一个节点减 1"},{"type":"list_item","depth":4,"payload":{"lines":[110,111]},"content":"Last Entry (LE)：转发路径的第一个 SID 索引号"},{"type":"list_item","depth":4,"payload":{"lines":[111,112]},"content":"Segment List：SR 转发节点构成的 SID 网络路径，索引越小越靠近尾节点"},{"type":"list_item","depth":4,"payload":{"lines":[112,113]},"content":"其他字段：略"}]}]},{"type":"heading","depth":2,"payload":{"lines":[114,115]},"content":"SRv6 报文转发","children":[{"type":"heading","depth":3,"payload":{"lines":[116,117]},"content":"1. SRv6 隧道转发确认","children":[{"type":"list_item","depth":4,"payload":{"lines":[118,119]},"content":"查找路由表判断是否 SRv6 隧道转发，若是则将报文发送给 tunnel 端口"}]},{"type":"heading","depth":3,"payload":{"lines":[120,121]},"content":"2. 源节点封装报文","children":[{"type":"list_item","depth":4,"payload":{"lines":[122,123]},"content":"a. 封装 SRH 头：正确填充 RT, SL, LE, SID 列表等字段"},{"type":"list_item","depth":4,"payload":{"lines":[123,124]},"content":"b. 封装新的 IPv6 头：SIP 为隧道源端地址，DIP 为 SID[SL]"}]},{"type":"heading","depth":3,"payload":{"lines":[125,126]},"content":"3. 查找路由表并转发","children":[{"type":"list_item","depth":4,"payload":{"lines":[127,128]},"content":"根据封装的 IPv6 头的 DIP 查找路由表，并转发"}]},{"type":"heading","depth":3,"payload":{"lines":[129,130]},"content":"4. SID 类型检查处理","children":[{"type":"list_item","depth":4,"payload":{"lines":[131,132]},"content":"a. 检查 IPv6 头中 DIP 的 SID 类型"},{"type":"list_item","depth":4,"payload":{"lines":[132,133]},"content":"b.1. 对于 End.X SID，获取其指定的出接口和下一跳信息"},{"type":"list_item","depth":4,"payload":{"lines":[133,134]},"content":"b.2. 对于其他 SID 类型，无任何操作"},{"type":"list_item","depth":4,"payload":{"lines":[134,135]},"content":"c. SRH 中 SL 减 1，并更新 IPv6 DIP 字段为 SID[SL]"}]},{"type":"heading","depth":3,"payload":{"lines":[136,137]},"content":"5. SRv6 报文转发","children":[{"type":"list_item","depth":4,"payload":{"lines":[138,139]},"content":"a. End.X SID 类型，使用指定的出接口和下一跳转发"},{"type":"list_item","depth":4,"payload":{"lines":[139,140]},"content":"b. 其他 SID 类型，根据 DIP 查找 IPv6 路由表转发"},{"type":"list_item","depth":4,"payload":{"lines":[140,141]},"content":"c. 中间节点：执行 4-5 步的操作，将 SRv6 报文转发给下一个 SR 节点"}]},{"type":"heading","depth":3,"payload":{"lines":[142,143]},"content":"6. 尾节点解封装转发","children":[{"type":"list_item","depth":4,"payload":{"lines":[144,145]},"content":"a. 检查并确认 SL 为 0，解封装报文头"},{"type":"list_item","depth":4,"payload":{"lines":[145,146]},"content":"b. 根据原始 IP 头中的 DIP 进行报文转发"}]}]},{"type":"heading","depth":2,"payload":{"lines":[147,148]},"content":"引流到 SRv6 隧道","children":[{"type":"heading","depth":3,"payload":{"lines":[149,150]},"content":"引流原因","children":[{"type":"list_item","depth":4,"payload":{"lines":[151,152]},"content":"业务报文可能不会自动通过 SRv6 隧道转发，而是被路由到其它出接口转发"}]},{"type":"heading","depth":3,"payload":{"lines":[153,154]},"content":"引流方式","children":[{"type":"heading","depth":4,"payload":{"lines":[155,156]},"content":"静态路由","children":[{"type":"list_item","depth":5,"payload":{"lines":[157,158]},"content":"方法：在源节点定义一条通过 tunnel 源端点到达目的网络的静态路由"},{"type":"list_item","depth":5,"payload":{"lines":[158,159]},"content":"优劣：简单、直观，但配置量与业务量成正比、维护难度大"}]},{"type":"heading","depth":4,"payload":{"lines":[160,161]},"content":"自动路由","children":[{"type":"list_item","depth":5,"payload":{"lines":[162,163]},"content":"原理：将 SRv6 隧道发布并参与到 IGP 路由计算中，使流量可以通过 SRv6 隧道转发"},{"type":"list_item","depth":5,"payload":{"lines":[163,164]},"content":"IGP Shortcut：将 SRv6 隧道实体化为一条<strong> 物理 </strong> 链路，隧道源端节点参与 IGP 路由扩散"}]}]}]}]},{"type":"heading","depth":1,"payload":{"lines":[165,166]},"content":"SRv6 BE vs TE","children":[{"type":"heading","depth":2,"payload":{"lines":[167,168]},"content":"SRv6 BE","children":[{"type":"list_item","depth":3,"payload":{"lines":[169,170]},"content":"只需首尾节点即可，SID 列表长度为 1，DIP 为 SRv6 隧道尾节点 SID，转发过程中 DIP 不变"}]},{"type":"heading","depth":2,"payload":{"lines":[171,172]},"content":"SRv6 TE","children":[{"type":"list_item","depth":3,"payload":{"lines":[173,174]},"content":"需要首、尾及中间节点，SID 列表长度为节点数 - 1，DIP 为 SID[SL]，每个中间节点都会修改 DIP"}]}]},{"type":"heading","depth":1,"payload":{"lines":[175,176]},"content":"SRv6 TE Policy","children":[{"type":"heading","depth":2,"payload":{"lines":[177,178]},"content":"简介","children":[{"type":"list_item","depth":3,"payload":{"lines":[179,180]},"content":"当 SR 网络的源 -&gt; 目的节点间存在多条路径时，SRv6 TE Policy 技术可以提供灵活的转发路径选择和负载分担"}]},{"type":"heading","depth":2,"payload":{"lines":[181,182]},"content":"标识","children":[{"type":"list_item","depth":3,"payload":{"lines":[183,184]},"content":"BSID：入节点 SID，用于匹配原始 IPv6 报文的 DIP"},{"type":"list_item","depth":3,"payload":{"lines":[184,185]},"content":"Color：转发路径的 Color 属性，用于在相同源 &amp; 目的节点间区分不同 SRv6 TE Policy"},{"type":"list_item","depth":3,"payload":{"lines":[185,186]},"content":"Endpoint：SRv6 TE Policy 目的 SR 节点的 IPv6 地址"}]},{"type":"heading","depth":2,"payload":{"lines":[187,188]},"content":"构成","children":[{"type":"heading","depth":3,"payload":{"lines":[189,190]},"content":"概括","children":[{"type":"list_item","depth":4,"payload":{"lines":[191,192]},"content":"一个 SRv6 TE Policy 由多条具有不同优先级的候选路径组成，每个候选路径包括由 SID 列表标识的一条或多条转发路径"}]},{"type":"heading","depth":3,"payload":{"lines":[193,194]},"content":"组织结构","children":[{"type":"list_item","depth":4,"payload":{"lines":[195,196]},"content":"I. SRv6 TE Policy 标识部分"},{"type":"list_item","depth":4,"payload":{"lines":[196,197]},"content":"I.A. 候选路径：一个 SRv6 TE Policy 至少包含一条具有优先级的候选路径"},{"type":"list_item","depth":4,"payload":{"lines":[197,198]},"content":"I.A.x SID 列表：每条候选路径至少包括一组带权 SID 列表标识的转发路径"}]}]},{"type":"heading","depth":2,"payload":{"lines":[199,200]},"content":"创建方式","children":[{"type":"heading","depth":3,"payload":{"lines":[201,202]},"content":"手工创建","children":[{"type":"list_item","depth":4,"payload":{"lines":[203,204]},"content":"手工配置 SRv6 TE Policy 结构信息：候选路径及其优先级、候选路径的 SID 列表及其权重"}]},{"type":"heading","depth":3,"payload":{"lines":[205,206]},"content":"路由学习","children":[{"type":"list_item","depth":4,"payload":{"lines":[207,209]},"content":"将本地配置的 SRv6 TE Policy 结构信息通过 BGP IPv6 SR Policy 路由发布到对端，<br>\n 对端接收并生成自己的 SRv6 TE Policy 结构信息"}]}]},{"type":"heading","depth":2,"payload":{"lines":[210,211]},"content":"有效性判断","children":[{"type":"list_item","depth":3,"payload":{"lines":[212,213]},"content":"a. 保证 SID 列表有效（不为空、权重非 0、SR 节点与 SID 列表第一跳可互通）"},{"type":"list_item","depth":3,"payload":{"lines":[213,214]},"content":"b. 再保证候选路径中存在有效 SID 列表、再保证 SRv6 TE Policy 中存在有效候选路径"}]},{"type":"heading","depth":2,"payload":{"lines":[215,216]},"content":"引流","children":[{"type":"heading","depth":3,"payload":{"lines":[217,218]},"content":"基于 BSID 引流","children":[{"type":"list_item","depth":4,"payload":{"lines":[219,220]},"content":"查找 IPv6 路由表，若为 SRv6 表项且报文的 DIP 为 SRv6 TE Policy 的 BSID，则通过 SRv6 TE Policy 转发"}]},{"type":"heading","depth":3,"payload":{"lines":[221,222]},"content":"基于 Color 引流","children":[{"type":"list_item","depth":4,"payload":{"lines":[223,224]},"content":"a. 查找并存在 existBGP(Color, Endpoint) 路由，则迭代 BGP 路由到 SRv6 TE Policy"},{"type":"list_item","depth":4,"payload":{"lines":[224,225]},"content":"b. 设备收到匹配该 BGP 路由的报文时，会通过 SRv6 TE Policy 转发"}]},{"type":"heading","depth":3,"payload":{"lines":[226,227]},"content":"基于隧道策略引流","children":[{"type":"list_item","depth":4,"payload":{"lines":[228,229]},"content":"通过部署隧道策略，将 SRv6 TE Policy 作为公网隧道来转发私网报文"}]}]},{"type":"heading","depth":2,"payload":{"lines":[230,231]},"content":"选路转发原则","children":[{"type":"list_item","depth":3,"payload":{"lines":[232,233]},"content":"a. 选择优先级最大的有效候选路径转发流量"},{"type":"list_item","depth":3,"payload":{"lines":[233,234]},"content":"b. 再根据 SID 列表权重，进行流量的负载分担"},{"type":"list_item","depth":3,"payload":{"lines":[234,235]},"content":"负载分担公式 <span class=\"katex\"><span class=\"katex-mathml\"><math xmlns=\"http://www.w3.org/1998/Math/MathML\"><semantics><mrow><msub><mi>w</mi><mi>i</mi></msub><mi mathvariant=\"normal\">/</mi><msubsup><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></msubsup><msub><mi>w</mi><mi>i</mi></msub></mrow><annotation encoding=\"application/x-tex\">w_{i}/\\sum_{i=1}^{N}{w_i}</annotation></semantics></math></span><span class=\"katex-html\"aria-hidden=\"true\"><span class=\"base\"><span class=\"strut\"style=\"height:1.2809em;vertical-align:-0.2997em;\"></span><span class=\"mord\"><span class=\"mord mathnormal\"style=\"margin-right:0.02691em;\">w</span><span class=\"msupsub\"><span class=\"vlist-t vlist-t2\"><span class=\"vlist-r\"><span class=\"vlist\"style=\"height:0.3117em;\"><span style=\"top:-2.55em;margin-left:-0.0269em;margin-right:0.05em;\"><span class=\"pstrut\"style=\"height:2.7em;\"></span><span class=\"sizing reset-size6 size3 mtight\"><span class=\"mord mtight\"><span class=\"mord mathnormal mtight\">i</span></span></span></span></span><span class=\"vlist-s\">​</span></span><span class=\"vlist-r\"><span class=\"vlist\"style=\"height:0.15em;\"><span></span></span></span></span></span></span><span class=\"mord\">/</span><span class=\"mspace\"style=\"margin-right:0.1667em;\"></span><span class=\"mop\"><span class=\"mop op-symbol small-op\"style=\"position:relative;top:0em;\">∑</span><span class=\"msupsub\"><span class=\"vlist-t vlist-t2\"><span class=\"vlist-r\"><span class=\"vlist\"style=\"height:0.9812em;\"><span style=\"top:-2.4003em;margin-left:0em;margin-right:0.05em;\"><span class=\"pstrut\"style=\"height:2.7em;\"></span><span class=\"sizing reset-size6 size3 mtight\"><span class=\"mord mtight\"><span class=\"mord mathnormal mtight\">i</span><span class=\"mrel mtight\">=</span><span class=\"mord mtight\">1</span></span></span></span><span style=\"top:-3.2029em;margin-right:0.05em;\"><span class=\"pstrut\"style=\"height:2.7em;\"></span><span class=\"sizing reset-size6 size3 mtight\"><span class=\"mord mtight\"><span class=\"mord mathnormal mtight\"style=\"margin-right:0.10903em;\">N</span></span></span></span></span><span class=\"vlist-s\">​</span></span><span class=\"vlist-r\"><span class=\"vlist\"style=\"height:0.2997em;\"><span></span></span></span></span></span></span><span class=\"mspace\"style=\"margin-right:0.1667em;\"></span><span class=\"mord\"><span class=\"mord\"><span class=\"mord mathnormal\"style=\"margin-right:0.02691em;\">w</span><span class=\"msupsub\"><span class=\"vlist-t vlist-t2\"><span class=\"vlist-r\"><span class=\"vlist\"style=\"height:0.3117em;\"><span style=\"top:-2.55em;margin-left:-0.0269em;margin-right:0.05em;\"><span class=\"pstrut\"style=\"height:2.7em;\"></span><span class=\"sizing reset-size6 size3 mtight\"><span class=\"mord mathnormal mtight\">i</span></span></span></span><span class=\"vlist-s\">​</span></span><span class=\"vlist-r\"><span class=\"vlist\"style=\"height:0.15em;\"><span></span></span></span></span></span></span></span></span></span></span>，流量按比例分流到对应转发路径上"}]},{"type":"heading","depth":2,"payload":{"lines":[236,237]},"content":"报文转发","children":[{"type":"list_item","depth":3,"payload":{"lines":[238,239]},"content":"a. 选择一种方式引流到 SRv6 TE Policy 隧道，如 BSID 引流"},{"type":"list_item","depth":3,"payload":{"lines":[239,240]},"content":"b. 按 SRv6 报文转发流量转发即可"}]},{"type":"heading","depth":2,"payload":{"lines":[241,242]},"content":"基于 SBFD 故障检测","children":[{"type":"heading","depth":3,"payload":{"lines":[243,244]},"content":"检测原因","children":[{"type":"list_item","depth":4,"payload":{"lines":[245,246]},"content":"SRv6 TE Policy 不会通过设备之间互相发送的消息来维持自身状态"}]},{"type":"heading","depth":3,"payload":{"lines":[247,248]},"content":"检测过程","children":[{"type":"list_item","depth":4,"payload":{"lines":[249,250]},"content":"a. 源节点发送 SBFD 报文，SBFD 报文封装 SRv6 TE Policy 中的 SID 列表"},{"type":"list_item","depth":4,"payload":{"lines":[250,252]},"content":"b. 尾节点接收 SBFD 报文，做报文与本地远端标识符一致判断，一致<br>\n 则通过 IPv6 路由向源节点发送 SBFD 响应报文"},{"type":"list_item","depth":4,"payload":{"lines":[252,254]},"content":"c. 头节点若在检检测超时时间内收到 SBFD 响应报文，则认为 SID 列表<br>\n 正常，否则故障"}]}]},{"type":"heading","depth":2,"payload":{"lines":[255,256]},"content":"热备份","children":[{"type":"heading","depth":3,"payload":{"lines":[257,258]},"content":"原因","children":[{"type":"list_item","depth":4,"payload":{"lines":[259,260]},"content":"在被选定使用的最高优先级候选路径发生故障时，可以无丢包的切换候选路径"}]},{"type":"heading","depth":3,"payload":{"lines":[261,262]},"content":"方法","children":[{"type":"list_item","depth":4,"payload":{"lines":[263,264]},"content":"选择优先级次高的有效候选路径作为备份路径，当主路径故障时切换为备份候选路径转发"}]}]}]}],"payload":{}},{})</script>
+</body>
+</html>
+
+</article>
+
+<div id="paginator">
+  
+</div>
+
+            </div>
+          </div>
+          <div class="column col-2 hide-lg">
+            <div class="book-post-info">
+  
+    <div class="book-post-meta">
+
+  <div class="author">
+
+    <!-- Author image -->
+    <div class="author-img">
+      
+        <figure
+          class="avatar avatar-lg"
+          data-initial="A"
+          style="background-color: #3b4351;">
+        </figure>
+      
+    </div>
+
+    <!-- Author title -->
+    <div class="author-title">
+      <div>aha</div>
+      <div>2025-06-29</div>
+    </div>
+  </div>
+
+  
+
+  <div class="divider"></div>
+</div>
+  
+
+  <div class="book-tocbot">
+</div>
+<div class="book-tocbot-menu">
+  <a class="book-toc-expand" onclick="expand_toc()">Expand all</a>
+  <a onclick="go_top()">Back to top</a>
+  <a onclick="go_bottom()">Go to bottom</a>
+  <a onclick="toggleSearch()">Search in blogs</a> <!-- 添加搜索文字的点击事件 -->
+</div>
+
+<div id="search-overlay" class="search-overlay" style="display: none;"> <!-- 初始状态为隐藏 -->
+  <div class="search-box">
+    <input type="text" id="search-input" placeholder="Search in all blogs...">
+    <button onclick="closeSearch()">Close</button> <!-- 添加关闭按钮 -->
+    <div id="search-results" class="search-results"></div>
+  </div>
+</div>
+
+<script>
+  function performSearch(query) {
+    if (!query.trim()) {
+      return;
+    }
+
+    fetch('/search.xml')
+      .then(response => response.text())
+      .then(data => {
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(data, "text/xml");
+        const entries = xmlDoc.getElementsByTagName('entry');
+        let results = '';
+
+        for (let i = 0; i < entries.length; i++) {
+          const title = entries[i].getElementsByTagName('title')[0].textContent;
+          const content = entries[i].getElementsByTagName('content')[0].textContent;
+          const url = entries[i].getElementsByTagName('url')[0].textContent;
+
+          let count = (title.match(new RegExp(query, "gi")) || []).length; // 统计查询词出现的次数
+          count += (content.match(new RegExp(query, "gi")) || []).length;
+
+          if (count > 0) { // title.includes(query) || content.includes(query)
+            results += `
+              <div class="search-result-item">
+                <a href="${url}">${title}</a> (${count})
+              </div>`;
+          }
+        }
+
+        const searchResultsElement = document.getElementById('search-results');
+        searchResultsElement.innerHTML = results;
+        searchResultsElement.classList.add('active');
+      });
+  }
+
+  function toggleSearch() {
+    const searchOverlay = document.getElementById('search-overlay');
+    searchOverlay.style.display = searchOverlay.style.display === 'none' ? 'flex' : 'none';
+  }
+
+  function closeSearch() {
+    document.getElementById('search-overlay').style.display = 'none';
+  }
+
+  document.getElementById('search-input').addEventListener('input', function() {
+    const query = this.value;
+    performSearch(query);
+  });
+</script>
+
+<style>
+  .search-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  .search-box {
+    background: white;
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+    width: 80%;
+    max-width: 500px;
+  }
+
+  .search-results {
+    margin-top: 10px;
+    max-height: 300px;
+    overflow-y: auto;
+    background: white;
+    padding: 10px;
+    border-radius: 5px;
+    width: 100%;
+  }
+
+  .search-result-item {
+    margin: 10px 0;
+  }
+
+  .search-result-item a {
+    color: blue; /* 设置链接颜色为蓝色 */
+    text-decoration: none;
+  }
+
+  .search-result-item a:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+<script src="/js/book-toc.js"></script>
+
+
+</div>
+          </div>
+        </div>
+      </div>
+
+      <a class="off-canvas-overlay" onclick="hide_canvas()"></a>
+
+      <button class="floating-button" onclick="toggleDropdownMenu()"></button>
+
+      <div class="dropdown-menu">
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FFFFFF', '#000000')">银河白</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#C7EDCC', '#000000')">豆沙绿</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FAF9DE', '#000000')">杏仁黄</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#E3EDCD', '#000000')">青草绿</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FFF2E2', '#000000')">秋叶褐</div>
+      </div>
+  </div>
+
+  <script>
+    function toggleDropdownMenu() {
+      document.querySelector('.floating-button').classList.toggle('active');
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      var storedBackgroundColor = localStorage.getItem('blogBackgroundColor');
+      var storedColor = localStorage.getItem('blogColor');
+
+      if (storedBackgroundColor && storedColor) {
+        document.body.style.backgroundColor = storedBackgroundColor;
+        document.body.style.color = storedColor;
+      }
+    });
+
+    function changeBackgroundColor(backgroundColor, color) {
+      document.body.style.backgroundColor = backgroundColor;
+      document.body.style.color = color;
+
+      localStorage.setItem('blogBackgroundColor', backgroundColor);
+      localStorage.setItem('blogColor', color);
+
+      document.querySelector('.floating-button').classList.remove('active');
+    }
+  </script>
+</body>
+
+</html>
+
+
+<script src="/js/book.js"></script>

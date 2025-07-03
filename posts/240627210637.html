@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
+
+    
+      <link rel="icon" href="/favicon.png" />
+    
+
+    <title>
+        
+          DPDK 无锁环形队列 - aha&#39;s book
+        
+    </title>
+
+    <!-- Spectre.css framework -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre-exp.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre-icons.min.css">
+
+    <!-- theme css & js -->
+    
+<link rel="stylesheet" href="/css/book.css">
+
+    
+<script src="/js/book.js"></script>
+
+
+    <!-- tocbot -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.css">
+    
+    <!-- katex -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/zooming/2.1.1/zooming.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const zooming = new Zooming()
+    zooming.listen('.book-content img')
+})
+</script>
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+    <style>
+      body {
+        background-color: #FFFFFF;
+        /* color: #000000; */
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+
+      /* Floating Button Styles */
+      .floating-button {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 999;
+        background-color: #000000;
+        color: #ffffff;
+        padding: 12px;
+        border-radius: 50%;
+        cursor: pointer;
+        border: 2px solid #000000;
+      }
+
+      .floating-button:hover {
+        background-color: #FFFFFF;
+      }
+
+      /* Dropdown Menu Styles */
+      .dropdown-menu {
+        position: fixed;
+        bottom: 60px;
+        right: 10px;
+        display: none;
+        min-width: 60px;
+        padding: 2px;
+        background-color: #fff;
+        /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
+        z-index: 1000;
+      }
+
+      .floating-button.active+.dropdown-menu {
+        display: block;
+      }
+
+      .dropdown-item {
+        display: block;
+        padding: 8px 16px;
+        cursor: pointer;
+      }
+
+      .dropdown-item:hover {
+        background-color: #f5f5f5;
+      }
+    </style>
+<style>.darkmode--activated{--body-bg-color:#282828;--content-bg-color:#333;--card-bg-color:#555;--text-color:#ccc;--blockquote-color:#bbb;--link-color:#ccc;--link-hover-color:#eee;--brand-color:#ddd;--brand-hover-color:#ddd;--table-row-odd-bg-color:#282828;--table-row-hover-bg-color:#363636;--menu-item-bg-color:#555;--btn-default-bg:#222;--btn-default-color:#ccc;--btn-default-border-color:#555;--btn-default-hover-bg:#666;--btn-default-hover-color:#ccc;--btn-default-hover-border-color:#666;--highlight-background:#282b2e;--highlight-foreground:#a9b7c6;--highlight-gutter-background:#34393d;--highlight-gutter-foreground:#9ca9b6}.darkmode--activated img{opacity:.75}.darkmode--activated img:hover{opacity:.9}.darkmode--activated code{color:#69dbdc;background:0 0}button.darkmode-toggle{z-index:9999}.darkmode-ignore,img{display:flex!important}.beian img{display:inline-block!important}</style></head>
+
+<body>
+  <div class="book-container">
+    <div class="book-sidebar">
+      <div class="book-brand">
+  <a href="/">
+    <img src="/favicon.png">
+    <span>AHA&#39;S BOOK</span>
+  </a>
+</div>
+        <div id="menu" class="book-menu hide">
+  <h2 id="基础知识"> 基础知识 </h2>
+<ul>
+<li><a href="/posts/231010144856.html"> 模运算 </a></li>
+<li><a href="/posts/231014105311.html"> 异或运算 </a></li>
+<li><a href="/posts/231210181853.html"> 计算机中的寄存器 </a></li>
+<li><a href="/posts/231213183051.html"> 正则表达式基础 </a></li>
+</ul>
+<h2 id="C 语言">C 语言 </h2>
+<ul>
+<li><a href="/posts/230916171929.html">main 函数参数 </a></li>
+<li><a href="/posts/231214192113.html"> 关键字与专有名词 </a></li>
+<li><a href="/posts/240103180653.html"> 输出打印函数 </a></li>
+<li><a href="/posts/230922143003.html"> 多维数组 </a></li>
+<li><a href="/posts/230913200729.html">const 关键字 </a></li>
+<li><a href="/posts/230918174223.html">typedef 类型基础 </a></li>
+<li><a href="/posts/230920172849.html">typedef 类型实践 </a></li>
+<li><a href="/posts/240224193217.html"> 二级指针 </a></li>
+<li><a href="/posts/240307195203.html"> 代码 TOP-K 问题 </a></li>
+<li><a href="/posts/230922172626.html">uthash 哈希表基础 </a></li>
+<li><a href="/posts/230918114841.html"> 大小端知识 </a></li>
+</ul>
+<h2 id="Golang 语言">Golang 语言 </h2>
+<ul>
+<li><a href="/posts/230907162612.html"> 变量与常量 </a></li>
+<li><a href="/posts/230909120145.html"> 函数 &amp; 包 &amp; 判断 &amp; 循环 </a></li>
+<li><a href="/posts/230912152800.html"> 数组与切片 </a></li>
+<li><a href="/posts/230913161326.html"> 可变参数函数与 Map 集合 </a></li>
+<li><a href="/posts/230915155105.html"> 字符串和指针 </a></li>
+</ul>
+<h2 id="数据结构"> 数据结构 </h2>
+<ul>
+<li><a href="/posts/231007174854.html"> 链表（数组实现）</a></li>
+<li><a href="/posts/231008213450.html"> 链表（链式实现）</a></li>
+<li><a href="/posts/231016161508.html"> 堆栈（数组实现）</a></li>
+<li><a href="/posts/231016184406.html"> 堆栈（链表实现）</a></li>
+<li><a href="/posts/231127185207.html"> 单调栈 </a></li>
+<li><a href="/posts/231017105123.html"> 队列（链表实现）</a></li>
+<li><a href="/posts/231017154121.html"> 双端队列（链表实现）</a></li>
+<li><a href="/posts/231018102559.html"> 堆基础与堆结构（数组实现）</a></li>
+<li><a href="/posts/231019102311.html"> 优先队列（堆实现）</a></li>
+<li><a href="/posts/230905224335.html"> 二叉树的遍历 </a></li>
+<li><a href="/posts/231020174358.html"> 二叉搜索树 </a></li>
+<li><a href="/posts/230916094606.html"> 拓扑排序 </a></li>
+<li><a href="/posts/230925185057.html">Trie 字典树 </a></li>
+<li><a href="/posts/231023164532.html"> 并查集（数组实现）</a></li>
+<li><a href="/posts/240702200642.html">Linux 数据结构之队列 </a></li>
+</ul>
+<h2 id="数据结构算法"> 数据结构算法 </h2>
+<ul>
+<li><a href="/posts/231218181635.html"> 归并排序 </a></li>
+<li><a href="/posts/231108163339.html"> 快速排序 </a></li>
+<li><a href="/posts/231107171607.html"> 堆排序 </a></li>
+<li><a href="/posts/231124181658.html"> 二分查找 </a></li>
+<li><a href="/posts/231227190828.html"> 哈希表实现 </a></li>
+<li><a href="/posts/240313193201.html"> 字符串哈希函数 </a></li>
+<li><a href="/posts/231116150205.html">Floyd 多源最短路径 </a></li>
+<li><a href="/posts/231117095232.html">Dijkstra 单源最短路径（原理部分）</a></li>
+<li><a href="/posts/231121152713.html">Dijkstra 单源最短路径（实现部分）</a></li>
+</ul>
+<h2 id="数据库"> 数据库 </h2>
+<ul>
+<li><a href="/posts/250605180332.html">MySQL 基础 </a></li>
+</ul>
+<h2 id="计算机网络"> 计算机网络 </h2>
+<ul>
+<li><a href="/posts/231011192359.html">OSI 参考模型 </a></li>
+<li><a href="/posts/240329202000.html"> 计网 CyC2018 之概述 </a></li>
+<li><a href="/posts/240329202004.html"> 计网 CyC2018 之链路层 </a></li>
+<li><a href="/posts/240329202003.html"> 计网 CyC2018 之网络层 </a></li>
+<li><a href="/posts/240329202002.html"> 计网 CyC2018 之传输层 </a></li>
+<li><a href="/posts/240329202001.html"> 计网 CyC2018 之应用层 </a></li>
+<li><a href="/posts/240306203742.html">ACL 访问控制列表 </a></li>
+<li><a href="/posts/240130190208.html"> 路由表、转发表与快速转发工作原理 </a></li>
+<li><a href="/posts/231221200716.html">VXLAN 网络虚拟化技术 </a></li>
+<li><a href="/posts/240903191243.html">TCP/IP checksum 计算 </a></li>
+<li><a href="/posts/240911185603.html"> 抓包分析 TCP 三次握手与四次挥手过程 </a></li>
+</ul>
+<h2 id="操作系统"> 操作系统 </h2>
+<ul>
+<li><a href="/posts/230921190726.html"> 概述 </a></li>
+<li><a href="/posts/230924172528.html"> 中断 &amp; 异常 &amp; 系统调用 </a></li>
+<li><a href="/posts/231017195157.html"> 内存分层体系与地址空间生成 </a></li>
+<li><a href="/posts/231108195351.html"> 连续内存分配 </a></li>
+<li><a href="/posts/231111172507.html"> 非连续内存分配之分段与分页 </a></li>
+<li><a href="/posts/231119170537.html"> 非连续内存分配之页表 </a></li>
+<li><a href="/posts/231123184526.html"> 内存管理之覆盖技术与交换技术 </a></li>
+<li><a href="/posts/231127193658.html"> 内存管理之虚存技术 </a></li>
+<li><a href="/posts/231129182631.html"> 局部页面置换算法 </a></li>
+<li><a href="/posts/231207184239.html"> 全局页面置换算法 </a></li>
+<li><a href="/posts/231207204958.html"> 进程描述 </a></li>
+<li><a href="/posts/231210211306.html"> 进程状态 </a></li>
+<li><a href="/posts/231215213932.html"> 线程 </a></li>
+<li><a href="/posts/231218220813.html"> 进程控制 </a></li>
+<li><a href="/posts/231228193143.html"> 调度 </a></li>
+<li><a href="/posts/240104202828.html"> 同步与互斥 </a></li>
+<li><a href="/posts/240113115605.html"> 信号量与管程 </a></li>
+<li><a href="/posts/240205182643.html"> 经典同步问题 </a></li>
+<li><a href="/posts/240310162231.html"> 死锁 </a></li>
+</ul>
+<h2 id="系统与网络编程"> 系统与网络编程 </h2>
+<ul>
+<li><a href="/posts/230911151334.html">pthread 库 </a></li>
+<li><a href="/posts/230921094127.html"> 锁与原子操作 </a></li>
+<li><a href="/posts/240319195609.html"> 读者写者问题 </a></li>
+<li><a href="/posts/240527200241.html"> 网络编程卷一阅读随笔 </a></li>
+<li><a href="/posts/240414190410.html"> 进程间通信 IPC 机制 </a></li>
+<li><a href="/posts/240424200123.html"> 多进程相关练习 </a></li>
+<li><a href="/posts/240516221527.html">I/O 模式与 I/O 多路复用 </a></li>
+<li><a href="/posts/240626192803.html">Linux 内核 kfifo 环形队列 </a></li>
+<li><a href="/posts/241009203126.html">Linux 内核等待队列 </a></li>
+<li><a href="/posts/240627210637.html">DPDK 无锁环形队列 </a></li>
+<li><a href="/posts/240919200410.html"> 解密内存屏障 </a></li>
+<li><a href="/posts/240927202500.html"> 内核线程的创建 </a></li>
+<li><a href="/posts/241015195205.html">Linux 网络数据包接收过程 </a></li>
+<li><a href="/posts/2410232111015.html"> 源码解读 epoll 实现原理 </a></li>
+<li><a href="/posts/241106182619.html">Linux 文件系统 </a></li>
+<li><a href="/posts/250619154429.html">Libevent 高性能 IO 事件驱动库 </a></li>
+</ul>
+<h2 id="工具与命令"> 工具与命令 </h2>
+<ul>
+<li><a href="/posts/240207180410.html">GCC 编译过程分解 </a></li>
+<li><a href="/posts/240312184132.html">GDB 调试入门 </a></li>
+<li><a href="/posts/240512184921.html">Makefile 学习 </a></li>
+<li><a href="/posts/250629214430.html">CMake 学习 </a></li>
+<li><a href="/posts/240417193754.html">Linux 命令之文件权限 </a></li>
+</ul>
+<h2 id="开源项目"> 开源项目 </h2>
+<ul>
+<li><a href="/posts/240303201855.html"> 线程池原理与实现 </a></li>
+<li><a href="/posts/240507194549.html">HTTP 服务器实现 </a></li>
+<li><a href="/posts/240904203605.html"> 聊天服务器实现 </a></li>
+<li><a href="/posts/241119182636.html">Linux 文件系统 </a></li>
+</ul>
+<h2 id="Docker">Docker</h2>
+<ul>
+<li><a href="/posts/230909171809.html">Docker 学习笔记 </a></li>
+</ul>
+<h1 id="LeetCode 刷题">LeetCode 刷题 </h1>
+<h2 id="链表相关"> 链表相关 </h2>
+<ul>
+<li><a href="/posts/231025143947.html">160 相交链表 </a></li>
+<li><a href="/posts/231025185947.html">206 反转链表 </a></li>
+<li><a href="/posts/231026101239.html">21 合并两个有序链表 </a></li>
+<li><a href="/posts/231026184514.html">83 删除排序链表中的重复元素 </a></li>
+<li><a href="/posts/231027150243.html">19 删除链表的倒数第 N 个节点 </a></li>
+<li><a href="/posts/231031120718.html">2 两数相加 </a></li>
+<li><a href="/posts/231031163133.html">445 两数相加 II</a></li>
+<li><a href="/posts/231101094219.html">234 回文链表 </a></li>
+<li><a href="/posts/231101135228.html">725 分隔链表 </a></li>
+<li><a href="/posts/231102120708.html">328 奇偶链表 </a></li>
+<li><a href="/posts/231102165703.html">142 环形链表 II</a></li>
+</ul>
+<h2 id="设计"> 设计 </h2>
+<ul>
+<li><a href="/posts/231201184542.html">146 LRU 缓存 </a></li>
+</ul>
+<h2 id="贪心算法"> 贪心算法 </h2>
+<ul>
+<li><a href="/posts/231107094652.html">1029 两地调度 </a></li>
+<li><a href="/posts/231109150855.html">435 无重叠区间 </a></li>
+</ul>
+<h2 id="哈希表"> 哈希表 </h2>
+<ul>
+<li><a href="/posts/231123181539.html">1410 实体解析器 </a></li>
+</ul>
+<h2 id="树的遍历"> 树的遍历 </h2>
+<ul>
+<li><a href="/posts/231103121209.html">117 填充每个节点的下一个右侧节点指针 II</a></li>
+</ul>
+<h2 id="深度优先搜索（递归）"> 深度优先搜索（递归）</h2>
+<ul>
+<li><a href="/posts/231206201243.html">2477 达到首都的最少油耗 </a></li>
+</ul>
+<h2 id="图或路径问题"> 图或路径问题 </h2>
+<ul>
+<li><a href="/posts/231211184652.html">1631 最小体力消耗路径 </a></li>
+</ul>
+<h2 id="其它"> 其它 </h2>
+<ul>
+<li><a href="/posts/230101120000.html"> 备忘录 </a></li>
+</ul>
+
+</div>
+
+
+<script src="/js/book-menu.js"></script>
+
+    </div>
+    <div class="sidebar-toggle" onclick="sidebar_toggle()" onmouseover="add_inner()" onmouseleave="remove_inner()">
+  <div class="sidebar-toggle-inner"></div>
+</div>
+
+<script>
+function add_inner() {
+  let inner = document.querySelector('.sidebar-toggle-inner')
+  inner.classList.add('show')  
+}
+
+function remove_inner() {
+  let inner = document.querySelector('.sidebar-toggle-inner')
+  inner.classList.remove('show')
+}
+
+function sidebar_toggle() {
+    let sidebar_toggle = document.querySelector('.sidebar-toggle')
+    let sidebar = document.querySelector('.book-sidebar')
+    let content = document.querySelector('.off-canvas-content')
+    if (sidebar_toggle.classList.contains('extend')) { // show
+        sidebar_toggle.classList.remove('extend')
+        sidebar.classList.remove('hide')
+        content.classList.remove('extend')
+    }
+    else { // hide
+        sidebar_toggle.classList.add('extend')
+        sidebar.classList.add('hide')
+        content.classList.add('extend')
+    }
+}
+</script>
+
+      <div class="off-canvas-content">
+        <div class="columns">
+          <div class="column col-10 col-lg-12">
+            <div class="book-navbar">
+              <!-- For Responsive Layout -->
+
+<header class="navbar">
+  <section class="navbar-section">
+    <a onclick="open_sidebar()">
+      <i class="icon icon-menu"></i>
+    </a>
+  </section>
+</header>
+
+            </div>
+            <div class="book-content">
+              <div class="book-post">
+  <p>DPDK 中的无锁环形队列利用原子操作（CAS）、出入队前后的内存屏蔽和高效的数据结构，提供了一个多生产者、多消费者并发安全的队列实现。但真的是“无锁”实现吗？</p>
+<p>严格来说，“无锁”指的是避免使用传统的锁（例如互斥锁、读写锁等）来控制并发访问。在某些情况下，使用 CAS（Compare-And-Swap）等原子操作也会被称为无锁编程，因为它们不需要锁的开销（如上下文切换开销）。</p>
+<p>其实，DPDK 中的无锁环形队的单生产者、单消费者是真正无锁的（也没有使用 CAS 原子操作）；但是，对于多生产者、多消费者来说，其利用了 CAS 原子操作来实现互斥地修改生产者、消费者的头指针和尾指针，达到安全地进行数据的并发访问。</p>
+<span id="more"></span>
+<blockquote>
+<p>为什么单生产者、单消费者是无锁的？因为单生产者只会竞争写入位置，单消费者只会竞争读取位置，不会出现跨线程的竞争同一位置。</p>
+</blockquote>
+<h1 id="前置知识">前置知识</h1>
+<h2 id="柔性数组成员">柔性数组成员</h2>
+<h3 id="概念">概念</h3>
+<p><code>void *ring[0]</code> 和 <code>void *ring</code> 都是指针类型，但它们有不同的含义和用法。</p>
+<ul>
+<li><code>void *ring</code>是一个指向 <code>void</code> 类型的 <em> 指针变量</em>。它可以指向任意类型的数据，但它本身只是一块内存地址。</li>
+<li><code>void *ring[0]</code>是一个 <em> 指针数组 </em>，数组的大小为 0，<strong> 放在结构体的最后一个成员中以声明变长数组</strong>。</li>
+</ul>
+<p>在 C 语言中，数组大小为 0 是非法的，通常不被允许。然而，在某些编译器扩展和特定用法（<strong>例如在结构体的最后一个成员中</strong>）中，使用零长度数组是一种常见的技巧，用于实现柔性数组成员（Flexible Array Member，FAM）。FAM 是一种用于在结构体中声明变长数组的方法。</p>
+<h3 id="示例">示例</h3>
+<p><code>void *ring</code> 用法示例：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">example1</span> &#123;</span></span><br><span class="line">    <span class="type">void</span> *ring;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">example1</span> *<span class="title">ex</span> =</span> <span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(<span class="keyword">struct</span> example1));</span><br><span class="line">ex-&gt;ring = <span class="built_in">malloc</span>(<span class="number">10</span> * <span class="keyword">sizeof</span>(<span class="type">int</span>)); <span class="comment">// 分配一个存储 10 个 int 的空间</span></span><br><span class="line"><span class="comment">// ex-&gt;ring 是一个单个指针，指向一块动态分配的内存</span></span><br></pre></td></tr></table></figure>
+<p><code>void *ring[0]</code> 用法示例：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">example2</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> size;</span><br><span class="line">    <span class="type">void</span> *ring[<span class="number">0</span>]; <span class="comment">// 柔性数组成员</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">example2</span> *<span class="title">ex</span> =</span> <span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(<span class="keyword">struct</span> example2) + <span class="number">10</span> * <span class="keyword">sizeof</span>(<span class="type">void</span> *)); <span class="comment">// NOTE</span></span><br><span class="line">ex-&gt;size = <span class="number">10</span>;</span><br><span class="line"><span class="comment">// ex-&gt;ring 是一个指向 10 个 void* 的数组</span></span><br></pre></td></tr></table></figure>
+<p><code>ring[0]</code>是一个柔性数组成员，<strong>用于在结构体中实现变长数据</strong>。分配内存后，<code>ring[0]</code> 表示数据的开始位置。</p>
+<p>实际使用时，柔性数组成员可 <strong> 作为数据项 </strong>，通常会分配比结构体定义更大的内存，如上面额外的<code>10 * sizeof(void *)</code> 资源，以便容纳实际的数据项。</p>
+<h3 id="优点">优点</h3>
+<p>在结构体中使用柔性数组成员的优点：</p>
+<ul>
+<li><strong>不占用任何空间 </strong>：由于<code>ring[0]</code> 是一个柔性数组成员，其大小在编译时为 0，不占用结构体本身的空间。</li>
+<li><strong>分配时连续 </strong>：当为这个结构体 malloc 分配内存时，<mark> 会同时分配结构体和需要存储的数据项所需的所有内存，且这两块内存是连续的</mark>。</li>
+<li><strong>方便内存释放 </strong>：因为内存是一次性分配的（不像上面的 example1 和它的 ring 成员是分别 malloc 的），释放时也只需要一次 free 操作即可释放整个结构体<strong> 及其包含的数据项</strong>。</li>
+<li><strong>能提高速度</strong>：连续内存分配使得缓存命中率更高，内存访问速度更快。这对于需要高性能的应用来说是非常重要的。</li>
+</ul>
+<h1 id="DPDK 无锁环形队列">DPDK 无锁环形队列</h1>
+<ul>
+<li>DPDK 版本：v2.2.0，与高版本（如 v20.08）中 rte_ring 的结构有所不同，这里还是从简单的结构学起吧。</li>
+</ul>
+<h2 id="rte-ring 数据结构">rte_ring 数据结构</h2>
+<p>数据结构 rte_ring 中需要关注的点：</p>
+<ul>
+<li class="checkbox-item"><input type="checkbox" id="checkbox5" checked="true"><label for="checkbox5">size 必须是一个 2 的幂次方的数，mask=size-1。</label></li>
+<li class="checkbox-item"><input type="checkbox" id="checkbox6" checked="true"><label for="checkbox6"></label><strong>生产者和消费者各有一对 head 和 tail 索引（而不是共用一对 head 和 tail 索引）：其实这是为了实现多个线程同时出队、入队</strong>（具体看后面的代码、配图）；</li>
+<li class="checkbox-item"><input type="checkbox" id="checkbox7" checked="true"><label for="checkbox7">head 和 tail 索引不是在 </label><code>[0, size)</code> 区间，而是在 <code>[0, 2^32)</code> 区间。</li>
+<li class="checkbox-item"><input type="checkbox" id="checkbox8" checked="true"><label for="checkbox8">在结构体的最后一个成员使用柔性数组 </label><code>void *ring[0]</code> 作为数据项（其优点见《前置知识》小节）。</li>
+<li class="checkbox-item"><input type="checkbox" id="checkbox9" checked="true"><label for="checkbox9">通过 head &amp; mask 和 tail &amp; mask 位运算来达到模运算，以高效地访问 </label><code>ring[]</code> 数组。</li>
+<li class="checkbox-item"><input type="checkbox" id="checkbox10" checked="true"><label for="checkbox10">一般生产者和消费者线程会被不同的 CPU 核访问，因此结构体的 prod&amp;cons 成员使用了</label><code>__rte_cache_aligned</code>，将其分配到不同的 cache line。</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * An RTE ring structure.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * The producer and the consumer have a head and a tail index. The particularity</span></span><br><span class="line"><span class="comment"> * of these index is that they are not between 0 and size(ring). These indexes</span></span><br><span class="line"><span class="comment"> * are between 0 and 2^32, and we mask their value when we access the ring[]</span></span><br><span class="line"><span class="comment"> * field. Thanks to this assumption, we can do subtractions between 2 index</span></span><br><span class="line"><span class="comment"> * values in a modulo-32bit base: that&#x27;s why the overflow of the indexes is not</span></span><br><span class="line"><span class="comment"> * a problem.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">rte_ring</span> &#123;</span></span><br><span class="line">    <span class="type">char</span> name[RTE_RING_NAMESIZE]; <span class="comment">/**&lt; Name of the ring. */</span></span><br><span class="line">    <span class="type">int</span> flags;                    <span class="comment">/**&lt; 创建模式，支持多 / 单生产者和多 / 单消费者 */</span></span><br><span class="line">    <span class="type">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">rte_memzone</span>* <span class="title">memzone</span>;</span></span><br><span class="line">    <span class="comment">/**&lt; Memzone, if any, containing the rte_ring */</span></span><br><span class="line">    <span class="comment">/**&lt; rte_menzone 是 dpdk 内存管理底层的数据结构，memzone 用于记录在哪块 mem 分配的 rte_ring，释放的时候使用 */</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/** Ring producer status. 生产者数据结构 */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">prod</span> &#123;</span></span><br><span class="line">        <span class="type">uint32_t</span> watermark;     <span class="comment">/**&lt; Maximum items before EDQUOT. 水位线，用于检查入队后是否超过水位线 */</span></span><br><span class="line">        <span class="type">uint32_t</span> sp_enqueue;    <span class="comment">/**&lt; True, if single producer. */</span></span><br><span class="line">        <span class="type">uint32_t</span> size;          <span class="comment">/**&lt; Size of ring. */</span></span><br><span class="line">        <span class="type">uint32_t</span> mask;          <span class="comment">/**&lt; Mask (size-1) of ring. */</span></span><br><span class="line">        <span class="keyword">volatile</span> <span class="type">uint32_t</span> head; <span class="comment">/**&lt; Producer head. 入队前更新 head 字段，然后进行入队 */</span></span><br><span class="line">        <span class="keyword">volatile</span> <span class="type">uint32_t</span> tail; <span class="comment">/**&lt; Producer tail. 入队完更新 tail 字段（让先更新过 head 字段的线程</span></span><br><span class="line"><span class="comment">                                                    优先更新 tail 字段，自己等待一会），更新后 tail == head */</span></span><br><span class="line">    &#125; prod __rte_cache_aligned;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/** Ring consumer status. 消费者数据结构 */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">cons</span> &#123;</span></span><br><span class="line">        <span class="type">uint32_t</span> sc_dequeue;    <span class="comment">/**&lt; True, if single consumer. */</span></span><br><span class="line">        <span class="type">uint32_t</span> size;          <span class="comment">/**&lt; Size of the ring. */</span></span><br><span class="line">        <span class="type">uint32_t</span> mask;          <span class="comment">/**&lt; Mask (size-1) of ring. */</span></span><br><span class="line">        <span class="keyword">volatile</span> <span class="type">uint32_t</span> head; <span class="comment">/**&lt; Consumer head. 与生产者处理逻辑一样 */</span></span><br><span class="line">        <span class="keyword">volatile</span> <span class="type">uint32_t</span> tail; <span class="comment">/**&lt; Consumer tail. 与生产者处理逻辑一样 */</span></span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> RTE_RING_SPLIT_PROD_CONS</span></span><br><span class="line">    <span class="comment">/* 这个属性就是要求 gcc 在编译的时候，把 cons/prod 结构分配到不同的 cache line，为什么这样做？</span></span><br><span class="line"><span class="comment">        因为如果没有这些的话，这两个结构在内存上是连续的，编译器不会把他们分配到不同 cache line，</span></span><br><span class="line"><span class="comment">        而一般上这两个结构是要被不同的 CPU 核访问的，如果连续的话这两个核就会产生伪共享问题 */</span></span><br><span class="line">    &#125; cons __rte_cache_aligned;</span><br><span class="line"><span class="meta">#<span class="keyword">else</span></span></span><br><span class="line">    &#125; cons;</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> RTE_LIBRTE_RING_DEBUG</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">rte_ring_debug_stats</span> <span class="title">stats</span>[<span class="title">RTE_MAX_LCORE</span>];</span></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"></span><br><span class="line">    <span class="type">void</span>* ring[<span class="number">0</span>] __rte_cache_aligned; <span class="comment">/**&lt; Memory space of ring starts here.</span></span><br><span class="line"><span class="comment">                                        * not volatile so need to be careful</span></span><br><span class="line"><span class="comment">                                        * about compiler re-ordering */</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h2 id="相关宏">相关宏</h2>
+<p>TAILQ_HEAD 和 TAILQ_ENTRY 尾队列设计细节可参考 <a href="/posts/240702200642.html"> 这篇文章</a>。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* 尾队列表头 TAILQ_HEAD 宏定义 */</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> TAILQ_HEAD(name, type)                                  \</span></span><br><span class="line"><span class="meta">    struct name &#123;                                               \</span></span><br><span class="line"><span class="meta">        struct type* tqh_first; <span class="comment">/* first element */</span>             \</span></span><br><span class="line"><span class="meta">        struct type** tqh_last; <span class="comment">/* addr of last next element */</span> \</span></span><br><span class="line"><span class="meta">    &#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* 尾队列实体 TAILQ_ENTRY 宏定义 */</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> TAILQ_ENTRY(type)                                              \</span></span><br><span class="line"><span class="meta">    struct &#123;                                                           \</span></span><br><span class="line"><span class="meta">        struct type* tqe_next;  <span class="comment">/* next element */</span>                     \</span></span><br><span class="line"><span class="meta">        struct type** tqe_prev; <span class="comment">/* address of previous next element */</span> \</span></span><br><span class="line"><span class="meta">    &#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/** dummy structure type used by the rte_tailq APIs */</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">rte_tailq_entry</span> &#123;</span></span><br><span class="line">    <span class="comment">/* 扩展到：</span></span><br><span class="line"><span class="comment">            struct &#123;</span></span><br><span class="line"><span class="comment">                    struct rte_tailq_entry* tqe_next;</span></span><br><span class="line"><span class="comment">                    struct rte_tailq_entry** tqe_prev;</span></span><br><span class="line"><span class="comment">            &#125; next;</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    TAILQ_ENTRY(rte_tailq_entry) next; <span class="comment">/**&lt; Pointer entries for a tailq list */</span></span><br><span class="line">    <span class="type">void</span>* data;                        <span class="comment">/**&lt; Pointer to the data referenced by this tailq entry */</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">/** dummy */</span></span><br><span class="line"><span class="comment">/* 扩展到：</span></span><br><span class="line"><span class="comment">        struct rte_tailq_entry_head &#123;</span></span><br><span class="line"><span class="comment">                struct rte_tailq_entry* tqh_first;</span></span><br><span class="line"><span class="comment">                struct rte_tailq_entry** tqh_last;</span></span><br><span class="line"><span class="comment">        &#125;;</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">TAILQ_HEAD(rte_tailq_entry_head, rte_tailq_entry);</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> RTE_TAILQ_NAMESIZE 32</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * The structure defining a tailq header entry for storing</span></span><br><span class="line"><span class="comment"> * in the rte_config structure in shared memory. Each tailq</span></span><br><span class="line"><span class="comment"> * is identified by name.</span></span><br><span class="line"><span class="comment"> * Any library storing a set of objects e.g. rings, mempools, hash-tables,</span></span><br><span class="line"><span class="comment"> * is recommended to use an entry here, so as to make it easy for</span></span><br><span class="line"><span class="comment"> * a multi-process app to find already-created elements in shared memory.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">rte_tailq_head</span> &#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">rte_tailq_entry_head</span> <span class="title">tailq_head</span>;</span> <span class="comment">/**&lt; <span class="doctag">NOTE:</span> must be first element */</span></span><br><span class="line">    <span class="type">char</span> name[RTE_TAILQ_NAMESIZE];</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">rte_tailq_elem</span> &#123;</span></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Reference to head in shared mem, updated at init time by</span></span><br><span class="line"><span class="comment">     * rte_eal_tailqs_init()</span></span><br><span class="line"><span class="comment">     * 在初始化时由 rte_eal_tailqs_init() 更新的共享内存中的头部引用</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">rte_tailq_head</span>* <span class="title">head</span>;</span></span><br><span class="line">    <span class="comment">/* 扩展到：</span></span><br><span class="line"><span class="comment">            struct &#123;</span></span><br><span class="line"><span class="comment">                    struct rte_tailq_elem* tqe_next;</span></span><br><span class="line"><span class="comment">                    struct rte_tailq_elem** tqe_prev;</span></span><br><span class="line"><span class="comment">            &#125; next;</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    TAILQ_ENTRY(rte_tailq_elem) next;</span><br><span class="line">    <span class="type">const</span> <span class="type">char</span> name[RTE_TAILQ_NAMESIZE];</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Return the first tailq entry casted to the right struct.</span></span><br><span class="line"><span class="comment"> * 返回转换为正确结构的第一个 tailq 条目</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> RTE_TAILQ_CAST(tailq_entry, struct_name) (struct struct_name*)&amp;(tailq_entry)-&gt;tailq_head</span></span><br></pre></td></tr></table></figure>
+<h2 id="宏扩展后的数据结构">宏扩展后的数据结构</h2>
+<p>上面的宏定义，使用 gcc -E 预处理后是这样的：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">rte_tailq_entry</span> &#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">rte_tailq_entry</span>* <span class="title">tqe_next</span>;</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">rte_tailq_entry</span>** <span class="title">tqe_prev</span>;</span></span><br><span class="line">    &#125; next;</span><br><span class="line">    <span class="type">void</span>* data;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">rte_tailq_entry_head</span> &#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">rte_tailq_entry</span>* <span class="title">tqh_first</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">rte_tailq_entry</span>** <span class="title">tqh_last</span>;</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">rte_tailq_head</span> &#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">rte_tailq_entry_head</span> <span class="title">tailq_head</span>;</span></span><br><span class="line">    <span class="type">char</span> name[<span class="number">32</span>];</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">rte_tailq_elem</span> &#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">rte_tailq_head</span>* <span class="title">head</span>;</span></span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">rte_tailq_elem</span>* <span class="title">tqe_next</span>;</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">rte_tailq_elem</span>** <span class="title">tqe_prev</span>;</span></span><br><span class="line">    &#125; next;</span><br><span class="line">    <span class="type">const</span> <span class="type">char</span> name[<span class="number">32</span>];</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">rte_ring_list</span> &#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">rte_tailq_entry</span>* <span class="title">tqh_first</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">rte_tailq_entry</span>** <span class="title">tqh_last</span>;</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 定义全局 rte_ring_tailq 尾队列，里面可以添加很多个创建的 ring_list（也是一个尾队列） */</span></span><br><span class="line"><span class="type">static</span> <span class="class"><span class="keyword">struct</span> <span class="title">rte_tailq_elem</span> <span class="title">rte_ring_tailq</span> =</span> &#123;</span><br><span class="line">    .name = RTE_TAILQ_RING_NAME,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h2 id="内存分布及挂接方式">内存分布及挂接方式</h2>
+<p>全局 rte_ring_tailq 尾队列的内存分布及挂接方式：</p>
+<img src="/images/data-structure/dpdk-lockless-ring-queue-1.png" alt="DPDK 无锁环形队列内存分布及挂接方式" width="100%" height="100%">
+<h2 id="rte-ring-create 队列创建">rte_ring_create 队列创建</h2>
+<p>几处要点：</p>
+<ul>
+<li>ring_size：计算待申请的 rte_ring 的大小（而不是申请空间），包含 void* ring[]数据块的空间。</li>
+<li>te：申请一块 rte_tailq_entry 的空间。</li>
+<li>r = mz-&gt;addr：申请一块内存，其中 mz-&gt;addr 指向了申请的大小为 ring_size 的 rte_ring 结构的首地址。</li>
+<li>rte_ring_init：对上一步申请的大小为 ring_size 的 rte_ring 结构 r 进行初始化。</li>
+<li>te-&gt;data = (void*)r：初始化参数之后，把 rte_tailq_entry 的 data 节点指向 rte_ring 结构地址。
+<ul>
+<li>要干嘛？尾队列里面的每个 entry 的 data 项都指向一个 rte_ring 无锁环形队列。</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * rte_ring_create - create the ring</span></span><br><span class="line"><span class="comment"> * @name: 唯一标识 ring 的 name，不同的 ring 具有不同的 name</span></span><br><span class="line"><span class="comment"> * @count: ring 队列的长度，必须是 2 的幂次方</span></span><br><span class="line"><span class="comment"> * @socket_id: ring 位于的 socket（不是那个网络 socket）</span></span><br><span class="line"><span class="comment"> * @flags: 指定创建的 ring 的属性：单 / 多生产者、单 / 多消费者之间的组合。</span></span><br><span class="line"><span class="comment"> *         0 表示使用默认属性（多生产者、多消费者）。不同的属性出入队的操作会有所不同。</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">struct</span> rte_ring* <span class="title function_">rte_ring_create</span><span class="params">(<span class="type">const</span> <span class="type">char</span>* name, <span class="type">unsigned</span> count, <span class="type">int</span> socket_id, <span class="type">unsigned</span> flags)</span> &#123;</span><br><span class="line">    <span class="type">char</span> mz_name[RTE_MEMZONE_NAMESIZE];</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">rte_ring</span>* <span class="title">r</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">rte_tailq_entry</span>* <span class="title">te</span>;</span></span><br><span class="line">    <span class="type">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">rte_memzone</span>* <span class="title">mz</span>;</span></span><br><span class="line">    <span class="type">ssize_t</span> ring_size;</span><br><span class="line">    <span class="type">int</span> mz_flags = <span class="number">0</span>;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">rte_ring_list</span>* <span class="title">ring_list</span> =</span> <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 这里是把 rte_tailq_entry_head 结构强转成了 rte_ring_list 结构，这俩结构的构成完全一样，强转没啥影响 */</span></span><br><span class="line">    ring_list = RTE_TAILQ_CAST(rte_ring_tailq.head, rte_ring_list);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 返回申请的资源大小（包含结构体和数据块）：sizeof(struct rte_ring) + (count * sizeof(void *)) */</span></span><br><span class="line">    ring_size = rte_ring_get_memsize(count);</span><br><span class="line">    <span class="keyword">if</span> (ring_size &lt; <span class="number">0</span>) &#123;</span><br><span class="line">        rte_errno = ring_size;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 申请一个 TAILQ ENTRY 尾队列节点的资源，在创建完成 rte_ring 后，挂接这个无锁队列到尾队列 entry 中 */</span></span><br><span class="line">    te = rte_zmalloc(<span class="string">&quot;RING_TAILQ_ENTRY&quot;</span>, <span class="keyword">sizeof</span>(*te), <span class="number">0</span>);</span><br><span class="line">    <span class="keyword">if</span> (te == <span class="literal">NULL</span>) &#123;</span><br><span class="line">        RTE_LOG(ERR, RING, <span class="string">&quot;Cannot reserve memory for tailq\n&quot;</span>);</span><br><span class="line">        rte_errno = ENOMEM;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 给唯一标识 ring 的名字增加一个前缀 */</span></span><br><span class="line">    <span class="built_in">snprintf</span>(mz_name, <span class="keyword">sizeof</span>(mz_name), <span class="string">&quot;%s%s&quot;</span>, RTE_RING_MZ_PREFIX, name);</span><br><span class="line"></span><br><span class="line">    rte_rwlock_write_lock(RTE_EAL_TAILQ_RWLOCK);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* reserve a memory zone for this ring. If we can&#x27;t get rte_config or</span></span><br><span class="line"><span class="comment">     * we are secondary process, the memzone_reserve function will set</span></span><br><span class="line"><span class="comment">     * rte_errno for us appropriately - hence no check in this this function</span></span><br><span class="line"><span class="comment">     * 为新创建的 ring 分配内存空间 */</span></span><br><span class="line">    mz = rte_memzone_reserve(mz_name, ring_size, socket_id, mz_flags);</span><br><span class="line">    <span class="keyword">if</span> (mz != <span class="literal">NULL</span>) &#123;</span><br><span class="line">        r = mz-&gt;addr;  <span class="comment">// 获取分配的内存空间的起始地址</span></span><br><span class="line">        <span class="comment">/* no need to check return value here, we already checked the</span></span><br><span class="line"><span class="comment">         * arguments above */</span></span><br><span class="line">        rte_ring_init(r, name, count, flags);  <span class="comment">// ring 队列初始化</span></span><br><span class="line"></span><br><span class="line">        te-&gt;data = (<span class="type">void</span>*)r; <span class="comment">// 挂接这个无锁队列到尾队列 entry 中</span></span><br><span class="line">        r-&gt;memzone = mz;</span><br><span class="line">        <span class="comment">/* 在全局尾队列 ring_list 上挂接一个节点 te（其数据为 ring 结构的节点 r 的地址）*/</span></span><br><span class="line">        TAILQ_INSERT_TAIL(ring_list, te, next);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        r = <span class="literal">NULL</span>;</span><br><span class="line">        RTE_LOG(ERR, RING, <span class="string">&quot;Cannot reserve memory\n&quot;</span>);</span><br><span class="line">        rte_free(te);</span><br><span class="line">    &#125;</span><br><span class="line">    rte_rwlock_write_unlock(RTE_EAL_TAILQ_RWLOCK);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> r;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="rte-ring-init 环初始化">rte_ring_init 环初始化</h2>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">rte_ring_init</span><span class="params">(<span class="keyword">struct</span> rte_ring* r, <span class="type">const</span> <span class="type">char</span>* name, <span class="type">unsigned</span> count, <span class="type">unsigned</span> flags)</span> &#123;</span><br><span class="line">    <span class="comment">/* compilation-time checks */</span></span><br><span class="line">    RTE_BUILD_BUG_ON((<span class="keyword">sizeof</span>(<span class="keyword">struct</span> rte_ring) &amp; RTE_CACHE_LINE_MASK) != <span class="number">0</span>);</span><br><span class="line">    RTE_BUILD_BUG_ON((offsetof(<span class="keyword">struct</span> rte_ring, prod) &amp; RTE_CACHE_LINE_MASK) != <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* init the ring structure */</span></span><br><span class="line">    <span class="built_in">memset</span>(r, <span class="number">0</span>, <span class="keyword">sizeof</span>(*r));</span><br><span class="line">    <span class="built_in">snprintf</span>(r-&gt;name, <span class="keyword">sizeof</span>(r-&gt;name), <span class="string">&quot;%s&quot;</span>, name);</span><br><span class="line">    r-&gt;flags = flags;</span><br><span class="line">    r-&gt;prod.watermark = count;</span><br><span class="line">    r-&gt;prod.sp_enqueue = !!(flags &amp; RING_F_SP_ENQ); <span class="comment">// 是否是 single-producer</span></span><br><span class="line">    r-&gt;cons.sc_dequeue = !!(flags &amp; RING_F_SC_DEQ); <span class="comment">// 是否是 single-consumer</span></span><br><span class="line">    r-&gt;prod.size = r-&gt;cons.size = count;</span><br><span class="line">    r-&gt;prod.mask = r-&gt;cons.mask = count - <span class="number">1</span>;</span><br><span class="line">    r-&gt;prod.head = r-&gt;cons.head = <span class="number">0</span>; <span class="comment">// 生产者与消费者的头指针索引</span></span><br><span class="line">    r-&gt;prod.tail = r-&gt;cons.tail = <span class="number">0</span>; <span class="comment">// 生产者与消费者的尾指针索引</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="rte-ring-free 环释放">rte_ring_free 环释放</h2>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* free the ring */</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">rte_ring_free</span><span class="params">(<span class="keyword">struct</span> rte_ring* r)</span> &#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">rte_ring_list</span>* <span class="title">ring_list</span> =</span> <span class="literal">NULL</span>;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">rte_tailq_entry</span>* <span class="title">te</span>;</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (r == <span class="literal">NULL</span>)</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * Ring was not created with rte_ring_create,</span></span><br><span class="line"><span class="comment">     * therefore, there is no memzone to free.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">if</span> (r-&gt;memzone == <span class="literal">NULL</span>) &#123;</span><br><span class="line">        RTE_LOG(ERR, RING, <span class="string">&quot;Cannot free ring (not created with rte_ring_create()&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (rte_memzone_free(r-&gt;memzone) != <span class="number">0</span>) &#123;</span><br><span class="line">        RTE_LOG(ERR, RING, <span class="string">&quot;Cannot free memory\n&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    ring_list = RTE_TAILQ_CAST(rte_ring_tailq.head, rte_ring_list);</span><br><span class="line">    rte_rwlock_write_lock(RTE_EAL_TAILQ_RWLOCK);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* find out tailq entry，找出尾队列节点中 data 指向入参 r 的 entry */</span></span><br><span class="line">    TAILQ_FOREACH(te, ring_list, next) &#123;</span><br><span class="line">        <span class="keyword">if</span> (te-&gt;data == (<span class="type">void</span>*)r)</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (te == <span class="literal">NULL</span>) &#123; <span class="comment">// 没找到</span></span><br><span class="line">        rte_rwlock_write_unlock(RTE_EAL_TAILQ_RWLOCK);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    TAILQ_REMOVE(ring_list, te, next); <span class="comment">// 找到，从全局尾队列中摘除该 rte_ring 无锁队列</span></span><br><span class="line"></span><br><span class="line">    rte_rwlock_write_unlock(RTE_EAL_TAILQ_RWLOCK);</span><br><span class="line"></span><br><span class="line">    rte_free(te);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="单生产者单消费者出入队">单生产者单消费者出入队</h2>
+<h3 id="单生产者 sp 入队">单生产者 sp 入队</h3>
+<p>核心流程：</p>
+<ol>
+<li>首先，获取 prod.head 和 cons.tail 位置，然后计算空余 buffer 数量为 mask-(prod.head - cons.tail)；</li>
+<li>其次，在入队操作前，修改 prod.head，后移 n 个单位，表明生产者将要生产到这里；</li>
+<li>然后，进行入队操作 ENQUEUE_PTRS；</li>
+<li>最后，在入队操作后，修改 prod.tail，使其值为生产前的 prod.head+n，表明生产完成后其尾节点的正确位置。
+<ul>
+<li>如果是单生产者模式，其实可以直接使用当前的 prod.head；但是如果多生产者模式，不能直接使用，因为多个线程会竞争写入。</li>
+</ul>
+</li>
+</ol>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @internal Enqueue several objects on a ring (NOT multi-producers safe).</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @param r</span></span><br><span class="line"><span class="comment"> *   A pointer to the ring structure.</span></span><br><span class="line"><span class="comment"> * @param obj_table</span></span><br><span class="line"><span class="comment"> *   A pointer to a table of void * pointers (objects).</span></span><br><span class="line"><span class="comment"> * @param n</span></span><br><span class="line"><span class="comment"> *   The number of objects to add in the ring from the obj_table.</span></span><br><span class="line"><span class="comment"> * @param behavior 环的两种入队模式：固定数量入队、尽力而为入队</span></span><br><span class="line"><span class="comment"> *   RTE_RING_QUEUE_FIXED:    Enqueue a fixed number of items from a ring</span></span><br><span class="line"><span class="comment"> *   RTE_RING_QUEUE_VARIABLE: Enqueue as many items a possible from ring</span></span><br><span class="line"><span class="comment"> * @return</span></span><br><span class="line"><span class="comment"> *   Depend on the behavior value</span></span><br><span class="line"><span class="comment"> *   if behavior = RTE_RING_QUEUE_FIXED</span></span><br><span class="line"><span class="comment"> *   - 0: Success; objects enqueue.</span></span><br><span class="line"><span class="comment"> *   - -EDQUOT: Quota exceeded. The objects have been enqueued, but the</span></span><br><span class="line"><span class="comment"> *     high water mark is exceeded.</span></span><br><span class="line"><span class="comment"> *   - -ENOBUFS: Not enough room in the ring to enqueue, no object is enqueued.</span></span><br><span class="line"><span class="comment"> *   if behavior = RTE_RING_QUEUE_VARIABLE</span></span><br><span class="line"><span class="comment"> *   - n: Actual number of objects enqueued.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">int</span> __attribute__((always_inline))</span><br><span class="line">__rte_ring_sp_do_enqueue(<span class="keyword">struct</span> rte_ring *r, <span class="type">void</span> * <span class="type">const</span> *obj_table,</span><br><span class="line">             <span class="type">unsigned</span> n, <span class="keyword">enum</span> rte_ring_queue_behavior behavior)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">uint32_t</span> prod_head, cons_tail; <span class="comment">// 假设无边界时，两指针的相对顺序：0____ct------ph________+inf</span></span><br><span class="line">    <span class="type">uint32_t</span> prod_next, free_entries;</span><br><span class="line">    <span class="type">unsigned</span> i;</span><br><span class="line">    <span class="type">uint32_t</span> mask = r-&gt;prod.mask; <span class="comment">// 等于 size(ring)-1</span></span><br><span class="line">    <span class="type">int</span> ret;</span><br><span class="line"></span><br><span class="line">    prod_head = r-&gt;prod.head;</span><br><span class="line">    cons_tail = r-&gt;cons.tail;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* The subtraction is done between two unsigned 32bits value</span></span><br><span class="line"><span class="comment">     * (the result is always modulo 32 bits even if we have</span></span><br><span class="line"><span class="comment">     * prod_head &gt; cons_tail). So &#x27;free_entries&#x27; is always between 0</span></span><br><span class="line"><span class="comment">     * and size(ring)-1. */</span></span><br><span class="line">    free_entries = mask + cons_tail - prod_head;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* check that we have enough room in ring */</span></span><br><span class="line">    <span class="keyword">if</span> (unlikely(n &gt; free_entries)) &#123; <span class="comment">// 入队的 obj 数量大于队列空余空间</span></span><br><span class="line">        <span class="keyword">if</span> (behavior == RTE_RING_QUEUE_FIXED) &#123; <span class="comment">// 固定数量入队模式：无法全部入队，异常退出</span></span><br><span class="line">            __RING_STAT_ADD(r, enq_fail, n);</span><br><span class="line">            <span class="keyword">return</span> -ENOBUFS;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> &#123; <span class="comment">// 尽力而为入队模式：入队全部空余空间，即入队 free_entries 个 obj</span></span><br><span class="line">            <span class="comment">/* No free entry available */</span></span><br><span class="line">            <span class="keyword">if</span> (unlikely(free_entries == <span class="number">0</span>)) &#123;</span><br><span class="line">                __RING_STAT_ADD(r, enq_fail, n);</span><br><span class="line">                <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            n = free_entries; <span class="comment">// 实际入队 free_entries 个 obj</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    prod_next = prod_head + n;</span><br><span class="line">    r-&gt;prod.head = prod_next; <span class="comment">// 修改 ring 结构中的 prod.head 指针</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/* write entries in ring */</span></span><br><span class="line">    ENQUEUE_PTRS(); <span class="comment">// 入队操作</span></span><br><span class="line">    rte_smp_wmb();  <span class="comment">// 内存屏障</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/* if we exceed the watermark */</span></span><br><span class="line">    <span class="keyword">if</span> (unlikely(((mask + <span class="number">1</span>) - free_entries + n) &gt; r-&gt;prod.watermark)) &#123; <span class="comment">// 已经用的空间 + 本次实际使用的空间 大于 水位线</span></span><br><span class="line">        ret = (behavior == RTE_RING_QUEUE_FIXED) ? -EDQUOT :</span><br><span class="line">            (<span class="type">int</span>)(n | RTE_RING_QUOT_EXCEED); <span class="comment">// 按模式指定异常返回值</span></span><br><span class="line">        __RING_STAT_ADD(r, enq_quota, n);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">        ret = (behavior == RTE_RING_QUEUE_FIXED) ? <span class="number">0</span> : n; <span class="comment">// 返回对应模式的成功状态下的返回值</span></span><br><span class="line">        __RING_STAT_ADD(r, enq_success, n);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    r-&gt;prod.tail = prod_next; <span class="comment">// 修改 ring 结构中的 prod.tail 指针（sp 模式下，这里等于 prod.head 的值）</span></span><br><span class="line">    <span class="keyword">return</span> ret;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="入队宏">入队宏</h3>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* the actual enqueue of pointers on the ring.</span></span><br><span class="line"><span class="comment"> * Placed here since identical code needed in both</span></span><br><span class="line"><span class="comment"> * single and multi producer enqueue functions */</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> ENQUEUE_PTRS() do &#123; \</span></span><br><span class="line"><span class="meta">    const uint32_t size = r-&gt;prod.size; \</span></span><br><span class="line"><span class="meta">    uint32_t idx = prod_head &amp; mask; \ <span class="comment">// 获取入队的起始索引</span></span></span><br><span class="line">    <span class="keyword">if</span> (likely(idx + n &lt; size)) &#123; \ <span class="comment">// 起始索引 + 入队量 小于 ring 大小，则直接往后入队，不用回绕到最开始继续入队</span></span><br><span class="line">        <span class="comment">// 先 4 个、4 个的入队（循环步长是 4），依次赋值，相当于循环展开优化，减少计算循环索引和预测条件分支判断等优化</span></span><br><span class="line">        <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; (n &amp; ((~(<span class="type">unsigned</span>)<span class="number">0x3</span>))); i+=<span class="number">4</span>, idx+=<span class="number">4</span>) &#123; \</span><br><span class="line">            r-&gt;ring[idx] = obj_table[i]; \</span><br><span class="line">            r-&gt;ring[idx+<span class="number">1</span>] = obj_table[i+<span class="number">1</span>]; \</span><br><span class="line">            r-&gt;ring[idx+<span class="number">2</span>] = obj_table[i+<span class="number">2</span>]; \</span><br><span class="line">            r-&gt;ring[idx+<span class="number">3</span>] = obj_table[i+<span class="number">3</span>]; \</span><br><span class="line">        &#125; \</span><br><span class="line">        <span class="keyword">switch</span> (n &amp; <span class="number">0x3</span>) &#123; \ <span class="comment">// 最后不足 4 个的 obj 入队</span></span><br><span class="line">            <span class="keyword">case</span> <span class="number">3</span>: r-&gt;ring[idx++] = obj_table[i++]; \</span><br><span class="line">            <span class="keyword">case</span> <span class="number">2</span>: r-&gt;ring[idx++] = obj_table[i++]; \</span><br><span class="line">            <span class="keyword">case</span> <span class="number">1</span>: r-&gt;ring[idx++] = obj_table[i++]; \</span><br><span class="line">        &#125; \</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123; \ <span class="comment">// 起始索引 + 入队量 不小于 ring 大小，则往后入队一部分到右边界，然后从左边界入队余下的一部分</span></span><br><span class="line">        <span class="keyword">for</span> (i = <span class="number">0</span>; idx &lt; size; i++, idx++)\ <span class="comment">// 入队部分 obj 到 ring 的[idx, size-1]</span></span><br><span class="line">            r-&gt;ring[idx] = obj_table[i]; \</span><br><span class="line">        <span class="keyword">for</span> (idx = <span class="number">0</span>; i &lt; n; i++, idx++) \ <span class="comment">// 入队余下的 obj 到 ring 的[0, n-(size-idx)-1]</span></span><br><span class="line">            r-&gt;ring[idx] = obj_table[i]; \</span><br><span class="line">    &#125; \</span><br><span class="line">&#125; <span class="keyword">while</span>(<span class="number">0</span>)</span><br></pre></td></tr></table></figure>
+<h3 id="单消费者 sc 出队">单消费者 sc 出队</h3>
+<p>核心流程：</p>
+<ol>
+<li>首先，获取 prod.tail 和 cons.head 位置，然后计算有效 buffer 数量为(prod.tail - cons.head)；</li>
+<li>其次，在出队操作前，修改 cons.head，后移 n 个单位，表明消费者将要消费到这里；</li>
+<li>然后，进行出队操作 DEQUEUE_PTRS；</li>
+<li>最后，在出队操作后，修改 cons.tail，使其值为消费前的 cons.head+n，表明消费完成后其尾节点的正确位置。
+<ul>
+<li>如果是单消费者模式，其实可以直接使用当前的 cons.head；但是如果多消费者模式，不能直接使用，因为多个线程会竞争写入。</li>
+</ul>
+</li>
+</ol>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">生产者计算有效 buffer：</span><br><span class="line">____ct******ch---------------------pt+++++++++++ph______</span><br><span class="line">    |                                           |</span><br><span class="line">    ------------------used buffer----------------</span><br><span class="line"></span><br><span class="line">消费者计算有效 buffer：</span><br><span class="line">____ct------ch---------------------pt-----------ph______</span><br><span class="line">            |                      |</span><br><span class="line">            -------used buffer------</span><br></pre></td></tr></table></figure>
+<p>为什么生产者、消费者计算有效使用 buffer 数量时的公式不一样？</p>
+<p>（个人理解）使用不同计算公式，可能是为了兼顾 MPMC 模式。因为 <code>+++</code> 可能是被其它生产者线程预留的将要生成的 buffer、但还没来得及生成完成；同样的，<code>***</code>可能是被其它消费者线程预留的将要消费的 buffer、但还没来得及消费完成。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @internal Dequeue several objects from a ring (NOT multi-consumers safe).</span></span><br><span class="line"><span class="comment"> * When the request objects are more than the available objects, only dequeue</span></span><br><span class="line"><span class="comment"> * the actual number of objects 当请求出队量大于队列剩余量，则仅出队实际余量</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @param r</span></span><br><span class="line"><span class="comment"> *   A pointer to the ring structure.</span></span><br><span class="line"><span class="comment"> * @param obj_table</span></span><br><span class="line"><span class="comment"> *   A pointer to a table of void * pointers (objects) that will be filled.</span></span><br><span class="line"><span class="comment"> *   从 ring 中出队的 obj 存放到 obj_table 指向的内存里</span></span><br><span class="line"><span class="comment"> * @param n</span></span><br><span class="line"><span class="comment"> *   The number of objects to dequeue from the ring to the obj_table.</span></span><br><span class="line"><span class="comment"> * @param behavior 环的两种出队模式：固定数量出队、尽力而为出队</span></span><br><span class="line"><span class="comment"> *   RTE_RING_QUEUE_FIXED:    Dequeue a fixed number of items from a ring</span></span><br><span class="line"><span class="comment"> *   RTE_RING_QUEUE_VARIABLE: Dequeue as many items a possible from ring</span></span><br><span class="line"><span class="comment"> * @return</span></span><br><span class="line"><span class="comment"> *   Depend on the behavior value</span></span><br><span class="line"><span class="comment"> *   if behavior = RTE_RING_QUEUE_FIXED</span></span><br><span class="line"><span class="comment"> *   - 0: Success; objects dequeued.</span></span><br><span class="line"><span class="comment"> *   - -ENOENT: Not enough entries in the ring to dequeue; no object is</span></span><br><span class="line"><span class="comment"> *     dequeued. 余量不足，则不出队任何 obj</span></span><br><span class="line"><span class="comment"> *   if behavior = RTE_RING_QUEUE_VARIABLE</span></span><br><span class="line"><span class="comment"> *   - n: Actual number of objects dequeued.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">int</span> __attribute__((always_inline))</span><br><span class="line">__rte_ring_sc_do_dequeue(<span class="keyword">struct</span> rte_ring *r, <span class="type">void</span> **obj_table,</span><br><span class="line">         <span class="type">unsigned</span> n, <span class="keyword">enum</span> rte_ring_queue_behavior behavior)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">uint32_t</span> cons_head, prod_tail; <span class="comment">// 假设无边界时，两指针的相对顺序：0____ct------ph________+inf</span></span><br><span class="line">    <span class="type">uint32_t</span> cons_next, entries;</span><br><span class="line">    <span class="type">unsigned</span> i;</span><br><span class="line">    <span class="type">uint32_t</span> mask = r-&gt;prod.mask;</span><br><span class="line"></span><br><span class="line">    cons_head = r-&gt;cons.head;</span><br><span class="line">    prod_tail = r-&gt;prod.tail;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* The subtraction is done between two unsigned 32bits value</span></span><br><span class="line"><span class="comment">     * (the result is always modulo 32 bits even if we have</span></span><br><span class="line"><span class="comment">     * cons_head &gt; prod_tail). So &#x27;entries&#x27; is always between 0</span></span><br><span class="line"><span class="comment">     * and size(ring)-1. */</span></span><br><span class="line">    entries = prod_tail - cons_head; <span class="comment">// ring 中的 obj 数量</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (n &gt; entries) &#123; <span class="comment">// 请求出队量大于实际余量，根据模式不同、处理不同</span></span><br><span class="line">        <span class="keyword">if</span> (behavior == RTE_RING_QUEUE_FIXED) &#123; <span class="comment">// 固定数量出队，无法出队指定数量，返回异常</span></span><br><span class="line">            __RING_STAT_ADD(r, deq_fail, n);</span><br><span class="line">            <span class="keyword">return</span> -ENOENT;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> (unlikely(entries == <span class="number">0</span>))&#123; <span class="comment">// 尽力而为出队，出队实际余量</span></span><br><span class="line">                __RING_STAT_ADD(r, deq_fail, n);</span><br><span class="line">                <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            n = entries; <span class="comment">// 出队量为实际余量</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    cons_next = cons_head + n;</span><br><span class="line">    r-&gt;cons.head = cons_next; <span class="comment">// 修改 ring 结构中的 cons.head 指针</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/* copy in table */</span></span><br><span class="line">    DEQUEUE_PTRS(); <span class="comment">// 出队操作</span></span><br><span class="line">    rte_smp_rmb();  <span class="comment">// 内存屏蔽</span></span><br><span class="line"></span><br><span class="line">    __RING_STAT_ADD(r, deq_success, n);</span><br><span class="line">    r-&gt;cons.tail = cons_next; <span class="comment">// 修改 ring 结构中的 cons.tail 指针（sp 模式下，这里等于 cons.head 的值）</span></span><br><span class="line">    <span class="keyword">return</span> behavior == RTE_RING_QUEUE_FIXED ? <span class="number">0</span> : n;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="出队宏">出队宏</h3>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* the actual copy of pointers on the ring to obj_table.</span></span><br><span class="line"><span class="comment"> * Placed here since identical code needed in both</span></span><br><span class="line"><span class="comment"> * single and multi consumer dequeue functions */</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> DEQUEUE_PTRS() do &#123; \</span></span><br><span class="line"><span class="meta">    uint32_t idx = cons_head &amp; mask; \ <span class="comment">// 获取出队的起始索引 </span></span></span><br><span class="line">    <span class="type">const</span> <span class="type">uint32_t</span> size = r-&gt;cons.size; \</span><br><span class="line">    <span class="keyword">if</span> (likely(idx + n &lt; size)) &#123; \ <span class="comment">// 起始索引 + 出队量 小于 ring 大小，则直接往后出队，不用回绕到最开始继续出队</span></span><br><span class="line">        <span class="comment">// 先 4 个、4 个的出队（循环步长是 4），依次赋值，相当于循环展开优化，减少计算循环索引和预测条件分支判断等优化</span></span><br><span class="line">        <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; (n &amp; (~(<span class="type">unsigned</span>)<span class="number">0x3</span>)); i+=<span class="number">4</span>, idx+=<span class="number">4</span>) &#123;\</span><br><span class="line">            obj_table[i] = r-&gt;ring[idx]; \</span><br><span class="line">            obj_table[i+<span class="number">1</span>] = r-&gt;ring[idx+<span class="number">1</span>]; \</span><br><span class="line">            obj_table[i+<span class="number">2</span>] = r-&gt;ring[idx+<span class="number">2</span>]; \</span><br><span class="line">            obj_table[i+<span class="number">3</span>] = r-&gt;ring[idx+<span class="number">3</span>]; \</span><br><span class="line">        &#125; \</span><br><span class="line">        <span class="keyword">switch</span> (n &amp; <span class="number">0x3</span>) &#123; \ <span class="comment">// 最后不足 4 个的 obj 出队</span></span><br><span class="line">            <span class="keyword">case</span> <span class="number">3</span>: obj_table[i++] = r-&gt;ring[idx++]; \</span><br><span class="line">            <span class="keyword">case</span> <span class="number">2</span>: obj_table[i++] = r-&gt;ring[idx++]; \</span><br><span class="line">            <span class="keyword">case</span> <span class="number">1</span>: obj_table[i++] = r-&gt;ring[idx++]; \</span><br><span class="line">        &#125; \</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123; \ <span class="comment">// 起始索引 + 出队量 不小于 ring 大小，则往后出队一部分到右边界，然后从左边界出队余下的一部分</span></span><br><span class="line">        <span class="keyword">for</span> (i = <span class="number">0</span>; idx &lt; size; i++, idx++) \ <span class="comment">// 出队 ring 的[idx, size-1] 区间的 obj 到 obj_table 的前一段 </span></span><br><span class="line">            obj_table[i] = r-&gt;ring[idx]; \</span><br><span class="line">        <span class="keyword">for</span> (idx = <span class="number">0</span>; i &lt; n; i++, idx++) \ <span class="comment">// 出队 ring 的[0, n-(size-idx)-1] 区间的 obj 到 obj_table 的后一段</span></span><br><span class="line">            obj_table[i] = r-&gt;ring[idx]; \</span><br><span class="line">    &#125; \</span><br><span class="line">&#125; <span class="keyword">while</span> (<span class="number">0</span>)</span><br></pre></td></tr></table></figure>
+<h3 id="sp-sc 场景分析">sp&amp;sc 场景分析</h3>
+<p>在单生产者、单消费者场景下，简单考虑 push 和 pop 数据，假设有生产者 A 和消费者 B 两个线程，分别指向 ring。</p>
+<p>有几个问题：B 去 pop 数据的时候会不会因为判断有数据而取不到的情况？（A 在 push 数据时，不小心先更新了 prod.tail 后 push 数据）；A 在 push 数据时，是否会因为 B 先更新 cons.tail 而导致覆盖 B 还没来得及 pop 的数据？还有一些其他情况…</p>
+<p>因为这里有内存屏障，并不会出现以上问题，以上的实现在单生产者和单消费者的情况下比较简单，但对于多读多写同一个 ring 可能比较复杂。</p>
+<h2 id="多生产者多消费者出入队">多生产者多消费者出入队</h2>
+<p>以下分析下复杂情况，即多个线程 push 和 pop 数据，这里仅分析生产和消费的源码，其他的一些比较细节且不是很重要的代码不在这里分析。</p>
+<img src="/images/data-structure/dpdk-lockless-ring-queue-2.png" alt="DPDK 无锁环形队列 MPMC 模式下 head 和 tail 同步逻辑" width="100%" height="100%">
+<h3 id="多生产者 mp 入队">多生产者 mp 入队</h3>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @internal Enqueue several objects on the ring (multi-producers safe).</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * This function uses a &quot;compare and set&quot; instruction to move the</span></span><br><span class="line"><span class="comment"> * producer index atomically.</span></span><br><span class="line"><span class="comment"> * 该函数使用 CAS 指令，原子地修改生产者索引 </span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @param r</span></span><br><span class="line"><span class="comment"> *   A pointer to the ring structure.</span></span><br><span class="line"><span class="comment"> * @param obj_table</span></span><br><span class="line"><span class="comment"> *   A pointer to a table of void * pointers (objects).</span></span><br><span class="line"><span class="comment"> * @param n</span></span><br><span class="line"><span class="comment"> *   The number of objects to add in the ring from the obj_table.</span></span><br><span class="line"><span class="comment"> * @param behavior</span></span><br><span class="line"><span class="comment"> *   RTE_RING_QUEUE_FIXED:    Enqueue a fixed number of items from a ring</span></span><br><span class="line"><span class="comment"> *   RTE_RING_QUEUE_VARIABLE: Enqueue as many items a possible from ring</span></span><br><span class="line"><span class="comment"> * @return</span></span><br><span class="line"><span class="comment"> *   Depend on the behavior value</span></span><br><span class="line"><span class="comment"> *   if behavior = RTE_RING_QUEUE_FIXED</span></span><br><span class="line"><span class="comment"> *   - 0: Success; objects enqueue.</span></span><br><span class="line"><span class="comment"> *   - -EDQUOT: Quota exceeded. The objects have been enqueued, but the</span></span><br><span class="line"><span class="comment"> *     high water mark is exceeded.</span></span><br><span class="line"><span class="comment"> *   - -ENOBUFS: Not enough room in the ring to enqueue, no object is enqueued.</span></span><br><span class="line"><span class="comment"> *   if behavior = RTE_RING_QUEUE_VARIABLE</span></span><br><span class="line"><span class="comment"> *   - n: Actual number of objects enqueued.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">int</span> __attribute__((always_inline))</span><br><span class="line">__rte_ring_mp_do_enqueue(<span class="keyword">struct</span> rte_ring *r, <span class="type">void</span> * <span class="type">const</span> *obj_table,</span><br><span class="line">             <span class="type">unsigned</span> n, <span class="keyword">enum</span> rte_ring_queue_behavior behavior)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">uint32_t</span> prod_head, prod_next; <span class="comment">// 假设无边界时，两指针的相对顺序：......____ct------ph________...</span></span><br><span class="line">    <span class="type">uint32_t</span> cons_tail, free_entries;</span><br><span class="line">    <span class="type">const</span> <span class="type">unsigned</span> max = n;</span><br><span class="line">    <span class="type">int</span> success;</span><br><span class="line">    <span class="type">unsigned</span> i, rep = <span class="number">0</span>;</span><br><span class="line">    <span class="type">uint32_t</span> mask = r-&gt;prod.mask;</span><br><span class="line">    <span class="type">int</span> ret;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Avoid the unnecessary cmpset operation below, which is also</span></span><br><span class="line"><span class="comment">     * potentially harmful when n equals 0. */</span></span><br><span class="line">    <span class="keyword">if</span> (n == <span class="number">0</span>)</span><br><span class="line">       <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* move prod.head atomically */</span></span><br><span class="line">    <span class="keyword">do</span> &#123;</span><br><span class="line">        <span class="comment">/* Reset n to the initial burst count */</span></span><br><span class="line">        n = max;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* </span></span><br><span class="line"><span class="comment">         * while (unlikely(success == 0)) 时，说明有其他线程修改了 r-&gt;prod.head，</span></span><br><span class="line"><span class="comment">         * 因此，这里要重新读取，并执行 CAS 指令，否则永远不会 success == 1 退出</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        prod_head = r-&gt;prod.head;</span><br><span class="line">        cons_tail = r-&gt;cons.tail;</span><br><span class="line">        <span class="comment">/* The subtraction is done between two unsigned 32bits value</span></span><br><span class="line"><span class="comment">         * (the result is always modulo 32 bits even if we have</span></span><br><span class="line"><span class="comment">         * prod_head &gt; cons_tail). So &#x27;free_entries&#x27; is always between 0</span></span><br><span class="line"><span class="comment">         * and size(ring)-1. */</span></span><br><span class="line">        free_entries = (mask + cons_tail - prod_head);</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* check that we have enough room in ring */</span></span><br><span class="line">        <span class="keyword">if</span> (unlikely(n &gt; free_entries)) &#123; <span class="comment">// 入队的 obj 数量大于队列空余空间</span></span><br><span class="line">            <span class="keyword">if</span> (behavior == RTE_RING_QUEUE_FIXED) &#123; <span class="comment">// 固定数量入队模式：无法全部入队，异常退出</span></span><br><span class="line">                __RING_STAT_ADD(r, enq_fail, n);</span><br><span class="line">                <span class="keyword">return</span> -ENOBUFS;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span> &#123; <span class="comment">// 尽力而为入队模式：入队全部空余空间，即入队 free_entries 个 obj</span></span><br><span class="line">                <span class="comment">/* No free entry available */</span></span><br><span class="line">                <span class="keyword">if</span> (unlikely(free_entries == <span class="number">0</span>)) &#123;</span><br><span class="line">                    __RING_STAT_ADD(r, enq_fail, n);</span><br><span class="line">                    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                n = free_entries; <span class="comment">// 实际入队 free_entries 个 obj</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        prod_next = prod_head + n;</span><br><span class="line">        <span class="comment">/*</span></span><br><span class="line"><span class="comment">         * 这里与 sp 模式不同，mp 模式下使用 CAS 指令实现原子比较并交换，这行代码试图在同一个时间点内，</span></span><br><span class="line"><span class="comment">         * 判断并更新 r-&gt;prod.head 的值，即当 r-&gt;prod.head 等于 prod_head 时，更新其值为 prod_next</span></span><br><span class="line"><span class="comment">         * 这种操作通常用于多线程编程中的同步，以确保没有两个线程同时修改共享变量 r-&gt;prod.head</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        success = rte_atomic32_cmpset(&amp;r-&gt;prod.head, prod_head, prod_next);</span><br><span class="line">    &#125; <span class="keyword">while</span> (unlikely(success == <span class="number">0</span>)); <span class="comment">// 操作失败时，再来一次</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/* write entries in ring */</span></span><br><span class="line">    ENQUEUE_PTRS(); <span class="comment">// 入队操作（与单生产者入队操作执行过程一样）</span></span><br><span class="line">    rte_smp_wmb();  <span class="comment">// 内存屏蔽</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/* if we exceed the watermark */</span></span><br><span class="line">    <span class="keyword">if</span> (unlikely(((mask + <span class="number">1</span>) - free_entries + n) &gt; r-&gt;prod.watermark)) &#123; <span class="comment">// 已经用的空间 + 本次实际使用的空间 大于 水位线</span></span><br><span class="line">        ret = (behavior == RTE_RING_QUEUE_FIXED) ? -EDQUOT :</span><br><span class="line">                (<span class="type">int</span>)(n | RTE_RING_QUOT_EXCEED); <span class="comment">// 按模式指定异常返回值</span></span><br><span class="line">        __RING_STAT_ADD(r, enq_quota, n);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">        ret = (behavior == RTE_RING_QUEUE_FIXED) ? <span class="number">0</span> : n; <span class="comment">// 返回对应模式的成功状态下的返回值</span></span><br><span class="line">        __RING_STAT_ADD(r, enq_success, n);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * If there are other enqueues in progress that preceded us,</span></span><br><span class="line"><span class="comment">     * we need to wait for them to complete</span></span><br><span class="line"><span class="comment">     * 如果在我们之前，还有其他更早的生产者线程正在入队，</span></span><br><span class="line"><span class="comment">     * 我们需要等待他们完成，然后再更新 prod.tail</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">while</span> (unlikely(r-&gt;prod.tail != prod_head)) &#123;</span><br><span class="line">        rte_pause();</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* Set RTE_RING_PAUSE_REP_COUNT to avoid spin too long waiting</span></span><br><span class="line"><span class="comment">         * for other thread finish. It gives pre-empted thread a chance</span></span><br><span class="line"><span class="comment">         * to proceed and finish with ring dequeue operation. */</span></span><br><span class="line">        <span class="keyword">if</span> (RTE_RING_PAUSE_REP_COUNT &amp;&amp;</span><br><span class="line">            ++rep == RTE_RING_PAUSE_REP_COUNT) &#123;</span><br><span class="line">            rep = <span class="number">0</span>;</span><br><span class="line">            sched_yield();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    r-&gt;prod.tail = prod_next; <span class="comment">// 修改 ring 结构中的 prod.tail 指针（mp 模式下，这里等于 CAS 更新后的 r-&gt;prod.head 的值）</span></span><br><span class="line">    <span class="keyword">return</span> ret;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="CAS 函数源码">CAS 函数源码</h3>
+<p>x86 平台的实现：lib\librte_eal\common\include\arch\x86\rte_atomic.h</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*------------------------- 32 bit atomic operations -------------------------*/</span></span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">int</span></span><br><span class="line"><span class="title function_">rte_atomic32_cmpset</span><span class="params">(<span class="keyword">volatile</span> <span class="type">uint32_t</span> *dst, <span class="type">uint32_t</span> <span class="built_in">exp</span>, <span class="type">uint32_t</span> src)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">uint8_t</span> res;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">asm</span> <span class="title function_">volatile</span><span class="params">(</span></span><br><span class="line"><span class="params">            MPLOCKED</span></span><br><span class="line"><span class="params">            <span class="string">&quot;cmpxchgl %[src], %[dst];&quot;</span></span></span><br><span class="line"><span class="params">            <span class="string">&quot;sete %[res];&quot;</span></span></span><br><span class="line"><span class="params">            : [res] <span class="string">&quot;=a&quot;</span> (res),     <span class="comment">/* output */</span></span></span><br><span class="line"><span class="params">              [dst] <span class="string">&quot;=m&quot;</span> (*dst)</span></span><br><span class="line"><span class="params">            : [src] <span class="string">&quot;r&quot;</span> (src),      <span class="comment">/* input */</span></span></span><br><span class="line"><span class="params">              <span class="string">&quot;a&quot;</span> (<span class="built_in">exp</span>),</span></span><br><span class="line"><span class="params">              <span class="string">&quot;m&quot;</span> (*dst)</span></span><br><span class="line"><span class="params">            : <span class="string">&quot;memory&quot;</span>)</span>;            <span class="comment">/* no-clobber list */</span></span><br><span class="line">    <span class="keyword">return</span> res;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="多消费者 mc 出队">多消费者 mc 出队</h3>
+<p>多消费者出队的实现，CAS 实现差不多和上面的多生产者一样，出队和单消费者实现一样。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @internal Dequeue several objects from a ring (multi-consumers safe). When</span></span><br><span class="line"><span class="comment"> * the request objects are more than the available objects, only dequeue the</span></span><br><span class="line"><span class="comment"> * actual number of objects</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * This function uses a &quot;compare and set&quot; instruction to move the</span></span><br><span class="line"><span class="comment"> * consumer index atomically.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @param r</span></span><br><span class="line"><span class="comment"> *   A pointer to the ring structure.</span></span><br><span class="line"><span class="comment"> * @param obj_table</span></span><br><span class="line"><span class="comment"> *   A pointer to a table of void * pointers (objects) that will be filled.</span></span><br><span class="line"><span class="comment"> * @param n</span></span><br><span class="line"><span class="comment"> *   The number of objects to dequeue from the ring to the obj_table.</span></span><br><span class="line"><span class="comment"> * @param behavior</span></span><br><span class="line"><span class="comment"> *   RTE_RING_QUEUE_FIXED:    Dequeue a fixed number of items from a ring</span></span><br><span class="line"><span class="comment"> *   RTE_RING_QUEUE_VARIABLE: Dequeue as many items a possible from ring</span></span><br><span class="line"><span class="comment"> * @return</span></span><br><span class="line"><span class="comment"> *   Depend on the behavior value</span></span><br><span class="line"><span class="comment"> *   if behavior = RTE_RING_QUEUE_FIXED</span></span><br><span class="line"><span class="comment"> *   - 0: Success; objects dequeued.</span></span><br><span class="line"><span class="comment"> *   - -ENOENT: Not enough entries in the ring to dequeue; no object is</span></span><br><span class="line"><span class="comment"> *     dequeued.</span></span><br><span class="line"><span class="comment"> *   if behavior = RTE_RING_QUEUE_VARIABLE</span></span><br><span class="line"><span class="comment"> *   - n: Actual number of objects dequeued.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">int</span> __attribute__((always_inline))</span><br><span class="line">__rte_ring_mc_do_dequeue(<span class="keyword">struct</span> rte_ring *r, <span class="type">void</span> **obj_table,</span><br><span class="line">         <span class="type">unsigned</span> n, <span class="keyword">enum</span> rte_ring_queue_behavior behavior)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">uint32_t</span> cons_head, prod_tail; <span class="comment">// 假设无边界时，两指针的相对顺序：......____ch------pt________...</span></span><br><span class="line">    <span class="type">uint32_t</span> cons_next, entries;</span><br><span class="line">    <span class="type">const</span> <span class="type">unsigned</span> max = n;</span><br><span class="line">    <span class="type">int</span> success;</span><br><span class="line">    <span class="type">unsigned</span> i, rep = <span class="number">0</span>;</span><br><span class="line">    <span class="type">uint32_t</span> mask = r-&gt;prod.mask;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Avoid the unnecessary cmpset operation below, which is also</span></span><br><span class="line"><span class="comment">     * potentially harmful when n equals 0. */</span></span><br><span class="line">    <span class="keyword">if</span> (n == <span class="number">0</span>)</span><br><span class="line">       <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* move cons.head atomically */</span></span><br><span class="line">    <span class="keyword">do</span> &#123;</span><br><span class="line">        <span class="comment">/* Restore n as it may change every loop */</span></span><br><span class="line">        n = max;</span><br><span class="line"></span><br><span class="line">        cons_head = r-&gt;cons.head;</span><br><span class="line">        prod_tail = r-&gt;prod.tail;</span><br><span class="line">        <span class="comment">/* The subtraction is done between two unsigned 32bits value</span></span><br><span class="line"><span class="comment">         * (the result is always modulo 32 bits even if we have</span></span><br><span class="line"><span class="comment">         * cons_head &gt; prod_tail). So &#x27;entries&#x27; is always between 0</span></span><br><span class="line"><span class="comment">         * and size(ring)-1. */</span></span><br><span class="line">        entries = (prod_tail - cons_head);</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* Set the actual entries for dequeue */</span></span><br><span class="line">        <span class="keyword">if</span> (n &gt; entries) &#123;</span><br><span class="line">            <span class="keyword">if</span> (behavior == RTE_RING_QUEUE_FIXED) &#123;</span><br><span class="line">                __RING_STAT_ADD(r, deq_fail, n);</span><br><span class="line">                <span class="keyword">return</span> -ENOENT;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="keyword">if</span> (unlikely(entries == <span class="number">0</span>))&#123;</span><br><span class="line">                    __RING_STAT_ADD(r, deq_fail, n);</span><br><span class="line">                    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                n = entries;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        cons_next = cons_head + n;</span><br><span class="line">        success = rte_atomic32_cmpset(&amp;r-&gt;cons.head, cons_head, cons_next);</span><br><span class="line">    &#125; <span class="keyword">while</span> (unlikely(success == <span class="number">0</span>));</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* copy in table */</span></span><br><span class="line">    DEQUEUE_PTRS();</span><br><span class="line">    rte_smp_rmb();</span><br><span class="line"></span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * If there are other dequeues in progress that preceded us,</span></span><br><span class="line"><span class="comment">     * we need to wait for them to complete</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">while</span> (unlikely(r-&gt;cons.tail != cons_head)) &#123;</span><br><span class="line">        rte_pause();</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* Set RTE_RING_PAUSE_REP_COUNT to avoid spin too long waiting</span></span><br><span class="line"><span class="comment">         * for other thread finish. It gives pre-empted thread a chance</span></span><br><span class="line"><span class="comment">         * to proceed and finish with ring dequeue operation. */</span></span><br><span class="line">        <span class="keyword">if</span> (RTE_RING_PAUSE_REP_COUNT &amp;&amp;</span><br><span class="line">            ++rep == RTE_RING_PAUSE_REP_COUNT) &#123;</span><br><span class="line">            rep = <span class="number">0</span>;</span><br><span class="line">            sched_yield();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    __RING_STAT_ADD(r, deq_success, n);</span><br><span class="line">    r-&gt;cons.tail = cons_next;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> behavior == RTE_RING_QUEUE_FIXED ? <span class="number">0</span> : n;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>参考资料：</p>
+<ol>
+<li><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/ab14b3d3aa83">https://www.jianshu.com/p/ab14b3d3aa83</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/u012630961/article/details/80974857">https://blog.csdn.net/u012630961/article/details/80974857</a></li>
+<li><a target="_blank" rel="noopener" href="https://elixir.bootlin.com/dpdk/v2.2.0/source/lib/librte_ring/rte_ring.c">https://elixir.bootlin.com/dpdk/v2.2.0/source/lib/librte_ring/rte_ring.c</a></li>
+</ol>
+</blockquote>
+
+</div>
+
+
+  <div class="book-comments">
+    
+
+
+
+
+  </div>
+
+
+
+<script src="/js/book-post.js"></script>
+
+
+            </div>
+          </div>
+          <div class="column col-2 hide-lg">
+            <div class="book-post-info">
+  
+    <div class="book-post-meta">
+
+  <div class="author">
+
+    <!-- Author image -->
+    <div class="author-img">
+      
+        <figure
+          class="avatar avatar-lg"
+          data-initial="A"
+          style="background-color: #3b4351;">
+        </figure>
+      
+    </div>
+
+    <!-- Author title -->
+    <div class="author-title">
+      <div>aha</div>
+      <div>2024-06-27</div>
+    </div>
+  </div>
+
+  
+    <div class="divider"></div>
+
+    <div class="link">
+      <a class="category-link" href="/categories/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/">并发编程</a>
+
+      <a class="tag-none-link" href="/tags/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/" rel="tag">#并发编程</a>
+    </div>
+    
+  
+
+  <div class="divider"></div>
+</div>
+  
+
+  <div class="book-tocbot">
+</div>
+<div class="book-tocbot-menu">
+  <a class="book-toc-expand" onclick="expand_toc()">Expand all</a>
+  <a onclick="go_top()">Back to top</a>
+  <a onclick="go_bottom()">Go to bottom</a>
+  <a onclick="toggleSearch()">Search in blogs</a> <!-- 添加搜索文字的点击事件 -->
+</div>
+
+<div id="search-overlay" class="search-overlay" style="display: none;"> <!-- 初始状态为隐藏 -->
+  <div class="search-box">
+    <input type="text" id="search-input" placeholder="Search in all blogs...">
+    <button onclick="closeSearch()">Close</button> <!-- 添加关闭按钮 -->
+    <div id="search-results" class="search-results"></div>
+  </div>
+</div>
+
+<script>
+  function performSearch(query) {
+    if (!query.trim()) {
+      return;
+    }
+
+    fetch('/search.xml')
+      .then(response => response.text())
+      .then(data => {
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(data, "text/xml");
+        const entries = xmlDoc.getElementsByTagName('entry');
+        let results = '';
+
+        for (let i = 0; i < entries.length; i++) {
+          const title = entries[i].getElementsByTagName('title')[0].textContent;
+          const content = entries[i].getElementsByTagName('content')[0].textContent;
+          const url = entries[i].getElementsByTagName('url')[0].textContent;
+
+          let count = (title.match(new RegExp(query, "gi")) || []).length; // 统计查询词出现的次数
+          count += (content.match(new RegExp(query, "gi")) || []).length;
+
+          if (count > 0) { // title.includes(query) || content.includes(query)
+            results += `
+              <div class="search-result-item">
+                <a href="${url}">${title}</a> (${count})
+              </div>`;
+          }
+        }
+
+        const searchResultsElement = document.getElementById('search-results');
+        searchResultsElement.innerHTML = results;
+        searchResultsElement.classList.add('active');
+      });
+  }
+
+  function toggleSearch() {
+    const searchOverlay = document.getElementById('search-overlay');
+    searchOverlay.style.display = searchOverlay.style.display === 'none' ? 'flex' : 'none';
+  }
+
+  function closeSearch() {
+    document.getElementById('search-overlay').style.display = 'none';
+  }
+
+  document.getElementById('search-input').addEventListener('input', function() {
+    const query = this.value;
+    performSearch(query);
+  });
+</script>
+
+<style>
+  .search-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  .search-box {
+    background: white;
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+    width: 80%;
+    max-width: 500px;
+  }
+
+  .search-results {
+    margin-top: 10px;
+    max-height: 300px;
+    overflow-y: auto;
+    background: white;
+    padding: 10px;
+    border-radius: 5px;
+    width: 100%;
+  }
+
+  .search-result-item {
+    margin: 10px 0;
+  }
+
+  .search-result-item a {
+    color: blue; /* 设置链接颜色为蓝色 */
+    text-decoration: none;
+  }
+
+  .search-result-item a:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+<script src="/js/book-toc.js"></script>
+
+
+</div>
+          </div>
+        </div>
+      </div>
+
+      <a class="off-canvas-overlay" onclick="hide_canvas()"></a>
+
+      <button class="floating-button" onclick="toggleDropdownMenu()"></button>
+
+      <div class="dropdown-menu">
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FFFFFF', '#000000')">银河白</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#C7EDCC', '#000000')">豆沙绿</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FAF9DE', '#000000')">杏仁黄</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#E3EDCD', '#000000')">青草绿</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FFF2E2', '#000000')">秋叶褐</div>
+      </div>
+  </div>
+
+  <script>
+    function toggleDropdownMenu() {
+      document.querySelector('.floating-button').classList.toggle('active');
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      var storedBackgroundColor = localStorage.getItem('blogBackgroundColor');
+      var storedColor = localStorage.getItem('blogColor');
+
+      if (storedBackgroundColor && storedColor) {
+        document.body.style.backgroundColor = storedBackgroundColor;
+        document.body.style.color = storedColor;
+      }
+    });
+
+    function changeBackgroundColor(backgroundColor, color) {
+      document.body.style.backgroundColor = backgroundColor;
+      document.body.style.color = color;
+
+      localStorage.setItem('blogBackgroundColor', backgroundColor);
+      localStorage.setItem('blogColor', color);
+
+      document.querySelector('.floating-button').classList.remove('active');
+    }
+  </script>
+</body>
+
+</html>
+
+
+<script src="/js/book.js"></script>

@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
+
+    
+      <link rel="icon" href="/favicon.png" />
+    
+
+    <title>
+        
+          多线程编程之锁与原子操作 - aha&#39;s book
+        
+    </title>
+
+    <!-- Spectre.css framework -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre-exp.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre-icons.min.css">
+
+    <!-- theme css & js -->
+    
+<link rel="stylesheet" href="/css/book.css">
+
+    
+<script src="/js/book.js"></script>
+
+
+    <!-- tocbot -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.css">
+    
+    <!-- katex -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/zooming/2.1.1/zooming.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const zooming = new Zooming()
+    zooming.listen('.book-content img')
+})
+</script>
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+    <style>
+      body {
+        background-color: #FFFFFF;
+        /* color: #000000; */
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+
+      /* Floating Button Styles */
+      .floating-button {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 999;
+        background-color: #000000;
+        color: #ffffff;
+        padding: 12px;
+        border-radius: 50%;
+        cursor: pointer;
+        border: 2px solid #000000;
+      }
+
+      .floating-button:hover {
+        background-color: #FFFFFF;
+      }
+
+      /* Dropdown Menu Styles */
+      .dropdown-menu {
+        position: fixed;
+        bottom: 60px;
+        right: 10px;
+        display: none;
+        min-width: 60px;
+        padding: 2px;
+        background-color: #fff;
+        /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
+        z-index: 1000;
+      }
+
+      .floating-button.active+.dropdown-menu {
+        display: block;
+      }
+
+      .dropdown-item {
+        display: block;
+        padding: 8px 16px;
+        cursor: pointer;
+      }
+
+      .dropdown-item:hover {
+        background-color: #f5f5f5;
+      }
+    </style>
+<style>.darkmode--activated{--body-bg-color:#282828;--content-bg-color:#333;--card-bg-color:#555;--text-color:#ccc;--blockquote-color:#bbb;--link-color:#ccc;--link-hover-color:#eee;--brand-color:#ddd;--brand-hover-color:#ddd;--table-row-odd-bg-color:#282828;--table-row-hover-bg-color:#363636;--menu-item-bg-color:#555;--btn-default-bg:#222;--btn-default-color:#ccc;--btn-default-border-color:#555;--btn-default-hover-bg:#666;--btn-default-hover-color:#ccc;--btn-default-hover-border-color:#666;--highlight-background:#282b2e;--highlight-foreground:#a9b7c6;--highlight-gutter-background:#34393d;--highlight-gutter-foreground:#9ca9b6}.darkmode--activated img{opacity:.75}.darkmode--activated img:hover{opacity:.9}.darkmode--activated code{color:#69dbdc;background:0 0}button.darkmode-toggle{z-index:9999}.darkmode-ignore,img{display:flex!important}.beian img{display:inline-block!important}</style></head>
+
+<body>
+  <div class="book-container">
+    <div class="book-sidebar">
+      <div class="book-brand">
+  <a href="/">
+    <img src="/favicon.png">
+    <span>AHA&#39;S BOOK</span>
+  </a>
+</div>
+        <div id="menu" class="book-menu hide">
+  <h2 id="基础知识"> 基础知识 </h2>
+<ul>
+<li><a href="/posts/231010144856.html"> 模运算 </a></li>
+<li><a href="/posts/231014105311.html"> 异或运算 </a></li>
+<li><a href="/posts/231210181853.html"> 计算机中的寄存器 </a></li>
+<li><a href="/posts/231213183051.html"> 正则表达式基础 </a></li>
+</ul>
+<h2 id="C 语言">C 语言 </h2>
+<ul>
+<li><a href="/posts/230916171929.html">main 函数参数 </a></li>
+<li><a href="/posts/231214192113.html"> 关键字与专有名词 </a></li>
+<li><a href="/posts/240103180653.html"> 输出打印函数 </a></li>
+<li><a href="/posts/230922143003.html"> 多维数组 </a></li>
+<li><a href="/posts/230913200729.html">const 关键字 </a></li>
+<li><a href="/posts/230918174223.html">typedef 类型基础 </a></li>
+<li><a href="/posts/230920172849.html">typedef 类型实践 </a></li>
+<li><a href="/posts/240224193217.html"> 二级指针 </a></li>
+<li><a href="/posts/240307195203.html"> 代码 TOP-K 问题 </a></li>
+<li><a href="/posts/230922172626.html">uthash 哈希表基础 </a></li>
+<li><a href="/posts/230918114841.html"> 大小端知识 </a></li>
+</ul>
+<h2 id="Golang 语言">Golang 语言 </h2>
+<ul>
+<li><a href="/posts/230907162612.html"> 变量与常量 </a></li>
+<li><a href="/posts/230909120145.html"> 函数 &amp; 包 &amp; 判断 &amp; 循环 </a></li>
+<li><a href="/posts/230912152800.html"> 数组与切片 </a></li>
+<li><a href="/posts/230913161326.html"> 可变参数函数与 Map 集合 </a></li>
+<li><a href="/posts/230915155105.html"> 字符串和指针 </a></li>
+</ul>
+<h2 id="数据结构"> 数据结构 </h2>
+<ul>
+<li><a href="/posts/231007174854.html"> 链表（数组实现）</a></li>
+<li><a href="/posts/231008213450.html"> 链表（链式实现）</a></li>
+<li><a href="/posts/231016161508.html"> 堆栈（数组实现）</a></li>
+<li><a href="/posts/231016184406.html"> 堆栈（链表实现）</a></li>
+<li><a href="/posts/231127185207.html"> 单调栈 </a></li>
+<li><a href="/posts/231017105123.html"> 队列（链表实现）</a></li>
+<li><a href="/posts/231017154121.html"> 双端队列（链表实现）</a></li>
+<li><a href="/posts/231018102559.html"> 堆基础与堆结构（数组实现）</a></li>
+<li><a href="/posts/231019102311.html"> 优先队列（堆实现）</a></li>
+<li><a href="/posts/230905224335.html"> 二叉树的遍历 </a></li>
+<li><a href="/posts/231020174358.html"> 二叉搜索树 </a></li>
+<li><a href="/posts/230916094606.html"> 拓扑排序 </a></li>
+<li><a href="/posts/230925185057.html">Trie 字典树 </a></li>
+<li><a href="/posts/231023164532.html"> 并查集（数组实现）</a></li>
+<li><a href="/posts/240702200642.html">Linux 数据结构之队列 </a></li>
+</ul>
+<h2 id="数据结构算法"> 数据结构算法 </h2>
+<ul>
+<li><a href="/posts/231218181635.html"> 归并排序 </a></li>
+<li><a href="/posts/231108163339.html"> 快速排序 </a></li>
+<li><a href="/posts/231107171607.html"> 堆排序 </a></li>
+<li><a href="/posts/231124181658.html"> 二分查找 </a></li>
+<li><a href="/posts/231227190828.html"> 哈希表实现 </a></li>
+<li><a href="/posts/240313193201.html"> 字符串哈希函数 </a></li>
+<li><a href="/posts/231116150205.html">Floyd 多源最短路径 </a></li>
+<li><a href="/posts/231117095232.html">Dijkstra 单源最短路径（原理部分）</a></li>
+<li><a href="/posts/231121152713.html">Dijkstra 单源最短路径（实现部分）</a></li>
+</ul>
+<h2 id="数据库"> 数据库 </h2>
+<ul>
+<li><a href="/posts/250605180332.html">MySQL 基础 </a></li>
+</ul>
+<h2 id="计算机网络"> 计算机网络 </h2>
+<ul>
+<li><a href="/posts/231011192359.html">OSI 参考模型 </a></li>
+<li><a href="/posts/240329202000.html"> 计网 CyC2018 之概述 </a></li>
+<li><a href="/posts/240329202004.html"> 计网 CyC2018 之链路层 </a></li>
+<li><a href="/posts/240329202003.html"> 计网 CyC2018 之网络层 </a></li>
+<li><a href="/posts/240329202002.html"> 计网 CyC2018 之传输层 </a></li>
+<li><a href="/posts/240329202001.html"> 计网 CyC2018 之应用层 </a></li>
+<li><a href="/posts/240306203742.html">ACL 访问控制列表 </a></li>
+<li><a href="/posts/240130190208.html"> 路由表、转发表与快速转发工作原理 </a></li>
+<li><a href="/posts/231221200716.html">VXLAN 网络虚拟化技术 </a></li>
+<li><a href="/posts/240903191243.html">TCP/IP checksum 计算 </a></li>
+<li><a href="/posts/240911185603.html"> 抓包分析 TCP 三次握手与四次挥手过程 </a></li>
+</ul>
+<h2 id="操作系统"> 操作系统 </h2>
+<ul>
+<li><a href="/posts/230921190726.html"> 概述 </a></li>
+<li><a href="/posts/230924172528.html"> 中断 &amp; 异常 &amp; 系统调用 </a></li>
+<li><a href="/posts/231017195157.html"> 内存分层体系与地址空间生成 </a></li>
+<li><a href="/posts/231108195351.html"> 连续内存分配 </a></li>
+<li><a href="/posts/231111172507.html"> 非连续内存分配之分段与分页 </a></li>
+<li><a href="/posts/231119170537.html"> 非连续内存分配之页表 </a></li>
+<li><a href="/posts/231123184526.html"> 内存管理之覆盖技术与交换技术 </a></li>
+<li><a href="/posts/231127193658.html"> 内存管理之虚存技术 </a></li>
+<li><a href="/posts/231129182631.html"> 局部页面置换算法 </a></li>
+<li><a href="/posts/231207184239.html"> 全局页面置换算法 </a></li>
+<li><a href="/posts/231207204958.html"> 进程描述 </a></li>
+<li><a href="/posts/231210211306.html"> 进程状态 </a></li>
+<li><a href="/posts/231215213932.html"> 线程 </a></li>
+<li><a href="/posts/231218220813.html"> 进程控制 </a></li>
+<li><a href="/posts/231228193143.html"> 调度 </a></li>
+<li><a href="/posts/240104202828.html"> 同步与互斥 </a></li>
+<li><a href="/posts/240113115605.html"> 信号量与管程 </a></li>
+<li><a href="/posts/240205182643.html"> 经典同步问题 </a></li>
+<li><a href="/posts/240310162231.html"> 死锁 </a></li>
+</ul>
+<h2 id="系统与网络编程"> 系统与网络编程 </h2>
+<ul>
+<li><a href="/posts/230911151334.html">pthread 库 </a></li>
+<li><a href="/posts/230921094127.html"> 锁与原子操作 </a></li>
+<li><a href="/posts/240319195609.html"> 读者写者问题 </a></li>
+<li><a href="/posts/240527200241.html"> 网络编程卷一阅读随笔 </a></li>
+<li><a href="/posts/240414190410.html"> 进程间通信 IPC 机制 </a></li>
+<li><a href="/posts/240424200123.html"> 多进程相关练习 </a></li>
+<li><a href="/posts/240516221527.html">I/O 模式与 I/O 多路复用 </a></li>
+<li><a href="/posts/240626192803.html">Linux 内核 kfifo 环形队列 </a></li>
+<li><a href="/posts/241009203126.html">Linux 内核等待队列 </a></li>
+<li><a href="/posts/240627210637.html">DPDK 无锁环形队列 </a></li>
+<li><a href="/posts/240919200410.html"> 解密内存屏障 </a></li>
+<li><a href="/posts/240927202500.html"> 内核线程的创建 </a></li>
+<li><a href="/posts/241015195205.html">Linux 网络数据包接收过程 </a></li>
+<li><a href="/posts/2410232111015.html"> 源码解读 epoll 实现原理 </a></li>
+<li><a href="/posts/241106182619.html">Linux 文件系统 </a></li>
+<li><a href="/posts/250619154429.html">Libevent 高性能 IO 事件驱动库 </a></li>
+</ul>
+<h2 id="工具与命令"> 工具与命令 </h2>
+<ul>
+<li><a href="/posts/240207180410.html">GCC 编译过程分解 </a></li>
+<li><a href="/posts/240312184132.html">GDB 调试入门 </a></li>
+<li><a href="/posts/240512184921.html">Makefile 学习 </a></li>
+<li><a href="/posts/250629214430.html">CMake 学习 </a></li>
+<li><a href="/posts/240417193754.html">Linux 命令之文件权限 </a></li>
+</ul>
+<h2 id="开源项目"> 开源项目 </h2>
+<ul>
+<li><a href="/posts/240303201855.html"> 线程池原理与实现 </a></li>
+<li><a href="/posts/240507194549.html">HTTP 服务器实现 </a></li>
+<li><a href="/posts/240904203605.html"> 聊天服务器实现 </a></li>
+<li><a href="/posts/241119182636.html">Linux 文件系统 </a></li>
+</ul>
+<h2 id="Docker">Docker</h2>
+<ul>
+<li><a href="/posts/230909171809.html">Docker 学习笔记 </a></li>
+</ul>
+<h1 id="LeetCode 刷题">LeetCode 刷题 </h1>
+<h2 id="链表相关"> 链表相关 </h2>
+<ul>
+<li><a href="/posts/231025143947.html">160 相交链表 </a></li>
+<li><a href="/posts/231025185947.html">206 反转链表 </a></li>
+<li><a href="/posts/231026101239.html">21 合并两个有序链表 </a></li>
+<li><a href="/posts/231026184514.html">83 删除排序链表中的重复元素 </a></li>
+<li><a href="/posts/231027150243.html">19 删除链表的倒数第 N 个节点 </a></li>
+<li><a href="/posts/231031120718.html">2 两数相加 </a></li>
+<li><a href="/posts/231031163133.html">445 两数相加 II</a></li>
+<li><a href="/posts/231101094219.html">234 回文链表 </a></li>
+<li><a href="/posts/231101135228.html">725 分隔链表 </a></li>
+<li><a href="/posts/231102120708.html">328 奇偶链表 </a></li>
+<li><a href="/posts/231102165703.html">142 环形链表 II</a></li>
+</ul>
+<h2 id="设计"> 设计 </h2>
+<ul>
+<li><a href="/posts/231201184542.html">146 LRU 缓存 </a></li>
+</ul>
+<h2 id="贪心算法"> 贪心算法 </h2>
+<ul>
+<li><a href="/posts/231107094652.html">1029 两地调度 </a></li>
+<li><a href="/posts/231109150855.html">435 无重叠区间 </a></li>
+</ul>
+<h2 id="哈希表"> 哈希表 </h2>
+<ul>
+<li><a href="/posts/231123181539.html">1410 实体解析器 </a></li>
+</ul>
+<h2 id="树的遍历"> 树的遍历 </h2>
+<ul>
+<li><a href="/posts/231103121209.html">117 填充每个节点的下一个右侧节点指针 II</a></li>
+</ul>
+<h2 id="深度优先搜索（递归）"> 深度优先搜索（递归）</h2>
+<ul>
+<li><a href="/posts/231206201243.html">2477 达到首都的最少油耗 </a></li>
+</ul>
+<h2 id="图或路径问题"> 图或路径问题 </h2>
+<ul>
+<li><a href="/posts/231211184652.html">1631 最小体力消耗路径 </a></li>
+</ul>
+<h2 id="其它"> 其它 </h2>
+<ul>
+<li><a href="/posts/230101120000.html"> 备忘录 </a></li>
+</ul>
+
+</div>
+
+
+<script src="/js/book-menu.js"></script>
+
+    </div>
+    <div class="sidebar-toggle" onclick="sidebar_toggle()" onmouseover="add_inner()" onmouseleave="remove_inner()">
+  <div class="sidebar-toggle-inner"></div>
+</div>
+
+<script>
+function add_inner() {
+  let inner = document.querySelector('.sidebar-toggle-inner')
+  inner.classList.add('show')  
+}
+
+function remove_inner() {
+  let inner = document.querySelector('.sidebar-toggle-inner')
+  inner.classList.remove('show')
+}
+
+function sidebar_toggle() {
+    let sidebar_toggle = document.querySelector('.sidebar-toggle')
+    let sidebar = document.querySelector('.book-sidebar')
+    let content = document.querySelector('.off-canvas-content')
+    if (sidebar_toggle.classList.contains('extend')) { // show
+        sidebar_toggle.classList.remove('extend')
+        sidebar.classList.remove('hide')
+        content.classList.remove('extend')
+    }
+    else { // hide
+        sidebar_toggle.classList.add('extend')
+        sidebar.classList.add('hide')
+        content.classList.add('extend')
+    }
+}
+</script>
+
+      <div class="off-canvas-content">
+        <div class="columns">
+          <div class="column col-10 col-lg-12">
+            <div class="book-navbar">
+              <!-- For Responsive Layout -->
+
+<header class="navbar">
+  <section class="navbar-section">
+    <a onclick="open_sidebar()">
+      <i class="icon icon-menu"></i>
+    </a>
+  </section>
+</header>
+
+            </div>
+            <div class="book-content">
+              <div class="book-post">
+  <h2 id="常见锁介绍">常见锁介绍</h2>
+<p>在 C 语言中，常见的用于解决多线程访问数据的锁包括互斥锁、读写锁、条件变量、自旋锁、屏蔽等。</p>
+<span id="more"></span>
+<ol>
+<li>
+<p>互斥锁（mutex）：互斥锁是一种 <strong> 最基本的锁机制 </strong>，用于<strong> 保护共享资源</strong>，防止多个线程同时访问和修改同一个资源。当一个线程持有了互斥锁后，其他线程需要等待该线程释放锁之后才能访问共享资源。</p>
+</li>
+<li>
+<p>读写锁（read-write lock）：读写锁是一种 <strong> 特殊的锁机制 </strong>，它<strong> 允许多个线程同时读取共享资源，但是只允许一个线程写入共享资源</strong>。这种锁可以提高读取操作的并发度，同时保证写入操作的正确性和一致性。如果一个线程获取了写锁，其他线程就必须等待它释放锁后才能继续访问；如果一个线程获取了读锁，其他线程也可以获取读锁并访问资源。</p>
+</li>
+<li>
+<p>条件变量（condition variable）：条件变量是一种 <strong> 用于线程之间通信的同步机制 </strong>，它允许线程在某个条件成立时才能继续执行，通常与互斥锁一起使用。<strong> 当条件变量不满足时，线程释放互斥锁并等待条件变量被唤醒（通过另一个线程来唤醒条件变量）；当条件变量满足时，通知线程重新获取互斥锁并继续执行</strong>。</p>
+</li>
+<li>
+<p>自旋锁（spinlock）：自旋锁是一种 <strong> 忙等待锁机制 </strong>，当一个线程尝试获取锁时，如果锁已经被占用，它会一直循环等待直到锁被释放。<strong> 自旋锁适用于锁的持有时间很短的情况</strong>，因为长时间占用 CPU 会影响系统性能。</p>
+</li>
+<li>
+<p>屏障（barrier）：屏障是一种 <strong> 用于多线程协同的同步机制 </strong>，它允许多个线程在某个点上等待，直到所有线程都到达该点后再继续执行。<strong> 屏障通常用于一组线程需要在某个点进行同步操作 </strong> 的情况，例如多线程排序算法。</p>
+</li>
+</ol>
+<p>综上，互斥锁、读写锁、自旋锁用于实现 <strong> 互斥访问 </strong>，条件变量、屏障用于实现<strong> 同步</strong>。</p>
+<h2 id="互斥锁">互斥锁</h2>
+<p><strong>互斥锁原理 </strong>：互斥锁属于 sleep-waiting 类型的锁。例如，在一个双核的机器上有两个线程（线程 A 和线程 B），它们分别运行在 Core0 和 Core1 上。假设线程 A 想要通过 pthread_mutex_lock 操作去得到一个临界区的锁，而此时这个锁正被线程 B 所持有，那么线程 A 就会<strong> 被阻塞 </strong>，Core0 会在此时进行上下文切换（Context Switch）将线程 A<strong> 置于等待队列中</strong>，此时 Core0 就可以运行其它的任务而不必进行忙等待。</p>
+<p><strong>互斥锁实现</strong>：通常使用了操作系统提供的原子操作或者硬件提供的锁机制，保证锁的正确性和高效性。</p>
+<p><strong>互斥锁两种类型</strong>：递归锁和非递归锁。递归锁允许同一线程在不释放锁的情况下多次获取锁，而非递归锁不允许这种情况发生。</p>
+<p><strong>互斥锁使用场景</strong>：因互斥锁会引起线程的切换，效率较低；使用互斥锁会引起线程阻塞等待，不会一直占用着 CPU。因此，当锁的内容较多、切换不频繁时，建议使用互斥锁。</p>
+<p><strong>互斥锁使用笔记</strong>：互斥锁的使用非常简单，主要包括以下几个步骤：</p>
+<ul>
+<li>定义互斥锁变量，一般使用 <code>pthread_mutex_t</code> 类型；</li>
+<li>在需要保护的代码段前调用 <code>pthread_mutex_lock</code> 函数获取锁；</li>
+<li>在代码段执行完毕后调用 <code>pthread_mutex_unlock</code> 函数释放锁；</li>
+<li>释放锁之后其他线程就可以获取锁并访问共享资源。</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;pthread.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">pthread_mutex_t</span> mutex = PTHREAD_MUTEX_INITIALIZER;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 初始化互斥锁</span></span><br><span class="line">pthread_mutex_init(&amp;mutex, <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 在需要保护的代码块前加锁</span></span><br><span class="line">pthread_mutex_lock(&amp;mutex);</span><br><span class="line"><span class="comment">// 访问共享资源</span></span><br><span class="line"><span class="comment">// ...</span></span><br><span class="line"><span class="comment">// 访问完毕后解锁</span></span><br><span class="line">pthread_mutex_unlock(&amp;mutex);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 在使用完后销毁</span></span><br><span class="line">pthread_mutex_destroy(&amp;mutex);</span><br></pre></td></tr></table></figure>
+<h2 id="读写锁">读写锁</h2>
+<p><strong>读写锁的实现</strong>：通常使用了计数器和互斥锁等机制，通过控制读写访问的次数和顺序来保证数据的正确性和一致性。</p>
+<p><strong>读写锁使用笔记</strong>：读写锁的使用也非常简单，主要包括以下几个步骤：</p>
+<ul>
+<li>定义读写锁变量，一般使用 <code>pthread_rwlock_t</code> 类型；</li>
+<li>在需要读取共享资源的代码段前调用 <code>pthread_rwlock_rdlock</code> 函数获取读锁；</li>
+<li>在需要写入共享资源的代码段前调用 <code>pthread_rwlock_wrlock</code> 函数获取写锁；</li>
+<li>在代码段执行完毕后调用 <code>pthread_rwlock_unlock</code> 函数释放锁；</li>
+<li>释放锁之后其他线程就可以获取锁并访问共享资源。</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;pthread.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">pthread_rwlock_t</span> rwlock = PTHREAD_RWLOCK_INITIALIZER;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 初始化读写锁</span></span><br><span class="line">pthread_rwlock_init(&amp;rwlock, <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 在需要读取共享资源的代码块前加读锁</span></span><br><span class="line">pthread_rwlock_rdlock(&amp;rwlock);</span><br><span class="line"><span class="comment">// 读取共享资源</span></span><br><span class="line"><span class="comment">// ...</span></span><br><span class="line"><span class="comment">// 读取完毕后释放读锁</span></span><br><span class="line">pthread_rwlock_unlock(&amp;rwlock);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 在需要写入共享资源的代码块前加写锁</span></span><br><span class="line">pthread_rwlock_wrlock(&amp;rwlock);</span><br><span class="line"><span class="comment">// 写入共享资源</span></span><br><span class="line"><span class="comment">// ...</span></span><br><span class="line"><span class="comment">// 写入完毕后释放写锁</span></span><br><span class="line">pthread_rwlock_unlock(&amp;rwlock);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 在使用完读写锁后销毁</span></span><br><span class="line">pthread_rwlock_destroy(&amp;rwlock);</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>读锁或写锁都是使用的 <code>rwlock</code> 变量。</p>
+</blockquote>
+<h2 id="自旋锁">自旋锁</h2>
+<p><strong>自旋锁原理 </strong>：自旋锁属于 busy-waiting 类型的锁。例如，在一个双核的机器上有两个线程（线程 A 和线程 B），它们分别运行在 Core0 和 Core1 上。如果线程 A 使用 pthread_spin_lock 操作去请求锁，那么线程 A 就会一直在 Core0 上进行<strong> 忙等待并不停的进行锁请求，直到拿到这个锁为止 </strong>。自旋锁不会引起调用者睡眠，如果自旋锁已经被别的线程持有，调用者就<strong> 一直循环在那里 </strong> 看是否该自旋锁的持有者已经释放了锁。</p>
+<p><strong>自旋锁使用场景 </strong>：因为自旋锁不会引起调用者睡眠，所以<strong> 自旋锁的效率远高于互斥锁</strong>。因此，如果锁的内容较少、阻塞的时间较短，使用自旋锁比较好。</p>
+<blockquote>
+<p>自旋锁只有在内核可抢占式或 SMP 的情况下才真正需要。在单 CPU 且不可抢占式的内核下，自旋锁的操作为空操作。</p>
+</blockquote>
+<p><strong>自旋锁使用笔记</strong>：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;pthread.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 定义自旋锁</span></span><br><span class="line"><span class="type">pthread_spinlock_t</span> spinlock = PTHREAD_PROCESS_PRIVATE;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 初始化自旋锁</span></span><br><span class="line">pthread_spin_init(&amp;spinlock, PTHREAD_PROCESS_PRIVATE);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 加锁，如果锁已被其他线程占用，则该函数会一直循环忙等待直到获取到锁</span></span><br><span class="line">pthread_spin_lock(&amp;spinlock);</span><br><span class="line"><span class="comment">// 访问共享资源</span></span><br><span class="line"><span class="comment">// ...</span></span><br><span class="line"><span class="comment">// 解锁，使其他线程可以获取锁并访问共享资源</span></span><br><span class="line">pthread_spin_unlock(&amp;spinlock);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 销毁自旋锁</span></span><br><span class="line">pthread_spin_destroy(&amp;lock);</span><br></pre></td></tr></table></figure>
+<h2 id="条件变量">条件变量</h2>
+<p>条件变量（condition variable）：条件变量是一种 <strong> 用于线程之间通信的同步机制 </strong>，它允许线程在某个条件成立时才能继续执行，通常与互斥锁一起使用。<strong> 当条件变量不满足时，线程释放互斥锁并等待条件变量被唤醒（通过另一个线程来唤醒条件变量）；当条件变量满足时，通知线程重新获取互斥锁并继续执行</strong>。</p>
+<p><strong>条件变量使用笔记</strong>：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;pthread.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 定义互斥锁和条件变量</span></span><br><span class="line"><span class="type">pthread_mutex_t</span> mutex = PTHREAD_MUTEX_INITIALIZER;</span><br><span class="line"><span class="type">pthread_cond_t</span> cond = PTHREAD_COND_INITIALIZER;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 初始化互斥锁和条件变量</span></span><br><span class="line">pthread_mutex_init(&amp;mutex, <span class="literal">NULL</span>);</span><br><span class="line">pthread_cond_init(&amp;cond, <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 加锁</span></span><br><span class="line">pthread_mutex_lock(&amp;mutex);</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> (条件不满足预期条件) &#123;</span><br><span class="line">    <span class="comment">// 释放锁，并等待条件变量通知——从而唤醒该线程继续执行</span></span><br><span class="line">    pthread_cond_wait(&amp;cond, &amp;mutex);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 条件满足（由另一个线程控制），继续执行，访问共享资源</span></span><br><span class="line"><span class="comment">// ...</span></span><br><span class="line"><span class="comment">// 解锁</span></span><br><span class="line">pthread_mutex_unlock(&amp;mutex);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 在使用完后销毁</span></span><br><span class="line">pthread_cond_destroy(&amp;cond);</span><br><span class="line">pthread_mutex_destroy(&amp;mutex);</span><br><span class="line"></span><br><span class="line"><span class="comment">//----------------------------------------------</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 在其他线程中通知条件变量</span></span><br><span class="line"><span class="comment">// ...</span></span><br><span class="line"><span class="comment">// 加锁</span></span><br><span class="line">pthread_mutex_lock(&amp;mutex);</span><br><span class="line"><span class="comment">// 访问共享资源</span></span><br><span class="line"><span class="comment">// ...</span></span><br><span class="line"><span class="comment">// 解锁后再发送通知</span></span><br><span class="line">pthread_mutex_unlock(&amp;mutex);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 发送条件变量通知其它等待的线程</span></span><br><span class="line">pthread_cond_signal(&amp;cond);</span><br></pre></td></tr></table></figure>
+<h3 id="生产消费者同步示例代码">生产消费者同步示例代码</h3>
+<p>一个生产者、消费者同步的多线程示例代码：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;pthread.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> BUFFER_SIZE (4)</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> buffer[BUFFER_SIZE];</span><br><span class="line"><span class="type">int</span> count = <span class="number">0</span>;  <span class="comment">// 产品余量</span></span><br><span class="line"><span class="type">pthread_mutex_t</span> mutex;</span><br><span class="line"><span class="type">pthread_cond_t</span> cond;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span>* <span class="title function_">producer</span><span class="params">(<span class="type">void</span>* arg)</span> &#123;</span><br><span class="line">    <span class="type">int</span> flag = <span class="number">0</span>, i = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">while</span> (<span class="number">1</span>) &#123;</span><br><span class="line">        pthread_mutex_lock(&amp;mutex);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 预期条件是 buffer 不能满（当 buffer 满时为条件不满足预期）</span></span><br><span class="line">        <span class="keyword">while</span> (BUFFER_SIZE == count) &#123;</span><br><span class="line">            <span class="keyword">if</span> (<span class="number">0</span> == flag) &#123;</span><br><span class="line">                <span class="built_in">printf</span>(<span class="string">&quot;    Buffer full...\n&quot;</span>);</span><br><span class="line">                flag = <span class="number">1</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            pthread_cond_wait(&amp;cond, &amp;mutex);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        flag = <span class="number">0</span>;</span><br><span class="line">        buffer[count++] = i++;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Producer produced: %d\n&quot;</span>, i);</span><br><span class="line"></span><br><span class="line">        pthread_mutex_unlock(&amp;mutex);</span><br><span class="line">        pthread_cond_signal(&amp;cond);  <span class="comment">// 释放锁，并通知条件变量</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span>* <span class="title function_">consumer</span><span class="params">(<span class="type">void</span>* arg)</span> &#123;</span><br><span class="line">    <span class="type">int</span> flag = <span class="number">0</span>, i = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">while</span> (<span class="number">1</span>) &#123;</span><br><span class="line">        pthread_mutex_lock(&amp;mutex);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 预期条件是 buffer 不能空（当 buffer 空时为条件不满足预期）</span></span><br><span class="line">        <span class="keyword">while</span> (<span class="number">0</span> == count) &#123;</span><br><span class="line">            <span class="keyword">if</span> (<span class="number">0</span> == flag) &#123;</span><br><span class="line">                <span class="built_in">printf</span>(<span class="string">&quot;    Buffer empty...\n&quot;</span>);</span><br><span class="line">                flag = <span class="number">1</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            pthread_cond_wait(&amp;cond, &amp;mutex);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        flag = <span class="number">0</span>;</span><br><span class="line">        <span class="type">int</span> value = buffer[--count];</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Consumer consumed: %d\n&quot;</span>, value);</span><br><span class="line"></span><br><span class="line">        pthread_mutex_unlock(&amp;mutex);</span><br><span class="line">        pthread_cond_signal(&amp;cond);  <span class="comment">// 释放锁，并通知条件变量</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span>* argv[])</span> &#123;</span><br><span class="line">    <span class="type">pthread_t</span> producer_thread, consumer_thread;</span><br><span class="line"></span><br><span class="line">    pthread_mutex_init(&amp;mutex, <span class="literal">NULL</span>);</span><br><span class="line">    pthread_cond_init(&amp;cond, <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">    pthread_create(&amp;producer_thread, <span class="literal">NULL</span>, producer, <span class="literal">NULL</span>);</span><br><span class="line">    pthread_create(&amp;consumer_thread, <span class="literal">NULL</span>, consumer, <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">    pthread_join(producer_thread, (<span class="type">void</span>**)(<span class="number">0</span>));</span><br><span class="line">    pthread_join(consumer_thread, (<span class="type">void</span>**)(<span class="number">0</span>));</span><br><span class="line"></span><br><span class="line">    pthread_cond_destroy(&amp;cond);</span><br><span class="line">    pthread_mutex_destroy(&amp;mutex);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在这个示例代码中，有一个容量为 4 的缓冲区，生产者线程负责往缓冲区中添加数据，消费者线程负责从缓冲区中取出数据：</p>
+<ul>
+<li>生产者线程通过加锁后检查缓冲区是否已满，如果已满则等待条件变量通知，否则将数据添加到缓冲区，并发送条件变量通知消费者线程。</li>
+<li>消费者线程通过加锁后检查缓冲区是否为空，如果为空则等待条件变量通知，否则从缓冲区中取出数据，并发送条件变量通知生产者线程。</li>
+</ul>
+<p>生产者和消费者线程之间的同步是通过互斥锁和条件变量来实现的。互斥锁用于保护共享资源，条件变量用于线程间的通信和同步。</p>
+<p>一种 <em> 可能的 </em> 运行结果：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line">Consumer consumed: 46584</span><br><span class="line">Consumer consumed: 46583</span><br><span class="line">    Buffer empty...</span><br><span class="line">Producer produced: 46588</span><br><span class="line">Producer produced: 46589</span><br><span class="line">Producer produced: 46590</span><br><span class="line">Consumer consumed: 46589</span><br><span class="line">Consumer consumed: 46588</span><br><span class="line">Consumer consumed: 46587</span><br><span class="line">Producer produced: 46591</span><br><span class="line">Producer produced: 46592</span><br><span class="line">Producer produced: 46593</span><br><span class="line">Producer produced: 46594</span><br><span class="line">    Buffer full...</span><br><span class="line">Consumer consumed: 46593</span><br><span class="line">Consumer consumed: 46592</span><br><span class="line">Consumer consumed: 46591</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+<h2 id="屏障">屏障</h2>
+<p>屏障（barrier）：屏障是一种 <strong> 用于多线程协同的同步机制 </strong>，它允许多个线程在某个点上等待，直到所有线程都到达该点后再继续执行。<strong> 屏障通常用于一组线程需要在某个点进行同步操作 </strong> 的情况，例如多线程排序算法。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;pthread.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 定义屏障</span></span><br><span class="line"><span class="type">pthread_barrier_t</span> barrier;</span><br><span class="line"><span class="type">int</span> thread_nums = <span class="number">5</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 初始化屏障</span></span><br><span class="line">pthread_barrier_init(&amp;barrier, <span class="literal">NULL</span>, thread_nums);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 在每个线程中执行以下代码</span></span><br><span class="line">pthread_barrier_wait(&amp;barrier); <span class="comment">// 等待屏障</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 所有线程都到达屏障后，继续执行以下代码</span></span><br><span class="line"><span class="comment">// ...</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 在使用完后销毁</span></span><br><span class="line">pthread_barrier_destroy(&amp;barrier);</span><br></pre></td></tr></table></figure>
+<h3 id="屏蔽实现线程同步示例代码">屏蔽实现线程同步示例代码</h3>
+<p>下面是一个完整的示例代码，演示了如何使用 pthread 库中的屏障实现线程同步：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;pthread.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 定义屏障</span></span><br><span class="line"><span class="type">pthread_barrier_t</span> barrier;</span><br><span class="line"><span class="type">int</span> thread_nums = <span class="number">5</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 线程函数</span></span><br><span class="line"><span class="type">void</span>* <span class="title function_">thread_func</span><span class="params">(<span class="type">void</span>* ptr)</span> &#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Thread #%lu, param %d operation\n&quot;</span>, pthread_self(), *(<span class="type">int</span>*)ptr);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 等待屏障</span></span><br><span class="line">    pthread_barrier_wait(&amp;barrier);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 所有线程都到达屏障后，继续执行以下代码</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Thread %lu, %d continues after the barrier\n&quot;</span>, pthread_self(), *(<span class="type">int</span>*)ptr);</span><br><span class="line">    <span class="built_in">free</span>(ptr);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">pthread_t</span> threads[thread_nums];</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 初始化屏障</span></span><br><span class="line">    pthread_barrier_init(&amp;barrier, <span class="literal">NULL</span>, thread_nums);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 创建线程</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; thread_nums; i++) &#123;</span><br><span class="line">        <span class="type">int</span>* ptr = (<span class="type">int</span>*)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(<span class="type">int</span>));</span><br><span class="line">        *ptr = i;</span><br><span class="line">        pthread_create(&amp;threads[i], <span class="literal">NULL</span>, thread_func, (<span class="type">void</span>*)ptr);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 等待线程结束</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; thread_nums; i++) &#123;</span><br><span class="line">        pthread_join(threads[i], (<span class="type">void</span>**)(<span class="number">0</span>));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 销毁屏障</span></span><br><span class="line">    pthread_barrier_destroy(&amp;barrier);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在线程函数中，线程首先执行一些操作，然后调用 pthread_barrier_wait 函数等待屏障。<strong>当所有线程都到达屏障后，屏障解除，所有线程继续执行后续的代码</strong>。下面是一种可能的执行结果。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">Thread #140592591922752, param 1 operation</span><br><span class="line">Thread #140592600315456, param 0 operation</span><br><span class="line">Thread #140592466097728, param 4 operation</span><br><span class="line">Thread #140592583530048, param 2 operation</span><br><span class="line">Thread #140592575137344, param 3 operation</span><br><span class="line">Thread 140592575137344, 3 continues after the barrier</span><br><span class="line">Thread 140592466097728, 4 continues after the barrier</span><br><span class="line">Thread 140592591922752, 1 continues after the barrier</span><br><span class="line">Thread 140592600315456, 0 continues after the barrier</span><br><span class="line">Thread 140592583530048, 2 continues after the barrier</span><br></pre></td></tr></table></figure>
+<h2 id="原子操作">原子操作</h2>
+<p>所谓原子操作，就是该操作绝不会在执行完毕前被任何其他任务或事件打断。也就是说，它是 <strong> 最小的执行单位</strong>，不可能有比它更小的执行单位。因此，这里的原子实际是使用了物理学里的物质微粒的概念。</p>
+<p>原子操作需要硬件的支持，因此是架构相关的，其 API 和原子类型的定义都定义在内核源码树的 <code>include/asm/atomic.h</code> 文件中，<strong>它们都使用汇编语言实现，因为 C 语言并不能实现这样的操作</strong>。</p>
+<p>原子操作主要用于实现资源计数，很多引用计数（Reference Count, refcnt）就是通过原子操作实现的。</p>
+<h2 id="总结分析">总结分析</h2>
+<p>互斥锁是 sleep-waiting 类型的锁：与自旋锁相比它需要消耗大量的系统资源来建立锁，但是在线程被阻塞期间，它不消耗 CPU 资源。</p>
+<ol>
+<li>当线程被阻塞等待时，线程的调度状态从就绪态到阻塞态，线程被加入等待线程队列；</li>
+<li>当锁可用时，在获取锁之前，线程会被从等待队列取出，并将其调度状态切换会运行态。</li>
+</ol>
+<p>互斥锁适用于那些可能会阻塞很长时间的场景：</p>
+<ul>
+<li>临界区有 IO 操作</li>
+<li>临界区代码复杂或者循环量大</li>
+<li>临界区竞争非常激烈</li>
+<li>单核处理器</li>
+</ul>
+<p>自旋锁是 busy-waiting 类型的锁：它只需要消耗很少的资源来建立锁。但当线程被阻塞时，它会一直重复检查锁是否可用了。也就是说，自旋锁处于等待状态时它会一直消耗 CPU 时间。因此，自旋锁适用于那些仅需要阻塞很短时间的场景。</p>
+
+</div>
+
+
+  <div class="book-comments">
+    
+
+
+
+
+  </div>
+
+
+
+<script src="/js/book-post.js"></script>
+
+
+            </div>
+          </div>
+          <div class="column col-2 hide-lg">
+            <div class="book-post-info">
+  
+    <div class="book-post-meta">
+
+  <div class="author">
+
+    <!-- Author image -->
+    <div class="author-img">
+      
+        <figure
+          class="avatar avatar-lg"
+          data-initial="A"
+          style="background-color: #3b4351;">
+        </figure>
+      
+    </div>
+
+    <!-- Author title -->
+    <div class="author-title">
+      <div>aha</div>
+      <div>2023-09-21</div>
+    </div>
+  </div>
+
+  
+    <div class="divider"></div>
+
+    <div class="link">
+      <a class="category-link" href="/categories/%E5%A4%9A%E7%BA%BF%E7%A8%8B%E7%BC%96%E7%A8%8B/">多线程编程</a>
+
+      <a class="tag-none-link" href="/tags/%E5%8E%9F%E5%AD%90%E6%93%8D%E4%BD%9C/" rel="tag">#原子操作</a> <a class="tag-none-link" href="/tags/%E9%94%81/" rel="tag">#锁</a>
+    </div>
+    
+  
+
+  <div class="divider"></div>
+</div>
+  
+
+  <div class="book-tocbot">
+</div>
+<div class="book-tocbot-menu">
+  <a class="book-toc-expand" onclick="expand_toc()">Expand all</a>
+  <a onclick="go_top()">Back to top</a>
+  <a onclick="go_bottom()">Go to bottom</a>
+  <a onclick="toggleSearch()">Search in blogs</a> <!-- 添加搜索文字的点击事件 -->
+</div>
+
+<div id="search-overlay" class="search-overlay" style="display: none;"> <!-- 初始状态为隐藏 -->
+  <div class="search-box">
+    <input type="text" id="search-input" placeholder="Search in all blogs...">
+    <button onclick="closeSearch()">Close</button> <!-- 添加关闭按钮 -->
+    <div id="search-results" class="search-results"></div>
+  </div>
+</div>
+
+<script>
+  function performSearch(query) {
+    if (!query.trim()) {
+      return;
+    }
+
+    fetch('/search.xml')
+      .then(response => response.text())
+      .then(data => {
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(data, "text/xml");
+        const entries = xmlDoc.getElementsByTagName('entry');
+        let results = '';
+
+        for (let i = 0; i < entries.length; i++) {
+          const title = entries[i].getElementsByTagName('title')[0].textContent;
+          const content = entries[i].getElementsByTagName('content')[0].textContent;
+          const url = entries[i].getElementsByTagName('url')[0].textContent;
+
+          let count = (title.match(new RegExp(query, "gi")) || []).length; // 统计查询词出现的次数
+          count += (content.match(new RegExp(query, "gi")) || []).length;
+
+          if (count > 0) { // title.includes(query) || content.includes(query)
+            results += `
+              <div class="search-result-item">
+                <a href="${url}">${title}</a> (${count})
+              </div>`;
+          }
+        }
+
+        const searchResultsElement = document.getElementById('search-results');
+        searchResultsElement.innerHTML = results;
+        searchResultsElement.classList.add('active');
+      });
+  }
+
+  function toggleSearch() {
+    const searchOverlay = document.getElementById('search-overlay');
+    searchOverlay.style.display = searchOverlay.style.display === 'none' ? 'flex' : 'none';
+  }
+
+  function closeSearch() {
+    document.getElementById('search-overlay').style.display = 'none';
+  }
+
+  document.getElementById('search-input').addEventListener('input', function() {
+    const query = this.value;
+    performSearch(query);
+  });
+</script>
+
+<style>
+  .search-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  .search-box {
+    background: white;
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+    width: 80%;
+    max-width: 500px;
+  }
+
+  .search-results {
+    margin-top: 10px;
+    max-height: 300px;
+    overflow-y: auto;
+    background: white;
+    padding: 10px;
+    border-radius: 5px;
+    width: 100%;
+  }
+
+  .search-result-item {
+    margin: 10px 0;
+  }
+
+  .search-result-item a {
+    color: blue; /* 设置链接颜色为蓝色 */
+    text-decoration: none;
+  }
+
+  .search-result-item a:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+<script src="/js/book-toc.js"></script>
+
+
+</div>
+          </div>
+        </div>
+      </div>
+
+      <a class="off-canvas-overlay" onclick="hide_canvas()"></a>
+
+      <button class="floating-button" onclick="toggleDropdownMenu()"></button>
+
+      <div class="dropdown-menu">
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FFFFFF', '#000000')">银河白</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#C7EDCC', '#000000')">豆沙绿</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FAF9DE', '#000000')">杏仁黄</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#E3EDCD', '#000000')">青草绿</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FFF2E2', '#000000')">秋叶褐</div>
+      </div>
+  </div>
+
+  <script>
+    function toggleDropdownMenu() {
+      document.querySelector('.floating-button').classList.toggle('active');
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      var storedBackgroundColor = localStorage.getItem('blogBackgroundColor');
+      var storedColor = localStorage.getItem('blogColor');
+
+      if (storedBackgroundColor && storedColor) {
+        document.body.style.backgroundColor = storedBackgroundColor;
+        document.body.style.color = storedColor;
+      }
+    });
+
+    function changeBackgroundColor(backgroundColor, color) {
+      document.body.style.backgroundColor = backgroundColor;
+      document.body.style.color = color;
+
+      localStorage.setItem('blogBackgroundColor', backgroundColor);
+      localStorage.setItem('blogColor', color);
+
+      document.querySelector('.floating-button').classList.remove('active');
+    }
+  </script>
+</body>
+
+</html>
+
+
+<script src="/js/book.js"></script>

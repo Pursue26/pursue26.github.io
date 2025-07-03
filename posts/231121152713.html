@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
+
+    
+      <link rel="icon" href="/favicon.png" />
+    
+
+    <title>
+        
+          数据结构算法之 Dijkstra 单源最短路径（实现部分） - aha&#39;s book
+        
+    </title>
+
+    <!-- Spectre.css framework -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre-exp.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre-icons.min.css">
+
+    <!-- theme css & js -->
+    
+<link rel="stylesheet" href="/css/book.css">
+
+    
+<script src="/js/book.js"></script>
+
+
+    <!-- tocbot -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.css">
+    
+    <!-- katex -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/zooming/2.1.1/zooming.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const zooming = new Zooming()
+    zooming.listen('.book-content img')
+})
+</script>
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+    <style>
+      body {
+        background-color: #FFFFFF;
+        /* color: #000000; */
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+
+      /* Floating Button Styles */
+      .floating-button {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 999;
+        background-color: #000000;
+        color: #ffffff;
+        padding: 12px;
+        border-radius: 50%;
+        cursor: pointer;
+        border: 2px solid #000000;
+      }
+
+      .floating-button:hover {
+        background-color: #FFFFFF;
+      }
+
+      /* Dropdown Menu Styles */
+      .dropdown-menu {
+        position: fixed;
+        bottom: 60px;
+        right: 10px;
+        display: none;
+        min-width: 60px;
+        padding: 2px;
+        background-color: #fff;
+        /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
+        z-index: 1000;
+      }
+
+      .floating-button.active+.dropdown-menu {
+        display: block;
+      }
+
+      .dropdown-item {
+        display: block;
+        padding: 8px 16px;
+        cursor: pointer;
+      }
+
+      .dropdown-item:hover {
+        background-color: #f5f5f5;
+      }
+    </style>
+<style>.darkmode--activated{--body-bg-color:#282828;--content-bg-color:#333;--card-bg-color:#555;--text-color:#ccc;--blockquote-color:#bbb;--link-color:#ccc;--link-hover-color:#eee;--brand-color:#ddd;--brand-hover-color:#ddd;--table-row-odd-bg-color:#282828;--table-row-hover-bg-color:#363636;--menu-item-bg-color:#555;--btn-default-bg:#222;--btn-default-color:#ccc;--btn-default-border-color:#555;--btn-default-hover-bg:#666;--btn-default-hover-color:#ccc;--btn-default-hover-border-color:#666;--highlight-background:#282b2e;--highlight-foreground:#a9b7c6;--highlight-gutter-background:#34393d;--highlight-gutter-foreground:#9ca9b6}.darkmode--activated img{opacity:.75}.darkmode--activated img:hover{opacity:.9}.darkmode--activated code{color:#69dbdc;background:0 0}button.darkmode-toggle{z-index:9999}.darkmode-ignore,img{display:flex!important}.beian img{display:inline-block!important}</style></head>
+
+<body>
+  <div class="book-container">
+    <div class="book-sidebar">
+      <div class="book-brand">
+  <a href="/">
+    <img src="/favicon.png">
+    <span>AHA&#39;S BOOK</span>
+  </a>
+</div>
+        <div id="menu" class="book-menu hide">
+  <h2 id="基础知识"> 基础知识 </h2>
+<ul>
+<li><a href="/posts/231010144856.html"> 模运算 </a></li>
+<li><a href="/posts/231014105311.html"> 异或运算 </a></li>
+<li><a href="/posts/231210181853.html"> 计算机中的寄存器 </a></li>
+<li><a href="/posts/231213183051.html"> 正则表达式基础 </a></li>
+</ul>
+<h2 id="C 语言">C 语言 </h2>
+<ul>
+<li><a href="/posts/230916171929.html">main 函数参数 </a></li>
+<li><a href="/posts/231214192113.html"> 关键字与专有名词 </a></li>
+<li><a href="/posts/240103180653.html"> 输出打印函数 </a></li>
+<li><a href="/posts/230922143003.html"> 多维数组 </a></li>
+<li><a href="/posts/230913200729.html">const 关键字 </a></li>
+<li><a href="/posts/230918174223.html">typedef 类型基础 </a></li>
+<li><a href="/posts/230920172849.html">typedef 类型实践 </a></li>
+<li><a href="/posts/240224193217.html"> 二级指针 </a></li>
+<li><a href="/posts/240307195203.html"> 代码 TOP-K 问题 </a></li>
+<li><a href="/posts/230922172626.html">uthash 哈希表基础 </a></li>
+<li><a href="/posts/230918114841.html"> 大小端知识 </a></li>
+</ul>
+<h2 id="Golang 语言">Golang 语言 </h2>
+<ul>
+<li><a href="/posts/230907162612.html"> 变量与常量 </a></li>
+<li><a href="/posts/230909120145.html"> 函数 &amp; 包 &amp; 判断 &amp; 循环 </a></li>
+<li><a href="/posts/230912152800.html"> 数组与切片 </a></li>
+<li><a href="/posts/230913161326.html"> 可变参数函数与 Map 集合 </a></li>
+<li><a href="/posts/230915155105.html"> 字符串和指针 </a></li>
+</ul>
+<h2 id="数据结构"> 数据结构 </h2>
+<ul>
+<li><a href="/posts/231007174854.html"> 链表（数组实现）</a></li>
+<li><a href="/posts/231008213450.html"> 链表（链式实现）</a></li>
+<li><a href="/posts/231016161508.html"> 堆栈（数组实现）</a></li>
+<li><a href="/posts/231016184406.html"> 堆栈（链表实现）</a></li>
+<li><a href="/posts/231127185207.html"> 单调栈 </a></li>
+<li><a href="/posts/231017105123.html"> 队列（链表实现）</a></li>
+<li><a href="/posts/231017154121.html"> 双端队列（链表实现）</a></li>
+<li><a href="/posts/231018102559.html"> 堆基础与堆结构（数组实现）</a></li>
+<li><a href="/posts/231019102311.html"> 优先队列（堆实现）</a></li>
+<li><a href="/posts/230905224335.html"> 二叉树的遍历 </a></li>
+<li><a href="/posts/231020174358.html"> 二叉搜索树 </a></li>
+<li><a href="/posts/230916094606.html"> 拓扑排序 </a></li>
+<li><a href="/posts/230925185057.html">Trie 字典树 </a></li>
+<li><a href="/posts/231023164532.html"> 并查集（数组实现）</a></li>
+<li><a href="/posts/240702200642.html">Linux 数据结构之队列 </a></li>
+</ul>
+<h2 id="数据结构算法"> 数据结构算法 </h2>
+<ul>
+<li><a href="/posts/231218181635.html"> 归并排序 </a></li>
+<li><a href="/posts/231108163339.html"> 快速排序 </a></li>
+<li><a href="/posts/231107171607.html"> 堆排序 </a></li>
+<li><a href="/posts/231124181658.html"> 二分查找 </a></li>
+<li><a href="/posts/231227190828.html"> 哈希表实现 </a></li>
+<li><a href="/posts/240313193201.html"> 字符串哈希函数 </a></li>
+<li><a href="/posts/231116150205.html">Floyd 多源最短路径 </a></li>
+<li><a href="/posts/231117095232.html">Dijkstra 单源最短路径（原理部分）</a></li>
+<li><a href="/posts/231121152713.html">Dijkstra 单源最短路径（实现部分）</a></li>
+</ul>
+<h2 id="数据库"> 数据库 </h2>
+<ul>
+<li><a href="/posts/250605180332.html">MySQL 基础 </a></li>
+</ul>
+<h2 id="计算机网络"> 计算机网络 </h2>
+<ul>
+<li><a href="/posts/231011192359.html">OSI 参考模型 </a></li>
+<li><a href="/posts/240329202000.html"> 计网 CyC2018 之概述 </a></li>
+<li><a href="/posts/240329202004.html"> 计网 CyC2018 之链路层 </a></li>
+<li><a href="/posts/240329202003.html"> 计网 CyC2018 之网络层 </a></li>
+<li><a href="/posts/240329202002.html"> 计网 CyC2018 之传输层 </a></li>
+<li><a href="/posts/240329202001.html"> 计网 CyC2018 之应用层 </a></li>
+<li><a href="/posts/240306203742.html">ACL 访问控制列表 </a></li>
+<li><a href="/posts/240130190208.html"> 路由表、转发表与快速转发工作原理 </a></li>
+<li><a href="/posts/231221200716.html">VXLAN 网络虚拟化技术 </a></li>
+<li><a href="/posts/240903191243.html">TCP/IP checksum 计算 </a></li>
+<li><a href="/posts/240911185603.html"> 抓包分析 TCP 三次握手与四次挥手过程 </a></li>
+</ul>
+<h2 id="操作系统"> 操作系统 </h2>
+<ul>
+<li><a href="/posts/230921190726.html"> 概述 </a></li>
+<li><a href="/posts/230924172528.html"> 中断 &amp; 异常 &amp; 系统调用 </a></li>
+<li><a href="/posts/231017195157.html"> 内存分层体系与地址空间生成 </a></li>
+<li><a href="/posts/231108195351.html"> 连续内存分配 </a></li>
+<li><a href="/posts/231111172507.html"> 非连续内存分配之分段与分页 </a></li>
+<li><a href="/posts/231119170537.html"> 非连续内存分配之页表 </a></li>
+<li><a href="/posts/231123184526.html"> 内存管理之覆盖技术与交换技术 </a></li>
+<li><a href="/posts/231127193658.html"> 内存管理之虚存技术 </a></li>
+<li><a href="/posts/231129182631.html"> 局部页面置换算法 </a></li>
+<li><a href="/posts/231207184239.html"> 全局页面置换算法 </a></li>
+<li><a href="/posts/231207204958.html"> 进程描述 </a></li>
+<li><a href="/posts/231210211306.html"> 进程状态 </a></li>
+<li><a href="/posts/231215213932.html"> 线程 </a></li>
+<li><a href="/posts/231218220813.html"> 进程控制 </a></li>
+<li><a href="/posts/231228193143.html"> 调度 </a></li>
+<li><a href="/posts/240104202828.html"> 同步与互斥 </a></li>
+<li><a href="/posts/240113115605.html"> 信号量与管程 </a></li>
+<li><a href="/posts/240205182643.html"> 经典同步问题 </a></li>
+<li><a href="/posts/240310162231.html"> 死锁 </a></li>
+</ul>
+<h2 id="系统与网络编程"> 系统与网络编程 </h2>
+<ul>
+<li><a href="/posts/230911151334.html">pthread 库 </a></li>
+<li><a href="/posts/230921094127.html"> 锁与原子操作 </a></li>
+<li><a href="/posts/240319195609.html"> 读者写者问题 </a></li>
+<li><a href="/posts/240527200241.html"> 网络编程卷一阅读随笔 </a></li>
+<li><a href="/posts/240414190410.html"> 进程间通信 IPC 机制 </a></li>
+<li><a href="/posts/240424200123.html"> 多进程相关练习 </a></li>
+<li><a href="/posts/240516221527.html">I/O 模式与 I/O 多路复用 </a></li>
+<li><a href="/posts/240626192803.html">Linux 内核 kfifo 环形队列 </a></li>
+<li><a href="/posts/241009203126.html">Linux 内核等待队列 </a></li>
+<li><a href="/posts/240627210637.html">DPDK 无锁环形队列 </a></li>
+<li><a href="/posts/240919200410.html"> 解密内存屏障 </a></li>
+<li><a href="/posts/240927202500.html"> 内核线程的创建 </a></li>
+<li><a href="/posts/241015195205.html">Linux 网络数据包接收过程 </a></li>
+<li><a href="/posts/2410232111015.html"> 源码解读 epoll 实现原理 </a></li>
+<li><a href="/posts/241106182619.html">Linux 文件系统 </a></li>
+<li><a href="/posts/250619154429.html">Libevent 高性能 IO 事件驱动库 </a></li>
+</ul>
+<h2 id="工具与命令"> 工具与命令 </h2>
+<ul>
+<li><a href="/posts/240207180410.html">GCC 编译过程分解 </a></li>
+<li><a href="/posts/240312184132.html">GDB 调试入门 </a></li>
+<li><a href="/posts/240512184921.html">Makefile 学习 </a></li>
+<li><a href="/posts/250629214430.html">CMake 学习 </a></li>
+<li><a href="/posts/240417193754.html">Linux 命令之文件权限 </a></li>
+</ul>
+<h2 id="开源项目"> 开源项目 </h2>
+<ul>
+<li><a href="/posts/240303201855.html"> 线程池原理与实现 </a></li>
+<li><a href="/posts/240507194549.html">HTTP 服务器实现 </a></li>
+<li><a href="/posts/240904203605.html"> 聊天服务器实现 </a></li>
+<li><a href="/posts/241119182636.html">Linux 文件系统 </a></li>
+</ul>
+<h2 id="Docker">Docker</h2>
+<ul>
+<li><a href="/posts/230909171809.html">Docker 学习笔记 </a></li>
+</ul>
+<h1 id="LeetCode 刷题">LeetCode 刷题 </h1>
+<h2 id="链表相关"> 链表相关 </h2>
+<ul>
+<li><a href="/posts/231025143947.html">160 相交链表 </a></li>
+<li><a href="/posts/231025185947.html">206 反转链表 </a></li>
+<li><a href="/posts/231026101239.html">21 合并两个有序链表 </a></li>
+<li><a href="/posts/231026184514.html">83 删除排序链表中的重复元素 </a></li>
+<li><a href="/posts/231027150243.html">19 删除链表的倒数第 N 个节点 </a></li>
+<li><a href="/posts/231031120718.html">2 两数相加 </a></li>
+<li><a href="/posts/231031163133.html">445 两数相加 II</a></li>
+<li><a href="/posts/231101094219.html">234 回文链表 </a></li>
+<li><a href="/posts/231101135228.html">725 分隔链表 </a></li>
+<li><a href="/posts/231102120708.html">328 奇偶链表 </a></li>
+<li><a href="/posts/231102165703.html">142 环形链表 II</a></li>
+</ul>
+<h2 id="设计"> 设计 </h2>
+<ul>
+<li><a href="/posts/231201184542.html">146 LRU 缓存 </a></li>
+</ul>
+<h2 id="贪心算法"> 贪心算法 </h2>
+<ul>
+<li><a href="/posts/231107094652.html">1029 两地调度 </a></li>
+<li><a href="/posts/231109150855.html">435 无重叠区间 </a></li>
+</ul>
+<h2 id="哈希表"> 哈希表 </h2>
+<ul>
+<li><a href="/posts/231123181539.html">1410 实体解析器 </a></li>
+</ul>
+<h2 id="树的遍历"> 树的遍历 </h2>
+<ul>
+<li><a href="/posts/231103121209.html">117 填充每个节点的下一个右侧节点指针 II</a></li>
+</ul>
+<h2 id="深度优先搜索（递归）"> 深度优先搜索（递归）</h2>
+<ul>
+<li><a href="/posts/231206201243.html">2477 达到首都的最少油耗 </a></li>
+</ul>
+<h2 id="图或路径问题"> 图或路径问题 </h2>
+<ul>
+<li><a href="/posts/231211184652.html">1631 最小体力消耗路径 </a></li>
+</ul>
+<h2 id="其它"> 其它 </h2>
+<ul>
+<li><a href="/posts/230101120000.html"> 备忘录 </a></li>
+</ul>
+
+</div>
+
+
+<script src="/js/book-menu.js"></script>
+
+    </div>
+    <div class="sidebar-toggle" onclick="sidebar_toggle()" onmouseover="add_inner()" onmouseleave="remove_inner()">
+  <div class="sidebar-toggle-inner"></div>
+</div>
+
+<script>
+function add_inner() {
+  let inner = document.querySelector('.sidebar-toggle-inner')
+  inner.classList.add('show')  
+}
+
+function remove_inner() {
+  let inner = document.querySelector('.sidebar-toggle-inner')
+  inner.classList.remove('show')
+}
+
+function sidebar_toggle() {
+    let sidebar_toggle = document.querySelector('.sidebar-toggle')
+    let sidebar = document.querySelector('.book-sidebar')
+    let content = document.querySelector('.off-canvas-content')
+    if (sidebar_toggle.classList.contains('extend')) { // show
+        sidebar_toggle.classList.remove('extend')
+        sidebar.classList.remove('hide')
+        content.classList.remove('extend')
+    }
+    else { // hide
+        sidebar_toggle.classList.add('extend')
+        sidebar.classList.add('hide')
+        content.classList.add('extend')
+    }
+}
+</script>
+
+      <div class="off-canvas-content">
+        <div class="columns">
+          <div class="column col-10 col-lg-12">
+            <div class="book-navbar">
+              <!-- For Responsive Layout -->
+
+<header class="navbar">
+  <section class="navbar-section">
+    <a onclick="open_sidebar()">
+      <i class="icon icon-menu"></i>
+    </a>
+  </section>
+</header>
+
+            </div>
+            <div class="book-content">
+              <div class="book-post">
+  <p>在文章 <a href="/posts/231117095232.html"> 数据结构算法之 Dijkstra 单源最短路径（原理部分）</a>中，给出了 Dijkstra 算法求单源最短路径的图文步骤，本文将给出该算法的代码实现。</p>
+<span id="more"></span>
+<h2 id="Dijkstra 算法步骤">Dijkstra 算法步骤</h2>
+<p>回顾一下 <a href="/posts/231117095232.html"> 数据结构算法之 Dijkstra 单源最短路径（原理部分）</a>中给出的 Dijkstra 算法的具体步骤：</p>
+<ol>
+<li>创建一个距离数组<code>dist[]</code>，用于存储源节点到各个节点的最短路径长度。初始时，将源节点的距离设为 0，与源节点直接相连的节点的距离设为边的权重，其他节点的距离设为无穷大。</li>
+<li>创建一个标记数组<code>visited[]</code>，用于标记是否已经访问过该节点。初始时，将源节点标记为已访问，其他节点标记为未访问。</li>
+<li>以源节点为基准，遍历所有与其相邻的、未访问过的节点，计算「源节点」到这些相邻节点的距离，并从未访问的节点中选择距离「源节点」最近的节点，作为基准节点。</li>
+<li>以这个基准节点为中间节点，更新从源节点经过中间节点到达其它节点的距离到 <code>dist[]</code> 数组中，并将这个基准节点标记为已访问。
+<ul>
+<li>更新的方式是：如果「从新的中间节点」到「该节点」的距离小于原本到它的距离，则更新它的值（你要从这个节点走才更近哦），并将这个中间节点作为它的前驱节点。</li>
+</ul>
+</li>
+<li>重复步骤 3 和步骤 4，直到所有节点都被访问过。</li>
+<li>最终，<code>dist[]</code>数组中存储的就是源节点到其他所有节点的最短路径长度。</li>
+</ol>
+<blockquote>
+<p>步骤三中的「相邻」节点包括直接与源节点相邻、通过已访问的节点间接与源节点相邻这两大类。换句话说，也就是 <code>dist[]</code> 数组中只要不是无穷大，就与源节点直接或间接相邻。</p>
+</blockquote>
+<h2 id="Dijkstra 算法实现">Dijkstra 算法实现</h2>
+<h3 id="定义图结构">定义图结构</h3>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 邻接矩阵</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> _<span class="title">graph</span> &#123;</span></span><br><span class="line">    <span class="type">char</span> vexs[MAX];        <span class="comment">// 顶点集合</span></span><br><span class="line">    <span class="type">int</span> vexnum;            <span class="comment">// 顶点数</span></span><br><span class="line">    <span class="type">int</span> edgenum;           <span class="comment">// 边数</span></span><br><span class="line">    <span class="type">int</span> matrix[MAX][MAX];  <span class="comment">// 邻接矩阵</span></span><br><span class="line">&#125; Graph;</span><br></pre></td></tr></table></figure>
+<p><code>Graph</code> 是图的邻接矩阵对应的结构体：</p>
+<ul>
+<li><code>vexs</code> 用于保存顶点的集合，<code>vexnum</code> 是顶点数量，<code>edgenum</code> 是边数；</li>
+<li><code>matrix</code> 用于保存邻接点信息的二维数组，<code>matrix[i][j]</code> 表示顶点 <code>vexs[i]</code> 和顶点 <code>vexs[j]</code> 之间的边的权重，若 <code>matrix[i][j] = INF</code>，则表示这两个顶点之间没有边（不是邻接点）。</li>
+</ul>
+<h3 id="定义边结构">定义边结构</h3>
+<p>实际中，一般给出的信息都是哪两个顶点之间有边，边的权重是多少，所有我们给出一个结构体用于存储边的数据。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 边的结构体</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> _<span class="title">edgeData</span> &#123;</span></span><br><span class="line">    <span class="type">char</span> start;  <span class="comment">// 边的起点</span></span><br><span class="line">    <span class="type">char</span> end;    <span class="comment">// 边的终点</span></span><br><span class="line">    <span class="type">int</span> weight;  <span class="comment">// 边的权重</span></span><br><span class="line">&#125; EData;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>在编码中，图结构体变量的数据将会从边结构体变量的数据中获取。</p>
+</blockquote>
+<h3 id="获取顶点的索引">获取顶点的索引</h3>
+<p>这里的顶点是字符型（而非整数型），所以需要获取字符型顶点对应的索引——它在顶点集合中的位置。这样，才方便后续将邻接点存储在图结构的成员 <code>matrix</code> 中。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 获取顶点在顶点集合中的索引</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">getIndexOfVex</span><span class="params">(Graph *pGraph, <span class="type">char</span> vex)</span> &#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; pGraph-&gt;vexnum; i++) &#123;</span><br><span class="line">        <span class="keyword">if</span> (pGraph-&gt;vexs[i] == vex) &#123;</span><br><span class="line">            <span class="keyword">return</span> i;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="构建图数据">构建图数据</h3>
+<p>就像上面说的，图结构体变量的数据将会从边结构体变量的数据中获取。所以，我们在这里实现了从给定的边数据来初始化图数据。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 构建图</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">createGraph</span><span class="params">(Graph *pGraph, <span class="type">char</span> vexs[], <span class="type">int</span> vexnum, EData edges[], <span class="type">int</span> edgenum)</span> &#123;</span><br><span class="line">    <span class="comment">// 初始化顶点数、边数、顶点集合</span></span><br><span class="line">    pGraph-&gt;vexnum = vexnum;</span><br><span class="line">    pGraph-&gt;edgenum = edgenum;</span><br><span class="line">    <span class="built_in">memcpy</span>(pGraph-&gt;vexs, vexs, vexnum * <span class="keyword">sizeof</span>(<span class="type">char</span>));</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 初始化邻接矩阵</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; pGraph-&gt;vexnum; i++) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">0</span>; j &lt; pGraph-&gt;vexnum; j++) &#123;</span><br><span class="line">            pGraph-&gt;matrix[i][j] = (i == j ? <span class="number">0</span> : INF);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 添加边数据到图中</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; pGraph-&gt;edgenum; i++) &#123;</span><br><span class="line">        <span class="comment">// 这里要保证顶点的索引有效</span></span><br><span class="line">        <span class="type">int</span> start = getIndexOfVex(pGraph, edges[i].start);</span><br><span class="line">        <span class="type">int</span> end = getIndexOfVex(pGraph, edges[i].end);</span><br><span class="line">        <span class="type">int</span> weight = edges[i].weight;</span><br><span class="line">        pGraph-&gt;matrix[start][end] = weight;</span><br><span class="line">        pGraph-&gt;matrix[end][start] = pGraph-&gt;matrix[start][end];  <span class="comment">// 无向图加这行，有向图不加这行</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>对于无向图，要多加一行代码 <code>pGraph-&gt;matrix[end][start] = pGraph-&gt;matrix[start][end]</code> 哦。</p>
+</blockquote>
+<h3 id="Dijkstra 算法">Dijkstra 算法</h3>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Dijkstra 算法，找到源顶点到各顶点的最短路径</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">dijkstra</span><span class="params">(Graph *pGraph, <span class="type">char</span> start, <span class="type">int</span> dist[], <span class="type">int</span> prev[])</span> &#123;</span><br><span class="line">    <span class="type">int</span> i, j, k;</span><br><span class="line">    <span class="type">int</span> visited[MAX]; <span class="comment">// 标记顶点是否已被访问</span></span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> startIdx = getIndexOfVex(pGraph, start);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 步骤一 &amp; 二：初始化访问数组、距离数组、路径数组</span></span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; pGraph-&gt;vexnum; i++) &#123;</span><br><span class="line">        visited[i] = <span class="number">0</span>; <span class="comment">// 顶点未被访问</span></span><br><span class="line">        dist[i] = pGraph-&gt;matrix[startIdx][i]; <span class="comment">// 初始化源顶点到各顶点的距离</span></span><br><span class="line">        prev[i] = (dist[i] != INF ? startIdx : <span class="number">-1</span>); <span class="comment">// 如果源顶点到该顶点有边，则设置前驱顶点为源顶点</span></span><br><span class="line">    &#125;</span><br><span class="line">    visited[startIdx] = <span class="number">1</span>; <span class="comment">// 源顶点已被访问</span></span><br><span class="line">    prev[startIdx] = <span class="number">-1</span>;  <span class="comment">// 源顶点没有前驱顶点</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 步骤五：遍历 N-1 次，每次找到一个顶点的最短路径</span></span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">1</span>; i &lt; pGraph-&gt;vexnum; i++) &#123;</span><br><span class="line">        <span class="type">int</span> min = INF;</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 步骤三：找到未被访问的顶点中距离最小的顶点 k</span></span><br><span class="line">        <span class="keyword">for</span> (j = <span class="number">0</span>; j &lt; pGraph-&gt;vexnum; j++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (!visited[j] &amp;&amp; dist[j] &lt; min) &#123;</span><br><span class="line">                min = dist[j];</span><br><span class="line">                k = j;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 步骤四：更新 dist 数组和 prev 数组</span></span><br><span class="line">        <span class="keyword">for</span> (j = <span class="number">0</span>; j &lt; pGraph-&gt;vexnum; j++) &#123;</span><br><span class="line">            <span class="type">int</span> distk2j = min + pGraph-&gt;matrix[k][j]; <span class="comment">// 溢出风险, 所以定义的 INF 为一半的最大值</span></span><br><span class="line">            <span class="comment">// 如果「从新的中间节点」到「该节点」的距离小于原本到它的距离，则更新它的值</span></span><br><span class="line">            <span class="keyword">if</span> (!visited[j] &amp;&amp; distk2j &lt; dist[j]) &#123;</span><br><span class="line">                dist[j] = distk2j;</span><br><span class="line">                prev[j] = k;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        visited[k] = <span class="number">1</span>; <span class="comment">// 将基准节点标记为已访问</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>一次遍历可以访问一个顶点，源节点在初始化时被访问；所以，遍历 N-1 次后，所有顶点就都被访问过了。</p>
+</blockquote>
+<h3 id="打印最短路径">打印最短路径</h3>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 打印给定起点和终点的最短路径</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">printPath</span><span class="params">(Graph *pGraph, <span class="type">char</span> start, <span class="type">char</span> end, <span class="type">int</span> dist[], <span class="type">int</span> prev[])</span> &#123;</span><br><span class="line">    <span class="type">int</span> startIdx = getIndexOfVex(pGraph, start);</span><br><span class="line">    <span class="type">int</span> endIdx = getIndexOfVex(pGraph, end);</span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> i = endIdx, count = <span class="number">0</span>;</span><br><span class="line">    <span class="type">char</span> path[MAX];</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 逆序将路径顶点存入 path 数组</span></span><br><span class="line">    <span class="keyword">while</span> (i != startIdx) &#123;</span><br><span class="line">        path[count++] = pGraph-&gt;vexs[i];</span><br><span class="line">        i = prev[i];  <span class="comment">// 顶点 i 的前驱顶点</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 打印路径顶点</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%c -&gt; %c: %c&quot;</span>, pGraph-&gt;vexs[startIdx], pGraph-&gt;vexs[endIdx], pGraph-&gt;vexs[startIdx]);</span><br><span class="line">    <span class="keyword">for</span> (i = count - <span class="number">1</span>; i &gt;= <span class="number">0</span>; i--) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot; %c&quot;</span>, path[i]);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;, minDist: %d\n&quot;</span>, dist[endIdx]);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="Dijkstra 算法测试">Dijkstra 算法测试</h2>
+<h3 id="测试代码">测试代码</h3>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> MAX (100)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> INF ((~(0x1U <span class="string">&lt;&lt; 31)) &gt;</span>&gt; 1) <span class="comment">// 最大值 0X7FFFFFFF 的一半</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> _<span class="title">graph</span> &#123;</span></span><br><span class="line">    <span class="type">char</span> vexs[MAX];        <span class="comment">// 顶点集合</span></span><br><span class="line">    <span class="type">int</span> vexnum;            <span class="comment">// 顶点数</span></span><br><span class="line">    <span class="type">int</span> edgenum;           <span class="comment">// 边数</span></span><br><span class="line">    <span class="type">int</span> matrix[MAX][MAX];  <span class="comment">// 邻接矩阵</span></span><br><span class="line">&#125; Graph;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> _<span class="title">edgeData</span> &#123;</span></span><br><span class="line">    <span class="type">char</span> start;  <span class="comment">// 边的起点</span></span><br><span class="line">    <span class="type">char</span> end;    <span class="comment">// 边的终点</span></span><br><span class="line">    <span class="type">int</span> weight;  <span class="comment">// 边的权重</span></span><br><span class="line">&#125; EData;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">getIndexOfVex</span><span class="params">(Graph *pGraph, <span class="type">char</span> vex)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">createGraph</span><span class="params">(Graph *pGraph, <span class="type">char</span> vexs[], <span class="type">int</span> vexnum, EData edges[], <span class="type">int</span> edgenum)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">dijkstra</span><span class="params">(Graph *pGraph, <span class="type">char</span> start, <span class="type">int</span> dist[], <span class="type">int</span> prev[])</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">printPath</span><span class="params">(Graph *pGraph, <span class="type">char</span> start, <span class="type">char</span> end, <span class="type">int</span> dist[], <span class="type">int</span> prev[])</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">char</span> vexs[] = &#123;<span class="string">&#x27;A&#x27;</span>, <span class="string">&#x27;B&#x27;</span>, <span class="string">&#x27;C&#x27;</span>, <span class="string">&#x27;D&#x27;</span>, <span class="string">&#x27;E&#x27;</span>, <span class="string">&#x27;F&#x27;</span>, <span class="string">&#x27;G&#x27;</span>&#125;;</span><br><span class="line">    <span class="type">int</span> vexnum = <span class="keyword">sizeof</span>(vexs) / <span class="keyword">sizeof</span>(vexs[<span class="number">0</span>]);</span><br><span class="line">    EData edges[] = &#123;</span><br><span class="line">        &#123;<span class="string">&#x27;A&#x27;</span>, <span class="string">&#x27;B&#x27;</span>, <span class="number">2</span>&#125;,</span><br><span class="line">        &#123;<span class="string">&#x27;A&#x27;</span>, <span class="string">&#x27;C&#x27;</span>, <span class="number">6</span>&#125;,</span><br><span class="line">        &#123;<span class="string">&#x27;B&#x27;</span>, <span class="string">&#x27;D&#x27;</span>, <span class="number">5</span>&#125;,</span><br><span class="line">        &#123;<span class="string">&#x27;C&#x27;</span>, <span class="string">&#x27;D&#x27;</span>, <span class="number">8</span>&#125;,</span><br><span class="line">        &#123;<span class="string">&#x27;D&#x27;</span>, <span class="string">&#x27;F&#x27;</span>, <span class="number">15</span>&#125;,</span><br><span class="line">        &#123;<span class="string">&#x27;D&#x27;</span>, <span class="string">&#x27;E&#x27;</span>, <span class="number">10</span>&#125;,</span><br><span class="line">        &#123;<span class="string">&#x27;E&#x27;</span>, <span class="string">&#x27;F&#x27;</span>, <span class="number">6</span>&#125;,</span><br><span class="line">        &#123;<span class="string">&#x27;F&#x27;</span>, <span class="string">&#x27;G&#x27;</span>, <span class="number">6</span>&#125;,</span><br><span class="line">        &#123;<span class="string">&#x27;E&#x27;</span>, <span class="string">&#x27;G&#x27;</span>, <span class="number">2</span>&#125;&#125;;</span><br><span class="line">    <span class="type">int</span> edgenum = <span class="keyword">sizeof</span>(edges) / <span class="keyword">sizeof</span>(edges[<span class="number">0</span>]);</span><br><span class="line">    Graph graph;</span><br><span class="line">    <span class="type">int</span> dist[MAX]; <span class="comment">// 存储最短路径长度</span></span><br><span class="line">    <span class="type">int</span> prev[MAX]; <span class="comment">// 存储前驱节点</span></span><br><span class="line"></span><br><span class="line">    createGraph(&amp;graph, vexs, vexnum, edges, edgenum);</span><br><span class="line">    dijkstra(&amp;graph, <span class="string">&#x27;A&#x27;</span>, dist, prev);</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; vexnum; i++) &#123;</span><br><span class="line">        printPath(&amp;graph, <span class="string">&#x27;A&#x27;</span>, vexs[i], dist, prev);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>一个数加上无穷大会溢出，所以定义的 INF 为最大值的一半，防止溢出风险。</p>
+</blockquote>
+<h3 id="测试结果">测试结果</h3>
+<p>这是测试用例中构建的图：</p>
+<p><img src="/images/algorithm/dijkstra-n.png" alt=""></p>
+<p>测试结果，打印从起点到终点的最短路径上的节点和最短距离：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">A -&gt; A: A, minDist: 0</span><br><span class="line">A -&gt; B: A B, minDist: 2</span><br><span class="line">A -&gt; C: A C, minDist: 6</span><br><span class="line">A -&gt; D: A B D, minDist: 7</span><br><span class="line">A -&gt; E: A B D E, minDist: 17</span><br><span class="line">A -&gt; F: A B D F, minDist: 22</span><br><span class="line">A -&gt; G: A B D E G, minDist: 19</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>参考资料：</p>
+<ol>
+<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/skywang12345/p/3711512.html">https://www.cnblogs.com/skywang12345/p/3711512.html</a></li>
+</ol>
+</blockquote>
+
+</div>
+
+
+  <div class="book-comments">
+    
+
+
+
+
+  </div>
+
+
+
+<script src="/js/book-post.js"></script>
+
+
+            </div>
+          </div>
+          <div class="column col-2 hide-lg">
+            <div class="book-post-info">
+  
+    <div class="book-post-meta">
+
+  <div class="author">
+
+    <!-- Author image -->
+    <div class="author-img">
+      
+        <figure
+          class="avatar avatar-lg"
+          data-initial="A"
+          style="background-color: #3b4351;">
+        </figure>
+      
+    </div>
+
+    <!-- Author title -->
+    <div class="author-title">
+      <div>aha</div>
+      <div>2023-11-21</div>
+    </div>
+  </div>
+
+  
+    <div class="divider"></div>
+
+    <div class="link">
+      <a class="category-link" href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/">数据结构</a> <a class="category-link" href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/%E5%9B%BE%E7%AE%97%E6%B3%95/">图算法</a>
+
+      <a class="tag-none-link" href="/tags/Dijkstra%E7%AE%97%E6%B3%95/" rel="tag">#Dijkstra算法</a> <a class="tag-none-link" href="/tags/%E5%8D%95%E6%BA%90%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84/" rel="tag">#单源最短路径</a>
+    </div>
+    
+  
+
+  <div class="divider"></div>
+</div>
+  
+
+  <div class="book-tocbot">
+</div>
+<div class="book-tocbot-menu">
+  <a class="book-toc-expand" onclick="expand_toc()">Expand all</a>
+  <a onclick="go_top()">Back to top</a>
+  <a onclick="go_bottom()">Go to bottom</a>
+  <a onclick="toggleSearch()">Search in blogs</a> <!-- 添加搜索文字的点击事件 -->
+</div>
+
+<div id="search-overlay" class="search-overlay" style="display: none;"> <!-- 初始状态为隐藏 -->
+  <div class="search-box">
+    <input type="text" id="search-input" placeholder="Search in all blogs...">
+    <button onclick="closeSearch()">Close</button> <!-- 添加关闭按钮 -->
+    <div id="search-results" class="search-results"></div>
+  </div>
+</div>
+
+<script>
+  function performSearch(query) {
+    if (!query.trim()) {
+      return;
+    }
+
+    fetch('/search.xml')
+      .then(response => response.text())
+      .then(data => {
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(data, "text/xml");
+        const entries = xmlDoc.getElementsByTagName('entry');
+        let results = '';
+
+        for (let i = 0; i < entries.length; i++) {
+          const title = entries[i].getElementsByTagName('title')[0].textContent;
+          const content = entries[i].getElementsByTagName('content')[0].textContent;
+          const url = entries[i].getElementsByTagName('url')[0].textContent;
+
+          let count = (title.match(new RegExp(query, "gi")) || []).length; // 统计查询词出现的次数
+          count += (content.match(new RegExp(query, "gi")) || []).length;
+
+          if (count > 0) { // title.includes(query) || content.includes(query)
+            results += `
+              <div class="search-result-item">
+                <a href="${url}">${title}</a> (${count})
+              </div>`;
+          }
+        }
+
+        const searchResultsElement = document.getElementById('search-results');
+        searchResultsElement.innerHTML = results;
+        searchResultsElement.classList.add('active');
+      });
+  }
+
+  function toggleSearch() {
+    const searchOverlay = document.getElementById('search-overlay');
+    searchOverlay.style.display = searchOverlay.style.display === 'none' ? 'flex' : 'none';
+  }
+
+  function closeSearch() {
+    document.getElementById('search-overlay').style.display = 'none';
+  }
+
+  document.getElementById('search-input').addEventListener('input', function() {
+    const query = this.value;
+    performSearch(query);
+  });
+</script>
+
+<style>
+  .search-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  .search-box {
+    background: white;
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+    width: 80%;
+    max-width: 500px;
+  }
+
+  .search-results {
+    margin-top: 10px;
+    max-height: 300px;
+    overflow-y: auto;
+    background: white;
+    padding: 10px;
+    border-radius: 5px;
+    width: 100%;
+  }
+
+  .search-result-item {
+    margin: 10px 0;
+  }
+
+  .search-result-item a {
+    color: blue; /* 设置链接颜色为蓝色 */
+    text-decoration: none;
+  }
+
+  .search-result-item a:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+<script src="/js/book-toc.js"></script>
+
+
+</div>
+          </div>
+        </div>
+      </div>
+
+      <a class="off-canvas-overlay" onclick="hide_canvas()"></a>
+
+      <button class="floating-button" onclick="toggleDropdownMenu()"></button>
+
+      <div class="dropdown-menu">
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FFFFFF', '#000000')">银河白</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#C7EDCC', '#000000')">豆沙绿</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FAF9DE', '#000000')">杏仁黄</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#E3EDCD', '#000000')">青草绿</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FFF2E2', '#000000')">秋叶褐</div>
+      </div>
+  </div>
+
+  <script>
+    function toggleDropdownMenu() {
+      document.querySelector('.floating-button').classList.toggle('active');
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      var storedBackgroundColor = localStorage.getItem('blogBackgroundColor');
+      var storedColor = localStorage.getItem('blogColor');
+
+      if (storedBackgroundColor && storedColor) {
+        document.body.style.backgroundColor = storedBackgroundColor;
+        document.body.style.color = storedColor;
+      }
+    });
+
+    function changeBackgroundColor(backgroundColor, color) {
+      document.body.style.backgroundColor = backgroundColor;
+      document.body.style.color = color;
+
+      localStorage.setItem('blogBackgroundColor', backgroundColor);
+      localStorage.setItem('blogColor', color);
+
+      document.querySelector('.floating-button').classList.remove('active');
+    }
+  </script>
+</body>
+
+</html>
+
+
+<script src="/js/book.js"></script>

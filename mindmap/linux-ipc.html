@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
+
+    
+      <link rel="icon" href="/favicon.png" />
+    
+
+    <title>
+        
+          aha&#39;s book
+        
+    </title>
+
+    <!-- Spectre.css framework -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre-exp.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre-icons.min.css">
+
+    <!-- theme css & js -->
+    
+<link rel="stylesheet" href="/css/book.css">
+
+    
+<script src="/js/book.js"></script>
+
+
+    <!-- tocbot -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.css">
+    
+    <!-- katex -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/zooming/2.1.1/zooming.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const zooming = new Zooming()
+    zooming.listen('.book-content img')
+})
+</script>
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+    <style>
+      body {
+        background-color: #FFFFFF;
+        /* color: #000000; */
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+
+      /* Floating Button Styles */
+      .floating-button {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 999;
+        background-color: #000000;
+        color: #ffffff;
+        padding: 12px;
+        border-radius: 50%;
+        cursor: pointer;
+        border: 2px solid #000000;
+      }
+
+      .floating-button:hover {
+        background-color: #FFFFFF;
+      }
+
+      /* Dropdown Menu Styles */
+      .dropdown-menu {
+        position: fixed;
+        bottom: 60px;
+        right: 10px;
+        display: none;
+        min-width: 60px;
+        padding: 2px;
+        background-color: #fff;
+        /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
+        z-index: 1000;
+      }
+
+      .floating-button.active+.dropdown-menu {
+        display: block;
+      }
+
+      .dropdown-item {
+        display: block;
+        padding: 8px 16px;
+        cursor: pointer;
+      }
+
+      .dropdown-item:hover {
+        background-color: #f5f5f5;
+      }
+    </style>
+</head>
+
+<body>
+  <div class="book-container">
+    <div class="book-sidebar">
+      <div class="book-brand">
+  <a href="/">
+    <img src="/favicon.png">
+    <span>AHA&#39;S BOOK</span>
+  </a>
+</div>
+        <div id="menu" class="book-menu hide">
+  <h2 id="基础知识"> 基础知识 </h2>
+<ul>
+<li><a href="/posts/231010144856.html"> 模运算 </a></li>
+<li><a href="/posts/231014105311.html"> 异或运算 </a></li>
+<li><a href="/posts/231210181853.html"> 计算机中的寄存器 </a></li>
+<li><a href="/posts/231213183051.html"> 正则表达式基础 </a></li>
+</ul>
+<h2 id="C 语言">C 语言 </h2>
+<ul>
+<li><a href="/posts/230916171929.html">main 函数参数 </a></li>
+<li><a href="/posts/231214192113.html"> 关键字与专有名词 </a></li>
+<li><a href="/posts/240103180653.html"> 输出打印函数 </a></li>
+<li><a href="/posts/230922143003.html"> 多维数组 </a></li>
+<li><a href="/posts/230913200729.html">const 关键字 </a></li>
+<li><a href="/posts/230918174223.html">typedef 类型基础 </a></li>
+<li><a href="/posts/230920172849.html">typedef 类型实践 </a></li>
+<li><a href="/posts/240224193217.html"> 二级指针 </a></li>
+<li><a href="/posts/240307195203.html"> 代码 TOP-K 问题 </a></li>
+<li><a href="/posts/230922172626.html">uthash 哈希表基础 </a></li>
+<li><a href="/posts/230918114841.html"> 大小端知识 </a></li>
+</ul>
+<h2 id="Golang 语言">Golang 语言 </h2>
+<ul>
+<li><a href="/posts/230907162612.html"> 变量与常量 </a></li>
+<li><a href="/posts/230909120145.html"> 函数 &amp; 包 &amp; 判断 &amp; 循环 </a></li>
+<li><a href="/posts/230912152800.html"> 数组与切片 </a></li>
+<li><a href="/posts/230913161326.html"> 可变参数函数与 Map 集合 </a></li>
+<li><a href="/posts/230915155105.html"> 字符串和指针 </a></li>
+</ul>
+<h2 id="数据结构"> 数据结构 </h2>
+<ul>
+<li><a href="/posts/231007174854.html"> 链表（数组实现）</a></li>
+<li><a href="/posts/231008213450.html"> 链表（链式实现）</a></li>
+<li><a href="/posts/231016161508.html"> 堆栈（数组实现）</a></li>
+<li><a href="/posts/231016184406.html"> 堆栈（链表实现）</a></li>
+<li><a href="/posts/231127185207.html"> 单调栈 </a></li>
+<li><a href="/posts/231017105123.html"> 队列（链表实现）</a></li>
+<li><a href="/posts/231017154121.html"> 双端队列（链表实现）</a></li>
+<li><a href="/posts/231018102559.html"> 堆基础与堆结构（数组实现）</a></li>
+<li><a href="/posts/231019102311.html"> 优先队列（堆实现）</a></li>
+<li><a href="/posts/230905224335.html"> 二叉树的遍历 </a></li>
+<li><a href="/posts/231020174358.html"> 二叉搜索树 </a></li>
+<li><a href="/posts/230916094606.html"> 拓扑排序 </a></li>
+<li><a href="/posts/230925185057.html">Trie 字典树 </a></li>
+<li><a href="/posts/231023164532.html"> 并查集（数组实现）</a></li>
+<li><a href="/posts/240702200642.html">Linux 数据结构之队列 </a></li>
+</ul>
+<h2 id="数据结构算法"> 数据结构算法 </h2>
+<ul>
+<li><a href="/posts/231218181635.html"> 归并排序 </a></li>
+<li><a href="/posts/231108163339.html"> 快速排序 </a></li>
+<li><a href="/posts/231107171607.html"> 堆排序 </a></li>
+<li><a href="/posts/231124181658.html"> 二分查找 </a></li>
+<li><a href="/posts/231227190828.html"> 哈希表实现 </a></li>
+<li><a href="/posts/240313193201.html"> 字符串哈希函数 </a></li>
+<li><a href="/posts/231116150205.html">Floyd 多源最短路径 </a></li>
+<li><a href="/posts/231117095232.html">Dijkstra 单源最短路径（原理部分）</a></li>
+<li><a href="/posts/231121152713.html">Dijkstra 单源最短路径（实现部分）</a></li>
+</ul>
+<h2 id="数据库"> 数据库 </h2>
+<ul>
+<li><a href="/posts/250605180332.html">MySQL 基础 </a></li>
+</ul>
+<h2 id="计算机网络"> 计算机网络 </h2>
+<ul>
+<li><a href="/posts/231011192359.html">OSI 参考模型 </a></li>
+<li><a href="/posts/240329202000.html"> 计网 CyC2018 之概述 </a></li>
+<li><a href="/posts/240329202004.html"> 计网 CyC2018 之链路层 </a></li>
+<li><a href="/posts/240329202003.html"> 计网 CyC2018 之网络层 </a></li>
+<li><a href="/posts/240329202002.html"> 计网 CyC2018 之传输层 </a></li>
+<li><a href="/posts/240329202001.html"> 计网 CyC2018 之应用层 </a></li>
+<li><a href="/posts/240306203742.html">ACL 访问控制列表 </a></li>
+<li><a href="/posts/240130190208.html"> 路由表、转发表与快速转发工作原理 </a></li>
+<li><a href="/posts/231221200716.html">VXLAN 网络虚拟化技术 </a></li>
+<li><a href="/posts/240903191243.html">TCP/IP checksum 计算 </a></li>
+<li><a href="/posts/240911185603.html"> 抓包分析 TCP 三次握手与四次挥手过程 </a></li>
+</ul>
+<h2 id="操作系统"> 操作系统 </h2>
+<ul>
+<li><a href="/posts/230921190726.html"> 概述 </a></li>
+<li><a href="/posts/230924172528.html"> 中断 &amp; 异常 &amp; 系统调用 </a></li>
+<li><a href="/posts/231017195157.html"> 内存分层体系与地址空间生成 </a></li>
+<li><a href="/posts/231108195351.html"> 连续内存分配 </a></li>
+<li><a href="/posts/231111172507.html"> 非连续内存分配之分段与分页 </a></li>
+<li><a href="/posts/231119170537.html"> 非连续内存分配之页表 </a></li>
+<li><a href="/posts/231123184526.html"> 内存管理之覆盖技术与交换技术 </a></li>
+<li><a href="/posts/231127193658.html"> 内存管理之虚存技术 </a></li>
+<li><a href="/posts/231129182631.html"> 局部页面置换算法 </a></li>
+<li><a href="/posts/231207184239.html"> 全局页面置换算法 </a></li>
+<li><a href="/posts/231207204958.html"> 进程描述 </a></li>
+<li><a href="/posts/231210211306.html"> 进程状态 </a></li>
+<li><a href="/posts/231215213932.html"> 线程 </a></li>
+<li><a href="/posts/231218220813.html"> 进程控制 </a></li>
+<li><a href="/posts/231228193143.html"> 调度 </a></li>
+<li><a href="/posts/240104202828.html"> 同步与互斥 </a></li>
+<li><a href="/posts/240113115605.html"> 信号量与管程 </a></li>
+<li><a href="/posts/240205182643.html"> 经典同步问题 </a></li>
+<li><a href="/posts/240310162231.html"> 死锁 </a></li>
+</ul>
+<h2 id="系统与网络编程"> 系统与网络编程 </h2>
+<ul>
+<li><a href="/posts/230911151334.html">pthread 库 </a></li>
+<li><a href="/posts/230921094127.html"> 锁与原子操作 </a></li>
+<li><a href="/posts/240319195609.html"> 读者写者问题 </a></li>
+<li><a href="/posts/240527200241.html"> 网络编程卷一阅读随笔 </a></li>
+<li><a href="/posts/240414190410.html"> 进程间通信 IPC 机制 </a></li>
+<li><a href="/posts/240424200123.html"> 多进程相关练习 </a></li>
+<li><a href="/posts/240516221527.html">I/O 模式与 I/O 多路复用 </a></li>
+<li><a href="/posts/240626192803.html">Linux 内核 kfifo 环形队列 </a></li>
+<li><a href="/posts/241009203126.html">Linux 内核等待队列 </a></li>
+<li><a href="/posts/240627210637.html">DPDK 无锁环形队列 </a></li>
+<li><a href="/posts/240919200410.html"> 解密内存屏障 </a></li>
+<li><a href="/posts/240927202500.html"> 内核线程的创建 </a></li>
+<li><a href="/posts/241015195205.html">Linux 网络数据包接收过程 </a></li>
+<li><a href="/posts/2410232111015.html"> 源码解读 epoll 实现原理 </a></li>
+<li><a href="/posts/241106182619.html">Linux 文件系统 </a></li>
+<li><a href="/posts/250619154429.html">Libevent 高性能 IO 事件驱动库 </a></li>
+</ul>
+<h2 id="工具与命令"> 工具与命令 </h2>
+<ul>
+<li><a href="/posts/240207180410.html">GCC 编译过程分解 </a></li>
+<li><a href="/posts/240312184132.html">GDB 调试入门 </a></li>
+<li><a href="/posts/240512184921.html">Makefile 学习 </a></li>
+<li><a href="/posts/250629214430.html">CMake 学习 </a></li>
+<li><a href="/posts/240417193754.html">Linux 命令之文件权限 </a></li>
+</ul>
+<h2 id="开源项目"> 开源项目 </h2>
+<ul>
+<li><a href="/posts/240303201855.html"> 线程池原理与实现 </a></li>
+<li><a href="/posts/240507194549.html">HTTP 服务器实现 </a></li>
+<li><a href="/posts/240904203605.html"> 聊天服务器实现 </a></li>
+<li><a href="/posts/241119182636.html">Linux 文件系统 </a></li>
+</ul>
+<h2 id="Docker">Docker</h2>
+<ul>
+<li><a href="/posts/230909171809.html">Docker 学习笔记 </a></li>
+</ul>
+<h1 id="LeetCode 刷题">LeetCode 刷题 </h1>
+<h2 id="链表相关"> 链表相关 </h2>
+<ul>
+<li><a href="/posts/231025143947.html">160 相交链表 </a></li>
+<li><a href="/posts/231025185947.html">206 反转链表 </a></li>
+<li><a href="/posts/231026101239.html">21 合并两个有序链表 </a></li>
+<li><a href="/posts/231026184514.html">83 删除排序链表中的重复元素 </a></li>
+<li><a href="/posts/231027150243.html">19 删除链表的倒数第 N 个节点 </a></li>
+<li><a href="/posts/231031120718.html">2 两数相加 </a></li>
+<li><a href="/posts/231031163133.html">445 两数相加 II</a></li>
+<li><a href="/posts/231101094219.html">234 回文链表 </a></li>
+<li><a href="/posts/231101135228.html">725 分隔链表 </a></li>
+<li><a href="/posts/231102120708.html">328 奇偶链表 </a></li>
+<li><a href="/posts/231102165703.html">142 环形链表 II</a></li>
+</ul>
+<h2 id="设计"> 设计 </h2>
+<ul>
+<li><a href="/posts/231201184542.html">146 LRU 缓存 </a></li>
+</ul>
+<h2 id="贪心算法"> 贪心算法 </h2>
+<ul>
+<li><a href="/posts/231107094652.html">1029 两地调度 </a></li>
+<li><a href="/posts/231109150855.html">435 无重叠区间 </a></li>
+</ul>
+<h2 id="哈希表"> 哈希表 </h2>
+<ul>
+<li><a href="/posts/231123181539.html">1410 实体解析器 </a></li>
+</ul>
+<h2 id="树的遍历"> 树的遍历 </h2>
+<ul>
+<li><a href="/posts/231103121209.html">117 填充每个节点的下一个右侧节点指针 II</a></li>
+</ul>
+<h2 id="深度优先搜索（递归）"> 深度优先搜索（递归）</h2>
+<ul>
+<li><a href="/posts/231206201243.html">2477 达到首都的最少油耗 </a></li>
+</ul>
+<h2 id="图或路径问题"> 图或路径问题 </h2>
+<ul>
+<li><a href="/posts/231211184652.html">1631 最小体力消耗路径 </a></li>
+</ul>
+<h2 id="其它"> 其它 </h2>
+<ul>
+<li><a href="/posts/230101120000.html"> 备忘录 </a></li>
+</ul>
+
+</div>
+
+
+<script src="/js/book-menu.js"></script>
+
+    </div>
+    <div class="sidebar-toggle" onclick="sidebar_toggle()" onmouseover="add_inner()" onmouseleave="remove_inner()">
+  <div class="sidebar-toggle-inner"></div>
+</div>
+
+<script>
+function add_inner() {
+  let inner = document.querySelector('.sidebar-toggle-inner')
+  inner.classList.add('show')  
+}
+
+function remove_inner() {
+  let inner = document.querySelector('.sidebar-toggle-inner')
+  inner.classList.remove('show')
+}
+
+function sidebar_toggle() {
+    let sidebar_toggle = document.querySelector('.sidebar-toggle')
+    let sidebar = document.querySelector('.book-sidebar')
+    let content = document.querySelector('.off-canvas-content')
+    if (sidebar_toggle.classList.contains('extend')) { // show
+        sidebar_toggle.classList.remove('extend')
+        sidebar.classList.remove('hide')
+        content.classList.remove('extend')
+    }
+    else { // hide
+        sidebar_toggle.classList.add('extend')
+        sidebar.classList.add('hide')
+        content.classList.add('extend')
+    }
+}
+</script>
+
+      <div class="off-canvas-content">
+        <div class="columns">
+          <div class="column col-10 col-lg-12">
+            <div class="book-navbar">
+              <!-- For Responsive Layout -->
+
+<header class="navbar">
+  <section class="navbar-section">
+    <a onclick="open_sidebar()">
+      <i class="icon icon-menu"></i>
+    </a>
+  </section>
+</header>
+
+            </div>
+            <div class="book-content">
+              
+<article id="page">
+  <h1></h1>
+  <!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<title>Markmap</title>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+}
+#mindmap {
+  display: block;
+  width: 100vw;
+  height: 100vh;
+}
+</style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.28.0/themes/prism.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/markmap-toolbar@0.14.4/dist/style.css">
+<style>.darkmode--activated{--body-bg-color:#282828;--content-bg-color:#333;--card-bg-color:#555;--text-color:#ccc;--blockquote-color:#bbb;--link-color:#ccc;--link-hover-color:#eee;--brand-color:#ddd;--brand-hover-color:#ddd;--table-row-odd-bg-color:#282828;--table-row-hover-bg-color:#363636;--menu-item-bg-color:#555;--btn-default-bg:#222;--btn-default-color:#ccc;--btn-default-border-color:#555;--btn-default-hover-bg:#666;--btn-default-hover-color:#ccc;--btn-default-hover-border-color:#666;--highlight-background:#282b2e;--highlight-foreground:#a9b7c6;--highlight-gutter-background:#34393d;--highlight-gutter-foreground:#9ca9b6}.darkmode--activated img{opacity:.75}.darkmode--activated img:hover{opacity:.9}.darkmode--activated code{color:#69dbdc;background:0 0}button.darkmode-toggle{z-index:9999}.darkmode-ignore,img{display:flex!important}.beian img{display:inline-block!important}</style></head>
+<body>
+<svg id="mindmap"></svg>
+<script src="https://cdn.jsdelivr.net/npm/d3@6.7.0"></script><script src="https://cdn.jsdelivr.net/npm/markmap-view@0.14.4"></script><script src="https://cdn.jsdelivr.net/npm/markmap-toolbar@0.14.4/dist/index.umd.min.js"></script><script>(r => {setTimeout(r);
+              })(() => {
+  const {
+    markmap,
+    mm
+  } = window;
+  const toolbar = new markmap.Toolbar();
+  toolbar.attach(mm);
+  const el = toolbar.render();
+  el.setAttribute('style', 'position:absolute;bottom:20px;right:20px');
+  document.body.append(el);
+})</script><script>((getMarkmap, getOptions, root, jsonOptions) => {const markmap = getMarkmap();
+        window.mm = markmap.Markmap.create('svg#mindmap', (getOptions || markmap.deriveOptions)(jsonOptions), root);
+      })(() => window.markmap,null,{"type":"heading","depth":0,"payload":{"lines":[0,1]},"content":"进程间通信 IPC","children":[{"type":"heading","depth":1,"payload":{"lines":[2,3]},"content":"IPC 方式汇总","children":[{"type":"list_item","depth":2,"payload":{"lines":[4,5]},"content":"共享文件：多个进程访问同一个文件（加锁）"},{"type":"list_item","depth":2,"payload":{"lines":[5,6]},"content":"共享内存","children":[{"type":"list_item","depth":3,"payload":{"lines":[6,7]},"content":"多个进程访问同一块内存区域"},{"type":"list_item","depth":3,"payload":{"lines":[7,8]},"content":"最快的 IPC 方式之一"}]},{"type":"list_item","depth":2,"payload":{"lines":[8,9]},"content":"信号量：控制对共享资源访问的同步机制"},{"type":"list_item","depth":2,"payload":{"lines":[9,10]},"content":"管道 Pipe：单向通信机制、通常用于父子进程之间的通信"},{"type":"list_item","depth":2,"payload":{"lines":[10,11]},"content":"消息队列","children":[{"type":"list_item","depth":3,"payload":{"lines":[11,12]},"content":"消息被放置在一个队列中，可由多个读者接收"},{"type":"list_item","depth":3,"payload":{"lines":[12,13]},"content":"通过消息队列标识符来引用 -&gt; 获取消息队列"}]},{"type":"list_item","depth":2,"payload":{"lines":[13,14]},"content":"套接字：网络上进行进程通信的方式、允许不同主机上的进程通信"}]},{"type":"heading","depth":1,"payload":{"lines":[15,16]},"content":"进程 vs 线程","children":[{"type":"list_item","depth":2,"payload":{"lines":[17,18]},"content":"进程一般不共享内存地址空间（通过 IPC 通信）"},{"type":"list_item","depth":2,"payload":{"lines":[18,19]},"content":"进程内的线程共享内存地址空间"}]},{"type":"heading","depth":1,"payload":{"lines":[20,21]},"content":"Shared File","children":[{"type":"heading","depth":2,"payload":{"lines":[22,23]},"content":"生产者","children":[{"type":"list_item","depth":3,"payload":{"lines":[24,25]},"content":"写之前获取文件的独占锁"},{"type":"list_item","depth":3,"payload":{"lines":[25,26]},"content":"释放锁前，其它进程无法访问共享文件"}]},{"type":"heading","depth":2,"payload":{"lines":[27,28]},"content":"消费者","children":[{"type":"list_item","depth":3,"payload":{"lines":[29,30]},"content":"读之前获取文件的共享锁、多个读者可同时持有共享锁"},{"type":"list_item","depth":3,"payload":{"lines":[30,31]},"content":"有读者持有共享锁时，写者无法访问共享文件"}]},{"type":"heading","depth":2,"payload":{"lines":[32,33]},"content":"API 部分","children":[{"type":"list_item","depth":3,"payload":{"lines":[34,35]},"content":"fcntl 函数：用于检查和操作文件上的独占锁和共享锁、它通过文件 fd 进行工作"},{"type":"list_item","depth":3,"payload":{"lines":[35,36]},"content":"struct flock 文件锁结构：设置锁的类型、锁定的文件的字节范围等"},{"type":"list_item","depth":3,"payload":{"lines":[36,37]},"content":"fcntl(fd, F_SETLK, &amp;lock) 设置锁的状态（存储在 lock 中）"}]},{"type":"heading","depth":2,"payload":{"lines":[38,39]},"content":"生产者写入数据的过程","children":[{"type":"list_item","depth":3,"payload":{"lines":[40,41]},"content":"初始化 lock 的成员，如 lock.l_type 为 F_WRLCK 读写锁"},{"type":"list_item","depth":3,"payload":{"lines":[41,42]},"content":"以可读写方式打开共享文件（获取 fd）"},{"type":"list_item","depth":3,"payload":{"lines":[42,43]},"content":"通过 fcntl(fd, F_SETLK/F_SETLKW, &amp;lock) 加锁"},{"type":"list_item","depth":3,"payload":{"lines":[43,44]},"content":"写入数据"},{"type":"list_item","depth":3,"payload":{"lines":[44,45]},"content":"更新 lock.l_type 为 F_UNLCK 未锁"},{"type":"list_item","depth":3,"payload":{"lines":[45,46]},"content":"通过 fcntl(fd, F_SETLK/F_SETLKW, &amp;lock) 解锁"},{"type":"list_item","depth":3,"payload":{"lines":[46,47]},"content":"close(fd)"}]},{"type":"heading","depth":2,"payload":{"lines":[48,49]},"content":"消费者读取数据的过程","children":[{"type":"list_item","depth":3,"payload":{"lines":[50,51]},"content":"初始化 lock 的成员，如 lock.l_type 为 F_WRLCK 读写锁"},{"type":"list_item","depth":3,"payload":{"lines":[51,52]},"content":"以只读方式打开共享文件（获取 fd）"},{"type":"list_item","depth":3,"payload":{"lines":[52,53]},"content":"通过 fcntl(fd, F_GETLK, &amp;lock) 获取文件的锁（存储在 lock 中）"},{"type":"list_item","depth":3,"payload":{"lines":[53,54]},"content":"在 lock.l_type == F_UNLCK 下，更新 lock.l_type 为 F_RDLCK 只读锁（禁写）"},{"type":"list_item","depth":3,"payload":{"lines":[54,55]},"content":"通过 fcntl(fd, F_SETLK/F_SETLKW, &amp;lock) 加锁"},{"type":"list_item","depth":3,"payload":{"lines":[55,56]},"content":"读取数据"},{"type":"list_item","depth":3,"payload":{"lines":[56,57]},"content":"更新 lock.l_type 为 F_UNLCK 未锁"},{"type":"list_item","depth":3,"payload":{"lines":[57,58]},"content":"通过 fcntl(fd, F_SETLK/F_SETLKW, &amp;lock) 解锁"},{"type":"list_item","depth":3,"payload":{"lines":[58,59]},"content":"close(fd)"}]},{"type":"heading","depth":2,"payload":{"lines":[60,61]},"content":"特点","children":[{"type":"list_item","depth":3,"payload":{"lines":[62,63]},"content":"灵活：共享文件的内容可以是大量的、任意字节的"},{"type":"list_item","depth":3,"payload":{"lines":[63,64]},"content":"访问效率慢：文件读、写数据效率都比较慢"}]}]},{"type":"heading","depth":1,"payload":{"lines":[65,66]},"content":"shared memory","children":[{"type":"heading","depth":2,"payload":{"lines":[67,68]},"content":"工作原理","children":[{"type":"list_item","depth":3,"payload":{"lines":[69,70]},"content":"将共享内存实现为内存映射文件：对于共享内存段，系统维护一个具有相应内容的后备文件（非必须）"},{"type":"list_item","depth":3,"payload":{"lines":[70,71]},"content":"支持后备文件：结合了内存访问（速度）和文件存储（持久性）的优点"},{"type":"list_item","depth":3,"payload":{"lines":[71,72]},"content":"需要同步机制（如信号量）避免对内存的访问的竞态条件"}]},{"type":"heading","depth":2,"payload":{"lines":[73,74]},"content":"API 部分","children":[{"type":"list_item","depth":3,"payload":{"lines":[75,76]},"content":"shm_open 函数：返回系统与共享内存协调的后备文件的 fd（此时还没有分配内存）"},{"type":"list_item","depth":3,"payload":{"lines":[76,77]},"content":"ftruncate(fd, ByteSize)：分配指定字节的内存"},{"type":"list_item","depth":3,"payload":{"lines":[77,78]},"content":"程序仅访问共享内存，而不访问后备文件。系统负责同步共享内存和后备文件"},{"type":"list_item","depth":3,"payload":{"lines":[78,79]},"content":"mmap 函数：获取指向共享内存的指针，执行成功后会在 /dev/shm 目录下创建并维护后备文件"},{"type":"list_item","depth":3,"payload":{"lines":[79,80]},"content":"sem_open 函数：创建一个信号量来同步对共享内存的访问（不同进程间通过相同的 semName 来访问同一个信号量）"},{"type":"list_item","depth":3,"payload":{"lines":[80,81]},"content":"munmap 函数：删除共享内存存储映射，不再能通过上述指针访问共享内存"},{"type":"list_item","depth":3,"payload":{"lines":[81,82]},"content":"sem_close 函数：与 sem_open 配合使用"},{"type":"list_item","depth":3,"payload":{"lines":[82,83]},"content":"shm_unlink 函数：在程序结束时，删除后备文件"}]},{"type":"heading","depth":2,"payload":{"lines":[84,85]},"content":"共享内存写者过程","children":[{"type":"list_item","depth":3,"payload":{"lines":[86,87]},"content":"fd = shm_open(...)"},{"type":"list_item","depth":3,"payload":{"lines":[87,88]},"content":"ftruncate(fd, ByteSize)"},{"type":"list_item","depth":3,"payload":{"lines":[88,89]},"content":"memptr = mmap(...)"},{"type":"list_item","depth":3,"payload":{"lines":[89,90]},"content":"semptr = sem_open(SemName, ..., 1)"},{"type":"list_item","depth":3,"payload":{"lines":[90,91]},"content":"通过 sem_wait(semptr) 获取锁"},{"type":"list_item","depth":3,"payload":{"lines":[91,92]},"content":"通过 memptr 首地址操作共享内存块，写入数据"},{"type":"list_item","depth":3,"payload":{"lines":[92,93]},"content":"通过 sem_post(semptr) 释放锁"},{"type":"list_item","depth":3,"payload":{"lines":[93,94]},"content":"munmap(memptr, ByteSize), close(fd)"},{"type":"list_item","depth":3,"payload":{"lines":[94,95]},"content":"sem_close(semptr), shm_unlink(BackingFile)"}]},{"type":"heading","depth":2,"payload":{"lines":[96,97]},"content":"共享内存读者过程","children":[{"type":"list_item","depth":3,"payload":{"lines":[98,99]},"content":"fd = shm_open(...)"},{"type":"list_item","depth":3,"payload":{"lines":[99,100]},"content":"memptr = mmap(...) 直接获取指针，写者进程已经分配了共享内存"},{"type":"list_item","depth":3,"payload":{"lines":[100,101]},"content":"semptr = sem_open(SemName, ..., 0)"},{"type":"list_item","depth":3,"payload":{"lines":[101,102]},"content":"通过 sem_wait(semptr) 获取锁"},{"type":"list_item","depth":3,"payload":{"lines":[102,103]},"content":"通过 memptr 首地址操作共享内存块，读取数据"},{"type":"list_item","depth":3,"payload":{"lines":[103,104]},"content":"通过 sem_post(semptr) 释放锁"},{"type":"list_item","depth":3,"payload":{"lines":[104,105]},"content":"munmap(memptr, ByteSize), close(fd)"},{"type":"list_item","depth":3,"payload":{"lines":[105,106]},"content":"sem_close(semptr), shm_unlink(BackingFile)"}]},{"type":"heading","depth":2,"payload":{"lines":[107,108]},"content":"特点","children":[{"type":"list_item","depth":3,"payload":{"lines":[109,110]},"content":"API 相对简单"},{"type":"list_item","depth":3,"payload":{"lines":[110,111]},"content":"共享文件和共享内存不适用于海量数据量场景（Channels 更好）"}]}]},{"type":"heading","depth":1,"payload":{"lines":[112,113]},"content":"Pipes","children":[{"type":"heading","depth":2,"payload":{"lines":[114,115]},"content":"基本概念","children":[{"type":"list_item","depth":3,"payload":{"lines":[116,119]},"content":"管道（pipes）是连接进程进行通信的通道（channels），<br>\n 一个 channel 有一个用于写入字节的写端，<br>\n 以及一个用于以 FIFO 顺序读取这些字节的读端"},{"type":"list_item","depth":3,"payload":{"lines":[119,120]},"content":"一个进程向 channel 写入数据，而另一个进程从同一 channel 读取数据"},{"type":"list_item","depth":3,"payload":{"lines":[120,121]},"content":"Unnamed and named Pipes，均可在命令行交互式地使用、也可以在程序内部使用"},{"type":"list_item","depth":3,"payload":{"lines":[121,122]},"content":"基于 channel 的 IPC 是并发安全的（在并发写入的字节不超过 PIPE_BUF=4096B 下）"},{"type":"list_item","depth":3,"payload":{"lines":[122,123]},"content":"匿名管道没有后备文件、命名管道有后备文件"}]},{"type":"heading","depth":2,"payload":{"lines":[124,125]},"content":"Unnamed Pipes","children":[{"type":"heading","depth":3,"payload":{"lines":[126,127]},"content":"在交互式命令行","children":[{"type":"list_item","depth":4,"payload":{"lines":[128,129]},"content":"竖线 | 表示命令行中的匿名管道"},{"type":"list_item","depth":4,"payload":{"lines":[129,130]},"content":"sleep 5 | echo &quot;hello!&quot;"},{"type":"list_item","depth":4,"payload":{"lines":[130,131]},"content":"写者进程 | 读者进程：（默认情况下）读者阻塞，写者写入 \\0 后唤醒读者"},{"type":"list_item","depth":4,"payload":{"lines":[131,132]},"content":"（特殊情况）无需写入数据的写者会直接唤醒读者，无需读取数据的读者不会阻塞"}]},{"type":"heading","depth":3,"payload":{"lines":[133,134]},"content":"在程序内部","children":[{"type":"heading","depth":4,"payload":{"lines":[135,136]},"content":"API 部分","children":[{"type":"list_item","depth":5,"payload":{"lines":[137,138]},"content":"cpid = fork() 子进程返回 0，父进程返回子进程的 PID"},{"type":"list_item","depth":5,"payload":{"lines":[138,139]},"content":"ret = pipe(pipeFDs) 创建单向管道，数组索引 0/1 存储管道的读 / 写端 fd"},{"type":"list_item","depth":5,"payload":{"lines":[139,140]},"content":"数据写入管道的写端，从管道的读端读取数据"},{"type":"list_item","depth":5,"payload":{"lines":[140,141]},"content":"写者一般不需要读，读者一般不需要写：写者 / 读者 close 读端 / 写端"}]},{"type":"heading","depth":4,"payload":{"lines":[142,143]},"content":"匿名管道通信过程","children":[{"type":"list_item","depth":5,"payload":{"lines":[144,145]},"content":"ret = pipe(pipeFDs) 创建单向管道"},{"type":"list_item","depth":5,"payload":{"lines":[145,146]},"content":"pid_t cpid = fork() 创建子进程（假设父进程写、子进程读）"},{"type":"list_item","depth":5,"payload":{"lines":[146,147]},"content":"子进程（cpid == 0）","children":[{"type":"list_item","depth":6,"payload":{"lines":[147,148]},"content":"close(pipeFDs[WriteEnd])"},{"type":"list_item","depth":6,"payload":{"lines":[148,149]},"content":"使用管道读端 fd 读取数据"},{"type":"list_item","depth":6,"payload":{"lines":[149,150]},"content":"close(pipeFDs[ReadEnd])"},{"type":"list_item","depth":6,"payload":{"lines":[150,151]},"content":"_exit(0) 退出并让系统尽快通知父进程自己已经终止"}]},{"type":"list_item","depth":5,"payload":{"lines":[151,152]},"content":"父进程（cpid &gt; 0）","children":[{"type":"list_item","depth":6,"payload":{"lines":[152,153]},"content":"close(pipeFDs[ReadEnd])"},{"type":"list_item","depth":6,"payload":{"lines":[153,154]},"content":"使用管道写端 fd 写入数据"},{"type":"list_item","depth":6,"payload":{"lines":[154,155]},"content":"close(pipeFDs[WriteEnd])"},{"type":"list_item","depth":6,"payload":{"lines":[155,156]},"content":"wait(NULL) 阻塞，等待所有子进程退出"},{"type":"list_item","depth":6,"payload":{"lines":[156,157]},"content":"exit(0) 正常退出"}]}]}]}]},{"type":"heading","depth":2,"payload":{"lines":[158,159]},"content":"Named pipes","children":[{"type":"bullet_list","depth":3,"payload":{"lines":[160,164]},"content":"","children":[{"type":"list_item","depth":4,"payload":{"lines":[160,163]},"content":" 管道的基本特性是先进先出（FIFO），写入管道的数据会按照顺序被读取。<br>\n 当写者进程往管道中写入数据时，如果没有读者进程在等待读取数据，写者进程【可能会被阻塞】，直到有读者进程读取了数据。<br>\n 相反，如果读者进程试图从空管道中读取数据，读者进程也会被阻塞，直到有写者进程向管道中写入数据。"}]},{"type":"heading","depth":3,"payload":{"lines":[164,165]},"content":" 在交互命令行 ","children":[{"type":"list_item","depth":4,"payload":{"lines":[166,167]},"content":" 创建命名管道文件：mkfifo namedPipeFileName"},{"type":"list_item","depth":4,"payload":{"lines":[167,168]},"content":" 清理已创建的命名管道文件：unlink namedPipeFileName"}]},{"type":"heading","depth":3,"payload":{"lines":[169,170]},"content":" 在程序内部 ","children":[{"type":"heading","depth":4,"payload":{"lines":[171,172]},"content":"API 部分 ","children":[{"type":"list_item","depth":5,"payload":{"lines":[173,174]},"content":" 创建一个 FIFO 命名管道文件：mkfifo(pipePathName, 0666)"},{"type":"list_item","depth":5,"payload":{"lines":[174,175]},"content":" 清理已创建的命名管道文件：unlink(pipePathName)"}]},{"type":"heading","depth":4,"payload":{"lines":[176,177]},"content":" 命名管道通信过程 ","children":[{"type":"heading","depth":5,"payload":{"lines":[178,179]},"content":" 写者程序 ","children":[{"type":"list_item","depth":6,"payload":{"lines":[180,181]},"content":"mkfifo(pipeName, 0666) 创建命名管道后备文件 "},{"type":"list_item","depth":6,"payload":{"lines":[181,182]},"content":"fd = open(pipeName, ...)"},{"type":"list_item","depth":6,"payload":{"lines":[182,183]},"content":" 使用 fd 向管道写入数据（如果没有读者在等待读取数据，会在这里阻塞）"},{"type":"list_item","depth":6,"payload":{"lines":[183,184]},"content":"close(fd)"},{"type":"list_item","depth":6,"payload":{"lines":[184,185]},"content":"unlink(pipeName) 清理已创建的命名管道文件 "}]},{"type":"heading","depth":5,"payload":{"lines":[186,187]},"content":" 读者程序 ","children":[{"type":"list_item","depth":6,"payload":{"lines":[188,189]},"content":"fd = open(pipeName, ...) 直接打开命名管道后备文件 "},{"type":"list_item","depth":6,"payload":{"lines":[189,190]},"content":" 使用 fd 从管道读取数据 "},{"type":"list_item","depth":6,"payload":{"lines":[190,191]},"content":"close(fd)"},{"type":"list_item","depth":6,"payload":{"lines":[191,192]},"content":"unlink(pipeName)"}]}]}]},{"type":"heading","depth":3,"payload":{"lines":[193,194]},"content":" 特点 ","children":[{"type":"list_item","depth":4,"payload":{"lines":[195,196]},"content":" 命名管道是一种高度可靠且高效的 IPC 机制，被广泛使用 "}]}]}]},{"type":"heading","depth":1,"payload":{"lines":[197,198]},"content":"Message queue","children":[{"type":"heading","depth":2,"payload":{"lines":[199,200]},"content":" 基本概念 ","children":[{"type":"list_item","depth":3,"payload":{"lines":[201,202]},"content":" 不同于 FIFO 管道，消息队列可以以相同的方式运行，同时可以不按 FIFO 顺序检索字节块 "},{"type":"list_item","depth":3,"payload":{"lines":[202,203]},"content":" 消息序列的构成：msgtype(ulong) 和 payload(void*)"}]},{"type":"heading","depth":2,"payload":{"lines":[204,205]},"content":"API 部分 ","children":[{"type":"list_item","depth":3,"payload":{"lines":[206,207]},"content":" 使用存在的文件和 ID 生成一个 key 值：key_t key = ftok(PathName, ProjectId)"},{"type":"list_item","depth":3,"payload":{"lines":[207,208]},"content":"msgget 函数：创建并返回与 key 关联的消息队列的标识符 qid"},{"type":"list_item","depth":3,"payload":{"lines":[208,209]},"content":"msgsend 函数：发送指定的消息到 qid 对应的消息队列中 "},{"type":"list_item","depth":3,"payload":{"lines":[209,210]},"content":"msgrcv 函数：从 qid 对应的消息队列中接收消息 "},{"type":"list_item","depth":3,"payload":{"lines":[210,211]},"content":"msgctl 函数：对 qid 对应的消息队列执行 cmd 操作，如显式地删除 "}]},{"type":"heading","depth":2,"payload":{"lines":[212,213]},"content":" 写入数据到消息队列过程 ","children":[{"type":"list_item","depth":3,"payload":{"lines":[214,215]},"content":"key_t key = ftok(PathName, ProjectId)"},{"type":"list_item","depth":3,"payload":{"lines":[215,216]},"content":"int qid = msgget(key, 0666 | IPC_CREAT) 不存在则创建消息队列 "},{"type":"list_item","depth":3,"payload":{"lines":[216,217]},"content":" 构造消息序列的每一个消息 msg = {msgtype, payload}"},{"type":"list_item","depth":3,"payload":{"lines":[217,218]},"content":"msgsnd(qid, &amp;msg, MsgLen + 1, IPC_NOWAIT) 不阻塞地写入消息到消息队列 "}]},{"type":"heading","depth":2,"payload":{"lines":[219,220]},"content":" 从消息队列接收消息过程 ","children":[{"type":"list_item","depth":3,"payload":{"lines":[221,222]},"content":"key_t key = ftok(PathName, ProjectId)"},{"type":"list_item","depth":3,"payload":{"lines":[222,223]},"content":"int qid = msgget(key, 0666 | IPC_CREAT) 存在则不创建消息队列 "},{"type":"list_item","depth":3,"payload":{"lines":[223,224]},"content":" 构造待读取消息的类型：types[] = {...}，其顺序可以不同于发送方入队的类型 "},{"type":"list_item","depth":3,"payload":{"lines":[224,226]},"content":"msgrcv(qid, &amp;msg, MsgLen + 1, type[i], MSG_NOERROR | IPC_NOWAIT)<br>\n 循环地接收类型序列 types[] 中的消息 "},{"type":"list_item","depth":3,"payload":{"lines":[226,227]},"content":"msgctl(qid, IPC_RMID, NULL) 删除队列 -&gt; 队列消失 "}]},{"type":"heading","depth":2,"payload":{"lines":[228,229]},"content":" 特点 ","children":[{"type":"list_item","depth":3,"payload":{"lines":[230,231]},"content":" 管道和消息队列的 API 本质上是单向的：一个进程写入，另一个进程读取。（虽然也有双向管道的实现）"}]}]},{"type":"heading","depth":1,"payload":{"lines":[232,233]},"content":"Sockets","children":[{"type":"heading","depth":2,"payload":{"lines":[234,235]},"content":" 基本概念 ","children":[{"type":"list_item","depth":3,"payload":{"lines":[236,237]},"content":" 两种类型：IPC sockets &amp; Network sockets"},{"type":"list_item","depth":3,"payload":{"lines":[237,238]},"content":"IPC sockets：为同一物理主机上的进程提供基于通道的通信。使用本地文件作为 socket address 进行通信 "},{"type":"list_item","depth":3,"payload":{"lines":[238,239]},"content":"Network sockets：可为不同主机上上的进程提供基于管道的通信。使用底层 tcp/udp 进行通信 "},{"type":"list_item","depth":3,"payload":{"lines":[239,240]},"content":" 使用 localhost(127.0.0.1) 即可实现 IPC socket"}]},{"type":"heading","depth":2,"payload":{"lines":[241,242]},"content":" 服务端监听客户端连接 ","children":[{"type":"list_item","depth":3,"payload":{"lines":[243,244]},"content":"sockfd = socket(AF_INET, SOCKET_STREAM, 0) 创建一个 socket 描述符 "},{"type":"list_item","depth":3,"payload":{"lines":[244,245]},"content":"struct sockaddr_in saddr 初始化：设置服务端 IP 和 Port"},{"type":"list_item","depth":3,"payload":{"lines":[245,246]},"content":"bind(sockfd, (struct sockaddr*)&amp;saddr, sizeof(saddr)) 将 sockfd 与 服务端地址绑定 "},{"type":"list_item","depth":3,"payload":{"lines":[246,247]},"content":"listen(sockfd, MaxConnects) 监听客户端的连接请求 "},{"type":"list_item","depth":3,"payload":{"lines":[247,248]},"content":" 进入 while(1) 死循环 "},{"type":"list_item","depth":3,"payload":{"lines":[248,250]},"content":"accept(sockfd, (struct sockaddr*)&amp;caddr, &amp;len) 以阻塞地方式等待客户端的到来，客户端信息存储在 caddr 结构下 <br>\nlen=sizeof(caddr)：既告诉内核 caddr 的大小，内核也会告诉应用返回的大小 "},{"type":"list_item","depth":3,"payload":{"lines":[250,251]},"content":" 使用 read() 读取客户端的消息，使用 write() 回复消息给客户端 "},{"type":"list_item","depth":3,"payload":{"lines":[251,252]},"content":"close(cfd) 断开该客户端的连接 "}]},{"type":"heading","depth":2,"payload":{"lines":[253,254]},"content":" 客户端连接服务端 ","children":[{"type":"list_item","depth":3,"payload":{"lines":[255,256]},"content":"sockfd = socket(AF_INET, SOCKET_STREAM, 0) 创建一个 socket 描述符 "},{"type":"list_item","depth":3,"payload":{"lines":[256,257]},"content":"struct sockaddr_in saddr 初始化：配置要连接的服务端 IP 和 Port"},{"type":"list_item","depth":3,"payload":{"lines":[257,258]},"content":"connect(sockfd, (struct sockaddr*)&amp;saddr, sizeof(saddr) 以阻塞地方式连接服务端 "},{"type":"list_item","depth":3,"payload":{"lines":[258,259]},"content":" 连接成功后，使用 write() 向服务端写入数据，后使用 read() 读取服务端的回复 "},{"type":"list_item","depth":3,"payload":{"lines":[259,260]},"content":"close(cfd) 客户端主动端口与服务端的连接 "}]},{"type":"heading","depth":2,"payload":{"lines":[261,262]},"content":" 特点 ","children":[{"type":"list_item","depth":3,"payload":{"lines":[263,264]},"content":" 服务器和客户端之间可以进行任意丰富对话 + 可以跨主机通信，这也是 socket 的主要吸引力 "}]}]},{"type":"heading","depth":1,"payload":{"lines":[266,267]},"content":"Signals","children":[{"type":"heading","depth":2,"payload":{"lines":[268,269]},"content":" 基本概念 ","children":[{"type":"bullet_list","depth":3,"payload":{"lines":[270,275]},"content":"","children":[{"type":"list_item","depth":4,"payload":{"lines":[270,272]},"content":"信号（signal）中断正在执行的程序并与其通信：信号是一种用于通知进程发生了某种事件的机制。<br>\n 当其它进程接收到信号时，OS 会中断进程的正常执行，然后根据接收到的信号执行相应的操作"},{"type":"list_item","depth":4,"payload":{"lines":[272,273]},"content":"一个进程也可以向另一个进程发送信号，从而使信号成为一种 IPC 机制"},{"type":"list_item","depth":4,"payload":{"lines":[273,274]},"content":"信号可以被忽略、也可以通过指定的代码进行处理"}]},{"type":"heading","depth":3,"payload":{"lines":[275,276]},"content":"部分信号","children":[{"type":"list_item","depth":4,"payload":{"lines":[277,278]},"content":"可以通过 kill -l 查看支持的信号列表"},{"type":"list_item","depth":4,"payload":{"lines":[278,279]},"content":"SIGKILL, 9, 强制终止进程，无法被捕获或忽略"},{"type":"list_item","depth":4,"payload":{"lines":[279,280]},"content":"SIGUSR1, 10, 用户自定义信号 1"},{"type":"list_item","depth":4,"payload":{"lines":[280,281]},"content":"SIGUSR2, 12, 用户自定义信号 2"},{"type":"list_item","depth":4,"payload":{"lines":[281,282]},"content":"SIGCHLD, 17, 子进程状态发生改变"},{"type":"list_item","depth":4,"payload":{"lines":[282,283]},"content":"SIGTERM, 15, 请求终止进程（通常是正常终止）"}]}]},{"type":"heading","depth":2,"payload":{"lines":[284,285]},"content":"API 部分","children":[{"type":"list_item","depth":3,"payload":{"lines":[286,287]},"content":"int kill(pid_t pid, int sig) 发生指定的信号到进程或所属的进程组"}]},{"type":"heading","depth":2,"payload":{"lines":[288,289]},"content":"父进程通过信号终止子进程","children":[{"type":"list_item","depth":3,"payload":{"lines":[290,291]},"content":"main() 函数：父进程 fork 一个子进程，父、子进程进入各自的处理函数"},{"type":"list_item","depth":3,"payload":{"lines":[291,292]},"content":"parent_code(cpid)","children":[{"type":"list_item","depth":4,"payload":{"lines":[292,293]},"content":"1）做一些私有事情"},{"type":"list_item","depth":4,"payload":{"lines":[293,294]},"content":"2）kill(cpid, SIGTERM) 向子进程 cpid 发送 SIGTERM 信号"},{"type":"list_item","depth":4,"payload":{"lines":[294,295]},"content":"3）wait(NULL) 等待子进程的终止"}]},{"type":"list_item","depth":3,"payload":{"lines":[295,296]},"content":"child_code()","children":[{"type":"bullet_list","depth":4,"payload":{"lines":[296,303]},"content":"","children":[{"type":"list_item","depth":5,"payload":{"lines":[296,297]},"content":"1）set_handler() 注册信号处理程序（当接收到信号时，就会执行 graceful() 函数以 _exit(0)）"},{"type":"list_item","depth":5,"payload":{"lines":[297,303]},"content":"<pre class=\"language-c void set_handler() {\"><code class=\"language-c void set_handler() &#123;\">  <span class=\"token keyword\">struct</span> <span class=\"token class-name\">sigaction</span> current<span class=\"token punctuation\">;</span>\n  <span class=\"token function\">sigemptyset</span><span class=\"token punctuation\">(</span><span class=\"token operator\">&amp;</span>current<span class=\"token punctuation\">.</span>sa_mask<span class=\"token punctuation\">)</span><span class=\"token punctuation\">;</span> <span class=\"token comment\">/* clear the signal set */</span>\n  current<span class=\"token punctuation\">.</span>sa_flags <span class=\"token operator\">=</span> <span class=\"token number\">0</span><span class=\"token punctuation\">;</span> <span class=\"token comment\">/* enables setting sa_handler, not sa_action */</span>\n  current<span class=\"token punctuation\">.</span>sa_handler <span class=\"token operator\">=</span> graceful<span class=\"token punctuation\">;</span> <span class=\"token comment\">/* specify a handler */</span>\n  <span class=\"token function\">sigaction</span><span class=\"token punctuation\">(</span>SIGTERM<span class=\"token punctuation\">,</span> <span class=\"token operator\">&amp;</span>current<span class=\"token punctuation\">,</span> <span class=\"token constant\">NULL</span><span class=\"token punctuation\">)</span><span class=\"token punctuation\">;</span> <span class=\"token comment\">/* register the handler */</span>\n</code></pre>\n"}]},{"type":"bullet_list","depth":4,"payload":{"lines":[304,305]},"content":"","children":[{"type":"list_item","depth":5,"payload":{"lines":[304,305]},"content":"2）做一些私有事情"}]}]}]}]}]},{})</script>
+</body>
+</html>
+
+</article>
+
+<div id="paginator">
+  
+</div>
+
+            </div>
+          </div>
+          <div class="column col-2 hide-lg">
+            <div class="book-post-info">
+  
+    <div class="book-post-meta">
+
+  <div class="author">
+
+    <!-- Author image -->
+    <div class="author-img">
+      
+        <figure
+          class="avatar avatar-lg"
+          data-initial="A"
+          style="background-color: #3b4351;">
+        </figure>
+      
+    </div>
+
+    <!-- Author title -->
+    <div class="author-title">
+      <div>aha</div>
+      <div>2025-06-29</div>
+    </div>
+  </div>
+
+  
+
+  <div class="divider"></div>
+</div>
+  
+
+  <div class="book-tocbot">
+</div>
+<div class="book-tocbot-menu">
+  <a class="book-toc-expand" onclick="expand_toc()">Expand all</a>
+  <a onclick="go_top()">Back to top</a>
+  <a onclick="go_bottom()">Go to bottom</a>
+  <a onclick="toggleSearch()">Search in blogs</a> <!-- 添加搜索文字的点击事件 -->
+</div>
+
+<div id="search-overlay" class="search-overlay" style="display: none;"> <!-- 初始状态为隐藏 -->
+  <div class="search-box">
+    <input type="text" id="search-input" placeholder="Search in all blogs...">
+    <button onclick="closeSearch()">Close</button> <!-- 添加关闭按钮 -->
+    <div id="search-results" class="search-results"></div>
+  </div>
+</div>
+
+<script>
+  function performSearch(query) {
+    if (!query.trim()) {
+      return;
+    }
+
+    fetch('/search.xml')
+      .then(response => response.text())
+      .then(data => {
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(data, "text/xml");
+        const entries = xmlDoc.getElementsByTagName('entry');
+        let results = '';
+
+        for (let i = 0; i < entries.length; i++) {
+          const title = entries[i].getElementsByTagName('title')[0].textContent;
+          const content = entries[i].getElementsByTagName('content')[0].textContent;
+          const url = entries[i].getElementsByTagName('url')[0].textContent;
+
+          let count = (title.match(new RegExp(query, "gi")) || []).length; // 统计查询词出现的次数
+          count += (content.match(new RegExp(query, "gi")) || []).length;
+
+          if (count > 0) { // title.includes(query) || content.includes(query)
+            results += `
+              <div class="search-result-item">
+                <a href="${url}">${title}</a> (${count})
+              </div>`;
+          }
+        }
+
+        const searchResultsElement = document.getElementById('search-results');
+        searchResultsElement.innerHTML = results;
+        searchResultsElement.classList.add('active');
+      });
+  }
+
+  function toggleSearch() {
+    const searchOverlay = document.getElementById('search-overlay');
+    searchOverlay.style.display = searchOverlay.style.display === 'none' ? 'flex' : 'none';
+  }
+
+  function closeSearch() {
+    document.getElementById('search-overlay').style.display = 'none';
+  }
+
+  document.getElementById('search-input').addEventListener('input', function() {
+    const query = this.value;
+    performSearch(query);
+  });
+</script>
+
+<style>
+  .search-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  .search-box {
+    background: white;
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+    width: 80%;
+    max-width: 500px;
+  }
+
+  .search-results {
+    margin-top: 10px;
+    max-height: 300px;
+    overflow-y: auto;
+    background: white;
+    padding: 10px;
+    border-radius: 5px;
+    width: 100%;
+  }
+
+  .search-result-item {
+    margin: 10px 0;
+  }
+
+  .search-result-item a {
+    color: blue; /* 设置链接颜色为蓝色 */
+    text-decoration: none;
+  }
+
+  .search-result-item a:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+<script src="/js/book-toc.js"></script>
+
+
+</div>
+          </div>
+        </div>
+      </div>
+
+      <a class="off-canvas-overlay" onclick="hide_canvas()"></a>
+
+      <button class="floating-button" onclick="toggleDropdownMenu()"></button>
+
+      <div class="dropdown-menu">
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FFFFFF', '#000000')">银河白</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#C7EDCC', '#000000')">豆沙绿</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FAF9DE', '#000000')">杏仁黄</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#E3EDCD', '#000000')">青草绿</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FFF2E2', '#000000')">秋叶褐</div>
+      </div>
+  </div>
+
+  <script>
+    function toggleDropdownMenu() {
+      document.querySelector('.floating-button').classList.toggle('active');
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      var storedBackgroundColor = localStorage.getItem('blogBackgroundColor');
+      var storedColor = localStorage.getItem('blogColor');
+
+      if (storedBackgroundColor && storedColor) {
+        document.body.style.backgroundColor = storedBackgroundColor;
+        document.body.style.color = storedColor;
+      }
+    });
+
+    function changeBackgroundColor(backgroundColor, color) {
+      document.body.style.backgroundColor = backgroundColor;
+      document.body.style.color = color;
+
+      localStorage.setItem('blogBackgroundColor', backgroundColor);
+      localStorage.setItem('blogColor', color);
+
+      document.querySelector('.floating-button').classList.remove('active');
+    }
+  </script>
+</body>
+
+</html>
+
+
+<script src="/js/book.js"></script>

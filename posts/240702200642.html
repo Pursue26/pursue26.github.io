@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
+
+    
+      <link rel="icon" href="/favicon.png" />
+    
+
+    <title>
+        
+          Linux 数据结构之队列 - aha&#39;s book
+        
+    </title>
+
+    <!-- Spectre.css framework -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre-exp.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre-icons.min.css">
+
+    <!-- theme css & js -->
+    
+<link rel="stylesheet" href="/css/book.css">
+
+    
+<script src="/js/book.js"></script>
+
+
+    <!-- tocbot -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.css">
+    
+    <!-- katex -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/zooming/2.1.1/zooming.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const zooming = new Zooming()
+    zooming.listen('.book-content img')
+})
+</script>
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+    <style>
+      body {
+        background-color: #FFFFFF;
+        /* color: #000000; */
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+
+      /* Floating Button Styles */
+      .floating-button {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 999;
+        background-color: #000000;
+        color: #ffffff;
+        padding: 12px;
+        border-radius: 50%;
+        cursor: pointer;
+        border: 2px solid #000000;
+      }
+
+      .floating-button:hover {
+        background-color: #FFFFFF;
+      }
+
+      /* Dropdown Menu Styles */
+      .dropdown-menu {
+        position: fixed;
+        bottom: 60px;
+        right: 10px;
+        display: none;
+        min-width: 60px;
+        padding: 2px;
+        background-color: #fff;
+        /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
+        z-index: 1000;
+      }
+
+      .floating-button.active+.dropdown-menu {
+        display: block;
+      }
+
+      .dropdown-item {
+        display: block;
+        padding: 8px 16px;
+        cursor: pointer;
+      }
+
+      .dropdown-item:hover {
+        background-color: #f5f5f5;
+      }
+    </style>
+<style>.darkmode--activated{--body-bg-color:#282828;--content-bg-color:#333;--card-bg-color:#555;--text-color:#ccc;--blockquote-color:#bbb;--link-color:#ccc;--link-hover-color:#eee;--brand-color:#ddd;--brand-hover-color:#ddd;--table-row-odd-bg-color:#282828;--table-row-hover-bg-color:#363636;--menu-item-bg-color:#555;--btn-default-bg:#222;--btn-default-color:#ccc;--btn-default-border-color:#555;--btn-default-hover-bg:#666;--btn-default-hover-color:#ccc;--btn-default-hover-border-color:#666;--highlight-background:#282b2e;--highlight-foreground:#a9b7c6;--highlight-gutter-background:#34393d;--highlight-gutter-foreground:#9ca9b6}.darkmode--activated img{opacity:.75}.darkmode--activated img:hover{opacity:.9}.darkmode--activated code{color:#69dbdc;background:0 0}button.darkmode-toggle{z-index:9999}.darkmode-ignore,img{display:flex!important}.beian img{display:inline-block!important}</style></head>
+
+<body>
+  <div class="book-container">
+    <div class="book-sidebar">
+      <div class="book-brand">
+  <a href="/">
+    <img src="/favicon.png">
+    <span>AHA&#39;S BOOK</span>
+  </a>
+</div>
+        <div id="menu" class="book-menu hide">
+  <h2 id="基础知识"> 基础知识 </h2>
+<ul>
+<li><a href="/posts/231010144856.html"> 模运算 </a></li>
+<li><a href="/posts/231014105311.html"> 异或运算 </a></li>
+<li><a href="/posts/231210181853.html"> 计算机中的寄存器 </a></li>
+<li><a href="/posts/231213183051.html"> 正则表达式基础 </a></li>
+</ul>
+<h2 id="C 语言">C 语言 </h2>
+<ul>
+<li><a href="/posts/230916171929.html">main 函数参数 </a></li>
+<li><a href="/posts/231214192113.html"> 关键字与专有名词 </a></li>
+<li><a href="/posts/240103180653.html"> 输出打印函数 </a></li>
+<li><a href="/posts/230922143003.html"> 多维数组 </a></li>
+<li><a href="/posts/230913200729.html">const 关键字 </a></li>
+<li><a href="/posts/230918174223.html">typedef 类型基础 </a></li>
+<li><a href="/posts/230920172849.html">typedef 类型实践 </a></li>
+<li><a href="/posts/240224193217.html"> 二级指针 </a></li>
+<li><a href="/posts/240307195203.html"> 代码 TOP-K 问题 </a></li>
+<li><a href="/posts/230922172626.html">uthash 哈希表基础 </a></li>
+<li><a href="/posts/230918114841.html"> 大小端知识 </a></li>
+</ul>
+<h2 id="Golang 语言">Golang 语言 </h2>
+<ul>
+<li><a href="/posts/230907162612.html"> 变量与常量 </a></li>
+<li><a href="/posts/230909120145.html"> 函数 &amp; 包 &amp; 判断 &amp; 循环 </a></li>
+<li><a href="/posts/230912152800.html"> 数组与切片 </a></li>
+<li><a href="/posts/230913161326.html"> 可变参数函数与 Map 集合 </a></li>
+<li><a href="/posts/230915155105.html"> 字符串和指针 </a></li>
+</ul>
+<h2 id="数据结构"> 数据结构 </h2>
+<ul>
+<li><a href="/posts/231007174854.html"> 链表（数组实现）</a></li>
+<li><a href="/posts/231008213450.html"> 链表（链式实现）</a></li>
+<li><a href="/posts/231016161508.html"> 堆栈（数组实现）</a></li>
+<li><a href="/posts/231016184406.html"> 堆栈（链表实现）</a></li>
+<li><a href="/posts/231127185207.html"> 单调栈 </a></li>
+<li><a href="/posts/231017105123.html"> 队列（链表实现）</a></li>
+<li><a href="/posts/231017154121.html"> 双端队列（链表实现）</a></li>
+<li><a href="/posts/231018102559.html"> 堆基础与堆结构（数组实现）</a></li>
+<li><a href="/posts/231019102311.html"> 优先队列（堆实现）</a></li>
+<li><a href="/posts/230905224335.html"> 二叉树的遍历 </a></li>
+<li><a href="/posts/231020174358.html"> 二叉搜索树 </a></li>
+<li><a href="/posts/230916094606.html"> 拓扑排序 </a></li>
+<li><a href="/posts/230925185057.html">Trie 字典树 </a></li>
+<li><a href="/posts/231023164532.html"> 并查集（数组实现）</a></li>
+<li><a href="/posts/240702200642.html">Linux 数据结构之队列 </a></li>
+</ul>
+<h2 id="数据结构算法"> 数据结构算法 </h2>
+<ul>
+<li><a href="/posts/231218181635.html"> 归并排序 </a></li>
+<li><a href="/posts/231108163339.html"> 快速排序 </a></li>
+<li><a href="/posts/231107171607.html"> 堆排序 </a></li>
+<li><a href="/posts/231124181658.html"> 二分查找 </a></li>
+<li><a href="/posts/231227190828.html"> 哈希表实现 </a></li>
+<li><a href="/posts/240313193201.html"> 字符串哈希函数 </a></li>
+<li><a href="/posts/231116150205.html">Floyd 多源最短路径 </a></li>
+<li><a href="/posts/231117095232.html">Dijkstra 单源最短路径（原理部分）</a></li>
+<li><a href="/posts/231121152713.html">Dijkstra 单源最短路径（实现部分）</a></li>
+</ul>
+<h2 id="数据库"> 数据库 </h2>
+<ul>
+<li><a href="/posts/250605180332.html">MySQL 基础 </a></li>
+</ul>
+<h2 id="计算机网络"> 计算机网络 </h2>
+<ul>
+<li><a href="/posts/231011192359.html">OSI 参考模型 </a></li>
+<li><a href="/posts/240329202000.html"> 计网 CyC2018 之概述 </a></li>
+<li><a href="/posts/240329202004.html"> 计网 CyC2018 之链路层 </a></li>
+<li><a href="/posts/240329202003.html"> 计网 CyC2018 之网络层 </a></li>
+<li><a href="/posts/240329202002.html"> 计网 CyC2018 之传输层 </a></li>
+<li><a href="/posts/240329202001.html"> 计网 CyC2018 之应用层 </a></li>
+<li><a href="/posts/240306203742.html">ACL 访问控制列表 </a></li>
+<li><a href="/posts/240130190208.html"> 路由表、转发表与快速转发工作原理 </a></li>
+<li><a href="/posts/231221200716.html">VXLAN 网络虚拟化技术 </a></li>
+<li><a href="/posts/240903191243.html">TCP/IP checksum 计算 </a></li>
+<li><a href="/posts/240911185603.html"> 抓包分析 TCP 三次握手与四次挥手过程 </a></li>
+</ul>
+<h2 id="操作系统"> 操作系统 </h2>
+<ul>
+<li><a href="/posts/230921190726.html"> 概述 </a></li>
+<li><a href="/posts/230924172528.html"> 中断 &amp; 异常 &amp; 系统调用 </a></li>
+<li><a href="/posts/231017195157.html"> 内存分层体系与地址空间生成 </a></li>
+<li><a href="/posts/231108195351.html"> 连续内存分配 </a></li>
+<li><a href="/posts/231111172507.html"> 非连续内存分配之分段与分页 </a></li>
+<li><a href="/posts/231119170537.html"> 非连续内存分配之页表 </a></li>
+<li><a href="/posts/231123184526.html"> 内存管理之覆盖技术与交换技术 </a></li>
+<li><a href="/posts/231127193658.html"> 内存管理之虚存技术 </a></li>
+<li><a href="/posts/231129182631.html"> 局部页面置换算法 </a></li>
+<li><a href="/posts/231207184239.html"> 全局页面置换算法 </a></li>
+<li><a href="/posts/231207204958.html"> 进程描述 </a></li>
+<li><a href="/posts/231210211306.html"> 进程状态 </a></li>
+<li><a href="/posts/231215213932.html"> 线程 </a></li>
+<li><a href="/posts/231218220813.html"> 进程控制 </a></li>
+<li><a href="/posts/231228193143.html"> 调度 </a></li>
+<li><a href="/posts/240104202828.html"> 同步与互斥 </a></li>
+<li><a href="/posts/240113115605.html"> 信号量与管程 </a></li>
+<li><a href="/posts/240205182643.html"> 经典同步问题 </a></li>
+<li><a href="/posts/240310162231.html"> 死锁 </a></li>
+</ul>
+<h2 id="系统与网络编程"> 系统与网络编程 </h2>
+<ul>
+<li><a href="/posts/230911151334.html">pthread 库 </a></li>
+<li><a href="/posts/230921094127.html"> 锁与原子操作 </a></li>
+<li><a href="/posts/240319195609.html"> 读者写者问题 </a></li>
+<li><a href="/posts/240527200241.html"> 网络编程卷一阅读随笔 </a></li>
+<li><a href="/posts/240414190410.html"> 进程间通信 IPC 机制 </a></li>
+<li><a href="/posts/240424200123.html"> 多进程相关练习 </a></li>
+<li><a href="/posts/240516221527.html">I/O 模式与 I/O 多路复用 </a></li>
+<li><a href="/posts/240626192803.html">Linux 内核 kfifo 环形队列 </a></li>
+<li><a href="/posts/241009203126.html">Linux 内核等待队列 </a></li>
+<li><a href="/posts/240627210637.html">DPDK 无锁环形队列 </a></li>
+<li><a href="/posts/240919200410.html"> 解密内存屏障 </a></li>
+<li><a href="/posts/240927202500.html"> 内核线程的创建 </a></li>
+<li><a href="/posts/241015195205.html">Linux 网络数据包接收过程 </a></li>
+<li><a href="/posts/2410232111015.html"> 源码解读 epoll 实现原理 </a></li>
+<li><a href="/posts/241106182619.html">Linux 文件系统 </a></li>
+<li><a href="/posts/250619154429.html">Libevent 高性能 IO 事件驱动库 </a></li>
+</ul>
+<h2 id="工具与命令"> 工具与命令 </h2>
+<ul>
+<li><a href="/posts/240207180410.html">GCC 编译过程分解 </a></li>
+<li><a href="/posts/240312184132.html">GDB 调试入门 </a></li>
+<li><a href="/posts/240512184921.html">Makefile 学习 </a></li>
+<li><a href="/posts/250629214430.html">CMake 学习 </a></li>
+<li><a href="/posts/240417193754.html">Linux 命令之文件权限 </a></li>
+</ul>
+<h2 id="开源项目"> 开源项目 </h2>
+<ul>
+<li><a href="/posts/240303201855.html"> 线程池原理与实现 </a></li>
+<li><a href="/posts/240507194549.html">HTTP 服务器实现 </a></li>
+<li><a href="/posts/240904203605.html"> 聊天服务器实现 </a></li>
+<li><a href="/posts/241119182636.html">Linux 文件系统 </a></li>
+</ul>
+<h2 id="Docker">Docker</h2>
+<ul>
+<li><a href="/posts/230909171809.html">Docker 学习笔记 </a></li>
+</ul>
+<h1 id="LeetCode 刷题">LeetCode 刷题 </h1>
+<h2 id="链表相关"> 链表相关 </h2>
+<ul>
+<li><a href="/posts/231025143947.html">160 相交链表 </a></li>
+<li><a href="/posts/231025185947.html">206 反转链表 </a></li>
+<li><a href="/posts/231026101239.html">21 合并两个有序链表 </a></li>
+<li><a href="/posts/231026184514.html">83 删除排序链表中的重复元素 </a></li>
+<li><a href="/posts/231027150243.html">19 删除链表的倒数第 N 个节点 </a></li>
+<li><a href="/posts/231031120718.html">2 两数相加 </a></li>
+<li><a href="/posts/231031163133.html">445 两数相加 II</a></li>
+<li><a href="/posts/231101094219.html">234 回文链表 </a></li>
+<li><a href="/posts/231101135228.html">725 分隔链表 </a></li>
+<li><a href="/posts/231102120708.html">328 奇偶链表 </a></li>
+<li><a href="/posts/231102165703.html">142 环形链表 II</a></li>
+</ul>
+<h2 id="设计"> 设计 </h2>
+<ul>
+<li><a href="/posts/231201184542.html">146 LRU 缓存 </a></li>
+</ul>
+<h2 id="贪心算法"> 贪心算法 </h2>
+<ul>
+<li><a href="/posts/231107094652.html">1029 两地调度 </a></li>
+<li><a href="/posts/231109150855.html">435 无重叠区间 </a></li>
+</ul>
+<h2 id="哈希表"> 哈希表 </h2>
+<ul>
+<li><a href="/posts/231123181539.html">1410 实体解析器 </a></li>
+</ul>
+<h2 id="树的遍历"> 树的遍历 </h2>
+<ul>
+<li><a href="/posts/231103121209.html">117 填充每个节点的下一个右侧节点指针 II</a></li>
+</ul>
+<h2 id="深度优先搜索（递归）"> 深度优先搜索（递归）</h2>
+<ul>
+<li><a href="/posts/231206201243.html">2477 达到首都的最少油耗 </a></li>
+</ul>
+<h2 id="图或路径问题"> 图或路径问题 </h2>
+<ul>
+<li><a href="/posts/231211184652.html">1631 最小体力消耗路径 </a></li>
+</ul>
+<h2 id="其它"> 其它 </h2>
+<ul>
+<li><a href="/posts/230101120000.html"> 备忘录 </a></li>
+</ul>
+
+</div>
+
+
+<script src="/js/book-menu.js"></script>
+
+    </div>
+    <div class="sidebar-toggle" onclick="sidebar_toggle()" onmouseover="add_inner()" onmouseleave="remove_inner()">
+  <div class="sidebar-toggle-inner"></div>
+</div>
+
+<script>
+function add_inner() {
+  let inner = document.querySelector('.sidebar-toggle-inner')
+  inner.classList.add('show')  
+}
+
+function remove_inner() {
+  let inner = document.querySelector('.sidebar-toggle-inner')
+  inner.classList.remove('show')
+}
+
+function sidebar_toggle() {
+    let sidebar_toggle = document.querySelector('.sidebar-toggle')
+    let sidebar = document.querySelector('.book-sidebar')
+    let content = document.querySelector('.off-canvas-content')
+    if (sidebar_toggle.classList.contains('extend')) { // show
+        sidebar_toggle.classList.remove('extend')
+        sidebar.classList.remove('hide')
+        content.classList.remove('extend')
+    }
+    else { // hide
+        sidebar_toggle.classList.add('extend')
+        sidebar.classList.add('hide')
+        content.classList.add('extend')
+    }
+}
+</script>
+
+      <div class="off-canvas-content">
+        <div class="columns">
+          <div class="column col-10 col-lg-12">
+            <div class="book-navbar">
+              <!-- For Responsive Layout -->
+
+<header class="navbar">
+  <section class="navbar-section">
+    <a onclick="open_sidebar()">
+      <i class="icon icon-menu"></i>
+    </a>
+  </section>
+</header>
+
+            </div>
+            <div class="book-content">
+              <div class="book-post">
+  <p>Tail Queue 位于 <code>/usr/include/x86_64-linux-gnu/sys/queue.h</code>，可以<code>include &lt;sys/queue.h&gt;</code> 后直接使用。Queue 的所有源码都是宏定义，因此完全包含于 queue.h 当中，无需编译为库文件。</p>
+<span id="more"></span>
+<h1 id="各种结构示意图">各种结构示意图</h1>
+<p>queue.h 包含以下几种数据结构：</p>
+<ul>
+<li>单链表（Singly-linked List, SLIST）</li>
+<li>单链尾队列（Singly-linked Tail queue, STAILQ）</li>
+<li>双链表（List, LIST）</li>
+<li>双链尾队列（Tail queue, TAILQ）</li>
+<li>简单队列（Simple queue, SQUEUE）</li>
+<li>循环队列（Circular queue, CIRCLEQ）</li>
+</ul>
+<p>SLIST：单向无尾队列。SLIST 非常适合具有大数据集且很少或没有删除的应用程序，或者用于实现 LIFO 后进先出队列。</p>
+<img src="/images/data-structure/linux-slist.png" alt="单向无尾队列" width="80%" height="80%">
+<p>STAILQ：单向有尾队列，节点 n 为尾节点。</p>
+<img src="/images/data-structure/linux-stailq.png" alt="单向有尾队列" width="80%" height="80%">
+<p>LIST：双向无尾队列。</p>
+<img src="/images/data-structure/linux-list.png" alt="双向无尾队列" width="80%" height="80%">
+<p>TAILQ：双向有尾队列。</p>
+<img src="/images/data-structure/linux-tailq.png" alt="双向有尾队列" width="80%" height="80%">
+<p>CIRCLEQ：双向循环队列。</p>
+<img src="/images/data-structure/linux-circleq.png" alt="双向循环队列" width="80%" height="80%">
+<blockquote>
+<p>有尾、无尾的区别：通过这几张图可以发现，有尾（无尾）就是 head 头结构中有（无）指向链表尾节点的指针。</p>
+</blockquote>
+<h1 id="各种结构指向图">各种结构指向图</h1>
+<img src="/images/data-structure/linux-queue.png" alt="各种结构指向图" width="100%" height="100%">
+<h1 id="单向无尾队列 SLIST">单向无尾队列 SLIST</h1>
+<p>SLIST：单向无尾队列。SLIST 非常适合具有大数据集且很少或没有删除的应用程序，或者用于实现 LIFO 后进先出队列。</p>
+<img src="/images/data-structure/linux-slist.png" alt="单向无尾队列" width="80%" height="80%">
+<h2 id="扩展后的数据结构">扩展后的数据结构</h2>
+<p>SLIST 数据结构涉及 SLIST_HEAD 和 SLIST_ENTRY 两个宏定义，先给出扩展后的数据结构示例，可以看出两处宏的 type 参数要保持统一（这里都是 entry）。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 链表节点，不同于新手常写的链表，这里被一个 struct 包裹起来了</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">entry</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> data;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> &#123;</span> <span class="comment">// SLIST_ENTRY(entry) entries;</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">entry</span>* <span class="title">sle_next</span>;</span></span><br><span class="line">    &#125; entries;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 头节点</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">slisthead</span> &#123;</span> <span class="comment">// SLIST_HEAD(slisthead, entry);</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">entry</span>* <span class="title">slh_first</span>;</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h2 id="数据结构宏定义">数据结构宏定义</h2>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * Singly-linked List definitions.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="comment">// SLIST 的头节点，这里传入的 type 与 SLIST_ENTRY 宏中的 type 一致</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SLIST_HEAD(name, type)                      \</span></span><br><span class="line"><span class="meta">    struct name &#123;                                   \</span></span><br><span class="line"><span class="meta">        struct type* slh_first; <span class="comment">/* first element */</span> \</span></span><br><span class="line"><span class="meta">    &#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 初始化 SLIST 的头节点结构体（不是结构体指针）为 NULL</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SLIST_HEAD_INITIALIZER(head) \</span></span><br><span class="line"><span class="meta">    &#123; NULL &#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// SLIST 的节点，这里传入的 type 与 SLIST_HEAD 宏中的 type 一致</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SLIST_ENTRY(type)                         \</span></span><br><span class="line"><span class="meta">    struct &#123;                                      \</span></span><br><span class="line"><span class="meta">        struct type* sle_next; <span class="comment">/* next element */</span> \</span></span><br><span class="line"><span class="meta">    &#125;</span></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">    这里只给出了指向下一个 SLIST 节点的数据结构，没有数据字段，在项目代码使用时，可以这样写：</span></span><br><span class="line"><span class="comment">    struct entry &#123;</span></span><br><span class="line"><span class="comment">        int data;</span></span><br><span class="line"><span class="comment">        SLIST_ENTRY(entry) entries;</span></span><br><span class="line"><span class="comment">    &#125;</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+<h2 id="操作函数宏定义">操作函数宏定义</h2>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * Singly-linked List functions.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="comment">// 初始化 SLIST 头节点结构体指针的 slh_first 成员为 NULL</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SLIST_INIT(head)          \</span></span><br><span class="line"><span class="meta">    do &#123;                          \</span></span><br><span class="line"><span class="meta">        (head)-&gt;slh_first = NULL; \</span></span><br><span class="line"><span class="meta">    &#125; while (<span class="comment">/*CONSTCOND*/</span> 0)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* 适用于中间节点、尾节点后面插入，不能用于首节点前面插入</span></span><br><span class="line"><span class="comment">    0. field 为 SLIST_ENTRY 成员的成员名</span></span><br><span class="line"><span class="comment">    1. 将新元素 elm 的 sle_next 指向 slistelm 元素的 sle_next</span></span><br><span class="line"><span class="comment">    2. 在元素 slistelm 后面插入新元素 elm</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SLIST_INSERT_AFTER(slistelm, elm, field)            \</span></span><br><span class="line"><span class="meta">    do &#123;                                                    \</span></span><br><span class="line"><span class="meta">        (elm)-&gt;field.sle_next = (slistelm)-&gt;field.sle_next; \</span></span><br><span class="line"><span class="meta">        (slistelm)-&gt;field.sle_next = (elm);                 \</span></span><br><span class="line"><span class="meta">    &#125; while (<span class="comment">/*CONSTCOND*/</span> 0)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* 适用于在首节点前插入（同时更新头节点）</span></span><br><span class="line"><span class="comment">    1. 将新元素 elm 的 sle_next 指向头节点的 slh_first</span></span><br><span class="line"><span class="comment">    2. 更新头节点 head 的 slh_first 地址为新元素</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SLIST_INSERT_HEAD(head, elm, field)        \</span></span><br><span class="line"><span class="meta">    do &#123;                                           \</span></span><br><span class="line"><span class="meta">        (elm)-&gt;field.sle_next = (head)-&gt;slh_first; \</span></span><br><span class="line"><span class="meta">        (head)-&gt;slh_first = (elm);                 \</span></span><br><span class="line"><span class="meta">    &#125; while (<span class="comment">/*CONSTCOND*/</span> 0)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 更新头节点 head 的 slh_first 地址为下一个节点</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SLIST_REMOVE_HEAD(head, field)                         \</span></span><br><span class="line"><span class="meta">    do &#123;                                                       \</span></span><br><span class="line"><span class="meta">        (head)-&gt;slh_first = (head)-&gt;slh_first-&gt;field.sle_next; \</span></span><br><span class="line"><span class="meta">    &#125; while (<span class="comment">/*CONSTCOND*/</span> 0)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* </span></span><br><span class="line"><span class="comment">    向后遍历头节点 head 指向的 type 类型的链表 curelm，移除（未释放）指定的元素 elm</span></span><br><span class="line"><span class="comment">    1. 如果头节点 head 指向的链表首节点是待移除的元素 elm -&gt; 更新头节点</span></span><br><span class="line"><span class="comment">    2. 否则，循环判断当前节点 curelm 的下一个节点是否是待移除的元素</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SLIST_REMOVE(head, elm, type, field)                                 \</span></span><br><span class="line"><span class="meta">    do &#123;                                                                     \</span></span><br><span class="line"><span class="meta">        <span class="keyword">if</span> ((head)-&gt;slh_first == (elm)) &#123;                                    \</span></span><br><span class="line"><span class="meta">            SLIST_REMOVE_HEAD((head), field);                                \</span></span><br><span class="line"><span class="meta">        &#125; <span class="keyword">else</span> &#123;                                                             \</span></span><br><span class="line"><span class="meta">            struct type* curelm = (head)-&gt;slh_first;                         \</span></span><br><span class="line"><span class="meta">            while (curelm-&gt;field.sle_next != (elm))                          \</span></span><br><span class="line"><span class="meta">                curelm = curelm-&gt;field.sle_next;                             \</span></span><br><span class="line"><span class="meta">            curelm-&gt;field.sle_next = curelm-&gt;field.sle_next-&gt;field.sle_next; \</span></span><br><span class="line"><span class="meta">        &#125;                                                                    \</span></span><br><span class="line"><span class="meta">    &#125; while (<span class="comment">/*CONSTCOND*/</span> 0)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 从头节点 head 指向的链表首节点开始遍历链表，依次将每个节点分配给 var，通过判断 var 是否为 NULL 决定是否遍历完成</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SLIST_FOREACH(var, head, field) for ((var) = (head)-&gt;slh_first; (var); (var) = (var)-&gt;field.sle_next)</span></span><br></pre></td></tr></table></figure>
+<h2 id="访问宏定义">访问宏定义</h2>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * Singly-linked List access methods.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SLIST_EMPTY(head) ((head)-&gt;slh_first == NULL)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SLIST_FIRST(head) ((head)-&gt;slh_first)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SLIST_NEXT(elm, field) ((elm)-&gt;field.sle_next)</span></span><br></pre></td></tr></table></figure>
+<h2 id="示例代码">示例代码</h2>
+<p>示例代码来自：<a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man3/SLIST_ENTRY.3.html">man-pages</a></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stddef.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/queue.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* 参见《扩展后的数据结构》 */</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">entry</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> data;</span><br><span class="line">    SLIST_ENTRY(entry) entries; <span class="comment">/* Singly linked list */</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">SLIST_HEAD(slisthead, entry);</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">void</span>)</span> &#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">entry</span> *<span class="title">n1</span>, *<span class="title">n2</span>, *<span class="title">n3</span>, *<span class="title">np</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">slisthead</span> <span class="title">head</span>;</span> <span class="comment">/* Singly linked list head */</span></span><br><span class="line"></span><br><span class="line">    SLIST_INIT(&amp;head); <span class="comment">/* Initialize the queue */</span></span><br><span class="line"></span><br><span class="line">    n1 = <span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(<span class="keyword">struct</span> entry)); <span class="comment">/* Insert at the head */</span></span><br><span class="line">    SLIST_INSERT_HEAD(&amp;head, n1, entries);</span><br><span class="line"></span><br><span class="line">    n2 = <span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(<span class="keyword">struct</span> entry)); <span class="comment">/* Insert after */</span></span><br><span class="line">    SLIST_INSERT_AFTER(n1, n2, entries);</span><br><span class="line"></span><br><span class="line">    SLIST_REMOVE(&amp;head, n2, entry, entries); <span class="comment">/* Deletion */</span></span><br><span class="line">    <span class="built_in">free</span>(n2);                                <span class="comment">// 用户手动释放</span></span><br><span class="line"></span><br><span class="line">    n3 = SLIST_FIRST(&amp;head);</span><br><span class="line">    SLIST_REMOVE_HEAD(&amp;head, entries); <span class="comment">/* Deletion from the head */</span></span><br><span class="line">    <span class="built_in">free</span>(n3);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">unsigned</span> <span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5</span>; i++) &#123;</span><br><span class="line">        n1 = <span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(<span class="keyword">struct</span> entry));</span><br><span class="line">        SLIST_INSERT_HEAD(&amp;head, n1, entries);  <span class="comment">// 在链表头插入</span></span><br><span class="line">        n1-&gt;data = i;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Forward traversal */</span></span><br><span class="line">    SLIST_FOREACH(np, &amp;head, entries) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%i &quot;</span>, np-&gt;data);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\r\n&quot;</span>); <span class="comment">// 4 3 2 1 0</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> (!SLIST_EMPTY(&amp;head)) &#123; <span class="comment">/* List deletion */</span></span><br><span class="line">        n1 = SLIST_FIRST(&amp;head);</span><br><span class="line">        SLIST_REMOVE_HEAD(&amp;head, entries);</span><br><span class="line">        <span class="built_in">free</span>(n1);</span><br><span class="line">    &#125;</span><br><span class="line">    SLIST_INIT(&amp;head);</span><br><span class="line"></span><br><span class="line">    <span class="built_in">exit</span>(EXIT_SUCCESS);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="单向有尾队列 STAILQ">单向有尾队列 STAILQ</h1>
+<p>STAILQ：单向有尾队列，节点 n 为尾节点。</p>
+<img src="/images/data-structure/linux-stailq.png" alt="单向有尾队列" width="80%" height="80%">
+<h2 id="扩展后的数据结构 -v2">扩展后的数据结构</h2>
+<p>STAILQ 数据结构涉及 STAILQ_HEAD 和 STAILQ_ENTRY 两个宏定义，先给出扩展后的数据结构示例，可以看出两处宏的 type 参数要保持统一（这里都是 entry）。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 单向尾队列的节点</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">entry</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> data;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> &#123;</span> <span class="comment">// STAILQ_ENTRY(entry)</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">entry</span>* <span class="title">stqe_next</span>;</span></span><br><span class="line">    &#125; entries;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 头节点</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">stailhead</span> &#123;</span> <span class="comment">// STAILQ_HEAD(stailhead, entry)</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">entry</span>* <span class="title">stqh_first</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">entry</span>** <span class="title">stqh_last</span>;</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h2 id="数据结构宏定义 -v2">数据结构宏定义</h2>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * Singly-linked Tail queue declarations.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="comment">// STAILQ 的头节点，stqh_last 是一个二级指针，里面存储着一个地址（指向尾节点的 stqe_next 成员地址，而不是尾节点首地址）</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> STAILQ_HEAD(name, type)                                       \</span></span><br><span class="line"><span class="meta">    struct name &#123;                                                     \</span></span><br><span class="line"><span class="meta">        struct type* stqh_first; <span class="comment">/* first element */</span>                  \</span></span><br><span class="line"><span class="meta">        struct type** stqh_last; <span class="comment">/* addr of last stqe_next element */</span> \</span></span><br><span class="line"><span class="meta">    &#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 初始化 STAILQ 的头节点（不是结构体指针）的 stqh_first 为 NULL，stqh_last 为 stqh_first 的地址</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> STAILQ_HEAD_INITIALIZER(head) \</span></span><br><span class="line"><span class="meta">    &#123; NULL, &amp;(head).stqh_first &#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// STAILQ 的节点，这里传入的 type 与 STAILQ_HEAD 宏中的 type 一致</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> STAILQ_ENTRY(type)                         \</span></span><br><span class="line"><span class="meta">    struct &#123;                                       \</span></span><br><span class="line"><span class="meta">        struct type* stqe_next; <span class="comment">/* next element */</span> \</span></span><br><span class="line"><span class="meta">    &#125;</span></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">    这里只给出了指向下一个 STAILQ 节点的数据结构，没有数据字段，在项目代码使用时，可以这样写：</span></span><br><span class="line"><span class="comment">    struct entry &#123;</span></span><br><span class="line"><span class="comment">        int data;</span></span><br><span class="line"><span class="comment">        STAILQ_ENTRY(entry) entries;</span></span><br><span class="line"><span class="comment">    &#125;</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+<h2 id="操作函数宏定义 -v2">操作函数宏定义</h2>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * Singly-linked Tail queue functions.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="comment">// 初始化 STAILQ 头节点结构体指针的成员</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> STAILQ_INIT(head)                        \</span></span><br><span class="line"><span class="meta">    do &#123;                                         \</span></span><br><span class="line"><span class="meta">        (head)-&gt;stqh_first = NULL;               \</span></span><br><span class="line"><span class="meta">        (head)-&gt;stqh_last = &amp;(head)-&gt;stqh_first; \</span></span><br><span class="line"><span class="meta">    &#125; while (<span class="comment">/*CONSTCOND*/</span> 0)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 在 STAILQ 的头节点 head 前插入新元素 elm，并重新将头节点 head 指向新元素 elm</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> STAILQ_INSERT_HEAD(head, elm, field)                       \</span></span><br><span class="line"><span class="meta">    do &#123;                                                           \</span></span><br><span class="line"><span class="meta">        <span class="keyword">if</span> (((elm)-&gt;field.stqe_next = (head)-&gt;stqh_first) == NULL) \</span></span><br><span class="line"><span class="meta">            (head)-&gt;stqh_last = &amp;(elm)-&gt;field.stqe_next;           \</span></span><br><span class="line"><span class="meta">        (head)-&gt;stqh_first = (elm);                                \</span></span><br><span class="line"><span class="meta">    &#125; while (<span class="comment">/*CONSTCOND*/</span> 0)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 在 STAILQ 尾节点（通过头节点 head 获取）后面插入新元素 elm</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> STAILQ_INSERT_TAIL(head, elm, field)         \</span></span><br><span class="line"><span class="meta">    do &#123;                                             \</span></span><br><span class="line"><span class="meta">        (elm)-&gt;field.stqe_next = NULL;               \</span></span><br><span class="line"><span class="meta">        *(head)-&gt;stqh_last = (elm); <span class="comment">/* 原尾节点的 stqe_next 指向新元素 */</span> \</span></span><br><span class="line"><span class="meta">        (head)-&gt;stqh_last = &amp;(elm)-&gt;field.stqe_next; \</span></span><br><span class="line"><span class="meta">    &#125; while (<span class="comment">/*CONSTCOND*/</span> 0)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 在中间节点、尾节点 listelm 后面插入新元素 elm。如果是尾节点后插入，则需要更新头节点的 stqh_last</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> STAILQ_INSERT_AFTER(head, listelm, elm, field)                     \</span></span><br><span class="line"><span class="meta">    do &#123;                                                                   \</span></span><br><span class="line"><span class="meta">        <span class="keyword">if</span> (((elm)-&gt;field.stqe_next = (listelm)-&gt;field.stqe_next) == NULL) \</span></span><br><span class="line"><span class="meta">            (head)-&gt;stqh_last = &amp;(elm)-&gt;field.stqe_next;                   \</span></span><br><span class="line"><span class="meta">        (listelm)-&gt;field.stqe_next = (elm);                                \</span></span><br><span class="line"><span class="meta">    &#125; while (<span class="comment">/*CONSTCOND*/</span> 0)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 头节点指向首节点的下一个节点。如果移动后只剩一个节点，则需要更新头节点的 stqh_last</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> STAILQ_REMOVE_HEAD(head, field)                                         \</span></span><br><span class="line"><span class="meta">    do &#123;                                                                        \</span></span><br><span class="line"><span class="meta">        <span class="keyword">if</span> (((head)-&gt;stqh_first = (head)-&gt;stqh_first-&gt;field.stqe_next) == NULL) \</span></span><br><span class="line"><span class="meta">            (head)-&gt;stqh_last = &amp;(head)-&gt;stqh_first;                            \</span></span><br><span class="line"><span class="meta">    &#125; while (<span class="comment">/*CONSTCOND*/</span> 0)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 通过 head 遍历 STAILQ，移除指定的元素 elm。如果移除的元素 elm 是尾节点，则需要更新头节点的 stqh_last</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> STAILQ_REMOVE(head, elm, type, field)                                                 \</span></span><br><span class="line"><span class="meta">    do &#123;                                                                                      \</span></span><br><span class="line"><span class="meta">        <span class="keyword">if</span> ((head)-&gt;stqh_first == (elm)) &#123;                                                    \</span></span><br><span class="line"><span class="meta">            STAILQ_REMOVE_HEAD((head), field);                                                \</span></span><br><span class="line"><span class="meta">        &#125; <span class="keyword">else</span> &#123;                                                                              \</span></span><br><span class="line"><span class="meta">            struct type* curelm = (head)-&gt;stqh_first;                                         \</span></span><br><span class="line"><span class="meta">            while (curelm-&gt;field.stqe_next != (elm))                                          \</span></span><br><span class="line"><span class="meta">                curelm = curelm-&gt;field.stqe_next;                                             \</span></span><br><span class="line"><span class="meta">            <span class="keyword">if</span> ((curelm-&gt;field.stqe_next = curelm-&gt;field.stqe_next-&gt;field.stqe_next) == NULL) \</span></span><br><span class="line"><span class="meta">                (head)-&gt;stqh_last = &amp;(curelm)-&gt;field.stqe_next;                               \</span></span><br><span class="line"><span class="meta">        &#125;                                                                                     \</span></span><br><span class="line"><span class="meta">    &#125; while (<span class="comment">/*CONSTCOND*/</span> 0)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 从头节点 head 指向的首节点开始遍历队列，依次将每个节点分配给 var，通过判断 var 是否为 NULL 决定是否遍历完成</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> STAILQ_FOREACH(var, head, field) for ((var) = ((head)-&gt;stqh_first); (var); (var) = ((var)-&gt;field.stqe_next))</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> STAILQ_CONCAT(head1, head2)                    \</span></span><br><span class="line"><span class="meta">    do &#123;                                               \</span></span><br><span class="line"><span class="meta">        <span class="keyword">if</span> (!STAILQ_EMPTY((head2))) &#123;                  \</span></span><br><span class="line"><span class="meta">            *(head1)-&gt;stqh_last = (head2)-&gt;stqh_first; \</span></span><br><span class="line"><span class="meta">            (head1)-&gt;stqh_last = (head2)-&gt;stqh_last;   \</span></span><br><span class="line"><span class="meta">            STAILQ_INIT((head2));                      \</span></span><br><span class="line"><span class="meta">        &#125;                                              \</span></span><br><span class="line"><span class="meta">    &#125; while (<span class="comment">/*CONSTCOND*/</span> 0)</span></span><br></pre></td></tr></table></figure>
+<h2 id="访问宏定义 -v2">访问宏定义</h2>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * Singly-linked Tail queue access methods.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> STAILQ_EMPTY(head) ((head)-&gt;stqh_first == NULL)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> STAILQ_FIRST(head) ((head)-&gt;stqh_first)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> STAILQ_NEXT(elm, field) ((elm)-&gt;field.stqe_next)</span></span><br></pre></td></tr></table></figure>
+<h2 id="示例代码 -v2">示例代码</h2>
+<p>示例代码来自：<a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man3/stailq.3.html">man-pages</a></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stddef.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/queue.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">entry</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> data;</span><br><span class="line">    STAILQ_ENTRY(entry) entries; <span class="comment">/* Singly linked tail queue */</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">STAILQ_HEAD(stailhead, entry);</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">void</span>)</span> &#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">entry</span> *<span class="title">n1</span>, *<span class="title">n2</span>, *<span class="title">n3</span>, *<span class="title">np</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">stailhead</span> <span class="title">head</span>;</span> <span class="comment">/* Singly linked tail queue head */</span></span><br><span class="line"></span><br><span class="line">    STAILQ_INIT(&amp;head); <span class="comment">/* Initialize the queue */</span></span><br><span class="line"></span><br><span class="line">    n1 = <span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(<span class="keyword">struct</span> entry)); <span class="comment">/* Insert at the head */</span></span><br><span class="line">    STAILQ_INSERT_HEAD(&amp;head, n1, entries);</span><br><span class="line"></span><br><span class="line">    n1 = <span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(<span class="keyword">struct</span> entry)); <span class="comment">/* Insert at the tail */</span></span><br><span class="line">    STAILQ_INSERT_TAIL(&amp;head, n1, entries);</span><br><span class="line"></span><br><span class="line">    n2 = <span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(<span class="keyword">struct</span> entry)); <span class="comment">/* Insert after */</span></span><br><span class="line">    STAILQ_INSERT_AFTER(&amp;head, n1, n2, entries);</span><br><span class="line"></span><br><span class="line">    STAILQ_REMOVE(&amp;head, n2, entry, entries); <span class="comment">/* Deletion */</span></span><br><span class="line">    <span class="built_in">free</span>(n2);</span><br><span class="line"></span><br><span class="line">    n3 = STAILQ_FIRST(&amp;head);</span><br><span class="line">    STAILQ_REMOVE_HEAD(&amp;head, entries); <span class="comment">/* Deletion from the head */</span></span><br><span class="line">    <span class="built_in">free</span>(n3);</span><br><span class="line"></span><br><span class="line">    n1 = STAILQ_FIRST(&amp;head);</span><br><span class="line">    n1-&gt;data = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">unsigned</span> <span class="type">int</span> i = <span class="number">1</span>; i &lt; <span class="number">5</span>; i++) &#123;</span><br><span class="line">        n1 = <span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(<span class="keyword">struct</span> entry));</span><br><span class="line">        STAILQ_INSERT_HEAD(&amp;head, n1, entries);</span><br><span class="line">        n1-&gt;data = i;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">/* Forward traversal */</span></span><br><span class="line">    STAILQ_FOREACH(np, &amp;head, entries) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%i &quot;</span>, np-&gt;data);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\r\n&quot;</span>); <span class="comment">// 4 3 2 1 0</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/* TailQ deletion */</span></span><br><span class="line">    n1 = STAILQ_FIRST(&amp;head);</span><br><span class="line">    <span class="keyword">while</span> (n1 != <span class="literal">NULL</span>) &#123;</span><br><span class="line">        n2 = STAILQ_NEXT(n1, entries);</span><br><span class="line">        <span class="built_in">free</span>(n1);</span><br><span class="line">        n1 = n2;</span><br><span class="line">    &#125;</span><br><span class="line">    STAILQ_INIT(&amp;head);</span><br><span class="line"></span><br><span class="line">    <span class="built_in">exit</span>(EXIT_SUCCESS);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="双向无尾队列 LIST">双向无尾队列 LIST</h1>
+<p>LIST：双向无尾队列。</p>
+<img src="/images/data-structure/linux-list.png" alt="双向无尾队列" width="80%" height="80%">
+<h2 id="扩展后的数据结构 -v3">扩展后的数据结构</h2>
+<p>LIST 数据结构涉及 LIST_HEAD 和 LIST_ENTRY 两个宏定义，先给出扩展后的数据结构示例，可以看出两处宏的 type 参数要保持统一（这里都是 entry）。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// LIST 节点</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">entry</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> data;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> &#123;</span> <span class="comment">// LIST_ENTRY(entry) entries;</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">entry</span>* <span class="title">le_next</span>;</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">entry</span>** <span class="title">le_prev</span>;</span></span><br><span class="line">    &#125; entries;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// LIST 头节点</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">listhead</span> &#123;</span> <span class="comment">// LIST_HEAD(listhead, entry);</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">entry</span>* <span class="title">lh_first</span>;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="数据结构宏定义 -v3">数据结构宏定义</h2>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * List definitions.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="comment">// LIST 头节点</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> LIST_HEAD(name, type)                      \</span></span><br><span class="line"><span class="meta">    struct name &#123;                                  \</span></span><br><span class="line"><span class="meta">        struct type* lh_first; <span class="comment">/* first element */</span> \</span></span><br><span class="line"><span class="meta">    &#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// LIST 头节点结构体（非结构体指针）初始化为 NULL</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> LIST_HEAD_INITIALIZER(head) \</span></span><br><span class="line"><span class="meta">    &#123; NULL &#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// LIST 节点，le_prev 是一个二级指针，里面存储着一个地址（指向前一个节点的 le_next 成员地址）</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> LIST_ENTRY(type)                                              \</span></span><br><span class="line"><span class="meta">    struct &#123;                                                          \</span></span><br><span class="line"><span class="meta">        struct type* le_next;  <span class="comment">/* next element */</span>                     \</span></span><br><span class="line"><span class="meta">        struct type** le_prev; <span class="comment">/* address of previous next element */</span> \</span></span><br><span class="line"><span class="meta">    &#125;</span></span><br></pre></td></tr></table></figure>
+<h2 id="操作函数宏定义 -v3">操作函数宏定义</h2>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * List functions.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> LIST_INIT(head)          \</span></span><br><span class="line"><span class="meta">    do &#123;                         \</span></span><br><span class="line"><span class="meta">        (head)-&gt;lh_first = NULL; \</span></span><br><span class="line"><span class="meta">    &#125; while (<span class="comment">/*CONSTCOND*/</span> 0)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* 在 listelm 节点后面插入新节点 elm</span></span><br><span class="line"><span class="comment">    1. 将新节点 elm 指向 listelm 节点的原有的下一个节点前面</span></span><br><span class="line"><span class="comment">    2. listelm 节点的原有的下一个节点的 le_prev，更新为指向新节点 elm 的 le_next 成员地址</span></span><br><span class="line"><span class="comment">    3. 更新 listelm 节点的下一个节点为新节点 elm</span></span><br><span class="line"><span class="comment">    4. 新节点的 le_prev，更新为指向 listelm 节点的 le_next 成员地址</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> LIST_INSERT_AFTER(listelm, elm, field)                               \</span></span><br><span class="line"><span class="meta">    do &#123;                                                                     \</span></span><br><span class="line"><span class="meta">        <span class="keyword">if</span> (((elm)-&gt;field.le_next = (listelm)-&gt;field.le_next) != NULL)       \</span></span><br><span class="line"><span class="meta">            (listelm)-&gt;field.le_next-&gt;field.le_prev = &amp;(elm)-&gt;field.le_next; \</span></span><br><span class="line"><span class="meta">        (listelm)-&gt;field.le_next = (elm);                                    \</span></span><br><span class="line"><span class="meta">        (elm)-&gt;field.le_prev = &amp;(listelm)-&gt;field.le_next;                    \</span></span><br><span class="line"><span class="meta">    &#125; while (<span class="comment">/*CONSTCOND*/</span> 0)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* 在 listelm 节点前面插入新节点 elm</span></span><br><span class="line"><span class="comment">    1. 新节点 elm 的 le_prev 更新为 listelm 节点的 le_prev</span></span><br><span class="line"><span class="comment">    2. 新节点 elm 的 le_next 指向 listelm 节点</span></span><br><span class="line"><span class="comment">    3. 让 listelm 节点的原有前一个节点指向新节点 elm</span></span><br><span class="line"><span class="comment">    4. listelm 节点的 le_prev 指向前一个新节点 elm 的 le_next 成员地址</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> LIST_INSERT_BEFORE(listelm, elm, field)           \</span></span><br><span class="line"><span class="meta">    do &#123;                                                  \</span></span><br><span class="line"><span class="meta">        (elm)-&gt;field.le_prev = (listelm)-&gt;field.le_prev;  \</span></span><br><span class="line"><span class="meta">        (elm)-&gt;field.le_next = (listelm);                 \</span></span><br><span class="line"><span class="meta">        *(listelm)-&gt;field.le_prev = (elm);                \</span></span><br><span class="line"><span class="meta">        (listelm)-&gt;field.le_prev = &amp;(elm)-&gt;field.le_next; \</span></span><br><span class="line"><span class="meta">    &#125; while (<span class="comment">/*CONSTCOND*/</span> 0)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* 在 head 头节点前插入一个节点 elm，并更新头</span></span><br><span class="line"><span class="comment">    1. 将新节点链接在头节点指向的首节点的前面</span></span><br><span class="line"><span class="comment">    2. 更新头节点指向的首节点的 le_prev 为新节点 elm 的 le_next 成员地址</span></span><br><span class="line"><span class="comment">    3. 更新头节点 lh_first 为新节点 elm 的首地址</span></span><br><span class="line"><span class="comment">    4. 更新新首节点 elm 的 le_prev 的地址为头节点的 lh_first 成员地址</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> LIST_INSERT_HEAD(head, elm, field)                           \</span></span><br><span class="line"><span class="meta">    do &#123;                                                             \</span></span><br><span class="line"><span class="meta">        <span class="keyword">if</span> (((elm)-&gt;field.le_next = (head)-&gt;lh_first) != NULL)       \</span></span><br><span class="line"><span class="meta">            (head)-&gt;lh_first-&gt;field.le_prev = &amp;(elm)-&gt;field.le_next; \</span></span><br><span class="line"><span class="meta">        (head)-&gt;lh_first = (elm);                                    \</span></span><br><span class="line"><span class="meta">        (elm)-&gt;field.le_prev = &amp;(head)-&gt;lh_first;                    \</span></span><br><span class="line"><span class="meta">    &#125; while (<span class="comment">/*CONSTCOND*/</span> 0)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* 移除指定的节点</span></span><br><span class="line"><span class="comment">    1. 将移除节点的下一个节点的 le_prev 更新为移除元素的 le_prev（如果移除节点不是尾节点）</span></span><br><span class="line"><span class="comment">    2. 通过解引用移除节点的 le_prev 获取前一个节点指向的下一个节点，将其重新指向移除元素的下一个节点</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> LIST_REMOVE(elm, field)                                         \</span></span><br><span class="line"><span class="meta">    do &#123;                                                                \</span></span><br><span class="line"><span class="meta">        <span class="keyword">if</span> ((elm)-&gt;field.le_next != NULL)                               \</span></span><br><span class="line"><span class="meta">            (elm)-&gt;field.le_next-&gt;field.le_prev = (elm)-&gt;field.le_prev; \</span></span><br><span class="line"><span class="meta">        *(elm)-&gt;field.le_prev = (elm)-&gt;field.le_next;                   \</span></span><br><span class="line"><span class="meta">    &#125; while (<span class="comment">/*CONSTCOND*/</span> 0)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 从头节点 head 指向的首节点开始遍历队列，依次将每个节点分配给 var，通过判断 var 是否为 NULL 决定是否遍历完成</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> LIST_FOREACH(var, head, field) for ((var) = ((head)-&gt;lh_first); (var); (var) = ((var)-&gt;field.le_next))</span></span><br></pre></td></tr></table></figure>
+<h2 id="访问宏定义 -v3">访问宏定义</h2>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * List access methods.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> LIST_EMPTY(head) ((head)-&gt;lh_first == NULL)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> LIST_FIRST(head) ((head)-&gt;lh_first)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> LIST_NEXT(elm, field) ((elm)-&gt;field.le_next)</span></span><br></pre></td></tr></table></figure>
+<h2 id="示例代码 -v3">示例代码</h2>
+<p>示例代码来自：<a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man3/list.3.html">man-pages</a></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stddef.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/queue.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">entry</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> data;</span><br><span class="line">    LIST_ENTRY(entry) entries; <span class="comment">/* List */</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">LIST_HEAD(listhead, entry);</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">void</span>)</span> &#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">entry</span> *<span class="title">n1</span>, *<span class="title">n2</span>, *<span class="title">n3</span>, *<span class="title">np</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">listhead</span> <span class="title">head</span>;</span> <span class="comment">/* List head */</span></span><br><span class="line">    <span class="type">int</span> i;</span><br><span class="line"></span><br><span class="line">    LIST_INIT(&amp;head); <span class="comment">/* Initialize the list */</span></span><br><span class="line"></span><br><span class="line">    n1 = <span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(<span class="keyword">struct</span> entry));     <span class="comment">/* Insert at the head */</span></span><br><span class="line">    LIST_INSERT_HEAD(&amp;head, n1, entries);  <span class="comment">// head &lt;-&gt; n1</span></span><br><span class="line"></span><br><span class="line">    n2 = <span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(<span class="keyword">struct</span> entry));   <span class="comment">/* Insert after */</span></span><br><span class="line">    LIST_INSERT_AFTER(n1, n2, entries);  <span class="comment">// head &lt;-&gt; n1 &lt;-&gt; n2</span></span><br><span class="line"></span><br><span class="line">    n3 = <span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(<span class="keyword">struct</span> entry));    <span class="comment">/* Insert before */</span></span><br><span class="line">    LIST_INSERT_BEFORE(n2, n3, entries);  <span class="comment">// head &lt;-&gt; n1 &lt;-&gt; n3 &lt;-&gt; n2</span></span><br><span class="line"></span><br><span class="line">    i = <span class="number">0</span>; <span class="comment">/* Forward traversal */</span></span><br><span class="line">    LIST_FOREACH(np, &amp;head, entries) &#123;</span><br><span class="line">        np-&gt;data = i++;  <span class="comment">// n1(0) n3(1) n2(2)</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    LIST_REMOVE(n2, entries); <span class="comment">/* Deletion, head &lt;-&gt; n1 &lt;-&gt; n3 */</span></span><br><span class="line">    <span class="built_in">free</span>(n2);</span><br><span class="line">    <span class="comment">/* Forward traversal */</span></span><br><span class="line">    LIST_FOREACH(np, &amp;head, entries) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%i &quot;</span>, np-&gt;data);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\r\n&quot;</span>);  <span class="comment">// 0 1</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/* List deletion */</span></span><br><span class="line">    n1 = LIST_FIRST(&amp;head);</span><br><span class="line">    <span class="keyword">while</span> (n1 != <span class="literal">NULL</span>) &#123;</span><br><span class="line">        n2 = LIST_NEXT(n1, entries);</span><br><span class="line">        <span class="built_in">free</span>(n1);</span><br><span class="line">        n1 = n2;</span><br><span class="line">    &#125;</span><br><span class="line">    LIST_INIT(&amp;head);</span><br><span class="line"></span><br><span class="line">    <span class="built_in">exit</span>(EXIT_SUCCESS);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="双向有尾队列 TAILQ">双向有尾队列 TAILQ</h1>
+<p>TAILQ：双向有尾队列。</p>
+<img src="/images/data-structure/linux-tailq.png" alt="双向有尾队列" width="80%" height="80%">
+<h2 id="扩展后的数据结构 -v4">扩展后的数据结构</h2>
+<p>TAILQ 数据结构涉及 TAILQ_HEAD 和 TAILQ_ENTRY 两个宏定义，先给出扩展后的数据结构示例，可以看出两处宏的 type 参数要保持统一（这里都是 entry）。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">entry</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> data;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> &#123;</span>  <span class="comment">// TAILQ_ENTRY(entry)</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">entry</span>* <span class="title">tqe_next</span>;</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">entry</span>** <span class="title">tqe_prev</span>;</span></span><br><span class="line">    &#125; entries;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">tailhead</span> &#123;</span>  <span class="comment">// TAILQ_HEAD(tailhead, entry)</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">entry</span>* <span class="title">tqh_first</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">entry</span>** <span class="title">tqh_last</span>;</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p><code>tqe_prev</code>和 <code>tqh_last</code> 为什么是二级指针，换成一级指针行不行？</p>
+<p>肯定不行，如果它的前面是头节点怎么办，头节点的定义里面没有 <code>struct entry</code> 结构体类型啊！再仔细看看，不管是头节点还是普通节点，都有 <code>struct entry*</code> 结构体指针类型，那就定义一个类型为 <code>struct entry**</code> 的变量好了。这样前插的时候就可以统一处理了，例子见 TAILQ_INSERT_BEFORE。</p>
+<h2 id="数据结构宏定义 -v4">数据结构宏定义</h2>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * Tail queue definitions.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="comment">// TAILQ 头节点，其中 qual=qualifier，用于修饰限定 type，如 qual=const</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> _TAILQ_HEAD(name, type, qual)                              \</span></span><br><span class="line"><span class="meta">    struct name &#123;                                                  \</span></span><br><span class="line"><span class="meta">        qual type* tqh_first;      <span class="comment">/* first element */</span>             \</span></span><br><span class="line"><span class="meta">        qual type* qual* tqh_last; <span class="comment">/* addr of last next element */</span> \</span></span><br><span class="line"><span class="meta">    &#125;</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> TAILQ_HEAD(name, type) _TAILQ_HEAD(name, struct type,)</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> TAILQ_HEAD_INITIALIZER(head) \</span></span><br><span class="line"><span class="meta">    &#123; NULL, &amp;(head).tqh_first &#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// TAILQ 节点，qual 用于修饰限定 type 和二级指针</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> _TAILQ_ENTRY(type, qual)                                          \</span></span><br><span class="line"><span class="meta">    struct &#123;                                                              \</span></span><br><span class="line"><span class="meta">        qual type* tqe_next;       <span class="comment">/* next element */</span>                     \</span></span><br><span class="line"><span class="meta">        qual type* qual* tqe_prev; <span class="comment">/* address of previous next element */</span> \</span></span><br><span class="line"><span class="meta">    &#125;</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> TAILQ_ENTRY(type) _TAILQ_ENTRY(struct type,)</span></span><br></pre></td></tr></table></figure>
+<h2 id="操作函数宏定义 -v4">操作函数宏定义</h2>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * Tail queue functions.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="comment">// TAILQ 头节点初始化，初始化时头节点中的二级指针 tqh_last 指向 tqh_first 成员变量的地址 </span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> TAILQ_INIT(head)                       \</span></span><br><span class="line"><span class="meta">    do &#123;                                       \</span></span><br><span class="line"><span class="meta">        (head)-&gt;tqh_first = NULL;              \</span></span><br><span class="line"><span class="meta">        (head)-&gt;tqh_last = &amp;(head)-&gt;tqh_first; \</span></span><br><span class="line"><span class="meta">    &#125; while (<span class="comment">/*CONSTCOND*/</span> 0)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* 在头节点 head 前插入新节点 elm，并更新头节点</span></span><br><span class="line"><span class="comment">    1. 将新节点的 tqe_next 指向头节点的 tqh_first 指向的首节点</span></span><br><span class="line"><span class="comment">    2. 如果首节点非空，则将原首节点的 tqe_prev 指向新节点 elm 的 tqe_next 成员变量的地址</span></span><br><span class="line"><span class="comment">    3. 否则（首节点为空），则【更新尾指针 tqh_last 指向新节点 elm 的 tqe_next 成员变量的地址】</span></span><br><span class="line"><span class="comment">    4. 更新头节点的 tqh_first 指向新节点 elm</span></span><br><span class="line"><span class="comment">    5. 更新新节点 elm 的 tqe_prev 指向头节点的 tqh_first 成员变量的地址</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> TAILQ_INSERT_HEAD(head, elm, field)                             \</span></span><br><span class="line"><span class="meta">    do &#123;                                                                \</span></span><br><span class="line"><span class="meta">        <span class="keyword">if</span> (((elm)-&gt;field.tqe_next = (head)-&gt;tqh_first) != NULL)        \</span></span><br><span class="line"><span class="meta">            (head)-&gt;tqh_first-&gt;field.tqe_prev = &amp;(elm)-&gt;field.tqe_next; \</span></span><br><span class="line"><span class="meta">        <span class="keyword">else</span>                                                            \</span></span><br><span class="line"><span class="meta">            (head)-&gt;tqh_last = &amp;(elm)-&gt;field.tqe_next;                  \</span></span><br><span class="line"><span class="meta">        (head)-&gt;tqh_first = (elm);                                      \</span></span><br><span class="line"><span class="meta">        (elm)-&gt;field.tqe_prev = &amp;(head)-&gt;tqh_first;                     \</span></span><br><span class="line"><span class="meta">    &#125; while (<span class="comment">/*CONSTCOND*/</span> 0)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* 在尾节点（通过 head 获取尾节点的 tqe_next 地址）后插入新节点 elm</span></span><br><span class="line"><span class="comment">    1. 将作为尾节点的新节点 elm 的 tqe_next 置 NULL</span></span><br><span class="line"><span class="comment">    2. 将作为尾节点的新节点 elm 的 tqe_prev 指向原尾节点的 tqe_next 成员的地址（通过(head)-&gt;tqh_last 获取）</span></span><br><span class="line"><span class="comment">    3. 将原尾节点作为新尾节点 elm 的前一个节点（将原尾节点指向新尾节点 elm）</span></span><br><span class="line"><span class="comment">    4. 更新头节点中指向尾节点的 tqe_next 成员地址的二级指针 tqh_last</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> TAILQ_INSERT_TAIL(head, elm, field)        \</span></span><br><span class="line"><span class="meta">    do &#123;                                           \</span></span><br><span class="line"><span class="meta">        (elm)-&gt;field.tqe_next = NULL;              \</span></span><br><span class="line"><span class="meta">        (elm)-&gt;field.tqe_prev = (head)-&gt;tqh_last;  \</span></span><br><span class="line"><span class="meta">        *(head)-&gt;tqh_last = (elm);                 \</span></span><br><span class="line"><span class="meta">        (head)-&gt;tqh_last = &amp;(elm)-&gt;field.tqe_next; \</span></span><br><span class="line"><span class="meta">    &#125; while (<span class="comment">/*CONSTCOND*/</span> 0)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* 在节点 listelm 后插入新节点 elm，如果是在尾节点后插入，则更新头节点的 tqh_last 成员地址</span></span><br><span class="line"><span class="comment">    1. 更新新节点 elm 的 tqe_next 为节点 listelm 的 tqe_next，即插入</span></span><br><span class="line"><span class="comment">    2. 如果更新后新节点 elm 的 tqe_next 不为空：</span></span><br><span class="line"><span class="comment">        则不是在尾节点后插入，更新节点 listelm 的原下一个节点的 tqe_prev 成员值为新节点 elm 的 tqe_next 成员地址</span></span><br><span class="line"><span class="comment">        否则，是在尾节点后插入，则更新头节点的 tqh_last 成员地址为新节点 elm(尾节点) 的 tqe_next 成员地址</span></span><br><span class="line"><span class="comment">    3. 将节点 listelm 指向新节点 elm</span></span><br><span class="line"><span class="comment">    4. 将新节点的 tqe_prev 成员值指向节点 listelm 的 tqe_next 成员地址</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> TAILQ_INSERT_AFTER(head, listelm, elm, field)                       \</span></span><br><span class="line"><span class="meta">    do &#123;                                                                    \</span></span><br><span class="line"><span class="meta">        <span class="keyword">if</span> (((elm)-&gt;field.tqe_next = (listelm)-&gt;field.tqe_next) != NULL)    \</span></span><br><span class="line"><span class="meta">            (elm)-&gt;field.tqe_next-&gt;field.tqe_prev = &amp;(elm)-&gt;field.tqe_next; \</span></span><br><span class="line"><span class="meta">        <span class="keyword">else</span>                                                                \</span></span><br><span class="line"><span class="meta">            (head)-&gt;tqh_last = &amp;(elm)-&gt;field.tqe_next;                      \</span></span><br><span class="line"><span class="meta">        (listelm)-&gt;field.tqe_next = (elm);                                  \</span></span><br><span class="line"><span class="meta">        (elm)-&gt;field.tqe_prev = &amp;(listelm)-&gt;field.tqe_next;                 \</span></span><br><span class="line"><span class="meta">    &#125; while (<span class="comment">/*CONSTCOND*/</span> 0)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* 在节点 listelm 前插入新节点 elm，不涉及更新头节点的成员信息</span></span><br><span class="line"><span class="comment">    1. 更新新节点的 tqe_prev 为节点 listelm 的 tqe_prev</span></span><br><span class="line"><span class="comment">    2. 将新节点的 tqe_next 指向节点 listelm</span></span><br><span class="line"><span class="comment">    3. 将节点 listelm 的前一个节点指向新节点 elm：</span></span><br><span class="line"><span class="comment">        a) 解引用 *(listelm)-&gt;field.tqe_prev，即节点 listelm 的前一个节点的 tqe_next 地址，指向新节点 elm</span></span><br><span class="line"><span class="comment">        b) 如果节点 listelm 是首节点呢? 解引用获取到的就是头节点 head 的 tqh_first 地址，其指向新节点 elm</span></span><br><span class="line"><span class="comment">    4. 更新节点 listelm 的 tqe_prev 成员值为新插入节点 elm 的 tqe_next 成员地址</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> TAILQ_INSERT_BEFORE(listelm, elm, field)            \</span></span><br><span class="line"><span class="meta">    do &#123;                                                    \</span></span><br><span class="line"><span class="meta">        (elm)-&gt;field.tqe_prev = (listelm)-&gt;field.tqe_prev;  \</span></span><br><span class="line"><span class="meta">        (elm)-&gt;field.tqe_next = (listelm);                  \</span></span><br><span class="line"><span class="meta">        *(listelm)-&gt;field.tqe_prev = (elm);                 \</span></span><br><span class="line"><span class="meta">        (listelm)-&gt;field.tqe_prev = &amp;(elm)-&gt;field.tqe_next; \</span></span><br><span class="line"><span class="meta">    &#125; while (<span class="comment">/*CONSTCOND*/</span> 0)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* 移除节点 elm，如果移除的是首 / 尾节点，则需要更新头节点的 tqh_first/tqh_last 地址</span></span><br><span class="line"><span class="comment">    1. 判断待移除的节点 elm 的 tqe_next 是否为空：</span></span><br><span class="line"><span class="comment">        不为空，则不是尾节点：更新节点 elm 的下一个节点的 tqe_prev 值为节点 elm 的 tqe_prev 值</span></span><br><span class="line"><span class="comment">        为空，则是尾结点：更新头节点的 tqh_last 值为节点 elm 的 tqe_prev 值</span></span><br><span class="line"><span class="comment">    2. 通过解引用修改待移除节点 elm 的前一个节点的值，从而将其指向待移除节点 elm 的下一个节点</span></span><br><span class="line"><span class="comment">        解引用前的前一个节点的地址：可能是前一个普通节点的 tqe_next 地址，也可能是头节点的 tqh_first 地址；</span></span><br><span class="line"><span class="comment">        通过解引用修改变量地址下的值，从而将其指向正确的节点（待移除节点 elm 的下一个节点）</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> TAILQ_REMOVE(head, elm, field)                                     \</span></span><br><span class="line"><span class="meta">    do &#123;                                                                   \</span></span><br><span class="line"><span class="meta">        <span class="keyword">if</span> (((elm)-&gt;field.tqe_next) != NULL)                               \</span></span><br><span class="line"><span class="meta">            (elm)-&gt;field.tqe_next-&gt;field.tqe_prev = (elm)-&gt;field.tqe_prev; \</span></span><br><span class="line"><span class="meta">        <span class="keyword">else</span>                                                               \</span></span><br><span class="line"><span class="meta">            (head)-&gt;tqh_last = (elm)-&gt;field.tqe_prev;                      \</span></span><br><span class="line"><span class="meta">        *(elm)-&gt;field.tqe_prev = (elm)-&gt;field.tqe_next;                    \</span></span><br><span class="line"><span class="meta">    &#125; while (<span class="comment">/*CONSTCOND*/</span> 0)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 正向遍历，从头节点 head 指向的首节点开始遍历队列，依次将每个节点分配给 var，通过判断 var 是否为 NULL 决定是否遍历完成</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> TAILQ_FOREACH(var, head, field) for ((var) = ((head)-&gt;tqh_first); (var); (var) = ((var)-&gt;field.tqe_next))</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 反向遍历，参考 TAILQ_LAST 和 TAILQ_PREV</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> TAILQ_FOREACH_REVERSE(var, head, headname, field) for ((var) = (*(((struct headname*)((head)-&gt;tqh_last))-&gt;tqh_last)); (var); (var) = (*(((struct headname*)((var)-&gt;field.tqe_prev))-&gt;tqh_last)))</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> TAILQ_CONCAT(head1, head2, field)                           \</span></span><br><span class="line"><span class="meta">    do &#123;                                                            \</span></span><br><span class="line"><span class="meta">        <span class="keyword">if</span> (!TAILQ_EMPTY(head2)) &#123;                                  \</span></span><br><span class="line"><span class="meta">            *(head1)-&gt;tqh_last = (head2)-&gt;tqh_first;                \</span></span><br><span class="line"><span class="meta">            (head2)-&gt;tqh_first-&gt;field.tqe_prev = (head1)-&gt;tqh_last; \</span></span><br><span class="line"><span class="meta">            (head1)-&gt;tqh_last = (head2)-&gt;tqh_last;                  \</span></span><br><span class="line"><span class="meta">            TAILQ_INIT((head2));                                    \</span></span><br><span class="line"><span class="meta">        &#125;                                                           \</span></span><br><span class="line"><span class="meta">    &#125; while (<span class="comment">/*CONSTCOND*/</span> 0)</span></span><br></pre></td></tr></table></figure>
+<h2 id="访问宏定义 -v4">访问宏定义</h2>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * Tail queue access methods.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> TAILQ_EMPTY(head) ((head)-&gt;tqh_first == NULL)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> TAILQ_FIRST(head) ((head)-&gt;tqh_first)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> TAILQ_NEXT(elm, field) ((elm)-&gt;field.tqe_next)</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> TAILQ_LAST(head, headname) (*(((struct headname*)((head)-&gt;tqh_last))-&gt;tqh_last))</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> TAILQ_PREV(elm, headname, field) (*(((struct headname*)((elm)-&gt;field.tqe_prev))-&gt;tqh_last))</span></span><br></pre></td></tr></table></figure>
+<h3 id="TAILQ-LAST">TAILQ_LAST</h3>
+<p>TAILQ_LAST 可以获取尾节点的结构体首地址（不是尾节点的 tqe_next 成员地址），它是如何获取到的？</p>
+<p><code>(head)-&gt;tqh_last</code> 是最后一个节点的 <code>entries.tqe_next</code> 成员的地址，可是这个地址不是用户想要的，用户要的是节点的地址（结构体的首地址），所以只好曲线救国，请看《各种结构指向图》小节的 TAILQ，从 1 到 2 再到 3。</p>
+<p>从 <code>entries.tqe_next</code> 的地址怎么得到 <code>entries.tqe_prev</code> 的值呢（目的是为了得到倒数第二个节点的 <code>entries.tqe_next</code>）？</p>
+<p>其实也不难，虽然 <code>struct entry</code> 里面 <code>entries</code> 这个结构体变量没有标签，但是 <strong> 它的元素构成和 <code>struct headname</code> 完全一样</strong>，都是一个 <code>struct entry*</code> 和一个 <code>struct entry**</code>，所以可以把 <code>entries.tqe_next</code> 的地址强制转换为 <code>(struct headname *)</code> 类型：</p>
+<p><code>(struct headname *)((head)-&gt;tqh_last)</code></p>
+<p>然后访问它的 <code>tqh_last</code> 成员（也就是图中尾节点的 <code>tqe_prev</code>）：</p>
+<p><code>((struct headname *)((head)-&gt;tqh_last))-&gt;tqh_last</code></p>
+<p>这样就得到了前一个节点的 <code>entries.tqe_next</code> 的地址，再对它解引用：</p>
+<p><code>*(((struct headname *)((head)-&gt;tqh_last))-&gt;tqh_last)</code></p>
+<p>就得到了 <code>entries.tqe_next</code> 变量，这恰好是大结构体（ struct entry ）的首地址。</p>
+<h3 id="TAILQ-PREV">TAILQ_PREV</h3>
+<p>我们再看 TAILQ_PREV 这个宏，道理类似。请看《各种结构指向图》小节的 TAILQ，从 a 到 b 再到 c。</p>
+<p>设当前节点的地址是 <code>elm</code>（图中用最后这个节点来示意），<code>(elm)-&gt;field.tqe_prev</code>，表示顺着 a，得到它前面那个节点的 <code>tqe_next</code> 成员的地址，对这个地址强制转换为 <code>struct headname *</code>，即</p>
+<p><code>(struct headname *)((elm)-&gt;field.tqe_prev)</code></p>
+<p>再通过访问 <code>tqh_last</code>（等效于访问 <code>tqe_prev</code>），也就是顺着 b，得到了 <code>elm</code> 前面的前面的节点的 <code>tqe_next</code> 地址，即</p>
+<p><code>((struct headname *)((elm)-&gt;field.tqe_prev))-&gt;tqh_last</code></p>
+<p>对它解引用，就得到 <code>elm</code> 前面的前面的节点的 <code>tqe_next</code>，它刚好是 c 指向的 <code>elm</code>前面的结构体的首地址。</p>
+<p><code>*(((struct headname *)((elm)-&gt;field.tqe_prev))-&gt;tqh_last)</code></p>
+<h2 id="示例代码 -v4">示例代码</h2>
+<p>示例代码来自：<a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man3/tailq.3.html">man-pages</a></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stddef.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/queue.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">entry</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> data;</span><br><span class="line">    TAILQ_ENTRY(entry) entries; <span class="comment">/* Tail queue */</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">TAILQ_HEAD(tailhead, entry);</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">void</span>)</span> &#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">entry</span> *<span class="title">n1</span>, *<span class="title">n2</span>, *<span class="title">n3</span>, *<span class="title">np</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">tailhead</span> <span class="title">head</span>;</span> <span class="comment">/* Tail queue head */</span></span><br><span class="line">    <span class="type">int</span> i;</span><br><span class="line"></span><br><span class="line">    TAILQ_INIT(&amp;head); <span class="comment">/* Initialize the queue */</span></span><br><span class="line"></span><br><span class="line">    n1 = <span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(<span class="keyword">struct</span> entry)); <span class="comment">/* Insert at the head */</span></span><br><span class="line">    n1-&gt;data = <span class="number">20</span>;</span><br><span class="line">    TAILQ_INSERT_HEAD(&amp;head, n1, entries);  <span class="comment">// 20</span></span><br><span class="line"></span><br><span class="line">    n1 = <span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(<span class="keyword">struct</span> entry)); <span class="comment">/* Insert at the tail */</span></span><br><span class="line">    n1-&gt;data = <span class="number">30</span>;</span><br><span class="line">    TAILQ_INSERT_TAIL(&amp;head, n1, entries);  <span class="comment">// 20 30</span></span><br><span class="line"></span><br><span class="line">    n2 = <span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(<span class="keyword">struct</span> entry)); <span class="comment">/* Insert after */</span></span><br><span class="line">    n2-&gt;data = <span class="number">40</span>;</span><br><span class="line">    TAILQ_INSERT_AFTER(&amp;head, n1, n2, entries);  <span class="comment">// 20 30 40</span></span><br><span class="line"></span><br><span class="line">    n3 = <span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(<span class="keyword">struct</span> entry)); <span class="comment">/* Insert before */</span></span><br><span class="line">    n3-&gt;data = <span class="number">50</span>;</span><br><span class="line">    TAILQ_INSERT_BEFORE(n2, n3, entries);  <span class="comment">// 20 30 50 40</span></span><br><span class="line"></span><br><span class="line">    TAILQ_REMOVE(&amp;head, n2, entries); <span class="comment">/* Deletion */</span></span><br><span class="line">    <span class="built_in">free</span>(n2);</span><br><span class="line">    <span class="comment">/* Forward traversal */</span></span><br><span class="line">    i = <span class="number">0</span>;</span><br><span class="line">    TAILQ_FOREACH(np, &amp;head, entries) &#123;</span><br><span class="line">        np-&gt;data = np-&gt;data + (i++);</span><br><span class="line">    &#125;  <span class="comment">// 20 31 52</span></span><br><span class="line">    <span class="comment">/* Reverse traversal */</span></span><br><span class="line">    TAILQ_FOREACH_REVERSE(np, &amp;head, tailhead, entries) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%i &quot;</span>, np-&gt;data);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\r\n&quot;</span>);  <span class="comment">// 52 31 20</span></span><br><span class="line">    <span class="comment">/* TailQ deletion */</span></span><br><span class="line">    n1 = TAILQ_FIRST(&amp;head);</span><br><span class="line">    <span class="keyword">while</span> (n1 != <span class="literal">NULL</span>) &#123;</span><br><span class="line">        n2 = TAILQ_NEXT(n1, entries);</span><br><span class="line">        <span class="built_in">free</span>(n1);</span><br><span class="line">        n1 = n2;</span><br><span class="line">    &#125;</span><br><span class="line">    TAILQ_INIT(&amp;head);</span><br><span class="line"></span><br><span class="line">    <span class="built_in">exit</span>(EXIT_SUCCESS);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>参考资料</p>
+<ol>
+<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/fuzidage/p/14482501.html">https://www.cnblogs.com/fuzidage/p/14482501.html</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/ET_Endeavoring/article/details/121609082">https://blog.csdn.net/ET_Endeavoring/article/details/121609082</a></li>
+<li>SLIT: <a target="_blank" rel="noopener" href="https://blog.csdn.net/longintchar/article/details/122907350">https://blog.csdn.net/longintchar/article/details/122907350</a></li>
+<li>STAILQ: <a target="_blank" rel="noopener" href="https://blog.csdn.net/longintchar/article/details/122907478">https://blog.csdn.net/longintchar/article/details/122907478</a></li>
+<li>TAILQ: <a target="_blank" rel="noopener" href="https://blog.csdn.net/longintchar/article/details/122907708">https://blog.csdn.net/longintchar/article/details/122907708</a></li>
+</ol>
+</blockquote>
+
+</div>
+
+
+  <div class="book-comments">
+    
+
+
+
+
+  </div>
+
+
+
+<script src="/js/book-post.js"></script>
+
+
+            </div>
+          </div>
+          <div class="column col-2 hide-lg">
+            <div class="book-post-info">
+  
+    <div class="book-post-meta">
+
+  <div class="author">
+
+    <!-- Author image -->
+    <div class="author-img">
+      
+        <figure
+          class="avatar avatar-lg"
+          data-initial="A"
+          style="background-color: #3b4351;">
+        </figure>
+      
+    </div>
+
+    <!-- Author title -->
+    <div class="author-title">
+      <div>aha</div>
+      <div>2024-07-02</div>
+    </div>
+  </div>
+
+  
+    <div class="divider"></div>
+
+    <div class="link">
+      <a class="category-link" href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/">数据结构</a>
+
+      <a class="tag-none-link" href="/tags/Linux/" rel="tag">#Linux</a> <a class="tag-none-link" href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" rel="tag">#数据结构</a> <a class="tag-none-link" href="/tags/%E9%98%9F%E5%88%97/" rel="tag">#队列</a>
+    </div>
+    
+  
+
+  <div class="divider"></div>
+</div>
+  
+
+  <div class="book-tocbot">
+</div>
+<div class="book-tocbot-menu">
+  <a class="book-toc-expand" onclick="expand_toc()">Expand all</a>
+  <a onclick="go_top()">Back to top</a>
+  <a onclick="go_bottom()">Go to bottom</a>
+  <a onclick="toggleSearch()">Search in blogs</a> <!-- 添加搜索文字的点击事件 -->
+</div>
+
+<div id="search-overlay" class="search-overlay" style="display: none;"> <!-- 初始状态为隐藏 -->
+  <div class="search-box">
+    <input type="text" id="search-input" placeholder="Search in all blogs...">
+    <button onclick="closeSearch()">Close</button> <!-- 添加关闭按钮 -->
+    <div id="search-results" class="search-results"></div>
+  </div>
+</div>
+
+<script>
+  function performSearch(query) {
+    if (!query.trim()) {
+      return;
+    }
+
+    fetch('/search.xml')
+      .then(response => response.text())
+      .then(data => {
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(data, "text/xml");
+        const entries = xmlDoc.getElementsByTagName('entry');
+        let results = '';
+
+        for (let i = 0; i < entries.length; i++) {
+          const title = entries[i].getElementsByTagName('title')[0].textContent;
+          const content = entries[i].getElementsByTagName('content')[0].textContent;
+          const url = entries[i].getElementsByTagName('url')[0].textContent;
+
+          let count = (title.match(new RegExp(query, "gi")) || []).length; // 统计查询词出现的次数
+          count += (content.match(new RegExp(query, "gi")) || []).length;
+
+          if (count > 0) { // title.includes(query) || content.includes(query)
+            results += `
+              <div class="search-result-item">
+                <a href="${url}">${title}</a> (${count})
+              </div>`;
+          }
+        }
+
+        const searchResultsElement = document.getElementById('search-results');
+        searchResultsElement.innerHTML = results;
+        searchResultsElement.classList.add('active');
+      });
+  }
+
+  function toggleSearch() {
+    const searchOverlay = document.getElementById('search-overlay');
+    searchOverlay.style.display = searchOverlay.style.display === 'none' ? 'flex' : 'none';
+  }
+
+  function closeSearch() {
+    document.getElementById('search-overlay').style.display = 'none';
+  }
+
+  document.getElementById('search-input').addEventListener('input', function() {
+    const query = this.value;
+    performSearch(query);
+  });
+</script>
+
+<style>
+  .search-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  .search-box {
+    background: white;
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+    width: 80%;
+    max-width: 500px;
+  }
+
+  .search-results {
+    margin-top: 10px;
+    max-height: 300px;
+    overflow-y: auto;
+    background: white;
+    padding: 10px;
+    border-radius: 5px;
+    width: 100%;
+  }
+
+  .search-result-item {
+    margin: 10px 0;
+  }
+
+  .search-result-item a {
+    color: blue; /* 设置链接颜色为蓝色 */
+    text-decoration: none;
+  }
+
+  .search-result-item a:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+<script src="/js/book-toc.js"></script>
+
+
+</div>
+          </div>
+        </div>
+      </div>
+
+      <a class="off-canvas-overlay" onclick="hide_canvas()"></a>
+
+      <button class="floating-button" onclick="toggleDropdownMenu()"></button>
+
+      <div class="dropdown-menu">
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FFFFFF', '#000000')">银河白</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#C7EDCC', '#000000')">豆沙绿</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FAF9DE', '#000000')">杏仁黄</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#E3EDCD', '#000000')">青草绿</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FFF2E2', '#000000')">秋叶褐</div>
+      </div>
+  </div>
+
+  <script>
+    function toggleDropdownMenu() {
+      document.querySelector('.floating-button').classList.toggle('active');
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      var storedBackgroundColor = localStorage.getItem('blogBackgroundColor');
+      var storedColor = localStorage.getItem('blogColor');
+
+      if (storedBackgroundColor && storedColor) {
+        document.body.style.backgroundColor = storedBackgroundColor;
+        document.body.style.color = storedColor;
+      }
+    });
+
+    function changeBackgroundColor(backgroundColor, color) {
+      document.body.style.backgroundColor = backgroundColor;
+      document.body.style.color = color;
+
+      localStorage.setItem('blogBackgroundColor', backgroundColor);
+      localStorage.setItem('blogColor', color);
+
+      document.querySelector('.floating-button').classList.remove('active');
+    }
+  </script>
+</body>
+
+</html>
+
+
+<script src="/js/book.js"></script>

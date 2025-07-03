@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
+
+    
+      <link rel="icon" href="/favicon.png" />
+    
+
+    <title>
+        
+          项目之 HTTP 服务器实现 - aha&#39;s book
+        
+    </title>
+
+    <!-- Spectre.css framework -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre-exp.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre-icons.min.css">
+
+    <!-- theme css & js -->
+    
+<link rel="stylesheet" href="/css/book.css">
+
+    
+<script src="/js/book.js"></script>
+
+
+    <!-- tocbot -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.css">
+    
+    <!-- katex -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/zooming/2.1.1/zooming.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const zooming = new Zooming()
+    zooming.listen('.book-content img')
+})
+</script>
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+    <style>
+      body {
+        background-color: #FFFFFF;
+        /* color: #000000; */
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+
+      /* Floating Button Styles */
+      .floating-button {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 999;
+        background-color: #000000;
+        color: #ffffff;
+        padding: 12px;
+        border-radius: 50%;
+        cursor: pointer;
+        border: 2px solid #000000;
+      }
+
+      .floating-button:hover {
+        background-color: #FFFFFF;
+      }
+
+      /* Dropdown Menu Styles */
+      .dropdown-menu {
+        position: fixed;
+        bottom: 60px;
+        right: 10px;
+        display: none;
+        min-width: 60px;
+        padding: 2px;
+        background-color: #fff;
+        /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
+        z-index: 1000;
+      }
+
+      .floating-button.active+.dropdown-menu {
+        display: block;
+      }
+
+      .dropdown-item {
+        display: block;
+        padding: 8px 16px;
+        cursor: pointer;
+      }
+
+      .dropdown-item:hover {
+        background-color: #f5f5f5;
+      }
+    </style>
+<style>.darkmode--activated{--body-bg-color:#282828;--content-bg-color:#333;--card-bg-color:#555;--text-color:#ccc;--blockquote-color:#bbb;--link-color:#ccc;--link-hover-color:#eee;--brand-color:#ddd;--brand-hover-color:#ddd;--table-row-odd-bg-color:#282828;--table-row-hover-bg-color:#363636;--menu-item-bg-color:#555;--btn-default-bg:#222;--btn-default-color:#ccc;--btn-default-border-color:#555;--btn-default-hover-bg:#666;--btn-default-hover-color:#ccc;--btn-default-hover-border-color:#666;--highlight-background:#282b2e;--highlight-foreground:#a9b7c6;--highlight-gutter-background:#34393d;--highlight-gutter-foreground:#9ca9b6}.darkmode--activated img{opacity:.75}.darkmode--activated img:hover{opacity:.9}.darkmode--activated code{color:#69dbdc;background:0 0}button.darkmode-toggle{z-index:9999}.darkmode-ignore,img{display:flex!important}.beian img{display:inline-block!important}</style></head>
+
+<body>
+  <div class="book-container">
+    <div class="book-sidebar">
+      <div class="book-brand">
+  <a href="/">
+    <img src="/favicon.png">
+    <span>AHA&#39;S BOOK</span>
+  </a>
+</div>
+        <div id="menu" class="book-menu hide">
+  <h2 id="基础知识"> 基础知识 </h2>
+<ul>
+<li><a href="/posts/231010144856.html"> 模运算 </a></li>
+<li><a href="/posts/231014105311.html"> 异或运算 </a></li>
+<li><a href="/posts/231210181853.html"> 计算机中的寄存器 </a></li>
+<li><a href="/posts/231213183051.html"> 正则表达式基础 </a></li>
+</ul>
+<h2 id="C 语言">C 语言 </h2>
+<ul>
+<li><a href="/posts/230916171929.html">main 函数参数 </a></li>
+<li><a href="/posts/231214192113.html"> 关键字与专有名词 </a></li>
+<li><a href="/posts/240103180653.html"> 输出打印函数 </a></li>
+<li><a href="/posts/230922143003.html"> 多维数组 </a></li>
+<li><a href="/posts/230913200729.html">const 关键字 </a></li>
+<li><a href="/posts/230918174223.html">typedef 类型基础 </a></li>
+<li><a href="/posts/230920172849.html">typedef 类型实践 </a></li>
+<li><a href="/posts/240224193217.html"> 二级指针 </a></li>
+<li><a href="/posts/240307195203.html"> 代码 TOP-K 问题 </a></li>
+<li><a href="/posts/230922172626.html">uthash 哈希表基础 </a></li>
+<li><a href="/posts/230918114841.html"> 大小端知识 </a></li>
+</ul>
+<h2 id="Golang 语言">Golang 语言 </h2>
+<ul>
+<li><a href="/posts/230907162612.html"> 变量与常量 </a></li>
+<li><a href="/posts/230909120145.html"> 函数 &amp; 包 &amp; 判断 &amp; 循环 </a></li>
+<li><a href="/posts/230912152800.html"> 数组与切片 </a></li>
+<li><a href="/posts/230913161326.html"> 可变参数函数与 Map 集合 </a></li>
+<li><a href="/posts/230915155105.html"> 字符串和指针 </a></li>
+</ul>
+<h2 id="数据结构"> 数据结构 </h2>
+<ul>
+<li><a href="/posts/231007174854.html"> 链表（数组实现）</a></li>
+<li><a href="/posts/231008213450.html"> 链表（链式实现）</a></li>
+<li><a href="/posts/231016161508.html"> 堆栈（数组实现）</a></li>
+<li><a href="/posts/231016184406.html"> 堆栈（链表实现）</a></li>
+<li><a href="/posts/231127185207.html"> 单调栈 </a></li>
+<li><a href="/posts/231017105123.html"> 队列（链表实现）</a></li>
+<li><a href="/posts/231017154121.html"> 双端队列（链表实现）</a></li>
+<li><a href="/posts/231018102559.html"> 堆基础与堆结构（数组实现）</a></li>
+<li><a href="/posts/231019102311.html"> 优先队列（堆实现）</a></li>
+<li><a href="/posts/230905224335.html"> 二叉树的遍历 </a></li>
+<li><a href="/posts/231020174358.html"> 二叉搜索树 </a></li>
+<li><a href="/posts/230916094606.html"> 拓扑排序 </a></li>
+<li><a href="/posts/230925185057.html">Trie 字典树 </a></li>
+<li><a href="/posts/231023164532.html"> 并查集（数组实现）</a></li>
+<li><a href="/posts/240702200642.html">Linux 数据结构之队列 </a></li>
+</ul>
+<h2 id="数据结构算法"> 数据结构算法 </h2>
+<ul>
+<li><a href="/posts/231218181635.html"> 归并排序 </a></li>
+<li><a href="/posts/231108163339.html"> 快速排序 </a></li>
+<li><a href="/posts/231107171607.html"> 堆排序 </a></li>
+<li><a href="/posts/231124181658.html"> 二分查找 </a></li>
+<li><a href="/posts/231227190828.html"> 哈希表实现 </a></li>
+<li><a href="/posts/240313193201.html"> 字符串哈希函数 </a></li>
+<li><a href="/posts/231116150205.html">Floyd 多源最短路径 </a></li>
+<li><a href="/posts/231117095232.html">Dijkstra 单源最短路径（原理部分）</a></li>
+<li><a href="/posts/231121152713.html">Dijkstra 单源最短路径（实现部分）</a></li>
+</ul>
+<h2 id="数据库"> 数据库 </h2>
+<ul>
+<li><a href="/posts/250605180332.html">MySQL 基础 </a></li>
+</ul>
+<h2 id="计算机网络"> 计算机网络 </h2>
+<ul>
+<li><a href="/posts/231011192359.html">OSI 参考模型 </a></li>
+<li><a href="/posts/240329202000.html"> 计网 CyC2018 之概述 </a></li>
+<li><a href="/posts/240329202004.html"> 计网 CyC2018 之链路层 </a></li>
+<li><a href="/posts/240329202003.html"> 计网 CyC2018 之网络层 </a></li>
+<li><a href="/posts/240329202002.html"> 计网 CyC2018 之传输层 </a></li>
+<li><a href="/posts/240329202001.html"> 计网 CyC2018 之应用层 </a></li>
+<li><a href="/posts/240306203742.html">ACL 访问控制列表 </a></li>
+<li><a href="/posts/240130190208.html"> 路由表、转发表与快速转发工作原理 </a></li>
+<li><a href="/posts/231221200716.html">VXLAN 网络虚拟化技术 </a></li>
+<li><a href="/posts/240903191243.html">TCP/IP checksum 计算 </a></li>
+<li><a href="/posts/240911185603.html"> 抓包分析 TCP 三次握手与四次挥手过程 </a></li>
+</ul>
+<h2 id="操作系统"> 操作系统 </h2>
+<ul>
+<li><a href="/posts/230921190726.html"> 概述 </a></li>
+<li><a href="/posts/230924172528.html"> 中断 &amp; 异常 &amp; 系统调用 </a></li>
+<li><a href="/posts/231017195157.html"> 内存分层体系与地址空间生成 </a></li>
+<li><a href="/posts/231108195351.html"> 连续内存分配 </a></li>
+<li><a href="/posts/231111172507.html"> 非连续内存分配之分段与分页 </a></li>
+<li><a href="/posts/231119170537.html"> 非连续内存分配之页表 </a></li>
+<li><a href="/posts/231123184526.html"> 内存管理之覆盖技术与交换技术 </a></li>
+<li><a href="/posts/231127193658.html"> 内存管理之虚存技术 </a></li>
+<li><a href="/posts/231129182631.html"> 局部页面置换算法 </a></li>
+<li><a href="/posts/231207184239.html"> 全局页面置换算法 </a></li>
+<li><a href="/posts/231207204958.html"> 进程描述 </a></li>
+<li><a href="/posts/231210211306.html"> 进程状态 </a></li>
+<li><a href="/posts/231215213932.html"> 线程 </a></li>
+<li><a href="/posts/231218220813.html"> 进程控制 </a></li>
+<li><a href="/posts/231228193143.html"> 调度 </a></li>
+<li><a href="/posts/240104202828.html"> 同步与互斥 </a></li>
+<li><a href="/posts/240113115605.html"> 信号量与管程 </a></li>
+<li><a href="/posts/240205182643.html"> 经典同步问题 </a></li>
+<li><a href="/posts/240310162231.html"> 死锁 </a></li>
+</ul>
+<h2 id="系统与网络编程"> 系统与网络编程 </h2>
+<ul>
+<li><a href="/posts/230911151334.html">pthread 库 </a></li>
+<li><a href="/posts/230921094127.html"> 锁与原子操作 </a></li>
+<li><a href="/posts/240319195609.html"> 读者写者问题 </a></li>
+<li><a href="/posts/240527200241.html"> 网络编程卷一阅读随笔 </a></li>
+<li><a href="/posts/240414190410.html"> 进程间通信 IPC 机制 </a></li>
+<li><a href="/posts/240424200123.html"> 多进程相关练习 </a></li>
+<li><a href="/posts/240516221527.html">I/O 模式与 I/O 多路复用 </a></li>
+<li><a href="/posts/240626192803.html">Linux 内核 kfifo 环形队列 </a></li>
+<li><a href="/posts/241009203126.html">Linux 内核等待队列 </a></li>
+<li><a href="/posts/240627210637.html">DPDK 无锁环形队列 </a></li>
+<li><a href="/posts/240919200410.html"> 解密内存屏障 </a></li>
+<li><a href="/posts/240927202500.html"> 内核线程的创建 </a></li>
+<li><a href="/posts/241015195205.html">Linux 网络数据包接收过程 </a></li>
+<li><a href="/posts/2410232111015.html"> 源码解读 epoll 实现原理 </a></li>
+<li><a href="/posts/241106182619.html">Linux 文件系统 </a></li>
+<li><a href="/posts/250619154429.html">Libevent 高性能 IO 事件驱动库 </a></li>
+</ul>
+<h2 id="工具与命令"> 工具与命令 </h2>
+<ul>
+<li><a href="/posts/240207180410.html">GCC 编译过程分解 </a></li>
+<li><a href="/posts/240312184132.html">GDB 调试入门 </a></li>
+<li><a href="/posts/240512184921.html">Makefile 学习 </a></li>
+<li><a href="/posts/250629214430.html">CMake 学习 </a></li>
+<li><a href="/posts/240417193754.html">Linux 命令之文件权限 </a></li>
+</ul>
+<h2 id="开源项目"> 开源项目 </h2>
+<ul>
+<li><a href="/posts/240303201855.html"> 线程池原理与实现 </a></li>
+<li><a href="/posts/240507194549.html">HTTP 服务器实现 </a></li>
+<li><a href="/posts/240904203605.html"> 聊天服务器实现 </a></li>
+<li><a href="/posts/241119182636.html">Linux 文件系统 </a></li>
+</ul>
+<h2 id="Docker">Docker</h2>
+<ul>
+<li><a href="/posts/230909171809.html">Docker 学习笔记 </a></li>
+</ul>
+<h1 id="LeetCode 刷题">LeetCode 刷题 </h1>
+<h2 id="链表相关"> 链表相关 </h2>
+<ul>
+<li><a href="/posts/231025143947.html">160 相交链表 </a></li>
+<li><a href="/posts/231025185947.html">206 反转链表 </a></li>
+<li><a href="/posts/231026101239.html">21 合并两个有序链表 </a></li>
+<li><a href="/posts/231026184514.html">83 删除排序链表中的重复元素 </a></li>
+<li><a href="/posts/231027150243.html">19 删除链表的倒数第 N 个节点 </a></li>
+<li><a href="/posts/231031120718.html">2 两数相加 </a></li>
+<li><a href="/posts/231031163133.html">445 两数相加 II</a></li>
+<li><a href="/posts/231101094219.html">234 回文链表 </a></li>
+<li><a href="/posts/231101135228.html">725 分隔链表 </a></li>
+<li><a href="/posts/231102120708.html">328 奇偶链表 </a></li>
+<li><a href="/posts/231102165703.html">142 环形链表 II</a></li>
+</ul>
+<h2 id="设计"> 设计 </h2>
+<ul>
+<li><a href="/posts/231201184542.html">146 LRU 缓存 </a></li>
+</ul>
+<h2 id="贪心算法"> 贪心算法 </h2>
+<ul>
+<li><a href="/posts/231107094652.html">1029 两地调度 </a></li>
+<li><a href="/posts/231109150855.html">435 无重叠区间 </a></li>
+</ul>
+<h2 id="哈希表"> 哈希表 </h2>
+<ul>
+<li><a href="/posts/231123181539.html">1410 实体解析器 </a></li>
+</ul>
+<h2 id="树的遍历"> 树的遍历 </h2>
+<ul>
+<li><a href="/posts/231103121209.html">117 填充每个节点的下一个右侧节点指针 II</a></li>
+</ul>
+<h2 id="深度优先搜索（递归）"> 深度优先搜索（递归）</h2>
+<ul>
+<li><a href="/posts/231206201243.html">2477 达到首都的最少油耗 </a></li>
+</ul>
+<h2 id="图或路径问题"> 图或路径问题 </h2>
+<ul>
+<li><a href="/posts/231211184652.html">1631 最小体力消耗路径 </a></li>
+</ul>
+<h2 id="其它"> 其它 </h2>
+<ul>
+<li><a href="/posts/230101120000.html"> 备忘录 </a></li>
+</ul>
+
+</div>
+
+
+<script src="/js/book-menu.js"></script>
+
+    </div>
+    <div class="sidebar-toggle" onclick="sidebar_toggle()" onmouseover="add_inner()" onmouseleave="remove_inner()">
+  <div class="sidebar-toggle-inner"></div>
+</div>
+
+<script>
+function add_inner() {
+  let inner = document.querySelector('.sidebar-toggle-inner')
+  inner.classList.add('show')  
+}
+
+function remove_inner() {
+  let inner = document.querySelector('.sidebar-toggle-inner')
+  inner.classList.remove('show')
+}
+
+function sidebar_toggle() {
+    let sidebar_toggle = document.querySelector('.sidebar-toggle')
+    let sidebar = document.querySelector('.book-sidebar')
+    let content = document.querySelector('.off-canvas-content')
+    if (sidebar_toggle.classList.contains('extend')) { // show
+        sidebar_toggle.classList.remove('extend')
+        sidebar.classList.remove('hide')
+        content.classList.remove('extend')
+    }
+    else { // hide
+        sidebar_toggle.classList.add('extend')
+        sidebar.classList.add('hide')
+        content.classList.add('extend')
+    }
+}
+</script>
+
+      <div class="off-canvas-content">
+        <div class="columns">
+          <div class="column col-10 col-lg-12">
+            <div class="book-navbar">
+              <!-- For Responsive Layout -->
+
+<header class="navbar">
+  <section class="navbar-section">
+    <a onclick="open_sidebar()">
+      <i class="icon icon-menu"></i>
+    </a>
+  </section>
+</header>
+
+            </div>
+            <div class="book-content">
+              <div class="book-post">
+  <p>tinyhttpd 是一个简易的 HTTP 服务器，支持 CGI。代码量少，非常容易阅读，十分适合网络编程初学者学习的项目。麻雀虽小，五脏俱全。在 tinyhttpd 中可以学到 linux 上进程的创建、管道的使用。Linux 下 socket 编程基本方法和 HTTP 协议的最基本结构。</p>
+<span id="more"></span>
+<h1 id="函数描述">函数描述</h1>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">error_die</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *)</span>;       <span class="comment">// 异常信息写到 perror 并退出</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">get_line</span><span class="params">(<span class="type">int</span>, <span class="type">char</span> *, <span class="type">int</span>)</span>;     <span class="comment">// 读取 request headers 的一行，把回车换行等情况都统一为换行符结束</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">cat</span><span class="params">(<span class="type">int</span>, FILE *)</span>;              <span class="comment">// 读取 server 上的一个文件，写到 client socket</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">serve_file</span><span class="params">(<span class="type">int</span>, <span class="type">const</span> <span class="type">char</span> *)</span>; <span class="comment">// 调用响应头并调用 cat 函数，将 server 上的文件发给 client</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">headers</span><span class="params">(<span class="type">int</span>, <span class="type">const</span> <span class="type">char</span> *)</span>;    <span class="comment">// 构造 200 OK 的响应头部，写到套接字</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">bad_request</span><span class="params">(<span class="type">int</span>)</span>;              <span class="comment">// 返回给客户端一个 400 BAD REQUEST 响应报文</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">not_found</span><span class="params">(<span class="type">int</span>)</span>;                <span class="comment">// 返回给客户端一个 404 NOT FOUND 响应报文</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">cannot_execute</span><span class="params">(<span class="type">int</span>)</span>;           <span class="comment">// 返回给客户端一个 500 Internal Server Error 响应报文，主要处理发生在执行 CGI 程序时出现的错误</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">unimplemented</span><span class="params">(<span class="type">int</span>)</span>;            <span class="comment">// 返回给客户端一个 501 Method Not Implemented 响应报文，表明 httpd 服务器不支持该方法</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">startup</span><span class="params">(u_short *)</span>;             <span class="comment">// 建立 HTTP 服务，包括创建套接字、绑定端口、监听客户端等</span></span><br><span class="line"><span class="type">void</span> *<span class="title function_">accept_request</span><span class="params">(<span class="type">void</span> *)</span>;       <span class="comment">// 处理 server 监听到的 client socket 的一个 HTTP 请求，在这里体现了服务器处理请求的流程</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">execute_cgi</span><span class="params">(<span class="type">int</span>, <span class="type">const</span> <span class="type">char</span> *, <span class="type">const</span> <span class="type">char</span> *, <span class="type">const</span> <span class="type">char</span> *)</span>; <span class="comment">// 执行 CGI 脚本程序，核心执行函数</span></span><br></pre></td></tr></table></figure>
+<p>不熟悉 HTTP 协议的可以看 <a target="_blank" rel="noopener" href="https://blog.csdn.net/chen1415886044/article/details/103748926"> 这篇博客</a>。</p>
+<p><strong>建议源码阅读顺序</strong>：</p>
+<p>main -&gt; startup -&gt; accept_request -&gt; execute_cgi，通晓主要工作流程后，再仔细把每个函数的源码看一看。</p>
+<h1 id="项目结构">项目结构</h1>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">./</span><br><span class="line">├── client  # makefile 编译产生</span><br><span class="line">├── htdocs</span><br><span class="line">│   ├── check.cgi  # 744 &lt;- Linux 文件权限</span><br><span class="line">│   ├── color.c    # 644</span><br><span class="line">│   ├── color.cgi  # 744</span><br><span class="line">│   ├── color_cgi  # 755, makefile 编译产生</span><br><span class="line">│   ├── index.html # 600</span><br><span class="line">│   └── README</span><br><span class="line">├── httpd  # makefile 编译产生</span><br><span class="line">├── httpd.c</span><br><span class="line">├── LICENSE</span><br><span class="line">├── Makefile</span><br><span class="line">├── README.md</span><br><span class="line">└── simpleclient.c</span><br></pre></td></tr></table></figure>
+<h1 id="整体执行流程">整体执行流程</h1>
+<p>整体执行流程图如下：</p>
+<img src="../images/projects/httpServer/httpd-flowchart.png" alt="httpd 执行流程图" width="100%" height="100%">
+<h1 id="工作流程">工作流程</h1>
+<ol>
+<li>
+<p>【setup 函数】服务器启动，在指定端口或随机选取端口绑定 httpd 服务。</p>
+</li>
+<li>
+<p>【main 函数死循环】收到一个 HTTP 请求报文时（其实就是 listen 的端口 accpet 的时候），派生一个线程运行 accept_request 函数。</p>
+</li>
+<li>
+<p>【accept_request 函数】取出 HTTP 请求报文的请求行中的 method (GET 或 POST) 和 url。</p>
+<ul>
+<li>对于 GET 方法，如果有携带参数，则 query_string 指针指向 url 中 ? 后面的 GET 参数。</li>
+<li>格式化 url 到 path 数组，path 表示浏览器请求的服务器文件路径（在 tinyhttpd 中服务器文件位于 htdocs 文件夹下）。当 url 以 / 结尾，或 url 是个目录，则默认在 path 中加上 index.html，表示访问主页。</li>
+<li>如果文件路径合法，对于无参数的 GET 请求，直接输出服务器文件到浏览器，即用 HTTP 格式写到套接字上，跳到流程 10。其他情况（带参数 GET、POST 方式，url 为可执行文件），则调用 excute_cgi 函数执行 cgi 脚本。</li>
+</ul>
+</li>
+<li>
+<p>【excute_cgi 函数】读取整个 HTTP 请求头并丢弃，如果是 POST 则找出 Content-Length 的值并放到环境变量中（后续 POST 请求使用）。然后，把 HTTP 200 状态码写到套接字。建立两个管道，cgi_input 和 cgi_output，并 fork 一个子进程。</p>
+<ul>
+<li>在子进程中，把 STDOUT 重定向到 cgi_output 的写入端，把 STDIN 重定向到 cgi_input 的读取端，关闭 cgi_input 的写入端 和 cgi_output 的读取端。然后，设置 request_method 环境变量，GET 的话设置 query_string 环境变量，POST 的话设置 content_length 环境变量，<strong>这些环境变量都是为了给 cgi 脚本调用</strong>，接着调用 execl 运行 cgi 程序。</li>
+<li>在父进程中，关闭 cgi_input 的读取端和 cgi_output 的写入端。<strong>如果 POST 的话，把 POST 数据写入 cgi_input，已被重定向到 STDIN，读取 cgi_output 管道的输出到客户端，该管道输入是 STDOUT</strong>。接着关闭所有管道，等待子进程结束。这一部分比较乱，见“httpd 执行流程图”的管道流向状态图。</li>
+</ul>
+</li>
+<li>
+<p>关闭与浏览器的连接，完成了一次 HTTP 请求与响应，因为 HTTP 是无连接的。</p>
+</li>
+</ol>
+<blockquote>
+<p>尽管 HTTP 在 TCP 之上运行，但 HTTP 被称为“无连接”是因为它每次请求 - 响应周期都是短暂的，没有保持持久连接状态。这意味着每个请求都需要在客户端和服务器之间建立一个新的 TCP 连接，并在请求完成后立即关闭连接。</p>
+</blockquote>
+<h1 id="项目编译">项目编译</h1>
+<p>Makefile 文件：</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">all: httpd client ./htdocs/color_cgi</span></span><br><span class="line">LIBS = -lpthread <span class="comment">#-lsocket</span></span><br><span class="line"><span class="section">httpd: httpd.c</span></span><br><span class="line">	gcc -g -W -Wall <span class="variable">$(LIBS)</span> -o <span class="variable">$@</span> <span class="variable">$&lt;</span></span><br><span class="line"></span><br><span class="line"><span class="section">client: simpleclient.c</span></span><br><span class="line">	gcc -W -Wall -o <span class="variable">$@</span> <span class="variable">$&lt;</span></span><br><span class="line"></span><br><span class="line"><span class="section">./htdocs/color_cgi: ./htdocs/color.c</span></span><br><span class="line">	gcc -W -Wall -o <span class="variable">$@</span> <span class="variable">$&lt;</span></span><br><span class="line"><span class="section">clean:</span></span><br><span class="line">	rm httpd client ./htdocs/color_cgi</span><br></pre></td></tr></table></figure>
+<h1 id="验证 httpd 服务器">验证 httpd 服务器</h1>
+<img src="../images/projects/httpServer/get-post-url.png" alt="GET 与 POST 请求" width="90%" height="90%">
+<h2 id="CGI- 程序">CGI 程序</h2>
+<p>这里使用 C 语言写一个 CGI 简单程序：通过获取服务器 execute_cgi 函数设置的 CONTENT_LENGTH 环境变量，来拿到请求正文的长度、解析出 color 表单数据，并使用 color 值生成相应的简单页面。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// gcc -o color_cgi color.c</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> MAX_LENGTH (1024)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 函数用于从标准输入读取 POST 数据</span></span><br><span class="line"><span class="type">char</span> *<span class="title function_">get_post_data</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">char</span> *post_data = <span class="literal">NULL</span>;</span><br><span class="line">    <span class="type">char</span> *content_length_str = getenv(<span class="string">&quot;CONTENT_LENGTH&quot;</span>); <span class="comment">// 服务器 execute_cgi 函数设置的</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (content_length_str != <span class="literal">NULL</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="type">int</span> content_length = atoi(content_length_str);</span><br><span class="line">        <span class="keyword">if</span> (content_length &gt; <span class="number">0</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            post_data = (<span class="type">char</span> *)<span class="built_in">malloc</span>((content_length + <span class="number">1</span>) * <span class="keyword">sizeof</span>(<span class="type">char</span>));</span><br><span class="line">            fgets(post_data, content_length + <span class="number">1</span>, <span class="built_in">stdin</span>); <span class="comment">// 从标准输入读取 n 个字节到数组</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> post_data;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// 获取 POST 数据</span></span><br><span class="line">    <span class="type">char</span> *post_data = get_post_data();</span><br><span class="line"></span><br><span class="line">    <span class="type">char</span> color[MAX_LENGTH] = <span class="string">&quot;yellow&quot;</span>; <span class="comment">// 默认颜色为黄色</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (post_data != <span class="literal">NULL</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// 包含 HTTP POST 请求数据的字符串，格式类似于 key1=value1&amp;key2=value2&amp;key3=value3</span></span><br><span class="line">        <span class="type">char</span> *token = strtok(post_data, <span class="string">&quot;&amp;&quot;</span>); <span class="comment">// 返回第一个子字符串（键值对）的指针</span></span><br><span class="line">        <span class="keyword">while</span> (token != <span class="literal">NULL</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="type">char</span> key[MAX_LENGTH], value[MAX_LENGTH];</span><br><span class="line">            <span class="built_in">sscanf</span>(token, <span class="string">&quot;%[^=]=%s&quot;</span>, key, value);</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (<span class="built_in">strcmp</span>(key, <span class="string">&quot;color&quot;</span>) == <span class="number">0</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="built_in">strncpy</span>(color, value, MAX_LENGTH - <span class="number">1</span>);</span><br><span class="line">                color[MAX_LENGTH - <span class="number">1</span>] = <span class="string">&#x27;\0&#x27;</span>; <span class="comment">// 确保字符串结尾</span></span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            token = strtok(<span class="literal">NULL</span>, <span class="string">&quot;&amp;&quot;</span>); <span class="comment">// 获取下一个子字符串（键值对）的指针</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 输出 HTML</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Content-type: text/html\r\n\r\n&quot;</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;&lt;!DOCTYPE html&gt;\n&quot;</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;&lt;html&gt;\n&quot;</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;&lt;head&gt;\n&quot;</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;    &lt;title&gt;%s&lt;/title&gt;\n&quot;</span>, color);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;    &lt;style&gt;\n&quot;</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;        body &#123;\n&quot;</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;            background-color: %s;\n&quot;</span>, color);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;        &#125;\n&quot;</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;    &lt;/style&gt;\n&quot;</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;&lt;/head&gt;\n&quot;</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;&lt;body&gt;\n&quot;</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;    &lt;h1&gt;This is %s&lt;/h1&gt;\n&quot;</span>, color);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;&lt;/body&gt;\n&quot;</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;&lt;/html&gt;\n&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 释放内存</span></span><br><span class="line">    <span class="keyword">if</span> (post_data != <span class="literal">NULL</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">free</span>(post_data);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="GET 请求">GET 请求</h2>
+<p><strong>HTTP 请求报文的一般格式</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;request-line&gt;</span><br><span class="line">&lt;request-headers&gt;</span><br><span class="line">&lt;blank line&gt;</span><br><span class="line">&lt;request-body&gt;</span><br></pre></td></tr></table></figure>
+<p>我们通过 Chrome 进行以下请求：</p>
+<ul>
+<li>Request URL: <a target="_blank" rel="noopener" href="http://127.0.0.1:4000/index.html">http://127.0.0.1:4000/index.html</a></li>
+<li>Request Method: GET</li>
+</ul>
+<p>Rqeuest Headers:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">GET /index.html HTTP/1.1  # 请求行</span><br><span class="line">Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9</span><br><span class="line">Accept-Encoding: gzip, deflate</span><br><span class="line">Accept-Language: zh-CN,zh;q=0.9</span><br><span class="line">Connection: keep-alive</span><br><span class="line">Host: 127.0.0.1:4000</span><br><span class="line">Upgrade-Insecure-Requests: 1</span><br><span class="line">User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36</span><br></pre></td></tr></table></figure>
+<p>上述请求的响应报文：</p>
+<p>Response Headers:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">HTTP/1.0 200 OK</span><br><span class="line">Server: jdbhttpd/0.1.0</span><br><span class="line">Content-Type: text/html</span><br></pre></td></tr></table></figure>
+<p>Response Body:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">    &lt;title&gt;Index&lt;/title&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;p&gt;Welcome to J. David&#x27;s webserver.&lt;/p&gt;</span><br><span class="line">    &lt;h1&gt;CGI demo&lt;/h1&gt;</span><br><span class="line">    &lt;form action=&quot;color_cgi&quot; method=&quot;post&quot;&gt;</span><br><span class="line">        Enter a color: &lt;input type=&quot;text&quot; name=&quot;color&quot;&gt;</span><br><span class="line">        &lt;input type=&quot;submit&quot;&gt;</span><br><span class="line">    &lt;/form&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
+<h2 id="POST 请求">POST 请求</h2>
+<p><strong>HTTP 响应报文的一般格式</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;status-line&gt;</span><br><span class="line">&lt;response-headers&gt;</span><br><span class="line">&lt;blank line&gt;</span><br><span class="line">&lt;response-body&gt;</span><br></pre></td></tr></table></figure>
+<p>我们通过 Chrome 进行以下请求：</p>
+<ul>
+<li>Request URL: <a target="_blank" rel="noopener" href="http://127.0.0.1:4000/color_cgi">http://127.0.0.1:4000/color_cgi</a></li>
+<li>Request Method: POST</li>
+<li>这里的 color_cgi 是 color.c 编写的 CGI 程序编译成的可执行文件。</li>
+</ul>
+<p>Rqeuest Headers: 通过页面输入的 Form Data 为 color=gray</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">POST /color_cgi HTTP/1.1  # 请求行</span><br><span class="line">Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9</span><br><span class="line">Accept-Encoding: gzip, deflate</span><br><span class="line">Accept-Language: zh-CN,zh;q=0.9</span><br><span class="line">Cache-Control: max-age=0</span><br><span class="line">Connection: keep-alive</span><br><span class="line">Content-Length: 10  # 请求正文长度，在这里即 `color=gray`</span><br><span class="line">Content-Type: application/x-www-form-urlencoded</span><br><span class="line">Host: 127.0.0.1:4000</span><br><span class="line">Origin: http://127.0.0.1:4000</span><br><span class="line">Referer: http://127.0.0.1:4000/</span><br><span class="line">Upgrade-Insecure-Requests: 1</span><br><span class="line">User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36</span><br></pre></td></tr></table></figure>
+<p>上述请求的响应报文：</p>
+<p>Response Headers:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">HTTP/1.0 200 OK  # 状态行</span><br><span class="line">Content-type: text/html</span><br></pre></td></tr></table></figure>
+<p>Response Body:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">    &lt;title&gt;gray&lt;/title&gt;</span><br><span class="line">    &lt;style&gt;</span><br><span class="line">        body &#123;</span><br><span class="line">            background-color: gray;</span><br><span class="line">        &#125;</span><br><span class="line">    &lt;/style&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;h1&gt;This is gray&lt;/h1&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
+<h1 id="完整源码">完整源码</h1>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br><span class="line">282</span><br><span class="line">283</span><br><span class="line">284</span><br><span class="line">285</span><br><span class="line">286</span><br><span class="line">287</span><br><span class="line">288</span><br><span class="line">289</span><br><span class="line">290</span><br><span class="line">291</span><br><span class="line">292</span><br><span class="line">293</span><br><span class="line">294</span><br><span class="line">295</span><br><span class="line">296</span><br><span class="line">297</span><br><span class="line">298</span><br><span class="line">299</span><br><span class="line">300</span><br><span class="line">301</span><br><span class="line">302</span><br><span class="line">303</span><br><span class="line">304</span><br><span class="line">305</span><br><span class="line">306</span><br><span class="line">307</span><br><span class="line">308</span><br><span class="line">309</span><br><span class="line">310</span><br><span class="line">311</span><br><span class="line">312</span><br><span class="line">313</span><br><span class="line">314</span><br><span class="line">315</span><br><span class="line">316</span><br><span class="line">317</span><br><span class="line">318</span><br><span class="line">319</span><br><span class="line">320</span><br><span class="line">321</span><br><span class="line">322</span><br><span class="line">323</span><br><span class="line">324</span><br><span class="line">325</span><br><span class="line">326</span><br><span class="line">327</span><br><span class="line">328</span><br><span class="line">329</span><br><span class="line">330</span><br><span class="line">331</span><br><span class="line">332</span><br><span class="line">333</span><br><span class="line">334</span><br><span class="line">335</span><br><span class="line">336</span><br><span class="line">337</span><br><span class="line">338</span><br><span class="line">339</span><br><span class="line">340</span><br><span class="line">341</span><br><span class="line">342</span><br><span class="line">343</span><br><span class="line">344</span><br><span class="line">345</span><br><span class="line">346</span><br><span class="line">347</span><br><span class="line">348</span><br><span class="line">349</span><br><span class="line">350</span><br><span class="line">351</span><br><span class="line">352</span><br><span class="line">353</span><br><span class="line">354</span><br><span class="line">355</span><br><span class="line">356</span><br><span class="line">357</span><br><span class="line">358</span><br><span class="line">359</span><br><span class="line">360</span><br><span class="line">361</span><br><span class="line">362</span><br><span class="line">363</span><br><span class="line">364</span><br><span class="line">365</span><br><span class="line">366</span><br><span class="line">367</span><br><span class="line">368</span><br><span class="line">369</span><br><span class="line">370</span><br><span class="line">371</span><br><span class="line">372</span><br><span class="line">373</span><br><span class="line">374</span><br><span class="line">375</span><br><span class="line">376</span><br><span class="line">377</span><br><span class="line">378</span><br><span class="line">379</span><br><span class="line">380</span><br><span class="line">381</span><br><span class="line">382</span><br><span class="line">383</span><br><span class="line">384</span><br><span class="line">385</span><br><span class="line">386</span><br><span class="line">387</span><br><span class="line">388</span><br><span class="line">389</span><br><span class="line">390</span><br><span class="line">391</span><br><span class="line">392</span><br><span class="line">393</span><br><span class="line">394</span><br><span class="line">395</span><br><span class="line">396</span><br><span class="line">397</span><br><span class="line">398</span><br><span class="line">399</span><br><span class="line">400</span><br><span class="line">401</span><br><span class="line">402</span><br><span class="line">403</span><br><span class="line">404</span><br><span class="line">405</span><br><span class="line">406</span><br><span class="line">407</span><br><span class="line">408</span><br><span class="line">409</span><br><span class="line">410</span><br><span class="line">411</span><br><span class="line">412</span><br><span class="line">413</span><br><span class="line">414</span><br><span class="line">415</span><br><span class="line">416</span><br><span class="line">417</span><br><span class="line">418</span><br><span class="line">419</span><br><span class="line">420</span><br><span class="line">421</span><br><span class="line">422</span><br><span class="line">423</span><br><span class="line">424</span><br><span class="line">425</span><br><span class="line">426</span><br><span class="line">427</span><br><span class="line">428</span><br><span class="line">429</span><br><span class="line">430</span><br><span class="line">431</span><br><span class="line">432</span><br><span class="line">433</span><br><span class="line">434</span><br><span class="line">435</span><br><span class="line">436</span><br><span class="line">437</span><br><span class="line">438</span><br><span class="line">439</span><br><span class="line">440</span><br><span class="line">441</span><br><span class="line">442</span><br><span class="line">443</span><br><span class="line">444</span><br><span class="line">445</span><br><span class="line">446</span><br><span class="line">447</span><br><span class="line">448</span><br><span class="line">449</span><br><span class="line">450</span><br><span class="line">451</span><br><span class="line">452</span><br><span class="line">453</span><br><span class="line">454</span><br><span class="line">455</span><br><span class="line">456</span><br><span class="line">457</span><br><span class="line">458</span><br><span class="line">459</span><br><span class="line">460</span><br><span class="line">461</span><br><span class="line">462</span><br><span class="line">463</span><br><span class="line">464</span><br><span class="line">465</span><br><span class="line">466</span><br><span class="line">467</span><br><span class="line">468</span><br><span class="line">469</span><br><span class="line">470</span><br><span class="line">471</span><br><span class="line">472</span><br><span class="line">473</span><br><span class="line">474</span><br><span class="line">475</span><br><span class="line">476</span><br><span class="line">477</span><br><span class="line">478</span><br><span class="line">479</span><br><span class="line">480</span><br><span class="line">481</span><br><span class="line">482</span><br><span class="line">483</span><br><span class="line">484</span><br><span class="line">485</span><br><span class="line">486</span><br><span class="line">487</span><br><span class="line">488</span><br><span class="line">489</span><br><span class="line">490</span><br><span class="line">491</span><br><span class="line">492</span><br><span class="line">493</span><br><span class="line">494</span><br><span class="line">495</span><br><span class="line">496</span><br><span class="line">497</span><br><span class="line">498</span><br><span class="line">499</span><br><span class="line">500</span><br><span class="line">501</span><br><span class="line">502</span><br><span class="line">503</span><br><span class="line">504</span><br><span class="line">505</span><br><span class="line">506</span><br><span class="line">507</span><br><span class="line">508</span><br><span class="line">509</span><br><span class="line">510</span><br><span class="line">511</span><br><span class="line">512</span><br><span class="line">513</span><br><span class="line">514</span><br><span class="line">515</span><br><span class="line">516</span><br><span class="line">517</span><br><span class="line">518</span><br><span class="line">519</span><br><span class="line">520</span><br><span class="line">521</span><br><span class="line">522</span><br><span class="line">523</span><br><span class="line">524</span><br><span class="line">525</span><br><span class="line">526</span><br><span class="line">527</span><br><span class="line">528</span><br><span class="line">529</span><br><span class="line">530</span><br><span class="line">531</span><br><span class="line">532</span><br><span class="line">533</span><br><span class="line">534</span><br><span class="line">535</span><br><span class="line">536</span><br><span class="line">537</span><br><span class="line">538</span><br><span class="line">539</span><br><span class="line">540</span><br><span class="line">541</span><br><span class="line">542</span><br><span class="line">543</span><br><span class="line">544</span><br><span class="line">545</span><br><span class="line">546</span><br><span class="line">547</span><br><span class="line">548</span><br><span class="line">549</span><br><span class="line">550</span><br><span class="line">551</span><br><span class="line">552</span><br><span class="line">553</span><br><span class="line">554</span><br><span class="line">555</span><br><span class="line">556</span><br><span class="line">557</span><br><span class="line">558</span><br><span class="line">559</span><br><span class="line">560</span><br><span class="line">561</span><br><span class="line">562</span><br><span class="line">563</span><br><span class="line">564</span><br><span class="line">565</span><br><span class="line">566</span><br><span class="line">567</span><br><span class="line">568</span><br><span class="line">569</span><br><span class="line">570</span><br><span class="line">571</span><br><span class="line">572</span><br><span class="line">573</span><br><span class="line">574</span><br><span class="line">575</span><br><span class="line">576</span><br><span class="line">577</span><br><span class="line">578</span><br><span class="line">579</span><br><span class="line">580</span><br><span class="line">581</span><br><span class="line">582</span><br><span class="line">583</span><br><span class="line">584</span><br><span class="line">585</span><br><span class="line">586</span><br><span class="line">587</span><br><span class="line">588</span><br><span class="line">589</span><br><span class="line">590</span><br><span class="line">591</span><br><span class="line">592</span><br><span class="line">593</span><br><span class="line">594</span><br><span class="line">595</span><br><span class="line">596</span><br><span class="line">597</span><br><span class="line">598</span><br><span class="line">599</span><br><span class="line">600</span><br><span class="line">601</span><br><span class="line">602</span><br><span class="line">603</span><br><span class="line">604</span><br><span class="line">605</span><br><span class="line">606</span><br><span class="line">607</span><br><span class="line">608</span><br><span class="line">609</span><br><span class="line">610</span><br><span class="line">611</span><br><span class="line">612</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/socket.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;netinet/in.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;arpa/inet.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;ctype.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;strings.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/stat.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;pthread.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/wait.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdint.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdarg.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> ISspace(x) isspace((int)(x)) <span class="comment">// 检查字符是否为空白字符（如空格、换行符等）</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SERVER_STRING <span class="string">&quot;Server: jdbhttpd/0.1.0\r\n&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> MAX_CONNECTS (5) <span class="comment">// 监听（连接）的最大客户端数量</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">error_die</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *)</span>;       <span class="comment">// 异常信息写到 perror 并退出</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">get_line</span><span class="params">(<span class="type">int</span>, <span class="type">char</span> *, <span class="type">int</span>)</span>;     <span class="comment">// 读取 request headers 的一行，把回车换行等情况都统一为换行符结束</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">cat</span><span class="params">(<span class="type">int</span>, FILE *)</span>;              <span class="comment">// 读取 server 上的一个文件，写到 client socket</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">serve_file</span><span class="params">(<span class="type">int</span>, <span class="type">const</span> <span class="type">char</span> *)</span>; <span class="comment">// 调用响应头并调用 cat 函数，将 server 上的文件发给 client</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">headers</span><span class="params">(<span class="type">int</span>, <span class="type">const</span> <span class="type">char</span> *)</span>;    <span class="comment">// 构造 200 OK 的响应头部，写到套接字</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">bad_request</span><span class="params">(<span class="type">int</span>)</span>;              <span class="comment">// 返回给客户端一个 400 BAD REQUEST 响应报文</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">not_found</span><span class="params">(<span class="type">int</span>)</span>;                <span class="comment">// 返回给客户端一个 404 NOT FOUND 响应报文</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">cannot_execute</span><span class="params">(<span class="type">int</span>)</span>;           <span class="comment">// 返回给客户端一个 500 Internal Server Error 响应报文，主要处理发生在执行 CGI 程序时出现的错误</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">unimplemented</span><span class="params">(<span class="type">int</span>)</span>;            <span class="comment">// 返回给客户端一个 501 Method Not Implemented 响应报文，表明 httpd 服务器不支持该方法</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">startup</span><span class="params">(u_short *)</span>;             <span class="comment">// 建立 HTTP 服务，包括创建套接字、绑定端口、监听客户端等</span></span><br><span class="line"><span class="type">void</span> *<span class="title function_">accept_request</span><span class="params">(<span class="type">void</span> *)</span>;       <span class="comment">// 处理 server 监听到的 client socket 的一个 HTTP 请求，在这里体现了服务器处理请求的流程</span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">execute_cgi</span><span class="params">(<span class="type">int</span>, <span class="type">const</span> <span class="type">char</span> *, <span class="type">const</span> <span class="type">char</span> *, <span class="type">const</span> <span class="type">char</span> *)</span>; <span class="comment">// 执行 CGI 脚本程序，核心执行函数</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SEND_BUF_MSG(sock_fd, buf, flags, msg, ...) \</span></span><br><span class="line"><span class="meta">    do                                              \</span></span><br><span class="line"><span class="meta">    &#123;                                               \</span></span><br><span class="line"><span class="meta">        sprintf(buf, msg, ##__VA_ARGS__);           \</span></span><br><span class="line"><span class="meta">        send(sock_fd, buf, strlen(buf), flags);     \</span></span><br><span class="line"><span class="meta">    &#125; while (0)</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> ERROR_REPORT_WITH_EXIT(code, msg) \</span></span><br><span class="line"><span class="meta">    do                                    \</span></span><br><span class="line"><span class="meta">    &#123;                                     \</span></span><br><span class="line"><span class="meta">        <span class="keyword">if</span> ((code) &lt; 0)                   \</span></span><br><span class="line"><span class="meta">        &#123;                                 \</span></span><br><span class="line"><span class="meta">            error_die(msg);               \</span></span><br><span class="line"><span class="meta">        &#125;                                 \</span></span><br><span class="line"><span class="meta">    &#125; while (0)</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> CHECK_POINTER_NON_NULL(ptr)    \</span></span><br><span class="line"><span class="meta">    do                                 \</span></span><br><span class="line"><span class="meta">    &#123;                                  \</span></span><br><span class="line"><span class="meta">        <span class="keyword">if</span> (NULL == (ptr))             \</span></span><br><span class="line"><span class="meta">        &#123;                              \</span></span><br><span class="line"><span class="meta">            error_die(<span class="string">&quot;null pointer&quot;</span>); \</span></span><br><span class="line"><span class="meta">        &#125;                              \</span></span><br><span class="line"><span class="meta">    &#125; while (0)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/**********************************************************************/</span></span><br><span class="line"><span class="comment">/* A request has caused a call to accept() on the server port to</span></span><br><span class="line"><span class="comment"> * return.  Process the request appropriately.</span></span><br><span class="line"><span class="comment"> * Parameters: the socket connected to the client */</span></span><br><span class="line"><span class="comment">/**********************************************************************/</span></span><br><span class="line"><span class="type">void</span> *<span class="title function_">accept_request</span><span class="params">(<span class="type">void</span> *arg)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> c_sock_fd = (<span class="type">intptr_t</span>)arg;</span><br><span class="line">    <span class="type">char</span> buf[<span class="number">1024</span>];</span><br><span class="line">    <span class="type">size_t</span> numchars;</span><br><span class="line">    <span class="type">char</span> method[<span class="number">255</span>];</span><br><span class="line">    <span class="type">char</span> url[<span class="number">255</span>];</span><br><span class="line">    <span class="type">char</span> path[<span class="number">512</span>];</span><br><span class="line">    <span class="type">size_t</span> i, j;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">stat</span> <span class="title">st</span>;</span></span><br><span class="line">    <span class="type">int</span> cgi = <span class="number">0</span>; <span class="comment">/* becomes true if server decides this is a CGI program */</span></span><br><span class="line">    <span class="type">char</span> *query_string = <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * 读取 HTTP 请求报文的第一行数据，假如访问 https://www.google.com/search?q=socket</span></span><br><span class="line"><span class="comment">     * 那么，HTTP 请求报文的第一行数据是：GET /search?q=socket HTTP/1.1</span></span><br><span class="line"><span class="comment">     * HTTP 请求报文组成：</span></span><br><span class="line"><span class="comment">     *      请求方法 请求 URL HTTP 协议及版本</span></span><br><span class="line"><span class="comment">     *      请求报文头</span></span><br><span class="line"><span class="comment">     *      \r\n</span></span><br><span class="line"><span class="comment">     *      请求报文体</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    numchars = get_line(c_sock_fd, buf, <span class="keyword">sizeof</span>(buf));</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 将请求方法存到 method 缓冲区 */</span></span><br><span class="line">    i = <span class="number">0</span>, j = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">while</span> (!ISspace(buf[i]) &amp;&amp; (i &lt; <span class="keyword">sizeof</span>(method) - <span class="number">1</span>)) <span class="comment">// 遍历到空白字符或缓存满为止</span></span><br><span class="line">    &#123;</span><br><span class="line">        method[i] = buf[i];</span><br><span class="line">        i++;</span><br><span class="line">    &#125;</span><br><span class="line">    j = i; <span class="comment">// 指向第一行数据的首个空白字符或缓存满的位置</span></span><br><span class="line">    method[i] = <span class="string">&#x27;\0&#x27;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 若请求的方法既不是 GET 或 POST，则发送 HTTP 响应报文，通知客户端请求的 Web 方法尚未实现 */</span></span><br><span class="line">    <span class="keyword">if</span> ((<span class="number">0</span> != strcasecmp(method, <span class="string">&quot;GET&quot;</span>)) &amp;&amp; (<span class="number">0</span> != strcasecmp(method, <span class="string">&quot;POST&quot;</span>)))</span><br><span class="line">    &#123;</span><br><span class="line">        unimplemented(c_sock_fd);</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    i = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">while</span> (ISspace(buf[j]) &amp;&amp; (j &lt; numchars)) <span class="comment">// 跳过请求方法后面的所有空白字符（空格）</span></span><br><span class="line">    &#123;</span><br><span class="line">        j++;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 将 HTTP 请求报文的请求 URL 存到 url 缓冲区 */</span></span><br><span class="line">    <span class="keyword">while</span> (!ISspace(buf[j]) &amp;&amp; (i &lt; <span class="keyword">sizeof</span>(url) - <span class="number">1</span>) &amp;&amp; (j &lt; numchars))</span><br><span class="line">    &#123;</span><br><span class="line">        url[i++] = buf[j++];</span><br><span class="line">    &#125;</span><br><span class="line">    url[i] = <span class="string">&#x27;\0&#x27;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 若请求的方法是 POST，则服务器认为是 CGI 程序 */</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="number">0</span> == strcasecmp(method, <span class="string">&quot;POST&quot;</span>))</span><br><span class="line">    &#123;</span><br><span class="line">        cgi = <span class="number">1</span>; <span class="comment">// 使能 CGI 标志</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * 若请求的方法是 GET，且在 url 中检查到 ? 字符，</span></span><br><span class="line"><span class="comment">     * 则服务器认为是 CGI 程序，并从 ? 位置分隔 url 缓存区为两份字符串</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (<span class="number">0</span> == strcasecmp(method, <span class="string">&quot;GET&quot;</span>))</span><br><span class="line">    &#123;</span><br><span class="line">        query_string = url;</span><br><span class="line">        <span class="keyword">while</span> ((*query_string != <span class="string">&#x27;?&#x27;</span>) &amp;&amp; (*query_string != <span class="string">&#x27;\0&#x27;</span>)) <span class="comment">// 遍历到 ? 字符或 \0 结束符为止</span></span><br><span class="line">        &#123;</span><br><span class="line">            query_string++;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (*query_string == <span class="string">&#x27;?&#x27;</span>) <span class="comment">// 检查是 ? 字符还是 url 的 \0 导致的跳出循环</span></span><br><span class="line">        &#123;</span><br><span class="line">            cgi = <span class="number">1</span>;              <span class="comment">// 使能 CGI 标志</span></span><br><span class="line">            *query_string = <span class="string">&#x27;\0&#x27;</span>; <span class="comment">// 从 ? 位置分隔 url 缓存区为两份字符串</span></span><br><span class="line">            query_string++;       <span class="comment">// 指向后一份字符串的起始位置（? 字符的下一个字符位置）</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 将 url 字符串的第一份（可能未分隔，只有一份）拼接在 htdocs 后面，并存储在 path 缓冲区</span></span><br><span class="line">    <span class="built_in">sprintf</span>(path, <span class="string">&quot;htdocs%s&quot;</span>, url);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 如果 path 缓冲区以 / 结尾，则拼接 index.html，即 Web 首页的意思</span></span><br><span class="line">    <span class="keyword">if</span> (path[<span class="built_in">strlen</span>(path) - <span class="number">1</span>] == <span class="string">&#x27;/&#x27;</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">strcat</span>(path, <span class="string">&quot;index.html&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 在服务器端中查找 path 缓冲区中的文件的状态信息，并将状态信息存储到 struct stat 指向的变量 */</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="number">-1</span> == stat(path, &amp;st))</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">/*</span></span><br><span class="line"><span class="comment">         * 如果文件不存在，则按行读取 HTTP 请求的 headers，但都忽略掉；</span></span><br><span class="line"><span class="comment">         * 并向客户端发送 404 NOT FOUND&#x27;s response</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        <span class="keyword">while</span> ((numchars &gt; <span class="number">0</span>) &amp;&amp; (<span class="number">0</span> != <span class="built_in">strcmp</span>(<span class="string">&quot;\n&quot;</span>, buf))) <span class="comment">/* read &amp; discard headers */</span></span><br><span class="line">        &#123;</span><br><span class="line">            numchars = get_line(c_sock_fd, buf, <span class="keyword">sizeof</span>(buf));</span><br><span class="line">        &#125;</span><br><span class="line">        not_found(c_sock_fd);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">/* 若文件类型为目录，则对路径拼接 index.html 首页 Web 文件 */</span></span><br><span class="line">        <span class="keyword">if</span> (S_ISDIR(st.st_mode))</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="built_in">strcat</span>(path, <span class="string">&quot;/index.html&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">/* 判断文件是否具有执行权限（任意用户），若是则使能 CGI 标志（才有权限执行 CGI 程序）*/</span></span><br><span class="line">        <span class="keyword">if</span> ((st.st_mode &amp; S_IXUSR) || (st.st_mode &amp; S_IXGRP) || (st.st_mode &amp; S_IXOTH))</span><br><span class="line">        &#123;</span><br><span class="line">            cgi = <span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">/* 使能或未使能 CGI 对应不同动作 */</span></span><br><span class="line">        <span class="keyword">if</span> (cgi)</span><br><span class="line">        &#123;</span><br><span class="line">            execute_cgi(c_sock_fd, path, method, query_string);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">        &#123;</span><br><span class="line">            serve_file(c_sock_fd, path); <span class="comment">// 将服务器上的文件发给客户端</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    close(c_sock_fd);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**********************************************************************/</span></span><br><span class="line"><span class="comment">/* Inform the client that a request it has made has a problem.</span></span><br><span class="line"><span class="comment"> * Parameters: client socket */</span></span><br><span class="line"><span class="comment">/**********************************************************************/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">bad_request</span><span class="params">(<span class="type">int</span> c_sock_fd)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">char</span> buf[<span class="number">1024</span>];</span><br><span class="line">    SEND_BUF_MSG(c_sock_fd, buf, <span class="number">0</span>, <span class="string">&quot;HTTP/1.0 400 BAD REQUEST\r\n&quot;</span>);</span><br><span class="line">    SEND_BUF_MSG(c_sock_fd, buf, <span class="number">0</span>, <span class="string">&quot;Content-type: text/html\r\n&quot;</span>);</span><br><span class="line">    SEND_BUF_MSG(c_sock_fd, buf, <span class="number">0</span>, <span class="string">&quot;\r\n&quot;</span>);</span><br><span class="line">    SEND_BUF_MSG(c_sock_fd, buf, <span class="number">0</span>, <span class="string">&quot;&lt;P&gt;Your browser sent a bad request, &quot;</span>);</span><br><span class="line">    SEND_BUF_MSG(c_sock_fd, buf, <span class="number">0</span>, <span class="string">&quot;such as a POST without a Content-Length.\r\n&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**********************************************************************/</span></span><br><span class="line"><span class="comment">/* Put the entire contents of a file out on a socket.  This function</span></span><br><span class="line"><span class="comment"> * is named after the UNIX &quot;cat&quot; command, because it might have been</span></span><br><span class="line"><span class="comment"> * easier just to do something like pipe, fork, and exec(&quot;cat&quot;).</span></span><br><span class="line"><span class="comment"> * Parameters: the client socket descriptor</span></span><br><span class="line"><span class="comment"> *             FILE pointer for the file to cat */</span></span><br><span class="line"><span class="comment">/**********************************************************************/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">cat</span><span class="params">(<span class="type">int</span> c_sock_fd, FILE *resource)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">char</span> buf[<span class="number">1024</span>];</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 不断地从文件流中读取一行数据，然后发给客户端，直到 End of File 为止 */</span></span><br><span class="line">    fgets(buf, <span class="keyword">sizeof</span>(buf), resource);</span><br><span class="line">    <span class="keyword">while</span> (!feof(resource))</span><br><span class="line">    &#123;</span><br><span class="line">        send(c_sock_fd, buf, <span class="built_in">strlen</span>(buf), <span class="number">0</span>);</span><br><span class="line">        fgets(buf, <span class="keyword">sizeof</span>(buf), resource);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**********************************************************************/</span></span><br><span class="line"><span class="comment">/* Inform the client that a CGI script could not be executed.</span></span><br><span class="line"><span class="comment"> * Parameter: the client socket descriptor. */</span></span><br><span class="line"><span class="comment">/**********************************************************************/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">cannot_execute</span><span class="params">(<span class="type">int</span> c_sock_fd)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">char</span> buf[<span class="number">1024</span>];</span><br><span class="line">    SEND_BUF_MSG(c_sock_fd, buf, <span class="number">0</span>, <span class="string">&quot;HTTP/1.0 500 Internal Server Error\r\n&quot;</span>);</span><br><span class="line">    SEND_BUF_MSG(c_sock_fd, buf, <span class="number">0</span>, <span class="string">&quot;Content-type: text/html\r\n&quot;</span>);</span><br><span class="line">    SEND_BUF_MSG(c_sock_fd, buf, <span class="number">0</span>, <span class="string">&quot;\r\n&quot;</span>);</span><br><span class="line">    SEND_BUF_MSG(c_sock_fd, buf, <span class="number">0</span>, <span class="string">&quot;&lt;P&gt;Error prohibited CGI execution.\r\n&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**********************************************************************/</span></span><br><span class="line"><span class="comment">/* Print out an error message with perror() (for system errors; based</span></span><br><span class="line"><span class="comment"> * on value of errno, which indicates system call errors) and exit the</span></span><br><span class="line"><span class="comment"> * program indicating an error. */</span></span><br><span class="line"><span class="comment">/**********************************************************************/</span></span><br><span class="line"><span class="keyword">inline</span> <span class="type">void</span> <span class="title function_">error_die</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *sc)</span></span><br><span class="line">&#123;</span><br><span class="line">    perror(sc);</span><br><span class="line">    <span class="built_in">exit</span>(EXIT_FAILURE);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**********************************************************************/</span></span><br><span class="line"><span class="comment">/* Execute a CGI script.  Will need to set environment variables as</span></span><br><span class="line"><span class="comment"> * appropriate.</span></span><br><span class="line"><span class="comment"> * Parameters: client socket descriptor</span></span><br><span class="line"><span class="comment"> *             path to the CGI script */</span></span><br><span class="line"><span class="comment">/**********************************************************************/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">execute_cgi</span><span class="params">(<span class="type">int</span> c_sock_fd, <span class="type">const</span> <span class="type">char</span> *path,</span></span><br><span class="line"><span class="params">                 <span class="type">const</span> <span class="type">char</span> *method, <span class="type">const</span> <span class="type">char</span> *query_string)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">char</span> buf[<span class="number">1024</span>] = &#123;<span class="string">&#x27;A&#x27;</span>, <span class="string">&#x27;\0&#x27;</span>&#125;;</span><br><span class="line">    <span class="type">int</span> cgi_output[<span class="number">2</span>]; <span class="comment">// 管道的读端与写端文件描述符</span></span><br><span class="line">    <span class="type">int</span> cgi_input[<span class="number">2</span>];</span><br><span class="line">    <span class="type">pid_t</span> cpid;</span><br><span class="line">    <span class="type">int</span> w_status;</span><br><span class="line">    <span class="type">int</span> iter;</span><br><span class="line">    <span class="type">char</span> c;</span><br><span class="line">    <span class="type">int</span> numchars = <span class="number">1</span>; <span class="comment">// 初始时 buf 的长度</span></span><br><span class="line">    <span class="type">int</span> content_length = <span class="number">-1</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * <span class="doctag">NOTE:</span> 因为这个函数被 accpect 函数调用（内部处理了客户端请求报文的请求行），</span></span><br><span class="line"><span class="comment">     * 故这里是从请求报头（第二行数据）开始接收处理的，但从请求行开始处理也没问题</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 按行读取 HTTP 请求 headers，但都忽略掉 */</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="number">0</span> == strcasecmp(method, <span class="string">&quot;GET&quot;</span>))</span><br><span class="line">    &#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span> ((numchars &gt; <span class="number">0</span>) &amp;&amp; (<span class="number">0</span> != <span class="built_in">strcmp</span>(<span class="string">&quot;\n&quot;</span>, buf))) <span class="comment">/* read &amp; discard headers */</span></span><br><span class="line">        &#123;</span><br><span class="line">            numchars = get_line(c_sock_fd, buf, <span class="keyword">sizeof</span>(buf));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">/* 按行读取 HTTP 请求的 headers 并截断，获取 POST 方法中的 `Content-Length:` 的值 */</span></span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (<span class="number">0</span> == strcasecmp(method, <span class="string">&quot;POST&quot;</span>))</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">while</span> ((numchars &gt; <span class="number">0</span>) &amp;&amp; (<span class="number">0</span> != <span class="built_in">strcmp</span>(<span class="string">&quot;\n&quot;</span>, buf)))</span><br><span class="line">        &#123;</span><br><span class="line">            buf[<span class="number">15</span>] = <span class="string">&#x27;\0&#x27;</span>;</span><br><span class="line">            <span class="keyword">if</span> (<span class="number">0</span> == strcasecmp(buf, <span class="string">&quot;Content-Length:&quot;</span>))</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="comment">/* 请求格式：Content-Length: 28，从子串中获取 Body 内容长度 */</span></span><br><span class="line">                content_length = atoi(&amp;(buf[<span class="number">16</span>]));</span><br><span class="line">                <span class="comment">/* break; */</span> <span class="comment">// 把 headers 接收完，所有不提前退出</span></span><br><span class="line">            &#125;</span><br><span class="line">            numchars = get_line(c_sock_fd, buf, <span class="keyword">sizeof</span>(buf));</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (<span class="number">-1</span> == content_length)</span><br><span class="line">        &#123;</span><br><span class="line">            bad_request(c_sock_fd);</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> <span class="comment">/* HEAD or other */</span></span><br><span class="line">    &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 创建 CGI 脚本的输入、输出管道 */</span></span><br><span class="line">    <span class="keyword">if</span> (pipe(cgi_output) &lt; <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        cannot_execute(c_sock_fd);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (pipe(cgi_input) &lt; <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        cannot_execute(c_sock_fd);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    cpid = fork();</span><br><span class="line">    <span class="keyword">if</span> (cpid &lt; <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        cannot_execute(c_sock_fd);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    SEND_BUF_MSG(c_sock_fd, buf, <span class="number">0</span>, <span class="string">&quot;HTTP/1.0 200 OK\r\n&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (<span class="number">0</span> == cpid) <span class="comment">/* child process: CGI script */</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="type">char</span> meth_env[<span class="number">255</span>];</span><br><span class="line">        <span class="type">char</span> query_env[<span class="number">255</span>];</span><br><span class="line">        <span class="type">char</span> length_env[<span class="number">255</span>];</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* 将标准输出（输入）重定向到 CGI 输出（输入）管道的写端（读端），并关闭不使用的一端 */</span></span><br><span class="line">        dup2(cgi_output[<span class="number">1</span>], STDOUT_FILENO);</span><br><span class="line">        dup2(cgi_input[<span class="number">0</span>], STDIN_FILENO);</span><br><span class="line">        close(cgi_output[<span class="number">0</span>]);</span><br><span class="line">        close(cgi_input[<span class="number">1</span>]);</span><br><span class="line"></span><br><span class="line">        <span class="built_in">sprintf</span>(meth_env, <span class="string">&quot;REQUEST_METHOD=%s&quot;</span>, method);</span><br><span class="line">        putenv(meth_env);</span><br><span class="line">        <span class="keyword">if</span> (<span class="number">0</span> == strcasecmp(method, <span class="string">&quot;GET&quot;</span>))</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="built_in">sprintf</span>(query_env, <span class="string">&quot;QUERY_STRING=%s&quot;</span>, query_string);</span><br><span class="line">            putenv(query_env);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">        &#123; <span class="comment">/* POST */</span></span><br><span class="line">            <span class="built_in">sprintf</span>(length_env, <span class="string">&quot;CONTENT_LENGTH=%d&quot;</span>, content_length);</span><br><span class="line">            putenv(length_env);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        close(cgi_output[<span class="number">1</span>]); <span class="comment">// 调用 execl 前关闭 fd</span></span><br><span class="line">        close(cgi_input[<span class="number">0</span>]);</span><br><span class="line"></span><br><span class="line">        execl(path, <span class="string">&quot;&quot;</span>, <span class="literal">NULL</span>); <span class="comment">// `&quot;&quot;` 消除 warning</span></span><br><span class="line">        _exit(EXIT_FAILURE);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123; <span class="comment">/* parent process */</span></span><br><span class="line">        close(cgi_output[<span class="number">1</span>]);</span><br><span class="line">        close(cgi_input[<span class="number">0</span>]);</span><br><span class="line">        <span class="keyword">if</span> (<span class="number">0</span> == strcasecmp(method, <span class="string">&quot;POST&quot;</span>))</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">for</span> (iter = <span class="number">0</span>; iter &lt; content_length; iter++)</span><br><span class="line">            &#123;</span><br><span class="line">                recv(c_sock_fd, &amp;c, <span class="number">1</span>, <span class="number">0</span>);</span><br><span class="line">                write(cgi_input[<span class="number">1</span>], &amp;c, <span class="number">1</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">while</span> (read(cgi_output[<span class="number">0</span>], &amp;c, <span class="number">1</span>) &gt; <span class="number">0</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            send(c_sock_fd, &amp;c, <span class="number">1</span>, <span class="number">0</span>); <span class="comment">// With a zero flags argument, send() is equivalent to write()</span></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        close(cgi_output[<span class="number">0</span>]);</span><br><span class="line">        close(cgi_input[<span class="number">1</span>]);</span><br><span class="line">        waitpid(cpid, &amp;w_status, <span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**********************************************************************/</span></span><br><span class="line"><span class="comment">/* Get a line from a socket, whether the line ends in a newline,</span></span><br><span class="line"><span class="comment"> * carriage return, or a CRLF combination.  Terminates the string read</span></span><br><span class="line"><span class="comment"> * with a null character.  If no newline indicator is found before the</span></span><br><span class="line"><span class="comment"> * end of the buffer, the string is terminated with a null.  If any of</span></span><br><span class="line"><span class="comment"> * the above three line terminators is read, the last character of the</span></span><br><span class="line"><span class="comment"> * string will be a linefeed and the string will be terminated with a</span></span><br><span class="line"><span class="comment"> * null character.</span></span><br><span class="line"><span class="comment"> * Parameters: the socket descriptor</span></span><br><span class="line"><span class="comment"> *             the buffer to save the data in</span></span><br><span class="line"><span class="comment"> *             the size of the buffer</span></span><br><span class="line"><span class="comment"> * Returns: the number of bytes stored (excluding null) */</span></span><br><span class="line"><span class="comment">/**********************************************************************/</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">get_line</span><span class="params">(<span class="type">int</span> sock_fd, <span class="type">char</span> *buf, <span class="type">int</span> size)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> i = <span class="number">0</span>;</span><br><span class="line">    <span class="type">char</span> c = <span class="string">&#x27;\0&#x27;</span>;</span><br><span class="line">    <span class="type">int</span> recv_bytes;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> ((i &lt; size - <span class="number">1</span>) &amp;&amp; (c != <span class="string">&#x27;\n&#x27;</span>))</span><br><span class="line">    &#123;</span><br><span class="line">        recv_bytes = recv(sock_fd, &amp;c, <span class="number">1</span>, <span class="number">0</span>);</span><br><span class="line">        <span class="keyword">if</span> (recv_bytes &gt; <span class="number">0</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span> (c == <span class="string">&#x27;\r&#x27;</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                recv_bytes = recv(sock_fd, &amp;c, <span class="number">1</span>, MSG_PEEK); <span class="comment">// 预读一个字节，不从管道弹出</span></span><br><span class="line">                <span class="keyword">if</span> ((recv_bytes &gt; <span class="number">0</span>) &amp;&amp; (c == <span class="string">&#x27;\n&#x27;</span>))</span><br><span class="line">                &#123;</span><br><span class="line">                    recv(sock_fd, &amp;c, <span class="number">1</span>, <span class="number">0</span>);</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">else</span></span><br><span class="line">                &#123;</span><br><span class="line">                    c = <span class="string">&#x27;\n&#x27;</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            buf[i] = c;</span><br><span class="line">            i++;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">        &#123;</span><br><span class="line">            c = <span class="string">&#x27;\n&#x27;</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    buf[i] = <span class="string">&#x27;\0&#x27;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> i;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**********************************************************************/</span></span><br><span class="line"><span class="comment">/* Return the informational HTTP headers about a file. */</span></span><br><span class="line"><span class="comment">/* Parameters: the socket to print the headers on</span></span><br><span class="line"><span class="comment"> *             the name of the file */</span></span><br><span class="line"><span class="comment">/**********************************************************************/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">headers</span><span class="params">(<span class="type">int</span> c_sock_fd, <span class="type">const</span> <span class="type">char</span> *filename)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">char</span> buf[<span class="number">1024</span>];</span><br><span class="line">    (<span class="type">void</span>)filename; <span class="comment">/* could use filename to determine file type */</span></span><br><span class="line"></span><br><span class="line">    SEND_BUF_MSG(c_sock_fd, buf, <span class="number">0</span>, <span class="string">&quot;HTTP/1.0 200 OK\r\n&quot;</span>);</span><br><span class="line">    SEND_BUF_MSG(c_sock_fd, buf, <span class="number">0</span>, SERVER_STRING);</span><br><span class="line">    SEND_BUF_MSG(c_sock_fd, buf, <span class="number">0</span>, <span class="string">&quot;Content-Type: text/html\r\n&quot;</span>);</span><br><span class="line">    SEND_BUF_MSG(c_sock_fd, buf, <span class="number">0</span>, <span class="string">&quot;\r\n&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**********************************************************************/</span></span><br><span class="line"><span class="comment">/* Give a client a 404 not found status message. */</span></span><br><span class="line"><span class="comment">/**********************************************************************/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">not_found</span><span class="params">(<span class="type">int</span> c_sock_fd)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">char</span> buf[<span class="number">1024</span>];</span><br><span class="line">    SEND_BUF_MSG(c_sock_fd, buf, <span class="number">0</span>, <span class="string">&quot;HTTP/1.0 404 NOT FOUND\r\n&quot;</span>);</span><br><span class="line">    SEND_BUF_MSG(c_sock_fd, buf, <span class="number">0</span>, SERVER_STRING);</span><br><span class="line">    SEND_BUF_MSG(c_sock_fd, buf, <span class="number">0</span>, <span class="string">&quot;Content-Type: text/html\r\n&quot;</span>);</span><br><span class="line">    SEND_BUF_MSG(c_sock_fd, buf, <span class="number">0</span>, <span class="string">&quot;\r\n&quot;</span>);</span><br><span class="line">    SEND_BUF_MSG(c_sock_fd, buf, <span class="number">0</span>, <span class="string">&quot;&lt;HTML&gt;&lt;TITLE&gt;Not Found&lt;/TITLE&gt;\r\n&quot;</span>);</span><br><span class="line">    SEND_BUF_MSG(c_sock_fd, buf, <span class="number">0</span>, <span class="string">&quot;&lt;BODY&gt;&lt;P&gt;The server could not fulfill\r\n&quot;</span>);</span><br><span class="line">    SEND_BUF_MSG(c_sock_fd, buf, <span class="number">0</span>, <span class="string">&quot;your request because the resource specified\r\n&quot;</span>);</span><br><span class="line">    SEND_BUF_MSG(c_sock_fd, buf, <span class="number">0</span>, <span class="string">&quot;is unavailable or nonexistent.\r\n&quot;</span>);</span><br><span class="line">    SEND_BUF_MSG(c_sock_fd, buf, <span class="number">0</span>, <span class="string">&quot;&lt;/BODY&gt;&lt;/HTML&gt;\r\n&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**********************************************************************/</span></span><br><span class="line"><span class="comment">/* Send a regular file to the client.  Use headers, and report</span></span><br><span class="line"><span class="comment"> * errors to client if they occur.</span></span><br><span class="line"><span class="comment"> * Parameters: a pointer to a file structure produced from the socket</span></span><br><span class="line"><span class="comment"> *              file descriptor</span></span><br><span class="line"><span class="comment"> *             the name of the file to serve */</span></span><br><span class="line"><span class="comment">/**********************************************************************/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">serve_file</span><span class="params">(<span class="type">int</span> c_sock_fd, <span class="type">const</span> <span class="type">char</span> *filename)</span></span><br><span class="line">&#123;</span><br><span class="line">    FILE *resource = <span class="literal">NULL</span>;</span><br><span class="line">    <span class="type">char</span> buf[<span class="number">1024</span>] = &#123;<span class="string">&#x27;A&#x27;</span>, <span class="string">&#x27;\0&#x27;</span>&#125;;</span><br><span class="line">    <span class="type">int</span> numchars = <span class="number">1</span>; <span class="comment">// 初始时 buf 的长度</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 按行读取 HTTP 请求的 headers，但都忽略掉 */</span></span><br><span class="line">    <span class="keyword">while</span> ((numchars &gt; <span class="number">0</span>) &amp;&amp; (<span class="number">0</span> != <span class="built_in">strcmp</span>(<span class="string">&quot;\n&quot;</span>, buf))) <span class="comment">/* read &amp; discard headers */</span></span><br><span class="line">    &#123;</span><br><span class="line">        numchars = get_line(c_sock_fd, buf, <span class="keyword">sizeof</span>(buf));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * 打开服务器上的文件，若打开失败则发送 404 NOT FOUND 给客户端；</span></span><br><span class="line"><span class="comment">     * 否则，构造 response headers 和 response body，将文件发送给客户端</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    resource = fopen(filename, <span class="string">&quot;r&quot;</span>);</span><br><span class="line">    <span class="keyword">if</span> (<span class="literal">NULL</span> == resource)</span><br><span class="line">    &#123;</span><br><span class="line">        not_found(c_sock_fd);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        headers(c_sock_fd, filename);</span><br><span class="line">        cat(c_sock_fd, resource);</span><br><span class="line">    &#125;</span><br><span class="line">    fclose(resource);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**********************************************************************/</span></span><br><span class="line"><span class="comment">/* This function starts the process of listening for web connections</span></span><br><span class="line"><span class="comment"> * on a specified port.  If the port is 0, then dynamically allocate a</span></span><br><span class="line"><span class="comment"> * port and modify the original port variable to reflect the actual</span></span><br><span class="line"><span class="comment"> * port.</span></span><br><span class="line"><span class="comment"> * Parameters: pointer to variable containing the port to connect on</span></span><br><span class="line"><span class="comment"> * Returns: the socket */</span></span><br><span class="line"><span class="comment">/**********************************************************************/</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">startup</span><span class="params">(u_short *port)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> httpd_fd;</span><br><span class="line">    <span class="type">int</span> on = <span class="number">1</span>;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">sockaddr_in</span> <span class="title">s_addr</span>;</span></span><br><span class="line">    <span class="type">int</span> ret_code;</span><br><span class="line"></span><br><span class="line">    CHECK_POINTER_NON_NULL(port);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 创建一个 socket 描述符，但此时 socket 未与特定地址绑定 */</span></span><br><span class="line">    httpd_fd = socket(AF_INET,     <span class="comment">// IPv4 地址族</span></span><br><span class="line">                      SOCK_STREAM, <span class="comment">// 提供有序的，可靠的，双向的，基于字节流的通讯</span></span><br><span class="line">                      <span class="number">0</span>);          <span class="comment">// system picks protocol (as TCP)</span></span><br><span class="line">    ERROR_REPORT_WITH_EXIT(httpd_fd, <span class="string">&quot;socket&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 初始化服务器的本地地址，用于与指定的文件描述符绑定（bind）在一起 */</span></span><br><span class="line">    <span class="built_in">memset</span>(&amp;s_addr, <span class="number">0</span>, <span class="keyword">sizeof</span>(s_addr));</span><br><span class="line">    s_addr.sin_family = AF_INET;</span><br><span class="line">    s_addr.sin_port = htons(*port);</span><br><span class="line">    s_addr.sin_addr.s_addr = htonl(INADDR_ANY); <span class="comment">// INADDR_ANY = 0.0.0.0</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * SO_REUSEADDR 选项允许在套接字关闭后，可以立即重新绑定相同的端口，</span></span><br><span class="line"><span class="comment">     * 而不必等待一段时间（不必等待 TCP 的 TIME-WAIT 状态的持续时间）</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    ret_code = setsockopt(httpd_fd, SOL_SOCKET, SO_REUSEADDR, &amp;on, <span class="keyword">sizeof</span>(on));</span><br><span class="line">    ERROR_REPORT_WITH_EXIT(ret_code, <span class="string">&quot;setsockopt failed&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * 将套接字描述符与指定的服务器本地地址相绑定，</span></span><br><span class="line"><span class="comment">     * 若 sockaddr 结构中的端口号为 0，操作系统会自动为套接字描述符分配一个可用的临时端口号</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    ret_code = bind(httpd_fd, (<span class="keyword">struct</span> sockaddr *)&amp;s_addr, <span class="keyword">sizeof</span>(s_addr));</span><br><span class="line">    ERROR_REPORT_WITH_EXIT(ret_code, <span class="string">&quot;bind&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 检查 bind 调用是否动态分配了端口 */</span></span><br><span class="line">    <span class="keyword">if</span> (*port == <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">/* 获取 httpd_fd 绑定到的本地地址，位于 s_addr 指向的缓冲区中 */</span></span><br><span class="line">        <span class="type">socklen_t</span> s_addr_len = (<span class="type">socklen_t</span>)<span class="keyword">sizeof</span>(s_addr);</span><br><span class="line">        ret_code = getsockname(httpd_fd, (<span class="keyword">struct</span> sockaddr *)&amp;s_addr, &amp;s_addr_len);</span><br><span class="line">        ERROR_REPORT_WITH_EXIT(ret_code, <span class="string">&quot;getsockname&quot;</span>);</span><br><span class="line"></span><br><span class="line">        *port = ntohs(s_addr.sin_port); <span class="comment">// 获取动态分配的端口号，以便在函数外正确读取</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    ret_code = listen(httpd_fd, MAX_CONNECTS);</span><br><span class="line">    ERROR_REPORT_WITH_EXIT(ret_code, <span class="string">&quot;listen&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> httpd_fd;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**********************************************************************/</span></span><br><span class="line"><span class="comment">/* Inform the client that the requested web method has not been</span></span><br><span class="line"><span class="comment"> * implemented.</span></span><br><span class="line"><span class="comment"> * Parameter: the client socket */</span></span><br><span class="line"><span class="comment">/**********************************************************************/</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">unimplemented</span><span class="params">(<span class="type">int</span> c_sock_fd)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">char</span> buf[<span class="number">1024</span>];</span><br><span class="line">    SEND_BUF_MSG(c_sock_fd, buf, <span class="number">0</span>, <span class="string">&quot;HTTP/1.0 501 Method Not Implemented\r\n&quot;</span>);</span><br><span class="line">    SEND_BUF_MSG(c_sock_fd, buf, <span class="number">0</span>, SERVER_STRING);</span><br><span class="line">    SEND_BUF_MSG(c_sock_fd, buf, <span class="number">0</span>, <span class="string">&quot;Content-Type: text/html\r\n&quot;</span>);</span><br><span class="line">    SEND_BUF_MSG(c_sock_fd, buf, <span class="number">0</span>, <span class="string">&quot;\r\n&quot;</span>);</span><br><span class="line">    SEND_BUF_MSG(c_sock_fd, buf, <span class="number">0</span>, <span class="string">&quot;&lt;HTML&gt;&lt;HEAD&gt;&lt;TITLE&gt;Method Not Implemented\r\n&quot;</span>);</span><br><span class="line">    SEND_BUF_MSG(c_sock_fd, buf, <span class="number">0</span>, <span class="string">&quot;&lt;/TITLE&gt;&lt;/HEAD&gt;\r\n&quot;</span>);</span><br><span class="line">    SEND_BUF_MSG(c_sock_fd, buf, <span class="number">0</span>, <span class="string">&quot;&lt;BODY&gt;&lt;P&gt;HTTP request method not supported.\r\n&quot;</span>);</span><br><span class="line">    SEND_BUF_MSG(c_sock_fd, buf, <span class="number">0</span>, <span class="string">&quot;&lt;/BODY&gt;&lt;/HTML&gt;\r\n&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**********************************************************************/</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> s_sock_fd, c_sock_fd; <span class="comment">// 服务端与客户端的文件描述符</span></span><br><span class="line">    u_short port = <span class="number">4000</span>;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">sockaddr_in</span> <span class="title">client_addr</span>;</span></span><br><span class="line">    <span class="type">socklen_t</span> client_addr_len = <span class="keyword">sizeof</span>(client_addr);</span><br><span class="line">    <span class="type">pthread_t</span> newthread;</span><br><span class="line">    <span class="type">int</span> ret_code;</span><br><span class="line"></span><br><span class="line">    s_sock_fd = startup(&amp;port);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;httpd running on port %d\n&quot;</span>, port);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> (<span class="number">1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        c_sock_fd = accept(s_sock_fd, (<span class="keyword">struct</span> sockaddr *)&amp;client_addr, &amp;client_addr_len);</span><br><span class="line">        ERROR_REPORT_WITH_EXIT(c_sock_fd, <span class="string">&quot;accept&quot;</span>);</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;httpd accepts a client connect, fd=%d\n&quot;</span>, c_sock_fd);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// accept_request((void *)(intptr_t)c_sock_fd);</span></span><br><span class="line">        ret_code = pthread_create(&amp;newthread, <span class="literal">NULL</span>, (<span class="type">void</span> *)accept_request, (<span class="type">void</span> *)(<span class="type">intptr_t</span>)c_sock_fd);</span><br><span class="line">        <span class="keyword">if</span> (ret_code != <span class="number">0</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            perror(<span class="string">&quot;pthread_create&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    close(s_sock_fd);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>参考资料：</p>
+<ol>
+<li><a target="_blank" rel="noopener" href="https://hanfeng.ink/post/tinyhttpd">https://hanfeng.ink/post/tinyhttpd</a></li>
+<li><a target="_blank" rel="noopener" href="https://jacktang816.github.io/post/tinyhttpdread">https://jacktang816.github.io/post/tinyhttpdread</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/chen1415886044/article/details/103748926">https://blog.csdn.net/chen1415886044/article/details/103748926</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_42621338/article/details/84574977">https://blog.csdn.net/weixin_42621338/article/details/84574977</a></li>
+<li>本文对应的源码：<a target="_blank" rel="noopener" href="https://github.com/Pursue26/Tinyhttpd">https://github.com/Pursue26/Tinyhttpd</a></li>
+</ol>
+</blockquote>
+
+</div>
+
+
+  <div class="book-comments">
+    
+
+
+
+
+  </div>
+
+
+
+<script src="/js/book-post.js"></script>
+
+
+            </div>
+          </div>
+          <div class="column col-2 hide-lg">
+            <div class="book-post-info">
+  
+    <div class="book-post-meta">
+
+  <div class="author">
+
+    <!-- Author image -->
+    <div class="author-img">
+      
+        <figure
+          class="avatar avatar-lg"
+          data-initial="A"
+          style="background-color: #3b4351;">
+        </figure>
+      
+    </div>
+
+    <!-- Author title -->
+    <div class="author-title">
+      <div>aha</div>
+      <div>2024-05-07</div>
+    </div>
+  </div>
+
+  
+    <div class="divider"></div>
+
+    <div class="link">
+      <a class="category-link" href="/categories/%E9%A1%B9%E7%9B%AE/">项目</a> <a class="category-link" href="/categories/%E9%A1%B9%E7%9B%AE/HTTP/">HTTP</a>
+
+      <a class="tag-none-link" href="/tags/HTTP/" rel="tag">#HTTP</a>
+    </div>
+    
+  
+
+  <div class="divider"></div>
+</div>
+  
+
+  <div class="book-tocbot">
+</div>
+<div class="book-tocbot-menu">
+  <a class="book-toc-expand" onclick="expand_toc()">Expand all</a>
+  <a onclick="go_top()">Back to top</a>
+  <a onclick="go_bottom()">Go to bottom</a>
+  <a onclick="toggleSearch()">Search in blogs</a> <!-- 添加搜索文字的点击事件 -->
+</div>
+
+<div id="search-overlay" class="search-overlay" style="display: none;"> <!-- 初始状态为隐藏 -->
+  <div class="search-box">
+    <input type="text" id="search-input" placeholder="Search in all blogs...">
+    <button onclick="closeSearch()">Close</button> <!-- 添加关闭按钮 -->
+    <div id="search-results" class="search-results"></div>
+  </div>
+</div>
+
+<script>
+  function performSearch(query) {
+    if (!query.trim()) {
+      return;
+    }
+
+    fetch('/search.xml')
+      .then(response => response.text())
+      .then(data => {
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(data, "text/xml");
+        const entries = xmlDoc.getElementsByTagName('entry');
+        let results = '';
+
+        for (let i = 0; i < entries.length; i++) {
+          const title = entries[i].getElementsByTagName('title')[0].textContent;
+          const content = entries[i].getElementsByTagName('content')[0].textContent;
+          const url = entries[i].getElementsByTagName('url')[0].textContent;
+
+          let count = (title.match(new RegExp(query, "gi")) || []).length; // 统计查询词出现的次数
+          count += (content.match(new RegExp(query, "gi")) || []).length;
+
+          if (count > 0) { // title.includes(query) || content.includes(query)
+            results += `
+              <div class="search-result-item">
+                <a href="${url}">${title}</a> (${count})
+              </div>`;
+          }
+        }
+
+        const searchResultsElement = document.getElementById('search-results');
+        searchResultsElement.innerHTML = results;
+        searchResultsElement.classList.add('active');
+      });
+  }
+
+  function toggleSearch() {
+    const searchOverlay = document.getElementById('search-overlay');
+    searchOverlay.style.display = searchOverlay.style.display === 'none' ? 'flex' : 'none';
+  }
+
+  function closeSearch() {
+    document.getElementById('search-overlay').style.display = 'none';
+  }
+
+  document.getElementById('search-input').addEventListener('input', function() {
+    const query = this.value;
+    performSearch(query);
+  });
+</script>
+
+<style>
+  .search-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  .search-box {
+    background: white;
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+    width: 80%;
+    max-width: 500px;
+  }
+
+  .search-results {
+    margin-top: 10px;
+    max-height: 300px;
+    overflow-y: auto;
+    background: white;
+    padding: 10px;
+    border-radius: 5px;
+    width: 100%;
+  }
+
+  .search-result-item {
+    margin: 10px 0;
+  }
+
+  .search-result-item a {
+    color: blue; /* 设置链接颜色为蓝色 */
+    text-decoration: none;
+  }
+
+  .search-result-item a:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+<script src="/js/book-toc.js"></script>
+
+
+</div>
+          </div>
+        </div>
+      </div>
+
+      <a class="off-canvas-overlay" onclick="hide_canvas()"></a>
+
+      <button class="floating-button" onclick="toggleDropdownMenu()"></button>
+
+      <div class="dropdown-menu">
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FFFFFF', '#000000')">银河白</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#C7EDCC', '#000000')">豆沙绿</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FAF9DE', '#000000')">杏仁黄</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#E3EDCD', '#000000')">青草绿</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FFF2E2', '#000000')">秋叶褐</div>
+      </div>
+  </div>
+
+  <script>
+    function toggleDropdownMenu() {
+      document.querySelector('.floating-button').classList.toggle('active');
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      var storedBackgroundColor = localStorage.getItem('blogBackgroundColor');
+      var storedColor = localStorage.getItem('blogColor');
+
+      if (storedBackgroundColor && storedColor) {
+        document.body.style.backgroundColor = storedBackgroundColor;
+        document.body.style.color = storedColor;
+      }
+    });
+
+    function changeBackgroundColor(backgroundColor, color) {
+      document.body.style.backgroundColor = backgroundColor;
+      document.body.style.color = color;
+
+      localStorage.setItem('blogBackgroundColor', backgroundColor);
+      localStorage.setItem('blogColor', color);
+
+      document.querySelector('.floating-button').classList.remove('active');
+    }
+  </script>
+</body>
+
+</html>
+
+
+<script src="/js/book.js"></script>

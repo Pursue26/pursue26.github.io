@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
+
+    
+      <link rel="icon" href="/favicon.png" />
+    
+
+    <title>
+        
+          Linux 内核等待队列 - aha&#39;s book
+        
+    </title>
+
+    <!-- Spectre.css framework -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre-exp.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre-icons.min.css">
+
+    <!-- theme css & js -->
+    
+<link rel="stylesheet" href="/css/book.css">
+
+    
+<script src="/js/book.js"></script>
+
+
+    <!-- tocbot -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.css">
+    
+    <!-- katex -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/zooming/2.1.1/zooming.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const zooming = new Zooming()
+    zooming.listen('.book-content img')
+})
+</script>
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+    <style>
+      body {
+        background-color: #FFFFFF;
+        /* color: #000000; */
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+
+      /* Floating Button Styles */
+      .floating-button {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 999;
+        background-color: #000000;
+        color: #ffffff;
+        padding: 12px;
+        border-radius: 50%;
+        cursor: pointer;
+        border: 2px solid #000000;
+      }
+
+      .floating-button:hover {
+        background-color: #FFFFFF;
+      }
+
+      /* Dropdown Menu Styles */
+      .dropdown-menu {
+        position: fixed;
+        bottom: 60px;
+        right: 10px;
+        display: none;
+        min-width: 60px;
+        padding: 2px;
+        background-color: #fff;
+        /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
+        z-index: 1000;
+      }
+
+      .floating-button.active+.dropdown-menu {
+        display: block;
+      }
+
+      .dropdown-item {
+        display: block;
+        padding: 8px 16px;
+        cursor: pointer;
+      }
+
+      .dropdown-item:hover {
+        background-color: #f5f5f5;
+      }
+    </style>
+<style>.darkmode--activated{--body-bg-color:#282828;--content-bg-color:#333;--card-bg-color:#555;--text-color:#ccc;--blockquote-color:#bbb;--link-color:#ccc;--link-hover-color:#eee;--brand-color:#ddd;--brand-hover-color:#ddd;--table-row-odd-bg-color:#282828;--table-row-hover-bg-color:#363636;--menu-item-bg-color:#555;--btn-default-bg:#222;--btn-default-color:#ccc;--btn-default-border-color:#555;--btn-default-hover-bg:#666;--btn-default-hover-color:#ccc;--btn-default-hover-border-color:#666;--highlight-background:#282b2e;--highlight-foreground:#a9b7c6;--highlight-gutter-background:#34393d;--highlight-gutter-foreground:#9ca9b6}.darkmode--activated img{opacity:.75}.darkmode--activated img:hover{opacity:.9}.darkmode--activated code{color:#69dbdc;background:0 0}button.darkmode-toggle{z-index:9999}.darkmode-ignore,img{display:flex!important}.beian img{display:inline-block!important}</style></head>
+
+<body>
+  <div class="book-container">
+    <div class="book-sidebar">
+      <div class="book-brand">
+  <a href="/">
+    <img src="/favicon.png">
+    <span>AHA&#39;S BOOK</span>
+  </a>
+</div>
+        <div id="menu" class="book-menu hide">
+  <h2 id="基础知识"> 基础知识 </h2>
+<ul>
+<li><a href="/posts/231010144856.html"> 模运算 </a></li>
+<li><a href="/posts/231014105311.html"> 异或运算 </a></li>
+<li><a href="/posts/231210181853.html"> 计算机中的寄存器 </a></li>
+<li><a href="/posts/231213183051.html"> 正则表达式基础 </a></li>
+</ul>
+<h2 id="C 语言">C 语言 </h2>
+<ul>
+<li><a href="/posts/230916171929.html">main 函数参数 </a></li>
+<li><a href="/posts/231214192113.html"> 关键字与专有名词 </a></li>
+<li><a href="/posts/240103180653.html"> 输出打印函数 </a></li>
+<li><a href="/posts/230922143003.html"> 多维数组 </a></li>
+<li><a href="/posts/230913200729.html">const 关键字 </a></li>
+<li><a href="/posts/230918174223.html">typedef 类型基础 </a></li>
+<li><a href="/posts/230920172849.html">typedef 类型实践 </a></li>
+<li><a href="/posts/240224193217.html"> 二级指针 </a></li>
+<li><a href="/posts/240307195203.html"> 代码 TOP-K 问题 </a></li>
+<li><a href="/posts/230922172626.html">uthash 哈希表基础 </a></li>
+<li><a href="/posts/230918114841.html"> 大小端知识 </a></li>
+</ul>
+<h2 id="Golang 语言">Golang 语言 </h2>
+<ul>
+<li><a href="/posts/230907162612.html"> 变量与常量 </a></li>
+<li><a href="/posts/230909120145.html"> 函数 &amp; 包 &amp; 判断 &amp; 循环 </a></li>
+<li><a href="/posts/230912152800.html"> 数组与切片 </a></li>
+<li><a href="/posts/230913161326.html"> 可变参数函数与 Map 集合 </a></li>
+<li><a href="/posts/230915155105.html"> 字符串和指针 </a></li>
+</ul>
+<h2 id="数据结构"> 数据结构 </h2>
+<ul>
+<li><a href="/posts/231007174854.html"> 链表（数组实现）</a></li>
+<li><a href="/posts/231008213450.html"> 链表（链式实现）</a></li>
+<li><a href="/posts/231016161508.html"> 堆栈（数组实现）</a></li>
+<li><a href="/posts/231016184406.html"> 堆栈（链表实现）</a></li>
+<li><a href="/posts/231127185207.html"> 单调栈 </a></li>
+<li><a href="/posts/231017105123.html"> 队列（链表实现）</a></li>
+<li><a href="/posts/231017154121.html"> 双端队列（链表实现）</a></li>
+<li><a href="/posts/231018102559.html"> 堆基础与堆结构（数组实现）</a></li>
+<li><a href="/posts/231019102311.html"> 优先队列（堆实现）</a></li>
+<li><a href="/posts/230905224335.html"> 二叉树的遍历 </a></li>
+<li><a href="/posts/231020174358.html"> 二叉搜索树 </a></li>
+<li><a href="/posts/230916094606.html"> 拓扑排序 </a></li>
+<li><a href="/posts/230925185057.html">Trie 字典树 </a></li>
+<li><a href="/posts/231023164532.html"> 并查集（数组实现）</a></li>
+<li><a href="/posts/240702200642.html">Linux 数据结构之队列 </a></li>
+</ul>
+<h2 id="数据结构算法"> 数据结构算法 </h2>
+<ul>
+<li><a href="/posts/231218181635.html"> 归并排序 </a></li>
+<li><a href="/posts/231108163339.html"> 快速排序 </a></li>
+<li><a href="/posts/231107171607.html"> 堆排序 </a></li>
+<li><a href="/posts/231124181658.html"> 二分查找 </a></li>
+<li><a href="/posts/231227190828.html"> 哈希表实现 </a></li>
+<li><a href="/posts/240313193201.html"> 字符串哈希函数 </a></li>
+<li><a href="/posts/231116150205.html">Floyd 多源最短路径 </a></li>
+<li><a href="/posts/231117095232.html">Dijkstra 单源最短路径（原理部分）</a></li>
+<li><a href="/posts/231121152713.html">Dijkstra 单源最短路径（实现部分）</a></li>
+</ul>
+<h2 id="数据库"> 数据库 </h2>
+<ul>
+<li><a href="/posts/250605180332.html">MySQL 基础 </a></li>
+</ul>
+<h2 id="计算机网络"> 计算机网络 </h2>
+<ul>
+<li><a href="/posts/231011192359.html">OSI 参考模型 </a></li>
+<li><a href="/posts/240329202000.html"> 计网 CyC2018 之概述 </a></li>
+<li><a href="/posts/240329202004.html"> 计网 CyC2018 之链路层 </a></li>
+<li><a href="/posts/240329202003.html"> 计网 CyC2018 之网络层 </a></li>
+<li><a href="/posts/240329202002.html"> 计网 CyC2018 之传输层 </a></li>
+<li><a href="/posts/240329202001.html"> 计网 CyC2018 之应用层 </a></li>
+<li><a href="/posts/240306203742.html">ACL 访问控制列表 </a></li>
+<li><a href="/posts/240130190208.html"> 路由表、转发表与快速转发工作原理 </a></li>
+<li><a href="/posts/231221200716.html">VXLAN 网络虚拟化技术 </a></li>
+<li><a href="/posts/240903191243.html">TCP/IP checksum 计算 </a></li>
+<li><a href="/posts/240911185603.html"> 抓包分析 TCP 三次握手与四次挥手过程 </a></li>
+</ul>
+<h2 id="操作系统"> 操作系统 </h2>
+<ul>
+<li><a href="/posts/230921190726.html"> 概述 </a></li>
+<li><a href="/posts/230924172528.html"> 中断 &amp; 异常 &amp; 系统调用 </a></li>
+<li><a href="/posts/231017195157.html"> 内存分层体系与地址空间生成 </a></li>
+<li><a href="/posts/231108195351.html"> 连续内存分配 </a></li>
+<li><a href="/posts/231111172507.html"> 非连续内存分配之分段与分页 </a></li>
+<li><a href="/posts/231119170537.html"> 非连续内存分配之页表 </a></li>
+<li><a href="/posts/231123184526.html"> 内存管理之覆盖技术与交换技术 </a></li>
+<li><a href="/posts/231127193658.html"> 内存管理之虚存技术 </a></li>
+<li><a href="/posts/231129182631.html"> 局部页面置换算法 </a></li>
+<li><a href="/posts/231207184239.html"> 全局页面置换算法 </a></li>
+<li><a href="/posts/231207204958.html"> 进程描述 </a></li>
+<li><a href="/posts/231210211306.html"> 进程状态 </a></li>
+<li><a href="/posts/231215213932.html"> 线程 </a></li>
+<li><a href="/posts/231218220813.html"> 进程控制 </a></li>
+<li><a href="/posts/231228193143.html"> 调度 </a></li>
+<li><a href="/posts/240104202828.html"> 同步与互斥 </a></li>
+<li><a href="/posts/240113115605.html"> 信号量与管程 </a></li>
+<li><a href="/posts/240205182643.html"> 经典同步问题 </a></li>
+<li><a href="/posts/240310162231.html"> 死锁 </a></li>
+</ul>
+<h2 id="系统与网络编程"> 系统与网络编程 </h2>
+<ul>
+<li><a href="/posts/230911151334.html">pthread 库 </a></li>
+<li><a href="/posts/230921094127.html"> 锁与原子操作 </a></li>
+<li><a href="/posts/240319195609.html"> 读者写者问题 </a></li>
+<li><a href="/posts/240527200241.html"> 网络编程卷一阅读随笔 </a></li>
+<li><a href="/posts/240414190410.html"> 进程间通信 IPC 机制 </a></li>
+<li><a href="/posts/240424200123.html"> 多进程相关练习 </a></li>
+<li><a href="/posts/240516221527.html">I/O 模式与 I/O 多路复用 </a></li>
+<li><a href="/posts/240626192803.html">Linux 内核 kfifo 环形队列 </a></li>
+<li><a href="/posts/241009203126.html">Linux 内核等待队列 </a></li>
+<li><a href="/posts/240627210637.html">DPDK 无锁环形队列 </a></li>
+<li><a href="/posts/240919200410.html"> 解密内存屏障 </a></li>
+<li><a href="/posts/240927202500.html"> 内核线程的创建 </a></li>
+<li><a href="/posts/241015195205.html">Linux 网络数据包接收过程 </a></li>
+<li><a href="/posts/2410232111015.html"> 源码解读 epoll 实现原理 </a></li>
+<li><a href="/posts/241106182619.html">Linux 文件系统 </a></li>
+<li><a href="/posts/250619154429.html">Libevent 高性能 IO 事件驱动库 </a></li>
+</ul>
+<h2 id="工具与命令"> 工具与命令 </h2>
+<ul>
+<li><a href="/posts/240207180410.html">GCC 编译过程分解 </a></li>
+<li><a href="/posts/240312184132.html">GDB 调试入门 </a></li>
+<li><a href="/posts/240512184921.html">Makefile 学习 </a></li>
+<li><a href="/posts/250629214430.html">CMake 学习 </a></li>
+<li><a href="/posts/240417193754.html">Linux 命令之文件权限 </a></li>
+</ul>
+<h2 id="开源项目"> 开源项目 </h2>
+<ul>
+<li><a href="/posts/240303201855.html"> 线程池原理与实现 </a></li>
+<li><a href="/posts/240507194549.html">HTTP 服务器实现 </a></li>
+<li><a href="/posts/240904203605.html"> 聊天服务器实现 </a></li>
+<li><a href="/posts/241119182636.html">Linux 文件系统 </a></li>
+</ul>
+<h2 id="Docker">Docker</h2>
+<ul>
+<li><a href="/posts/230909171809.html">Docker 学习笔记 </a></li>
+</ul>
+<h1 id="LeetCode 刷题">LeetCode 刷题 </h1>
+<h2 id="链表相关"> 链表相关 </h2>
+<ul>
+<li><a href="/posts/231025143947.html">160 相交链表 </a></li>
+<li><a href="/posts/231025185947.html">206 反转链表 </a></li>
+<li><a href="/posts/231026101239.html">21 合并两个有序链表 </a></li>
+<li><a href="/posts/231026184514.html">83 删除排序链表中的重复元素 </a></li>
+<li><a href="/posts/231027150243.html">19 删除链表的倒数第 N 个节点 </a></li>
+<li><a href="/posts/231031120718.html">2 两数相加 </a></li>
+<li><a href="/posts/231031163133.html">445 两数相加 II</a></li>
+<li><a href="/posts/231101094219.html">234 回文链表 </a></li>
+<li><a href="/posts/231101135228.html">725 分隔链表 </a></li>
+<li><a href="/posts/231102120708.html">328 奇偶链表 </a></li>
+<li><a href="/posts/231102165703.html">142 环形链表 II</a></li>
+</ul>
+<h2 id="设计"> 设计 </h2>
+<ul>
+<li><a href="/posts/231201184542.html">146 LRU 缓存 </a></li>
+</ul>
+<h2 id="贪心算法"> 贪心算法 </h2>
+<ul>
+<li><a href="/posts/231107094652.html">1029 两地调度 </a></li>
+<li><a href="/posts/231109150855.html">435 无重叠区间 </a></li>
+</ul>
+<h2 id="哈希表"> 哈希表 </h2>
+<ul>
+<li><a href="/posts/231123181539.html">1410 实体解析器 </a></li>
+</ul>
+<h2 id="树的遍历"> 树的遍历 </h2>
+<ul>
+<li><a href="/posts/231103121209.html">117 填充每个节点的下一个右侧节点指针 II</a></li>
+</ul>
+<h2 id="深度优先搜索（递归）"> 深度优先搜索（递归）</h2>
+<ul>
+<li><a href="/posts/231206201243.html">2477 达到首都的最少油耗 </a></li>
+</ul>
+<h2 id="图或路径问题"> 图或路径问题 </h2>
+<ul>
+<li><a href="/posts/231211184652.html">1631 最小体力消耗路径 </a></li>
+</ul>
+<h2 id="其它"> 其它 </h2>
+<ul>
+<li><a href="/posts/230101120000.html"> 备忘录 </a></li>
+</ul>
+
+</div>
+
+
+<script src="/js/book-menu.js"></script>
+
+    </div>
+    <div class="sidebar-toggle" onclick="sidebar_toggle()" onmouseover="add_inner()" onmouseleave="remove_inner()">
+  <div class="sidebar-toggle-inner"></div>
+</div>
+
+<script>
+function add_inner() {
+  let inner = document.querySelector('.sidebar-toggle-inner')
+  inner.classList.add('show')  
+}
+
+function remove_inner() {
+  let inner = document.querySelector('.sidebar-toggle-inner')
+  inner.classList.remove('show')
+}
+
+function sidebar_toggle() {
+    let sidebar_toggle = document.querySelector('.sidebar-toggle')
+    let sidebar = document.querySelector('.book-sidebar')
+    let content = document.querySelector('.off-canvas-content')
+    if (sidebar_toggle.classList.contains('extend')) { // show
+        sidebar_toggle.classList.remove('extend')
+        sidebar.classList.remove('hide')
+        content.classList.remove('extend')
+    }
+    else { // hide
+        sidebar_toggle.classList.add('extend')
+        sidebar.classList.add('hide')
+        content.classList.add('extend')
+    }
+}
+</script>
+
+      <div class="off-canvas-content">
+        <div class="columns">
+          <div class="column col-10 col-lg-12">
+            <div class="book-navbar">
+              <!-- For Responsive Layout -->
+
+<header class="navbar">
+  <section class="navbar-section">
+    <a onclick="open_sidebar()">
+      <i class="icon icon-menu"></i>
+    </a>
+  </section>
+</header>
+
+            </div>
+            <div class="book-content">
+              <div class="book-post">
+  <p>Linux 内核的等待队列是以双循环链表为基础数据结构，与进程调度机制紧密结合，能够用于实现核心的异步事件通知机制、可以使用等待队列实现阻塞进程的唤醒。等待队列在 Linux 内核中有着举足轻重的作用，很多 Linux 驱动都或多或少涉及到了等待队列。因此，对于 Linux 内核及驱动开发者来说，掌握等待队列是必修课之一。</p>
+<span id="more"></span>
+<p>在介绍等待队列机制的技术实现之前，先从功能角度谈下等待队列在内核中的角色。</p>
+<h1 id="你理解阻塞吗">你理解阻塞吗</h1>
+<p>写程序的时候，我们常常说某个系统调用是阻塞调用。</p>
+<p>从用户层的角度，基本理解是：进程在执行某个系统调用的时候，因为需要的资源不满足（I/O 操作，加锁等），导致进程“停”在那里，等到资源就绪了或者设置的 timeout 时间超时了，进程得以继续执行。</p>
+<p>从内核的角度，面对用户层对阻塞调用的需求，需要实现哪些机制呢？</p>
+<ol>
+<li>
+<p>首先，进程陷入内核，内核发现进程所要求的资源暂时无法满足，需要将其设置为睡眠状态，然后调度其它进程执行。</p>
+<ul>
+<li>这里引出一个问题：1）<strong>内核如何将一个进程睡眠的</strong>？</li>
+</ul>
+</li>
+<li>
+<p>其次，等到资源就绪时，我们需要唤醒等待在该资源上的进程。</p>
+<ul>
+<li>这里存在两个问题：2）<strong>内核是怎么知道资源就绪的 </strong>？以及，3）<strong> 某个资源就绪了，内核怎么找到对应的等待进程，并将它唤醒的</strong>？</li>
+</ul>
+</li>
+</ol>
+<blockquote>
+<p>一个场景：我们希望对某个 socket fd 进行阻塞 write 操作。发起写操作的时候，陷入内核，内核发现该 socket fd 的写缓冲区是满的（即需要的资源不满足），暂时不能写。这时，内核会将进程设置为睡眠状态。转而调用执行其它运行态的进程。等到该写缓冲区可以写的时候（即需要的资源满足了），内核将进程设置为运行状态，然后执行写操作，拷贝数据到内核写缓冲区。执行完，切换回用户态。</p>
+</blockquote>
+<p>1）<strong>内核如何将一个进程睡眠的</strong>？</p>
+<p>在 Linux 中每一个进程都由 <code>task_struct</code> 数据结构来定义。它有一个 <code>.state</code> 状态成员，将其设置为睡眠（TASK_INTERRUPTIBLE 或 TASK_UNINTERRUPTIBLE），并将表示该进程的 <code>task_struct</code> 结构从就绪队列中移走（转移到等待队列中），内核就不会调度其执行，也就相当于睡眠了。</p>
+<p>2）<strong>内核是怎么知道资源就绪的</strong>？</p>
+<p>中断机制：内核的所有工作都是由中断驱动的。不管是系统调用陷入内核，还是调度，还是其它的内核活动，都是由各种各样的中断来触发执行的。对于设备 I/O，如果设备空闲了，会触发一个外部中断，该中断触发内核执行中断处理程序，通知等待进程、执行回调等等。</p>
+<blockquote>
+<p>资源可用 -&gt; 中断触发 -&gt; 内核接收到中断信号 -&gt; 中断处理程序（<strong>更新某种状态标记以表示资源可用</strong>） -&gt; 通知唤醒等待该资源的等待进程，重新进入调度队列（到这里中断处理结束） -&gt; 被调度时，执行资源处理（这通常是在进程的上下文中进行，而不是在中断上下文中）。</p>
+</blockquote>
+<p>3）<strong>某个资源就绪了，内核怎么找到对应的等待进程，并将它唤醒的</strong>？</p>
+<p>等待队列：我们将一个资源和一个等待队列关联起来。如果进程所请求的资源还未就绪，就先加入到该资源的等待队列中。等到资源就绪了，就唤醒等待队列中的进程，加入到调度。</p>
+<blockquote>
+<p>怎么知道进程等待的资源是否就绪了呢（资源就绪后会发生什么变化）？在等待队列中，“资源”是一个通过条件变量 condition 模拟的抽象，当资源满足时，会将 condition 修改为真，从而 wake_up 等待队列中的进程。</p>
+</blockquote>
+<h1 id="等待队列与惊群">等待队列与惊群</h1>
+<p><strong>“惊群”的基本行为是</strong>：有多个进程 / 线程等待在同一个资源上，而该资源一次只能有一个进程处理。比如文件描述符的写操作、accept 一个新连接等。那么，在资源就绪的时候，如果内核采取的策略是唤醒所有的进程，这样，只有一个进程获取了该资源，其它进程发现没有资源就绪，继续进入睡眠（所谓虚假唤醒）。这样的行为浪费了系统的 CPU 资源。</p>
+<p>那是不是，内核在资源就绪的时候，就唤醒一个进程不就得了。其实也不是，因为不是所有资源都是互斥的。比如某个文件的读操作。</p>
+<p><strong>那么，惊群问题怎么解决</strong>？</p>
+<p>在用户态，可以有不同的解决方式。或者忽略惊群所带来的开销，或者使用锁方式保证一次只有一个进程来阻塞在一个资源上。</p>
+<p>而对于内核来说，在等待队列上增加了一个是否“互斥等待”的标志。即如果是互斥等待的，一次唤醒一个进程；如果不是互斥等待的，一次唤醒所有进程。</p>
+<p>互斥等待的经典例子：accept。因为我们很明确知道，对一个 listen fd 的 accept，肯定是一次只有一个进程可以处理。那么，我们在 listen fd 上的等待队列，就毫无疑问可以设置为“互斥等待”。所以，现今版本的 linux 内核，解决了 accept 的惊群问题。</p>
+<p>但是像 epoll_wait 的惊群问题，就无法从等待队列的互斥等待来解决。首先，epoll fd 上也有一个等待队列，代表 epoll fd 所监听的其他若干文件描述符（资源）就绪时，唤醒等待队列上的进程。因为我们无法确定，进程对这些资源是不是都是互斥访问的，还是都不是。所以，只好唤醒所有进程。更多的惊群问题，可以查阅相关资料。</p>
+<h1 id="等待队列">等待队列</h1>
+<h2 id="作用">作用</h2>
+<p>Linux 内核的 <strong> 等待队列是以双循环链表为基础数据结构</strong>，与进程调度机制紧密结合，能够用于实现核心的异步事件通知机制、可以使用等待队列实现阻塞进程的唤醒。</p>
+<p>它有两种数据结构：等待队列头（<code>wait_queue_head_t</code>）和等待队列项（<code>wait_queue_t</code>）。等待队列头和等待队列中都包含一个 <code>list_head</code> 类型的域作为“连接件”。它通过一个双链表把等待 task 的头（<code>wait_queue_head_t</code>类型）和等待的进程列表（<code>wait_queue_t</code>类型）链接起来。</p>
+<p><strong>等待队列的每个节点都代表一个进程 <code>task_struct</code> 的封装，它通过等待队列项的 <code>.private = current</code> 来“绑定”进程</strong>，具体看后面的代码实现。</p>
+<h2 id="结构组成">结构组成</h2>
+<p>（1）等待队列头</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 等待队列头</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> __<span class="title">wait_queue_head</span> &#123;</span></span><br><span class="line">    <span class="type">spinlock_t</span> lock;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> <span class="title">task_list</span>;</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> &#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> *<span class="title">next</span>, *<span class="title">prev</span>;</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> __<span class="title">wait_queue_head</span> <span class="title">wait_queue_head_t</span>;</span></span><br></pre></td></tr></table></figure>
+<table>
+<thead>
+<tr>
+<th>成员</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>lock</td>
+<td>自旋锁，在对 task_list 操作的过程中，使用该锁实现对等待队列（如添加、删除操作）的互斥访问</td>
+</tr>
+<tr>
+<td>task_list</td>
+<td>双向循环链表，存放等待的进程</td>
+</tr>
+</tbody>
+</table>
+<p>（2）等待队列</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 等待队列</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> __<span class="title">wait_queue</span> &#123;</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> flags;  <span class="comment">// 指明该等待的进程是互斥进程还是非互斥进程</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> WQ_FLAG_EXCLUSIVE 0x01</span></span><br><span class="line">    <span class="type">void</span>* private;</span><br><span class="line">    <span class="type">wait_queue_func_t</span> func;  <span class="comment">// 挂唤醒函数用的，如 default_wake_function</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> <span class="title">task_list</span>;</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="title function_">int</span> <span class="params">(*<span class="type">wait_queue_func_t</span>)</span><span class="params">(<span class="type">wait_queue_t</span>* wait, <span class="type">unsigned</span> mode, <span class="type">int</span> flags, <span class="type">void</span>* key)</span>;</span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> __<span class="title">wait_queue</span> <span class="title">wait_queue_t</span>;</span></span><br></pre></td></tr></table></figure>
+<p>（3）等待队列头（<code>wait_queue_head_t</code>）和等待队列（<code>wait_queue_t</code>）的区别是等待队列是等待队列头的成员。也就是说等待队列头的 <code>.task_list</code> 域链接的成员就是等待队列类型的（<code>wait_queue_t</code>）。</p>
+<p><img src="https://cslqm.github.io/img/in-post/%E7%AD%89%E5%BE%85%E9%98%9F%E5%88%97.png" alt="等待队列"></p>
+<p>通过 <code>-&gt;task_list-&gt;next</code> 得到的是下一个等待项的 <code>task_list</code> 成员的地址。那么，如何找到 <code>wait_queue_t</code> 结构的首地址呢？如果是通过减法操作，不会受字节对齐影响吗？不会的。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * container_of - 从结构体的成员指针获取指向整个结构体的指针</span></span><br><span class="line"><span class="comment"> * @ptr:    指向结构体成员的指针</span></span><br><span class="line"><span class="comment"> * @type:   结构体类型</span></span><br><span class="line"><span class="comment"> * @member: 成员在结构体中的名字</span></span><br><span class="line"><span class="comment"> * typeof(((type*)0)-&gt;member) 创建一个 type 类型的空指针，并访问其成员，</span></span><br><span class="line"><span class="comment"> *                            不会实际访问内存，只是获取成员的类型</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> container_of(ptr, type, member)                   \</span></span><br><span class="line"><span class="meta">    (&#123;                                                    \</span></span><br><span class="line"><span class="meta">        const typeof(((type*)0)-&gt;member)* __mptr = (ptr); \</span></span><br><span class="line"><span class="meta">        (type*)((char*)__mptr - offsetof(type, member));  \</span></span><br><span class="line"><span class="meta">    &#125;)</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> offsetof(TYPE, MEMBER) ((size_t) &amp;((TYPE *)0)-&gt;MEMBER)</span></span><br></pre></td></tr></table></figure>
+<h1 id="操作 - 常用函数接口">操作 / 常用函数接口</h1>
+<p>Linux-2.6 提供如下关于等待队列的操作：</p>
+<p>（1）定义等待队列头</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">wait_queue_head_t</span> my_queue;</span><br></pre></td></tr></table></figure>
+<p>（2）初始化等待队列头</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">init_waitqueue_head(&amp;my_queue);     <span class="comment">// 对已定义的结构初始化</span></span><br><span class="line">DECLARE_WAIT_QUEUE_HEAD(my_queue);  <span class="comment">// 定义结构并初始化</span></span><br></pre></td></tr></table></figure>
+<p>（3）定义等待队列</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">DECLARE_WAITQUEUE(name, tsk);  <span class="comment">// 定义并初始化一个名为 name 的等待队列，并设置 private 域为 tsk</span></span><br></pre></td></tr></table></figure>
+<p>（4）添加 / 移除等待队列</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 用于将等待队列 wait，（头插）添加到等待队列头 q 指向的等待队列链表中</span></span><br><span class="line"><span class="type">void</span> fastcall <span class="title function_">add_wait_queue</span><span class="params">(<span class="type">wait_queue_head_t</span>* q, <span class="type">wait_queue_t</span>* wait)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 用于将等待队列 wait，从等待队列头 q 指向的等待队列链表中移除</span></span><br><span class="line"><span class="type">void</span> fastcall <span class="title function_">remove_wait_queue</span><span class="params">(<span class="type">wait_queue_head_t</span>* q, <span class="type">wait_queue_t</span>* wait)</span>;</span><br></pre></td></tr></table></figure>
+<p>（5）等待事件</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">wait_event(<span class="built_in">queue</span>, condition);</span><br><span class="line">wait_event_interruptible(<span class="built_in">queue</span>, condition);</span><br><span class="line">wait_event_timeout(<span class="built_in">queue</span>, condition, timeout);</span><br><span class="line">wait_event_interruptible_timeout(<span class="built_in">queue</span>, condition, timeout);</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">等待第一个参数 queue 作为等待队列头的等待队列被唤醒，而且第二个参数 condition 必须满足，否则阻塞 </span></span><br><span class="line"><span class="comment">wait_event 和 wait_event_interruptible 的区别在于后者可以被信号打断，而前者不能</span></span><br><span class="line"><span class="comment"> 加上 timeout 意味着阻塞等待的超时时间，以 jiffy 为单位，在第三个参数的 timeout 到达时，不论 condition 是否满足，均返回</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+<p>（6）唤醒队列</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">wake_up</span><span class="params">(<span class="type">wait_queue_head_t</span>* <span class="built_in">queue</span>)</span>;</span><br><span class="line"><span class="type">void</span> <span class="title function_">wake_up_interruptible</span><span class="params">(<span class="type">wait_queue_head_t</span>* <span class="built_in">queue</span>)</span>;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">上述操作会唤醒以 queue 作为等待队列头的【所有】等待队列对应的进程</span></span><br><span class="line"><span class="comment">wake_up()               &lt;---&gt;   wait_event()</span></span><br><span class="line"><span class="comment">                                wait_event_timeout()</span></span><br><span class="line"><span class="comment">wake_up_interruptible() &lt;---&gt;   wait_event_interruptible()</span></span><br><span class="line"><span class="comment">                                wait_event_interruptible_timeout()</span></span><br><span class="line"><span class="comment">wake_up() 可以唤醒处于 TASK_INTERRUPTIBLE 和 TASK_UNINTERRUPTIBLE 的进程</span></span><br><span class="line"><span class="comment">wake_up_interruptble() 只能唤醒处于 TASK_INTERRUPTIBLE 的进程</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+<p>（7）在等待队列上睡眠。sleep_on 无需条件的睡眠，可能导致竞态，3.15 版本后废弃，采用 wait_event 代替 sleep_on。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 作用是将当前进程的状态置成 TASK_UNINTERRUPTIBLE，定义一个等待队列，并把它添加到等待队列头 q，直到资源获得，q 指向的等待队列被唤醒</span></span><br><span class="line">sleep_on(<span class="type">wait_queue_head_t</span>* q);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 作用是将当前进程的状态置成 TASK_INTERRUPTIBLE，并定义一个等待队列，之后把它附属到等待队列头 q，直到资源可获得，q 指向的等待队列被唤醒或者进程收到信号</span></span><br><span class="line">interruptible_sleep_on(<span class="type">wait_queue_head_t</span>* q);</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">sleep_on()               &lt;---&gt;   wake_up()</span></span><br><span class="line"><span class="comment">interruptible_sleep_on() &lt;---&gt;   wake_up_interruptible()</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+<h1 id="接口实现">接口实现</h1>
+<h2 id="初始化">初始化</h2>
+<p>（1）直接定义后初始化。init_waitqueue_head()函数会将自旋锁初始化为未锁，等待队列初始化为空的双向循环链表。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">wait_queue_head_t</span> my_queue;</span><br><span class="line">init_waitqueue_head(&amp;my_queue);</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> init_waitqueue_head(q)              \</span></span><br><span class="line"><span class="meta">    do &#123;                                    \</span></span><br><span class="line"><span class="meta">        static struct lock_class_key __key; \</span></span><br><span class="line"><span class="meta">                                            \</span></span><br><span class="line"><span class="meta">        __init_waitqueue_head((q), &amp;__key); \</span></span><br><span class="line"><span class="meta">    &#125; while (0)</span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span> __init_waitqueue_head(<span class="type">wait_queue_head_t</span>* q, <span class="keyword">struct</span> lock_class_key* key) &#123;</span><br><span class="line">    spin_lock_init(&amp;q-&gt;lock);          <span class="comment">// 初始化自旋锁</span></span><br><span class="line">    lockdep_set_class(&amp;q-&gt;lock, key);  <span class="comment">// 高级调试，具体代码看不懂，只知道可以检测是否发生死锁</span></span><br><span class="line">    INIT_LIST_HEAD(&amp;q-&gt;task_list);     <span class="comment">// 初始化链表</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">void</span> <span class="title function_">INIT_LIST_HEAD</span><span class="params">(<span class="keyword">struct</span> list_head* <span class="built_in">list</span>)</span> &#123;</span><br><span class="line">    <span class="built_in">list</span>-&gt;next = <span class="built_in">list</span>;</span><br><span class="line">    <span class="built_in">list</span>-&gt;prev = <span class="built_in">list</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>（2）定义并初始化的快捷方式，等价于（1）。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">DECLARE_WAIT_QUEUE_HEAD(my_queue);</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> DECLARE_WAIT_QUEUE_HEAD(name) \</span></span><br><span class="line"><span class="meta">    wait_queue_head_t name = __WAIT_QUEUE_HEAD_INITIALIZER(name)</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> __WAIT_QUEUE_HEAD_INITIALIZER(name) &#123; \</span></span><br><span class="line"><span class="meta">    .lock      = __SPIN_LOCK_UNLOCKED(name.lock), \</span></span><br><span class="line"><span class="meta">    .task_list = &#123; &amp;(name).task_list, &amp;(name).task_list &#125; &#125;</span></span><br></pre></td></tr></table></figure>
+<p>（3）定义等待队列，注意此处是定义一个 <code>wait_queue_t</code> 类型的变量 name，并将其 private 与设置为 tsk。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">DECLARE_WAITQUEUE(name, tsk);</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> DECLARE_WAITQUEUE(name, tsk) \</span></span><br><span class="line"><span class="meta">    wait_queue_t name = __WAITQUEUE_INITIALIZER(name, tsk)</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> __WAITQUEUE_INITIALIZER(name, tsk) &#123; \</span></span><br><span class="line"><span class="meta">    .private    = tsk, \</span></span><br><span class="line"><span class="meta">    .func       = default_wake_function, \</span></span><br><span class="line"><span class="meta">    .task_list  = &#123; NULL, NULL &#125; &#125;</span></span><br></pre></td></tr></table></figure>
+<h2 id="添加／移出等待队列">添加／移出等待队列</h2>
+<p>（1）向等待队列头中添加等待队列，设置等待的进程为非互斥进程，并将其添加进等待队列头的 <strong> 队头中（而非队尾）</strong>。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">add_wait_queue</span><span class="params">(<span class="type">wait_queue_head_t</span>* q, <span class="type">wait_queue_t</span>* wait)</span> &#123;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> flags;</span><br><span class="line"></span><br><span class="line">    wait-&gt;flags &amp;= ~WQ_FLAG_EXCLUSIVE;   <span class="comment">// ~WQ_FLAG_EXCLUSIVE 位运算表示非互斥</span></span><br><span class="line">    spin_lock_irqsave(&amp;q-&gt;lock, flags);  <span class="comment">// 需要修改等待队列，申请锁</span></span><br><span class="line">    __add_wait_queue(q, wait);           <span class="comment">// 添加到等待队列的队头</span></span><br><span class="line">    spin_unlock_irqrestore(&amp;q-&gt;lock, flags);</span><br><span class="line">&#125;</span><br><span class="line">EXPORT_SYMBOL(add_wait_queue);</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">void</span> __add_wait_queue(<span class="type">wait_queue_head_t</span>* head, <span class="type">wait_queue_t</span>* new) &#123;</span><br><span class="line">    list_add(&amp;new-&gt;task_list, &amp;head-&gt;task_list);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>（2）向等待队列头中添加等待队列，设置等待的进程为互斥进程，并将其添加进等待队列头的 <strong> 队尾中（而非队头）</strong>。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">add_wait_queue_exclusive</span><span class="params">(<span class="type">wait_queue_head_t</span>* q, <span class="type">wait_queue_t</span>* wait)</span> &#123;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> flags;</span><br><span class="line"></span><br><span class="line">    wait-&gt;flags |= WQ_FLAG_EXCLUSIVE;    <span class="comment">// 互斥进程 WQ_FLAG_EXCLUSIVE</span></span><br><span class="line">    spin_lock_irqsave(&amp;q-&gt;lock, flags);  <span class="comment">// 需要修改等待队列，申请锁</span></span><br><span class="line">    __add_wait_queue_tail(q, wait);      <span class="comment">// 添加到等待队列的队尾</span></span><br><span class="line">    spin_unlock_irqrestore(&amp;q-&gt;lock, flags);</span><br><span class="line">&#125;</span><br><span class="line">EXPORT_SYMBOL(add_wait_queue_exclusive);</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">void</span> __add_wait_queue_tail(<span class="type">wait_queue_head_t</span>* head, <span class="type">wait_queue_t</span>* new) &#123;</span><br><span class="line">    list_add_tail(&amp;new-&gt;task_list, &amp;head-&gt;task_list);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>该函数和 add_wait_queue()函数功能基本一样，只不过它是将等待的进程设置为互斥进程。</p>
+<p>（3）在等待的资源或事件满足时，进程被唤醒，使用该函数从等待头指向的等待队列中删除一项。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">remove_wait_queue</span><span class="params">(<span class="type">wait_queue_head_t</span>* q, <span class="type">wait_queue_t</span>* wait)</span> &#123;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> flags;</span><br><span class="line"></span><br><span class="line">    spin_lock_irqsave(&amp;q-&gt;lock, flags);  <span class="comment">// 需要修改等待队列，申请锁</span></span><br><span class="line">    __remove_wait_queue(q, wait);        <span class="comment">// 删除</span></span><br><span class="line">    spin_unlock_irqrestore(&amp;q-&gt;lock, flags);</span><br><span class="line">&#125;</span><br><span class="line">EXPORT_SYMBOL(remove_wait_queue);</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">void</span> __remove_wait_queue(<span class="type">wait_queue_head_t</span>* head, <span class="type">wait_queue_t</span>* old) &#123;</span><br><span class="line">    list_del(&amp;old-&gt;task_list);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="等待事件">等待事件</h2>
+<h3 id="wait-event">wait_event</h3>
+<p>wait_event 宏使进程被置于深睡眠状态（不可被信号中断）进行等待，直到 @condition 条件满足。等待队列头 @wq 在每次被 wakeup 时都会检查 @condition 条件，<strong>如果不满足则继续睡眠等待</strong>。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// linux/wait.h</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * wait_event - 睡眠直到条件满足 </span></span><br><span class="line"><span class="comment"> * @wq: 要等待的等待队列头</span></span><br><span class="line"><span class="comment"> * @condition: 要等待的条件表达式</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * 进程会进入不可中断的睡眠状态 (TASK_UNINTERRUPTIBLE)，直到</span></span><br><span class="line"><span class="comment"> * @condition 条件为真。每次等待队列头 @wq 被唤醒时都会检查该条件。</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * 在改变可能影响等待条件的任何变量之后，必须调用 wake_up()。</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> wait_event(wq, condition)    \</span></span><br><span class="line"><span class="meta">    do &#123;                             \</span></span><br><span class="line"><span class="meta">        <span class="keyword">if</span> (condition)               \</span></span><br><span class="line"><span class="meta">            break;                   \</span></span><br><span class="line"><span class="meta">        __wait_event(wq, condition); \</span></span><br><span class="line"><span class="meta">    &#125; while (0)</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> __wait_event(wq, condition)                              \</span></span><br><span class="line"><span class="meta">    do &#123;                                                         \</span></span><br><span class="line"><span class="meta">        DEFINE_WAIT(__wait);                                     \</span></span><br><span class="line"><span class="meta">                                                                 \</span></span><br><span class="line"><span class="meta">        for (;;) &#123;                                               \</span></span><br><span class="line"><span class="meta">            prepare_to_wait(&amp;wq, &amp;__wait, TASK_UNINTERRUPTIBLE); \</span></span><br><span class="line"><span class="meta">            <span class="keyword">if</span> (condition)                                       \</span></span><br><span class="line"><span class="meta">                break;                                           \</span></span><br><span class="line"><span class="meta">            schedule();                                          \</span></span><br><span class="line"><span class="meta">        &#125;                                                        \</span></span><br><span class="line"><span class="meta">        finish_wait(&amp;wq, &amp;__wait);                               \</span></span><br><span class="line"><span class="meta">    &#125; while (0)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// linux/wait.h</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> DEFINE_WAIT_FUNC(name, function)               \</span></span><br><span class="line"><span class="meta">    wait_queue_t name = &#123;                              \</span></span><br><span class="line"><span class="meta">        .private = current,                            \</span></span><br><span class="line"><span class="meta">        .func = function,                              \</span></span><br><span class="line"><span class="meta">        .task_list = LIST_HEAD_INIT((name).task_list), \</span></span><br><span class="line"><span class="meta">    &#125;  <span class="comment">// current 指向当前运行的进程的指针</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 定义并初始化一个等待队列项，同时指定了 private 和 func 分别为 current 和 autoremove_wake_function</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> DEFINE_WAIT(name) DEFINE_WAIT_FUNC(name, autoremove_wake_function)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// include/asm-generic/current.h</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> get_current() (current_thread_info()-&gt;task)  <span class="comment">// 获取当前执行的任务（进程）的 task_struct 类型指针</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> current get_current()  <span class="comment">// 当前运行进程的指针</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">// prepare_to_wait() 修改当前进程状态为不可中断的睡眠状态（TASK_UNINTERRUPTIBLE）</span></span><br><span class="line"><span class="comment">// schedule()开始进行睡眠 </span></span><br><span class="line"><span class="comment">// finish_wait() 修改当前进程状态为 TASK_RUNNING，并将当前进程从等待队列中移除（若它还在）</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// kernel/wait.h</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * 注意：我们需要在添加到等待队列之后再使用 &quot;set_current_state()&quot;，</span></span><br><span class="line"><span class="comment"> * 因为在 SMP 系统中需要一个内存屏障，避免编译器优化</span></span><br><span class="line"><span class="comment"> * 这样任何检测等待队列是否活跃的唤醒函数</span></span><br><span class="line"><span class="comment"> * 将被保证看到等待队列的添加，或者本线程中随后的测试将看到唤醒已经发生。</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">prepare_to_wait</span><span class="params">(<span class="type">wait_queue_head_t</span>* q, <span class="type">wait_queue_t</span>* wait, <span class="type">int</span> state)</span> &#123;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> flags;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 睡眠前的准备工作，用于防止 wait 不在队列中，而事件已产生，则会无限等待 */</span></span><br><span class="line"></span><br><span class="line">    wait-&gt;flags &amp;= ~WQ_FLAG_EXCLUSIVE;   <span class="comment">// 设置为非互斥模式</span></span><br><span class="line">    spin_lock_irqsave(&amp;q-&gt;lock, flags);  <span class="comment">// 需要修改等待队列，申请锁</span></span><br><span class="line">    <span class="keyword">if</span> (list_empty(&amp;wait-&gt;task_list))    <span class="comment">// 当 wait 不在队列 q，则加入其中，防止无法唤醒</span></span><br><span class="line">        __add_wait_queue(q, wait);       <span class="comment">// 添加事件到等待队列</span></span><br><span class="line">    set_current_state(state);            <span class="comment">// 修改当前进程状态</span></span><br><span class="line">    spin_unlock_irqrestore(&amp;q-&gt;lock, flags);</span><br><span class="line">&#125;</span><br><span class="line">EXPORT_SYMBOL(prepare_to_wait);</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * finish_wait - clean up after waiting in a queue</span></span><br><span class="line"><span class="comment"> * @q: waitqueue waited on</span></span><br><span class="line"><span class="comment"> * @wait: wait descriptor</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * Sets current thread back to running state and removes</span></span><br><span class="line"><span class="comment"> * the wait descriptor from the given waitqueue if still</span></span><br><span class="line"><span class="comment"> * queued.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">finish_wait</span><span class="params">(<span class="type">wait_queue_head_t</span>* q, <span class="type">wait_queue_t</span>* wait)</span> &#123;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> flags;</span><br><span class="line"></span><br><span class="line">    __set_current_state(TASK_RUNNING);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (!list_empty_careful(&amp;wait-&gt;task_list)) &#123;</span><br><span class="line">        spin_lock_irqsave(&amp;q-&gt;lock, flags);</span><br><span class="line">        list_del_init(&amp;wait-&gt;task_list);  <span class="comment">// deletes entry from list and reinitialize it</span></span><br><span class="line">        spin_unlock_irqrestore(&amp;q-&gt;lock, flags);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">EXPORT_SYMBOL(finish_wait);</span><br><span class="line"></span><br><span class="line"><span class="comment">// linux/sched.h</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> set_current_state(state_value) set_mb(current-&gt;state, (state_value))</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> set_mb(var, value) \</span></span><br><span class="line"><span class="meta">    do &#123;                   \</span></span><br><span class="line"><span class="meta">        var = value;       \</span></span><br><span class="line"><span class="meta">        barrier();         \</span></span><br><span class="line"><span class="meta">    &#125; while (0)  <span class="comment">// 设置变量值并加上内存屏障避免指令重排</span></span></span><br></pre></td></tr></table></figure>
+<p>有一个疑问，这里 <code>DEFINE_WAIT(__wait)</code> 定义一个 <strong> 局部 </strong> 等待队列项<code>__wait</code>，其用意在哪？</p>
+<ul>
+<li><strong>管理当前等待状态</strong>：使用 <code>__wait</code> 来表示当前进程（<code>.private = current</code>）的等待状态（<code>set_current_state(state)</code>），用来跟踪哪个线程（<code>current</code>）在等待哪个条件（<code>condition</code>）。</li>
+<li><strong>自动清理</strong>：使用 <code>autoremove_wake_function</code> 回调函数，<code>__wait</code> 可以在条件满足时自动移除。</li>
+</ul>
+<p>另一个疑问，在 <code>set_current_state(state)</code> 设置进程状态时，为什么不是修改 <code>(&amp;__wait)-&gt;private-&gt;state</code>，而是再次获取<code>current-&gt;state</code> 来修改？它俩会不会已经不是同一个进程了呢？</p>
+<ul>
+<li><strong>单线程上下文 </strong>：<code>wait_event</code> 和 <code>__wait_event</code> 宏都<strong> 运行在调用进程的上下文中，不会被其它进程异步更改</strong>。因此，在循环等待或状态设置之前和之后，<code>current</code> 不会改变。</li>
+<li><strong>调度保障</strong>：在进入不可中断状态后，进程会在调度器 <code>schedule()</code> 中等待条件发生改变并被唤醒。在这一过程中，进程上下文保持一致。</li>
+</ul>
+<p>所以，正常情况下 <code>current</code> 和 <code>.private</code> 所指的进程将保持一致。</p>
+<h3 id="wait-event-interruptible">wait_event_interruptible</h3>
+<p>wait_event_interruptible 与 wait_event 宏的不同之处是：该宏使进程被置于浅睡眠状态（可被信号中断）进行等待。在每次被唤醒的时候，首先检查 condition 是否为真，如果为真则返回 0；否则，检查进程是被信号唤醒，是则返回 -ERESTARTSYS 错误码。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * wait_event_interruptible - sleep until a condition gets true</span></span><br><span class="line"><span class="comment"> * @wq: the waitqueue to wait on</span></span><br><span class="line"><span class="comment"> * @condition: a C expression for the event to wait for</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * The process is put to sleep (TASK_INTERRUPTIBLE) until the</span></span><br><span class="line"><span class="comment"> * @condition evaluates to true or a signal is received.</span></span><br><span class="line"><span class="comment"> * The @condition is checked each time the waitqueue @wq is woken up.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * wake_up() has to be called after changing any variable that could</span></span><br><span class="line"><span class="comment"> * change the result of the wait condition.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * The function will return -ERESTARTSYS if it was interrupted by a</span></span><br><span class="line"><span class="comment"> * signal and 0 if @condition evaluated to true.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> wait_event_interruptible(wq, condition)               \</span></span><br><span class="line"><span class="meta">    (&#123;                                                        \</span></span><br><span class="line"><span class="meta">        int __ret = 0;                                        \</span></span><br><span class="line"><span class="meta">        <span class="keyword">if</span> (!(condition))                                     \</span></span><br><span class="line"><span class="meta">            __wait_event_interruptible(wq, condition, __ret); \</span></span><br><span class="line"><span class="meta">        __ret;                                                \</span></span><br><span class="line"><span class="meta">    &#125;)</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> __wait_event_interruptible(wq, condition, ret)         \</span></span><br><span class="line"><span class="meta">    do &#123;                                                       \</span></span><br><span class="line"><span class="meta">        DEFINE_WAIT(__wait);                                   \</span></span><br><span class="line"><span class="meta">                                                               \</span></span><br><span class="line"><span class="meta">        for (;;) &#123;                                             \</span></span><br><span class="line"><span class="meta">            prepare_to_wait(&amp;wq, &amp;__wait, TASK_INTERRUPTIBLE); \</span></span><br><span class="line"><span class="meta">            <span class="keyword">if</span> (condition)                                     \</span></span><br><span class="line"><span class="meta">                break;                                         \</span></span><br><span class="line"><span class="meta">            <span class="keyword">if</span> (!signal_pending(current)) &#123;                    \</span></span><br><span class="line"><span class="meta">                schedule();                                    \</span></span><br><span class="line"><span class="meta">                continue;                                      \</span></span><br><span class="line"><span class="meta">            &#125;                                                  \</span></span><br><span class="line"><span class="meta">            ret = -ERESTARTSYS;                                \</span></span><br><span class="line"><span class="meta">            break;                                             \</span></span><br><span class="line"><span class="meta">        &#125;                                                      \</span></span><br><span class="line"><span class="meta">        finish_wait(&amp;wq, &amp;__wait);                             \</span></span><br><span class="line"><span class="meta">    &#125; while (0)</span></span><br></pre></td></tr></table></figure>
+<h3 id="wait-event-timeout">wait_event_timeout</h3>
+<p>wait_event_timeout 也与 wait_event 类似，均使进程被置于深睡眠状态（不可被中断）进行等待。不过如果所给的睡眠时间为负数则立即返回；如果在睡眠期间被唤醒，且 condition 为真则返回剩余的睡眠时间，否则继续睡眠直到到达或超过给定的睡眠时间，然后返回 0。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> wait_event_timeout(wq, condition, timeout)      \</span></span><br><span class="line"><span class="meta">    (&#123;                                                  \</span></span><br><span class="line"><span class="meta">        long __ret = timeout;                           \</span></span><br><span class="line"><span class="meta">        <span class="keyword">if</span> (!(condition))                               \</span></span><br><span class="line"><span class="meta">            __wait_event_timeout(wq, condition, __ret); \</span></span><br><span class="line"><span class="meta">        __ret;                                          \</span></span><br><span class="line"><span class="meta">    &#125;)</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> __wait_event_timeout(wq, condition, ret)                 \</span></span><br><span class="line"><span class="meta">    do &#123;                                                         \</span></span><br><span class="line"><span class="meta">        DEFINE_WAIT(__wait);                                     \</span></span><br><span class="line"><span class="meta">                                                                 \</span></span><br><span class="line"><span class="meta">        for (;;) &#123;                                               \</span></span><br><span class="line"><span class="meta">            prepare_to_wait(&amp;wq, &amp;__wait, TASK_UNINTERRUPTIBLE); \</span></span><br><span class="line"><span class="meta">            <span class="keyword">if</span> (condition)                                       \</span></span><br><span class="line"><span class="meta">                break;                                           \</span></span><br><span class="line"><span class="meta">            ret = schedule_timeout(ret);                         \</span></span><br><span class="line"><span class="meta">            <span class="keyword">if</span> (!ret)                                            \</span></span><br><span class="line"><span class="meta">                break;                                           \</span></span><br><span class="line"><span class="meta">        &#125;                                                        \</span></span><br><span class="line"><span class="meta">        finish_wait(&amp;wq, &amp;__wait);                               \</span></span><br><span class="line"><span class="meta">    &#125; while (0)</span></span><br></pre></td></tr></table></figure>
+<h3 id="wait-event-interruptible-timeout">wait_event_interruptible_timeout</h3>
+<p>wait_event_interruptible_timeout 是 interruptible 和 timeout 的结合，可使进程被置于浅睡眠状态（可被信号中断）进行等待。如果在睡眠期间被信号打断，则返回 -ERESTARTSYS 错误码；到达或超过给定的睡眠时间，则返回 0。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> wait_event_interruptible_timeout(wq, condition, timeout)      \</span></span><br><span class="line"><span class="meta">    (&#123;                                                                \</span></span><br><span class="line"><span class="meta">        long __ret = timeout;                                         \</span></span><br><span class="line"><span class="meta">        <span class="keyword">if</span> (!(condition))                                             \</span></span><br><span class="line"><span class="meta">            __wait_event_interruptible_timeout(wq, condition, __ret); \</span></span><br><span class="line"><span class="meta">        __ret;                                                        \</span></span><br><span class="line"><span class="meta">    &#125;)</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> __wait_event_interruptible_timeout(wq, condition, ret) \</span></span><br><span class="line"><span class="meta">    do &#123;                                                       \</span></span><br><span class="line"><span class="meta">        DEFINE_WAIT(__wait);                                   \</span></span><br><span class="line"><span class="meta">                                                               \</span></span><br><span class="line"><span class="meta">        for (;;) &#123;                                             \</span></span><br><span class="line"><span class="meta">            prepare_to_wait(&amp;wq, &amp;__wait, TASK_INTERRUPTIBLE); \</span></span><br><span class="line"><span class="meta">            <span class="keyword">if</span> (condition)                                     \</span></span><br><span class="line"><span class="meta">                break;                                         \</span></span><br><span class="line"><span class="meta">            <span class="keyword">if</span> (!signal_pending(current)) &#123;                    \</span></span><br><span class="line"><span class="meta">                ret = schedule_timeout(ret);                   \</span></span><br><span class="line"><span class="meta">                <span class="keyword">if</span> (!ret)                                      \</span></span><br><span class="line"><span class="meta">                    break;                                     \</span></span><br><span class="line"><span class="meta">                continue;                                      \</span></span><br><span class="line"><span class="meta">            &#125;                                                  \</span></span><br><span class="line"><span class="meta">            ret = -ERESTARTSYS;                                \</span></span><br><span class="line"><span class="meta">            break;                                             \</span></span><br><span class="line"><span class="meta">        &#125;                                                      \</span></span><br><span class="line"><span class="meta">        finish_wait(&amp;wq, &amp;__wait);                             \</span></span><br><span class="line"><span class="meta">    &#125; while (0)</span></span><br></pre></td></tr></table></figure>
+<h3 id="wait-event-interruptible-exclusive">wait_event_interruptible_exclusive</h3>
+<p>同样和 wait_event_interruptible 一样，不过该睡眠的进程是一个互斥进程。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> wait_event_interruptible_exclusive(wq, condition)               \</span></span><br><span class="line"><span class="meta">    (&#123;                                                                  \</span></span><br><span class="line"><span class="meta">        int __ret = 0;                                                  \</span></span><br><span class="line"><span class="meta">        <span class="keyword">if</span> (!(condition))                                               \</span></span><br><span class="line"><span class="meta">            __wait_event_interruptible_exclusive(wq, condition, __ret); \</span></span><br><span class="line"><span class="meta">        __ret;                                                          \</span></span><br><span class="line"><span class="meta">    &#125;)</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> __wait_event_interruptible_exclusive(wq, condition, ret)          \</span></span><br><span class="line"><span class="meta">    do &#123;                                                                  \</span></span><br><span class="line"><span class="meta">        DEFINE_WAIT(__wait);                                              \</span></span><br><span class="line"><span class="meta">                                                                          \</span></span><br><span class="line"><span class="meta">        for (;;) &#123;                                                        \</span></span><br><span class="line"><span class="meta">            prepare_to_wait_exclusive(&amp;wq, &amp;__wait, TASK_INTERRUPTIBLE);  \</span></span><br><span class="line"><span class="meta">            <span class="keyword">if</span> (condition) &#123;                                              \</span></span><br><span class="line"><span class="meta">                finish_wait(&amp;wq, &amp;__wait);                                \</span></span><br><span class="line"><span class="meta">                break;                                                    \</span></span><br><span class="line"><span class="meta">            &#125;                                                             \</span></span><br><span class="line"><span class="meta">            <span class="keyword">if</span> (!signal_pending(current)) &#123;                               \</span></span><br><span class="line"><span class="meta">                schedule();                                               \</span></span><br><span class="line"><span class="meta">                continue;                                                 \</span></span><br><span class="line"><span class="meta">            &#125;                                                             \</span></span><br><span class="line"><span class="meta">            ret = -ERESTARTSYS;                                           \</span></span><br><span class="line"><span class="meta">            abort_exclusive_wait(&amp;wq, &amp;__wait, TASK_INTERRUPTIBLE, NULL); \</span></span><br><span class="line"><span class="meta">            break;                                                        \</span></span><br><span class="line"><span class="meta">        &#125;                                                                 \</span></span><br><span class="line"><span class="meta">    &#125; while (0)</span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">prepare_to_wait_exclusive</span><span class="params">(<span class="type">wait_queue_head_t</span>* q, <span class="type">wait_queue_t</span>* wait, <span class="type">int</span> state)</span> &#123;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> flags;</span><br><span class="line"></span><br><span class="line">    wait-&gt;flags |= WQ_FLAG_EXCLUSIVE;  <span class="comment">// 互斥进程</span></span><br><span class="line">    spin_lock_irqsave(&amp;q-&gt;lock, flags);</span><br><span class="line">    <span class="keyword">if</span> (list_empty(&amp;wait-&gt;task_list))</span><br><span class="line">        __add_wait_queue_tail(q, wait);  <span class="comment">// 添加到队列尾</span></span><br><span class="line">    set_current_state(state);</span><br><span class="line">    spin_unlock_irqrestore(&amp;q-&gt;lock, flags);</span><br><span class="line">&#125;</span><br><span class="line">EXPORT_SYMBOL(prepare_to_wait_exclusive);</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * abort_exclusive_wait - 终止在队列中的独占等待（abort exclusive waiting in a queue）</span></span><br><span class="line"><span class="comment"> * @q: waitqueue waited on</span></span><br><span class="line"><span class="comment"> * @wait: wait descriptor</span></span><br><span class="line"><span class="comment"> * @mode: runstate of the waiter to be woken</span></span><br><span class="line"><span class="comment"> * @key: key to identify a wait bit queue or %NULL</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * 将当前线程设置回运行状态，并从给定的等待队列中删除等待描述符（如果仍在队列中）。</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * 如果调用者并发地唤醒该队列，则唤醒队列里的下一个等待者。</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * This prevents waiter starvation where an exclusive waiter</span></span><br><span class="line"><span class="comment"> * aborts and is woken up concurrently and no one wakes up</span></span><br><span class="line"><span class="comment"> * the next waiter.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">abort_exclusive_wait</span><span class="params">(<span class="type">wait_queue_head_t</span>* q, <span class="type">wait_queue_t</span>* wait, <span class="type">unsigned</span> <span class="type">int</span> mode, <span class="type">void</span>* key)</span> &#123;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> flags;</span><br><span class="line"></span><br><span class="line">    __set_current_state(TASK_RUNNING);</span><br><span class="line">    spin_lock_irqsave(&amp;q-&gt;lock, flags);</span><br><span class="line">    <span class="keyword">if</span> (!list_empty(&amp;wait-&gt;task_list))</span><br><span class="line">        list_del_init(&amp;wait-&gt;task_list);</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (waitqueue_active(q))  <span class="comment">// (!list_empty(&amp;q-&gt;task_list))</span></span><br><span class="line">        __wake_up_locked_key(q, mode, key);</span><br><span class="line">    spin_unlock_irqrestore(&amp;q-&gt;lock, flags);</span><br><span class="line">&#125;</span><br><span class="line">EXPORT_SYMBOL(abort_exclusive_wait);</span><br></pre></td></tr></table></figure>
+<h2 id="唤醒队列">唤醒队列</h2>
+<h3 id="wake-up">wake_up</h3>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> wake_up(x)      __wake_up(x, TASK_NORMAL, 1, NULL)</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> TASK_NORMAL     (TASK_INTERRUPTIBLE | TASK_UNINTERRUPTIBLE)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * __wake_up - wake up threads blocked on a waitqueue.</span></span><br><span class="line"><span class="comment"> * @q: the waitqueue</span></span><br><span class="line"><span class="comment"> * @mode: which threads</span></span><br><span class="line"><span class="comment"> * @nr_exclusive: how many wake-one or wake-many threads to wake up</span></span><br><span class="line"><span class="comment"> * @key: is directly passed to the wakeup function</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * It may be assumed that this function implies a write memory barrier before</span></span><br><span class="line"><span class="comment"> * changing the task state if and only if any tasks are woken up.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="type">void</span> __wake_up(<span class="type">wait_queue_head_t</span> *q, <span class="type">unsigned</span> <span class="type">int</span> mode,</span><br><span class="line">            <span class="type">int</span> nr_exclusive, <span class="type">void</span> *key)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> flags;</span><br><span class="line"></span><br><span class="line">    spin_lock_irqsave(&amp;q-&gt;lock, flags);</span><br><span class="line">    __wake_up_common(q, mode, nr_exclusive, <span class="number">0</span>, key);</span><br><span class="line">    spin_unlock_irqrestore(&amp;q-&gt;lock, flags);</span><br><span class="line">&#125;</span><br><span class="line">EXPORT_SYMBOL(__wake_up);</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * The core wakeup function. Non-exclusive wakeups (nr_exclusive == 0) just</span></span><br><span class="line"><span class="comment"> * wake everything up. If it&#x27;s an exclusive wakeup (nr_exclusive == small +ve</span></span><br><span class="line"><span class="comment"> * number) then we wake all the non-exclusive tasks and one exclusive task.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * There are circumstances in which we can try to wake a task which has already</span></span><br><span class="line"><span class="comment"> * started to run but is not in state TASK_RUNNING. try_to_wake_up() returns</span></span><br><span class="line"><span class="comment"> * zero in this (rare) case, and we handle it by continuing to scan the queue.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="type">static</span> <span class="type">void</span> __wake_up_common(<span class="type">wait_queue_head_t</span> *q, <span class="type">unsigned</span> <span class="type">int</span> mode,</span><br><span class="line">            <span class="type">int</span> nr_exclusive, <span class="type">int</span> wake_flags, <span class="type">void</span> *key)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">wait_queue_t</span> *curr, *next;</span><br><span class="line"></span><br><span class="line">    list_for_each_entry_safe(curr, next, &amp;q-&gt;task_list, task_list) &#123;</span><br><span class="line">        <span class="type">unsigned</span> flags = curr-&gt;flags;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 通过 curr-&gt;func 获取唤醒回调函数并执行</span></span><br><span class="line">        <span class="keyword">if</span> (curr-&gt;func(curr, mode, wake_flags, key) &amp;&amp;</span><br><span class="line">                (flags &amp; WQ_FLAG_EXCLUSIVE) &amp;&amp; !--nr_exclusive)</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>唤醒等待队列：可唤醒处于 TASK_INTERRUPTIBLE 和 TASK_UNINTERUPTIBLE 状态的进程，和 wait_event/wait_event_timeout 成对使用。</p>
+<p>被唤醒的进程，都会检查自己等待的条件是否满足，满足的进程会修改自己的状态为 TASK_RUNNING；如果条件不满足会继续睡眠，等待下次被唤醒（睡眠的进程可能支持可中断，所以并发所有的唤醒都是由类似函数唤醒）。</p>
+<h3 id="wake-up-interruptible">wake_up_interruptible</h3>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> wake_up_interruptible(x)        __wake_up(x, TASK_INTERRUPTIBLE, 1, NULL)</span></span><br></pre></td></tr></table></figure>
+<p>与 wake_up 的唯一区别是它只能唤醒 TASK_INTERRUPTIBLE 状态的进程。与 wait_event_interruptible/wait_event_interruptible_timeout/wait_event_interruptible_exclusive 成对使用。</p>
+<h3 id="wake-up-…">wake_up_…</h3>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> wake_up_all(x)      __wake_up(x, TASK_NORMAL, 0, NULL)  <span class="comment">// Non-exclusive wakeups (nr_exclusive == 0) just wake everything up.</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> wake_up_interruptible_nr(x, nr) __wake_up(x, TASK_INTERRUPTIBLE, nr, NULL)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> wake_up_interruptible_all(x)    __wake_up(x, TASK_INTERRUPTIBLE, 0, NULL)</span></span><br></pre></td></tr></table></figure>
+<p>这些也基本都和 wake_up/wake_up_interruptible 一样。</p>
+<h2 id="在等待队列上睡眠">在等待队列上睡眠</h2>
+<h3 id="sleep-on">sleep_on</h3>
+<p>该函数的作用是定义一个等待队列（wait），并将 current 进程添加到等待队列中（wait），然后将当前进程的状态置为 TASK_UNINTERRUPTIBLE，并将等待队列（wait）添加到等待队列头（q）中。之后就被挂起直到资源可以获取，才被从等待队列头（q）中唤醒，从等待队列头（q）中移出等待队列（wait）。在被挂起等待资源期间，该进程不能被信号唤醒。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> __sched <span class="title function_">sleep_on</span><span class="params">(<span class="type">wait_queue_head_t</span>* q)</span> &#123;</span><br><span class="line">    sleep_on_common(q, TASK_UNINTERRUPTIBLE, MAX_SCHEDULE_TIMEOUT);</span><br><span class="line">&#125;</span><br><span class="line">EXPORT_SYMBOL(sleep_on);</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">long</span> __sched <span class="title function_">sleep_on_common</span><span class="params">(<span class="type">wait_queue_head_t</span>* q, <span class="type">int</span> state, <span class="type">long</span> timeout)</span> &#123;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> flags;</span><br><span class="line">    <span class="type">wait_queue_t</span> wait;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// wait 变量用于当前线程 current 挂接，并指定唤醒函数</span></span><br><span class="line">    init_waitqueue_entry(&amp;wait, current);</span><br><span class="line"></span><br><span class="line">    __set_current_state(state);</span><br><span class="line"></span><br><span class="line">    spin_lock_irqsave(&amp;q-&gt;lock, flags);</span><br><span class="line">    __add_wait_queue(q, &amp;wait);</span><br><span class="line">    spin_unlock(&amp;q-&gt;lock);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 让线程调度并进入睡眠，直到资源可以获取或者超时</span></span><br><span class="line">    timeout = schedule_timeout(timeout);</span><br><span class="line">    spin_lock_irq(&amp;q-&gt;lock);</span><br><span class="line">    __remove_wait_queue(q, &amp;wait);</span><br><span class="line">    spin_unlock_irqrestore(&amp;q-&gt;lock, flags);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> timeout;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// kernel/wait.h</span></span><br><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">void</span> <span class="title function_">init_waitqueue_entry</span><span class="params">(<span class="type">wait_queue_t</span>* q, <span class="keyword">struct</span> task_struct* p)</span> &#123;</span><br><span class="line">    q-&gt;flags = <span class="number">0</span>;</span><br><span class="line">    q-&gt;private = p;</span><br><span class="line">    q-&gt;func = default_wake_function;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> __set_current_state(state_value) \</span></span><br><span class="line"><span class="meta">    do &#123;                                 \</span></span><br><span class="line"><span class="meta">        current-&gt;state = (state_value);  \</span></span><br><span class="line"><span class="meta">    &#125; while (0)</span></span><br></pre></td></tr></table></figure>
+<p>上面，四个自旋锁操作的区别在于中断处理和锁的解锁方式：</p>
+<ol>
+<li>
+<p><code>spin_lock_irqsave(&amp;q-&gt;lock, flags)</code>:</p>
+<ul>
+<li>获取自旋锁并禁用本地 CPU 中断。</li>
+<li><strong>保存中断状态到 <code>flags</code> 中，以便之后恢复</strong>，用于确保在锁持有期间，不会因中断处理导致竞态条件。</li>
+</ul>
+</li>
+<li>
+<p><code>spin_unlock(&amp;q-&gt;lock)</code>:</p>
+<ul>
+<li>释放自旋锁。</li>
+<li><strong>不恢复中断状态</strong>，常用于不涉及中断的情况下。</li>
+</ul>
+</li>
+<li>
+<p><code>spin_lock_irq(&amp;q-&gt;lock)</code>:</p>
+<ul>
+<li>获取自旋锁并禁用本地 CPU 中断。</li>
+<li><strong>不保存中断状态</strong>，一般用于不关心中断状态恢复的临界区。</li>
+</ul>
+</li>
+<li>
+<p><code>spin_unlock_irqrestore(&amp;q-&gt;lock, flags)</code>:</p>
+<ul>
+<li>释放自旋锁。</li>
+<li><strong>恢复之前保存的中断状态</strong>，用于结束一段可能影响中断处理的代码块，并恢复到进入时的中断状态。</li>
+</ul>
+</li>
+</ol>
+<h3 id="sleep-on-timeout">sleep_on_timeout</h3>
+<p>与 sleep_on() 函数的区别在于调用该函数时，如果在指定的时间内（timeout）没有获得等待的资源就会返回。实际上是调用 schedule_timeout() 函数实现的。值得注意的是，如果给定的 timeout 小于 0，则不会睡眠。该函数返回的是真正的睡眠时间。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">long</span> __sched <span class="title function_">sleep_on_timeout</span><span class="params">(<span class="type">wait_queue_head_t</span>* q, <span class="type">long</span> timeout)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> sleep_on_common(q, TASK_UNINTERRUPTIBLE, timeout);</span><br><span class="line">&#125;</span><br><span class="line">EXPORT_SYMBOL(sleep_on_timeout);</span><br></pre></td></tr></table></figure>
+<h3 id="interruptible-sleep-on">interruptible_sleep_on</h3>
+<p>该函数和 sleep_on() 函数唯一的区别是：将当前进程的状态置为 TASK_INTERRUPTINLE，这意味在睡眠过程中，如果该进程收到信号则会被唤醒。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> __sched <span class="title function_">interruptible_sleep_on</span><span class="params">(<span class="type">wait_queue_head_t</span>* q)</span> &#123;</span><br><span class="line">    sleep_on_common(q, TASK_INTERRUPTIBLE, MAX_SCHEDULE_TIMEOUT);</span><br><span class="line">&#125;</span><br><span class="line">EXPORT_SYMBOL(interruptible_sleep_on);</span><br></pre></td></tr></table></figure>
+<h3 id="interruptible-sleep-on-timeout">interruptible_sleep_on_timeout</h3>
+<p>类似于 sleep_on_timeout() 函数。进程在睡眠中可能在等待的时间没有到达就被信号打断而被唤醒，也可能是等待的时间到达而被唤醒。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">long</span> __sched <span class="title function_">interruptible_sleep_on_timeout</span><span class="params">(<span class="type">wait_queue_head_t</span>* q, <span class="type">long</span> timeout)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> sleep_on_common(q, TASK_INTERRUPTIBLE, timeout);</span><br><span class="line">&#125;</span><br><span class="line">EXPORT_SYMBOL(interruptible_sleep_on_timeout);</span><br></pre></td></tr></table></figure>
+<p>以上四个函数都是让进程在等待队列上睡眠，不过是小有差异而已。在实际用的过程中，根据需要选择合适的函数使用就是了。例如，</p>
+<ul>
+<li>在对软驱数据的读写中，如果设备没有就绪，则调用 sleep_on() 函数睡眠直到数据可读（可写）；</li>
+<li>在打开串口的时候，如果串口端口处于关闭状态，则调用 interruptible_sleep_on() 函数尝试等待其打开；</li>
+<li>在声卡驱动中，读取声音数据时，如果没有数据可读，就会等待足够常的时间直到可读取。</li>
+</ul>
+<h2 id="字符设备驱动示例">字符设备驱动示例</h2>
+<p>要在 Linux 内核中使用 <code>wait_queue_head_t</code> 来实现进程的等待和唤醒，我们可以编写一个简单的字符设备驱动示例。该示例将展示如何让一个进程进入睡眠状态，直到另一个进程或事件唤醒它。</p>
+<h3 id="内核代码">内核代码</h3>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/fs.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/init.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/module.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/sched.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/uaccess.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/wait.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> DEVICE_NAME <span class="string">&quot;wait_queue_example&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">int</span> major_num;</span><br><span class="line"><span class="type">static</span> <span class="title function_">DECLARE_WAIT_QUEUE_HEAD</span><span class="params">(wq)</span>;</span><br><span class="line"><span class="type">static</span> <span class="type">int</span> condition = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">ssize_t</span> <span class="title function_">device_read</span><span class="params">(<span class="keyword">struct</span> file* filp, <span class="type">char</span>* buffer, <span class="type">size_t</span> length, <span class="type">loff_t</span>* offset)</span> &#123;</span><br><span class="line">    printk(<span class="string">&quot;Process %d (%s) going to sleep\n&quot;</span>, current-&gt;pid, current-&gt;comm);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 让进程进入睡眠，并在条件满足（等待数据到达）时被唤醒</span></span><br><span class="line">    wait_event_interruptible(wq, condition != <span class="number">0</span>);  <span class="comment">// 该函数将进程设置为非互斥的 TASK_INTERRUPTIBLE 状态的进程</span></span><br><span class="line"></span><br><span class="line">    condition = <span class="number">0</span>;  <span class="comment">// Reset the condition</span></span><br><span class="line"></span><br><span class="line">    printk(<span class="string">&quot;Process %d (%s) woken up\n&quot;</span>, current-&gt;pid, current-&gt;comm);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">ssize_t</span> <span class="title function_">device_write</span><span class="params">(<span class="keyword">struct</span> file* filp, <span class="type">const</span> <span class="type">char</span>* buffer, <span class="type">size_t</span> length, <span class="type">loff_t</span>* offset)</span> &#123;</span><br><span class="line">    printk(<span class="string">&quot;Process %d (%s) waking up the readers\n&quot;</span>, current-&gt;pid, current-&gt;comm);</span><br><span class="line"></span><br><span class="line">    condition = <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 唤醒等待在条件上的所有进程，通知已经有数据可以读取</span></span><br><span class="line">    wake_up_interruptible(&amp;wq);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> length;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="class"><span class="keyword">struct</span> <span class="title">file_operations</span> <span class="title">fops</span> =</span> &#123;</span><br><span class="line">    .read = device_read,</span><br><span class="line">    .write = device_write,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">int</span> __init <span class="title function_">wait_queue_example_init</span><span class="params">(<span class="type">void</span>)</span> &#123;</span><br><span class="line">    major_num = register_chrdev(<span class="number">0</span>, DEVICE_NAME, &amp;fops);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (major_num &lt; <span class="number">0</span>) &#123;</span><br><span class="line">        printk(<span class="string">&quot;Registering char device failed with %d\n&quot;</span>, major_num);</span><br><span class="line">        <span class="keyword">return</span> major_num;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    printk(<span class="string">&quot;I was assigned major number %d.&quot;</span>, major_num);</span><br><span class="line">    printk(<span class="string">&quot;To talk to the driver, create a dev file with &#x27;mknod /dev/%s c %d 0&#x27;.\n&quot;</span>, DEVICE_NAME, major_num);</span><br><span class="line">    printk(<span class="string">&quot;Try various minor numbers. Try to cat and echo to the device file.\n&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">void</span> __exit <span class="title function_">wait_queue_example_exit</span><span class="params">(<span class="type">void</span>)</span> &#123;</span><br><span class="line">    unregister_chrdev(major_num, DEVICE_NAME);</span><br><span class="line">    printk(<span class="string">&quot;Goodbye, world!\n&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">module_init(wait_queue_example_init);</span><br><span class="line">module_exit(wait_queue_example_exit);</span><br><span class="line"></span><br><span class="line">MODULE_LICENSE(<span class="string">&quot;GPL&quot;</span>);</span><br><span class="line">MODULE_AUTHOR(<span class="string">&quot;ahaaa&quot;</span>);</span><br><span class="line">MODULE_DESCRIPTION(<span class="string">&quot;A simple Linux driver with wait queues&quot;</span>);</span><br></pre></td></tr></table></figure>
+<h3 id="编译模块">编译模块</h3>
+<p>使用 make 编译模块，在包含源代码和 Makefile 的目录中运行 make 命令，这会生成一个.ko（内核模块）文件，比如 wait_queue_example.ko。</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">obj-m += wait_queue_example.o</span><br><span class="line"></span><br><span class="line"><span class="section">all:</span></span><br><span class="line">	make -C /lib/modules/<span class="variable">$(<span class="built_in">shell</span> uname -r)</span>/build M=<span class="variable">$(PWD)</span> modules</span><br><span class="line"></span><br><span class="line"><span class="section">clean:</span></span><br><span class="line">	make -C /lib/modules/<span class="variable">$(<span class="built_in">shell</span> uname -r)</span>/build M=<span class="variable">$(PWD)</span> clean</span><br></pre></td></tr></table></figure>
+<h3 id="加载模块">加载模块</h3>
+<p>使用 insmod 命令加载模块：<code>sudo insmod wait_queue_example.ko</code>。如果一切顺利，你将看不到任何输出，因为 <code>printk</code> 函数不会输出到控制台，而是输出到内核日志。</p>
+<p>查看模块是否成功加载 / 卸载：<code>lsmod | grep wait_queue_example</code></p>
+<p>查看内核日志，以确保模块正常启动：<code>dmesg | tail</code></p>
+<p>使用 rmmod 命令卸载模块：<code>sudo rmmod wait_queue_example</code></p>
+<h3 id="创建设备文件">创建设备文件</h3>
+<p>查找 wait_queue_example 对应的主设备号：<code>cat /proc/devices</code></p>
+<p>使用 mknod 创建设备文件，假设主设备号是 major_num：<code>sudo mknod /dev/wait_queue_example c &lt;major_num&gt; 0</code></p>
+<p>设置设备文件的权限，使其可读写：<code>sudo chmod 666 /dev/wait_queue_example</code></p>
+<h3 id="运行进程">运行进程</h3>
+<p>在一个终端中运行<code>cat /dev/wait_queue_example</code>，此进程将进入等待队列进行睡眠。</p>
+<p>在另一个终端中使用<code>echo &quot;wake&quot; &gt; /dev/wait_queue_example</code>，这将唤醒等待的进程。</p>
+<p>再次通过 <code>dmesg | tail</code> 查看内核日志，可以看到：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[28154.120944] Process 9571 (cat) going to sleep</span><br><span class="line">[28200.935241] Process 9603 (bash) waking up the readers</span><br><span class="line">[28200.935265] Process 9571 (cat) woken up</span><br></pre></td></tr></table></figure>
+<p>这两个进程，能共享 condition 这个变量吗？一个进行修改了这个变量，另一个进程可以读到修改后的变量吗？</p>
+<p>是的，这两个进程可以共享和访问 condition 变量，因为 <strong> 它们在同一个内核模块中运行，并共享相同的内存地址空间（同一块内存）</strong>。因此，一个进程对 condition 的更改对其它进程立即可见。</p>
+<blockquote>
+<p>参考资料：</p>
+<ol>
+<li><a target="_blank" rel="noopener" href="https://shunlqing.github.io/2018/05/19/2018_5_19LinuxKernel_WaitQueue/">https://shunlqing.github.io/2018/05/19/2018_5_19LinuxKernel_WaitQueue/</a></li>
+<li><a target="_blank" rel="noopener" href="https://cslqm.github.io/2020/01/08/wait_queue_head_t/">https://cslqm.github.io/2020/01/08/wait_queue_head_t/</a></li>
+<li><a target="_blank" rel="noopener" href="https://juejin.cn/post/7083852861930471432">https://juejin.cn/post/7083852861930471432</a></li>
+</ol>
+</blockquote>
+
+</div>
+
+
+  <div class="book-comments">
+    
+
+
+
+
+  </div>
+
+
+
+<script src="/js/book-post.js"></script>
+
+
+            </div>
+          </div>
+          <div class="column col-2 hide-lg">
+            <div class="book-post-info">
+  
+    <div class="book-post-meta">
+
+  <div class="author">
+
+    <!-- Author image -->
+    <div class="author-img">
+      
+        <figure
+          class="avatar avatar-lg"
+          data-initial="A"
+          style="background-color: #3b4351;">
+        </figure>
+      
+    </div>
+
+    <!-- Author title -->
+    <div class="author-title">
+      <div>aha</div>
+      <div>2024-10-09</div>
+    </div>
+  </div>
+
+  
+    <div class="divider"></div>
+
+    <div class="link">
+      <a class="category-link" href="/categories/Linux%E5%86%85%E6%A0%B8/">Linux内核</a>
+
+      <a class="tag-none-link" href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84-%E7%AD%89%E5%BE%85%E9%98%9F%E5%88%97/" rel="tag">#数据结构 - 等待队列</a>
+    </div>
+    
+  
+
+  <div class="divider"></div>
+</div>
+  
+
+  <div class="book-tocbot">
+</div>
+<div class="book-tocbot-menu">
+  <a class="book-toc-expand" onclick="expand_toc()">Expand all</a>
+  <a onclick="go_top()">Back to top</a>
+  <a onclick="go_bottom()">Go to bottom</a>
+  <a onclick="toggleSearch()">Search in blogs</a> <!-- 添加搜索文字的点击事件 -->
+</div>
+
+<div id="search-overlay" class="search-overlay" style="display: none;"> <!-- 初始状态为隐藏 -->
+  <div class="search-box">
+    <input type="text" id="search-input" placeholder="Search in all blogs...">
+    <button onclick="closeSearch()">Close</button> <!-- 添加关闭按钮 -->
+    <div id="search-results" class="search-results"></div>
+  </div>
+</div>
+
+<script>
+  function performSearch(query) {
+    if (!query.trim()) {
+      return;
+    }
+
+    fetch('/search.xml')
+      .then(response => response.text())
+      .then(data => {
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(data, "text/xml");
+        const entries = xmlDoc.getElementsByTagName('entry');
+        let results = '';
+
+        for (let i = 0; i < entries.length; i++) {
+          const title = entries[i].getElementsByTagName('title')[0].textContent;
+          const content = entries[i].getElementsByTagName('content')[0].textContent;
+          const url = entries[i].getElementsByTagName('url')[0].textContent;
+
+          let count = (title.match(new RegExp(query, "gi")) || []).length; // 统计查询词出现的次数
+          count += (content.match(new RegExp(query, "gi")) || []).length;
+
+          if (count > 0) { // title.includes(query) || content.includes(query)
+            results += `
+              <div class="search-result-item">
+                <a href="${url}">${title}</a> (${count})
+              </div>`;
+          }
+        }
+
+        const searchResultsElement = document.getElementById('search-results');
+        searchResultsElement.innerHTML = results;
+        searchResultsElement.classList.add('active');
+      });
+  }
+
+  function toggleSearch() {
+    const searchOverlay = document.getElementById('search-overlay');
+    searchOverlay.style.display = searchOverlay.style.display === 'none' ? 'flex' : 'none';
+  }
+
+  function closeSearch() {
+    document.getElementById('search-overlay').style.display = 'none';
+  }
+
+  document.getElementById('search-input').addEventListener('input', function() {
+    const query = this.value;
+    performSearch(query);
+  });
+</script>
+
+<style>
+  .search-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  .search-box {
+    background: white;
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+    width: 80%;
+    max-width: 500px;
+  }
+
+  .search-results {
+    margin-top: 10px;
+    max-height: 300px;
+    overflow-y: auto;
+    background: white;
+    padding: 10px;
+    border-radius: 5px;
+    width: 100%;
+  }
+
+  .search-result-item {
+    margin: 10px 0;
+  }
+
+  .search-result-item a {
+    color: blue; /* 设置链接颜色为蓝色 */
+    text-decoration: none;
+  }
+
+  .search-result-item a:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+<script src="/js/book-toc.js"></script>
+
+
+</div>
+          </div>
+        </div>
+      </div>
+
+      <a class="off-canvas-overlay" onclick="hide_canvas()"></a>
+
+      <button class="floating-button" onclick="toggleDropdownMenu()"></button>
+
+      <div class="dropdown-menu">
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FFFFFF', '#000000')">银河白</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#C7EDCC', '#000000')">豆沙绿</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FAF9DE', '#000000')">杏仁黄</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#E3EDCD', '#000000')">青草绿</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FFF2E2', '#000000')">秋叶褐</div>
+      </div>
+  </div>
+
+  <script>
+    function toggleDropdownMenu() {
+      document.querySelector('.floating-button').classList.toggle('active');
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      var storedBackgroundColor = localStorage.getItem('blogBackgroundColor');
+      var storedColor = localStorage.getItem('blogColor');
+
+      if (storedBackgroundColor && storedColor) {
+        document.body.style.backgroundColor = storedBackgroundColor;
+        document.body.style.color = storedColor;
+      }
+    });
+
+    function changeBackgroundColor(backgroundColor, color) {
+      document.body.style.backgroundColor = backgroundColor;
+      document.body.style.color = color;
+
+      localStorage.setItem('blogBackgroundColor', backgroundColor);
+      localStorage.setItem('blogColor', color);
+
+      document.querySelector('.floating-button').classList.remove('active');
+    }
+  </script>
+</body>
+
+</html>
+
+
+<script src="/js/book.js"></script>

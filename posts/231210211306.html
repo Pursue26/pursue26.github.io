@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
+
+    
+      <link rel="icon" href="/favicon.png" />
+    
+
+    <title>
+        
+          操作系统之 chapter7.2 进程状态 - aha&#39;s book
+        
+    </title>
+
+    <!-- Spectre.css framework -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre-exp.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre-icons.min.css">
+
+    <!-- theme css & js -->
+    
+<link rel="stylesheet" href="/css/book.css">
+
+    
+<script src="/js/book.js"></script>
+
+
+    <!-- tocbot -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.css">
+    
+    <!-- katex -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/zooming/2.1.1/zooming.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const zooming = new Zooming()
+    zooming.listen('.book-content img')
+})
+</script>
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+    <style>
+      body {
+        background-color: #FFFFFF;
+        /* color: #000000; */
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+
+      /* Floating Button Styles */
+      .floating-button {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 999;
+        background-color: #000000;
+        color: #ffffff;
+        padding: 12px;
+        border-radius: 50%;
+        cursor: pointer;
+        border: 2px solid #000000;
+      }
+
+      .floating-button:hover {
+        background-color: #FFFFFF;
+      }
+
+      /* Dropdown Menu Styles */
+      .dropdown-menu {
+        position: fixed;
+        bottom: 60px;
+        right: 10px;
+        display: none;
+        min-width: 60px;
+        padding: 2px;
+        background-color: #fff;
+        /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
+        z-index: 1000;
+      }
+
+      .floating-button.active+.dropdown-menu {
+        display: block;
+      }
+
+      .dropdown-item {
+        display: block;
+        padding: 8px 16px;
+        cursor: pointer;
+      }
+
+      .dropdown-item:hover {
+        background-color: #f5f5f5;
+      }
+    </style>
+<style>.darkmode--activated{--body-bg-color:#282828;--content-bg-color:#333;--card-bg-color:#555;--text-color:#ccc;--blockquote-color:#bbb;--link-color:#ccc;--link-hover-color:#eee;--brand-color:#ddd;--brand-hover-color:#ddd;--table-row-odd-bg-color:#282828;--table-row-hover-bg-color:#363636;--menu-item-bg-color:#555;--btn-default-bg:#222;--btn-default-color:#ccc;--btn-default-border-color:#555;--btn-default-hover-bg:#666;--btn-default-hover-color:#ccc;--btn-default-hover-border-color:#666;--highlight-background:#282b2e;--highlight-foreground:#a9b7c6;--highlight-gutter-background:#34393d;--highlight-gutter-foreground:#9ca9b6}.darkmode--activated img{opacity:.75}.darkmode--activated img:hover{opacity:.9}.darkmode--activated code{color:#69dbdc;background:0 0}button.darkmode-toggle{z-index:9999}.darkmode-ignore,img{display:flex!important}.beian img{display:inline-block!important}</style></head>
+
+<body>
+  <div class="book-container">
+    <div class="book-sidebar">
+      <div class="book-brand">
+  <a href="/">
+    <img src="/favicon.png">
+    <span>AHA&#39;S BOOK</span>
+  </a>
+</div>
+        <div id="menu" class="book-menu hide">
+  <h2 id="基础知识"> 基础知识 </h2>
+<ul>
+<li><a href="/posts/231010144856.html"> 模运算 </a></li>
+<li><a href="/posts/231014105311.html"> 异或运算 </a></li>
+<li><a href="/posts/231210181853.html"> 计算机中的寄存器 </a></li>
+<li><a href="/posts/231213183051.html"> 正则表达式基础 </a></li>
+</ul>
+<h2 id="C 语言">C 语言 </h2>
+<ul>
+<li><a href="/posts/230916171929.html">main 函数参数 </a></li>
+<li><a href="/posts/231214192113.html"> 关键字与专有名词 </a></li>
+<li><a href="/posts/240103180653.html"> 输出打印函数 </a></li>
+<li><a href="/posts/230922143003.html"> 多维数组 </a></li>
+<li><a href="/posts/230913200729.html">const 关键字 </a></li>
+<li><a href="/posts/230918174223.html">typedef 类型基础 </a></li>
+<li><a href="/posts/230920172849.html">typedef 类型实践 </a></li>
+<li><a href="/posts/240224193217.html"> 二级指针 </a></li>
+<li><a href="/posts/240307195203.html"> 代码 TOP-K 问题 </a></li>
+<li><a href="/posts/230922172626.html">uthash 哈希表基础 </a></li>
+<li><a href="/posts/230918114841.html"> 大小端知识 </a></li>
+</ul>
+<h2 id="Golang 语言">Golang 语言 </h2>
+<ul>
+<li><a href="/posts/230907162612.html"> 变量与常量 </a></li>
+<li><a href="/posts/230909120145.html"> 函数 &amp; 包 &amp; 判断 &amp; 循环 </a></li>
+<li><a href="/posts/230912152800.html"> 数组与切片 </a></li>
+<li><a href="/posts/230913161326.html"> 可变参数函数与 Map 集合 </a></li>
+<li><a href="/posts/230915155105.html"> 字符串和指针 </a></li>
+</ul>
+<h2 id="数据结构"> 数据结构 </h2>
+<ul>
+<li><a href="/posts/231007174854.html"> 链表（数组实现）</a></li>
+<li><a href="/posts/231008213450.html"> 链表（链式实现）</a></li>
+<li><a href="/posts/231016161508.html"> 堆栈（数组实现）</a></li>
+<li><a href="/posts/231016184406.html"> 堆栈（链表实现）</a></li>
+<li><a href="/posts/231127185207.html"> 单调栈 </a></li>
+<li><a href="/posts/231017105123.html"> 队列（链表实现）</a></li>
+<li><a href="/posts/231017154121.html"> 双端队列（链表实现）</a></li>
+<li><a href="/posts/231018102559.html"> 堆基础与堆结构（数组实现）</a></li>
+<li><a href="/posts/231019102311.html"> 优先队列（堆实现）</a></li>
+<li><a href="/posts/230905224335.html"> 二叉树的遍历 </a></li>
+<li><a href="/posts/231020174358.html"> 二叉搜索树 </a></li>
+<li><a href="/posts/230916094606.html"> 拓扑排序 </a></li>
+<li><a href="/posts/230925185057.html">Trie 字典树 </a></li>
+<li><a href="/posts/231023164532.html"> 并查集（数组实现）</a></li>
+<li><a href="/posts/240702200642.html">Linux 数据结构之队列 </a></li>
+</ul>
+<h2 id="数据结构算法"> 数据结构算法 </h2>
+<ul>
+<li><a href="/posts/231218181635.html"> 归并排序 </a></li>
+<li><a href="/posts/231108163339.html"> 快速排序 </a></li>
+<li><a href="/posts/231107171607.html"> 堆排序 </a></li>
+<li><a href="/posts/231124181658.html"> 二分查找 </a></li>
+<li><a href="/posts/231227190828.html"> 哈希表实现 </a></li>
+<li><a href="/posts/240313193201.html"> 字符串哈希函数 </a></li>
+<li><a href="/posts/231116150205.html">Floyd 多源最短路径 </a></li>
+<li><a href="/posts/231117095232.html">Dijkstra 单源最短路径（原理部分）</a></li>
+<li><a href="/posts/231121152713.html">Dijkstra 单源最短路径（实现部分）</a></li>
+</ul>
+<h2 id="数据库"> 数据库 </h2>
+<ul>
+<li><a href="/posts/250605180332.html">MySQL 基础 </a></li>
+</ul>
+<h2 id="计算机网络"> 计算机网络 </h2>
+<ul>
+<li><a href="/posts/231011192359.html">OSI 参考模型 </a></li>
+<li><a href="/posts/240329202000.html"> 计网 CyC2018 之概述 </a></li>
+<li><a href="/posts/240329202004.html"> 计网 CyC2018 之链路层 </a></li>
+<li><a href="/posts/240329202003.html"> 计网 CyC2018 之网络层 </a></li>
+<li><a href="/posts/240329202002.html"> 计网 CyC2018 之传输层 </a></li>
+<li><a href="/posts/240329202001.html"> 计网 CyC2018 之应用层 </a></li>
+<li><a href="/posts/240306203742.html">ACL 访问控制列表 </a></li>
+<li><a href="/posts/240130190208.html"> 路由表、转发表与快速转发工作原理 </a></li>
+<li><a href="/posts/231221200716.html">VXLAN 网络虚拟化技术 </a></li>
+<li><a href="/posts/240903191243.html">TCP/IP checksum 计算 </a></li>
+<li><a href="/posts/240911185603.html"> 抓包分析 TCP 三次握手与四次挥手过程 </a></li>
+</ul>
+<h2 id="操作系统"> 操作系统 </h2>
+<ul>
+<li><a href="/posts/230921190726.html"> 概述 </a></li>
+<li><a href="/posts/230924172528.html"> 中断 &amp; 异常 &amp; 系统调用 </a></li>
+<li><a href="/posts/231017195157.html"> 内存分层体系与地址空间生成 </a></li>
+<li><a href="/posts/231108195351.html"> 连续内存分配 </a></li>
+<li><a href="/posts/231111172507.html"> 非连续内存分配之分段与分页 </a></li>
+<li><a href="/posts/231119170537.html"> 非连续内存分配之页表 </a></li>
+<li><a href="/posts/231123184526.html"> 内存管理之覆盖技术与交换技术 </a></li>
+<li><a href="/posts/231127193658.html"> 内存管理之虚存技术 </a></li>
+<li><a href="/posts/231129182631.html"> 局部页面置换算法 </a></li>
+<li><a href="/posts/231207184239.html"> 全局页面置换算法 </a></li>
+<li><a href="/posts/231207204958.html"> 进程描述 </a></li>
+<li><a href="/posts/231210211306.html"> 进程状态 </a></li>
+<li><a href="/posts/231215213932.html"> 线程 </a></li>
+<li><a href="/posts/231218220813.html"> 进程控制 </a></li>
+<li><a href="/posts/231228193143.html"> 调度 </a></li>
+<li><a href="/posts/240104202828.html"> 同步与互斥 </a></li>
+<li><a href="/posts/240113115605.html"> 信号量与管程 </a></li>
+<li><a href="/posts/240205182643.html"> 经典同步问题 </a></li>
+<li><a href="/posts/240310162231.html"> 死锁 </a></li>
+</ul>
+<h2 id="系统与网络编程"> 系统与网络编程 </h2>
+<ul>
+<li><a href="/posts/230911151334.html">pthread 库 </a></li>
+<li><a href="/posts/230921094127.html"> 锁与原子操作 </a></li>
+<li><a href="/posts/240319195609.html"> 读者写者问题 </a></li>
+<li><a href="/posts/240527200241.html"> 网络编程卷一阅读随笔 </a></li>
+<li><a href="/posts/240414190410.html"> 进程间通信 IPC 机制 </a></li>
+<li><a href="/posts/240424200123.html"> 多进程相关练习 </a></li>
+<li><a href="/posts/240516221527.html">I/O 模式与 I/O 多路复用 </a></li>
+<li><a href="/posts/240626192803.html">Linux 内核 kfifo 环形队列 </a></li>
+<li><a href="/posts/241009203126.html">Linux 内核等待队列 </a></li>
+<li><a href="/posts/240627210637.html">DPDK 无锁环形队列 </a></li>
+<li><a href="/posts/240919200410.html"> 解密内存屏障 </a></li>
+<li><a href="/posts/240927202500.html"> 内核线程的创建 </a></li>
+<li><a href="/posts/241015195205.html">Linux 网络数据包接收过程 </a></li>
+<li><a href="/posts/2410232111015.html"> 源码解读 epoll 实现原理 </a></li>
+<li><a href="/posts/241106182619.html">Linux 文件系统 </a></li>
+<li><a href="/posts/250619154429.html">Libevent 高性能 IO 事件驱动库 </a></li>
+</ul>
+<h2 id="工具与命令"> 工具与命令 </h2>
+<ul>
+<li><a href="/posts/240207180410.html">GCC 编译过程分解 </a></li>
+<li><a href="/posts/240312184132.html">GDB 调试入门 </a></li>
+<li><a href="/posts/240512184921.html">Makefile 学习 </a></li>
+<li><a href="/posts/250629214430.html">CMake 学习 </a></li>
+<li><a href="/posts/240417193754.html">Linux 命令之文件权限 </a></li>
+</ul>
+<h2 id="开源项目"> 开源项目 </h2>
+<ul>
+<li><a href="/posts/240303201855.html"> 线程池原理与实现 </a></li>
+<li><a href="/posts/240507194549.html">HTTP 服务器实现 </a></li>
+<li><a href="/posts/240904203605.html"> 聊天服务器实现 </a></li>
+<li><a href="/posts/241119182636.html">Linux 文件系统 </a></li>
+</ul>
+<h2 id="Docker">Docker</h2>
+<ul>
+<li><a href="/posts/230909171809.html">Docker 学习笔记 </a></li>
+</ul>
+<h1 id="LeetCode 刷题">LeetCode 刷题 </h1>
+<h2 id="链表相关"> 链表相关 </h2>
+<ul>
+<li><a href="/posts/231025143947.html">160 相交链表 </a></li>
+<li><a href="/posts/231025185947.html">206 反转链表 </a></li>
+<li><a href="/posts/231026101239.html">21 合并两个有序链表 </a></li>
+<li><a href="/posts/231026184514.html">83 删除排序链表中的重复元素 </a></li>
+<li><a href="/posts/231027150243.html">19 删除链表的倒数第 N 个节点 </a></li>
+<li><a href="/posts/231031120718.html">2 两数相加 </a></li>
+<li><a href="/posts/231031163133.html">445 两数相加 II</a></li>
+<li><a href="/posts/231101094219.html">234 回文链表 </a></li>
+<li><a href="/posts/231101135228.html">725 分隔链表 </a></li>
+<li><a href="/posts/231102120708.html">328 奇偶链表 </a></li>
+<li><a href="/posts/231102165703.html">142 环形链表 II</a></li>
+</ul>
+<h2 id="设计"> 设计 </h2>
+<ul>
+<li><a href="/posts/231201184542.html">146 LRU 缓存 </a></li>
+</ul>
+<h2 id="贪心算法"> 贪心算法 </h2>
+<ul>
+<li><a href="/posts/231107094652.html">1029 两地调度 </a></li>
+<li><a href="/posts/231109150855.html">435 无重叠区间 </a></li>
+</ul>
+<h2 id="哈希表"> 哈希表 </h2>
+<ul>
+<li><a href="/posts/231123181539.html">1410 实体解析器 </a></li>
+</ul>
+<h2 id="树的遍历"> 树的遍历 </h2>
+<ul>
+<li><a href="/posts/231103121209.html">117 填充每个节点的下一个右侧节点指针 II</a></li>
+</ul>
+<h2 id="深度优先搜索（递归）"> 深度优先搜索（递归）</h2>
+<ul>
+<li><a href="/posts/231206201243.html">2477 达到首都的最少油耗 </a></li>
+</ul>
+<h2 id="图或路径问题"> 图或路径问题 </h2>
+<ul>
+<li><a href="/posts/231211184652.html">1631 最小体力消耗路径 </a></li>
+</ul>
+<h2 id="其它"> 其它 </h2>
+<ul>
+<li><a href="/posts/230101120000.html"> 备忘录 </a></li>
+</ul>
+
+</div>
+
+
+<script src="/js/book-menu.js"></script>
+
+    </div>
+    <div class="sidebar-toggle" onclick="sidebar_toggle()" onmouseover="add_inner()" onmouseleave="remove_inner()">
+  <div class="sidebar-toggle-inner"></div>
+</div>
+
+<script>
+function add_inner() {
+  let inner = document.querySelector('.sidebar-toggle-inner')
+  inner.classList.add('show')  
+}
+
+function remove_inner() {
+  let inner = document.querySelector('.sidebar-toggle-inner')
+  inner.classList.remove('show')
+}
+
+function sidebar_toggle() {
+    let sidebar_toggle = document.querySelector('.sidebar-toggle')
+    let sidebar = document.querySelector('.book-sidebar')
+    let content = document.querySelector('.off-canvas-content')
+    if (sidebar_toggle.classList.contains('extend')) { // show
+        sidebar_toggle.classList.remove('extend')
+        sidebar.classList.remove('hide')
+        content.classList.remove('extend')
+    }
+    else { // hide
+        sidebar_toggle.classList.add('extend')
+        sidebar.classList.add('hide')
+        content.classList.add('extend')
+    }
+}
+</script>
+
+      <div class="off-canvas-content">
+        <div class="columns">
+          <div class="column col-10 col-lg-12">
+            <div class="book-navbar">
+              <!-- For Responsive Layout -->
+
+<header class="navbar">
+  <section class="navbar-section">
+    <a onclick="open_sidebar()">
+      <i class="icon icon-menu"></i>
+    </a>
+  </section>
+</header>
+
+            </div>
+            <div class="book-content">
+              <div class="book-post">
+  <p>进程是一个具有一定独立功能的 <strong> 程序 </strong> 在一个 <strong> 数据集合 </strong> 上的 <strong> 一次动态执行 </strong> 过程。</p>
+<p>本文是进程与线程的第二部分，主要介绍进程的状态，包括进程的生命周期管理、进程状态变化模型和进程挂起模型，以及操作系统如何管理进程的状态队列。</p>
+<span id="more"></span>
+<h1 id="进程的生命周期管理">进程的生命周期管理</h1>
+<p>一个进程的生命周期包括：进程的创建、就绪、运行、等待（阻塞）、终止。</p>
+<h2 id="进程创建">进程创建</h2>
+<p>引起进程创建的 3 个主要事件：</p>
+<ul>
+<li>系统初始化（创建出计算机的首个进程）；</li>
+<li>用户请求创建一个新进程；</li>
+<li>正在运行的进程执行了创建进程的系统调用。</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">P_create</span><br></pre></td></tr></table></figure>
+<h2 id="进程就绪">进程就绪</h2>
+<p>一个进程被创建完成后，便会进入就绪状态，等待操作系统的调度执行。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">P_create -&gt; P_ready</span><br></pre></td></tr></table></figure>
+<h2 id="进程运行">进程运行</h2>
+<p>内核选择一个 <strong> 就绪 </strong> 的进程，让它占用 CPU 并执行。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">P_create -&gt; P_ready -&gt; P_running</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>计算机有那么多进程呢，操作系统如何选择进程？又为何选择这个进程？这由后续要讲解的调度算法控制！</p>
+</blockquote>
+<h2 id="进程等待（阻塞）">进程等待（阻塞）</h2>
+<p>在以下情况下，进程等待（阻塞）：</p>
+<ul>
+<li>请求并等待系统服务，无法马上完成；</li>
+<li>启动某种操作，无法马上完成；</li>
+<li>需要的数据没有到达。</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">P_create -&gt; P_ready -&gt; P_running</span><br><span class="line">                           ↓</span><br><span class="line">                       P_waiting</span><br></pre></td></tr></table></figure>
+<p><strong>进程只能自己阻塞自己</strong>，因为只有进程自身才能知道何时需要等待某种事件的发生。</p>
+<h2 id="进程唤醒">进程唤醒</h2>
+<p>唤醒进程的原因：</p>
+<ul>
+<li>被阻塞进程需要的资源可被满足；</li>
+<li>被阻塞进程等待的事件到达；</li>
+<li>将该进程的 PCB 插入到就绪队列。</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">P_create -&gt; P_ready -&gt; P_running</span><br><span class="line">               ↑           ↓</span><br><span class="line">               &lt;------ P_waiting</span><br></pre></td></tr></table></figure>
+<p>被唤醒的进程将进入就绪状态，<strong>进程只能被别的进程或操作系统唤醒</strong>。</p>
+<h2 id="进程结束">进程结束</h2>
+<p>在以下四种情况下，进程结束：</p>
+<ul>
+<li>正常退出（自愿的）；</li>
+<li>错误退出（自愿的）；</li>
+<li>致命错误（强制性的）；</li>
+<li>被其他进程所杀死（强制性的）。</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">P_create -&gt; P_ready -&gt; P_running -&gt; Exit</span><br><span class="line">               ↑           ↓</span><br><span class="line">               &lt;------ P_waiting</span><br></pre></td></tr></table></figure>
+<h1 id="进程状态变化模型">进程状态变化模型</h1>
+<h2 id="三种基本状态">三种基本状态</h2>
+<p>进程的三种基本状态（进程在生命结束前处于三种基本状态之一）：</p>
+<ul>
+<li>运行状态（Running）：当一个进程正在 CPU 上运行时。</li>
+<li>就绪状态（Ready）：一个进程获得了除 CPU 之外的一切所需资源，一旦得到 CPU 便可运行。</li>
+<li>等待（阻塞）状态（Waiting/Blocked）：一个进程正在等待某一事件而暂停运行时。如等待某资源、等待输入 / 输出完成。</li>
+</ul>
+<blockquote>
+<p>不同操作系统设置的进程状态数目可能不同。</p>
+</blockquote>
+<h2 id="其它基本状态">其它基本状态</h2>
+<p>进程其它的基本状态：</p>
+<ul>
+<li>创建状态（New）：一个进程正在被创建，还没被转到就绪状态之前的状态；</li>
+<li>结束状态（Exit）： 一个进程正在从系统中消失时的状态。</li>
+</ul>
+<h2 id="进程状态变化">进程状态变化</h2>
+<img src="../images/os-kernel/chapter7/process-state.png" alt="进程状态变化图" width="80%" height="80%">
+<p>进程可能的状态变化如下：</p>
+<ul>
+<li><code>NULL -&gt; New</code>：一个新进程被产生出来执行一个程序。</li>
+<li><code>New -&gt; Ready</code>：当进程创建并并初始化完成后，一切就绪准备运行时，变为就绪状态。
+<ul>
+<li>该变化过程是否会持续很久？很快。</li>
+</ul>
+</li>
+<li><code>Ready -&gt; Running</code>：处于就绪态的进程被进程调度程序选中后，就分配到 CPU 上来运行。</li>
+<li><code>Running -&gt; Exit</code>：当进程表示它已经完成或者发生异常，当前运行的进程会由操作系统作结束处理。</li>
+<li><code>Running -&gt; Ready</code>：处于运行状态的进程在其运行过程中，<strong>由于分配它的 CPU 时间片用完而让出 CPU，或者当一个高优先级的进程就绪时，操作系统可能会抢占当前正在运行的低优先级进程，并将其切换到就绪态，以便优先执行高优先级进程</strong>。</li>
+<li><code>Running -&gt; Blocked</code>：当进程请求某个事件且必须等待时。
+<ul>
+<li>例如，等待一个计时器的到达、读 / 写文件比较慢等。</li>
+</ul>
+</li>
+<li><code>Blocked -&gt; Ready</code>：当进程等待到某个事件到来时，它从阻塞状态变到就绪状态。</li>
+</ul>
+<h1 id="进程挂起模型">进程挂起模型</h1>
+<h2 id="进程挂起">进程挂起</h2>
+<p>进程挂起（suspend）是指操作系统进程管理将前台的进程暂停并转入后台的动作。将进程挂起可以让用户在前台执行其他的进程。挂起的进程通常释放除 CPU 以外已经占有的系统资源，如内存等。在需要时用户可以恢复进程的运行，将被挂起的进程从后台转入前台，并从暂停处开始继续运行。（Wikipedia）</p>
+<p>进程挂起：为了合理且充分地利用系统资源。</p>
+<p>进程在挂起状态时，意味着进程 <strong> 没有占用内存空间</strong>，处在挂起状态的进程映像在磁盘上（把进程放到磁盘上）。</p>
+<h2 id="两种挂起状态">两种挂起状态</h2>
+<ul>
+<li><strong>阻塞挂起状态</strong>：进程在外存，并等待某事件的出现。</li>
+<li><strong>就绪挂起状态</strong>：进程在外村，但只要进入内存，即可运行。</li>
+</ul>
+<h2 id="与挂起相关的状态转换">与挂起相关的状态转换</h2>
+<p>带有挂起状态的进程状态转移模型：</p>
+<img src="../images/os-kernel/chapter7/process-state-transfer-with-suspend.png" alt="带有挂起状态的进程状态转移模型" width="80%" height="80%">
+<p>可以将挂起状态间的转化分为两类，<strong>一类是进程处于内存中时发生的挂起，另一类是进程处于外存时的挂起</strong>。</p>
+<h3 id="进程处于内存时的挂起">进程处于内存时的挂起</h3>
+<p><strong>阻塞 -&gt; 阻塞挂起</strong>：</p>
+<ul>
+<li>条件：当没有进程处于就绪状态（即没有可以立即执行的进程）或者就绪进程需要更多的内存资源时，系统会进行阻塞挂起的转换。</li>
+<li>目的：为了让其他进程先执行，以便提交新进程或者为就绪进程提供所需的内存资源。换句话说，系统会将当前的进程暂时停止执行，以满足其他进程的需求，直到满足某种条件后再重新唤醒该进程。</li>
+</ul>
+<p><strong>就绪 -&gt; 就绪挂起</strong>：</p>
+<ul>
+<li>条件：当有高优先级阻塞（系统认为会很快就绪的）进程和低优先级就绪进程时，系统会选择挂起低优先级就绪进程。</li>
+<li>目的：让优先级更高的进程得到更多的资源运行。</li>
+</ul>
+<blockquote>
+<p>通常，<strong>操作系统更倾向于挂起阻塞态进程而不是就绪态进程</strong>，因为就绪态进程可以立即执行，而阻塞态进程占用了内存空间但不能立即执行。<br>
+但是，如果释放内存以得到足够空间的 <strong> 唯一方法 </strong> 是挂起一个就绪态进程的话，那么这种转换也是必需的；并且，如果操作系统确信高优先级的阻塞态进程很快就会就绪，那么它可能选择挂起一个低优先级的就绪态进程，而不是一个高优先级的阻塞态进程。</p>
+</blockquote>
+<p><strong>运行 -&gt; 就绪挂起</strong>：</p>
+<ul>
+<li>条件：对抢先式分时系统（即可抢占 CPU 资源），当有高优先级阻塞挂起进程因事件出现而进入就绪挂起时，系统可能会把运行进程转到就绪挂起状态。</li>
+<li>目的：让优先级更高的进程得到更多的资源运行。</li>
+</ul>
+<h3 id="进程处于外存时的挂起">进程处于外存时的挂起</h3>
+<p><strong>阻塞挂起 -&gt; 就绪挂起</strong>：</p>
+<p>条件：当有阻塞挂起因相关事件出现时，系统会把阻塞挂起进程转换为就绪挂起进程。</p>
+<h3 id="解挂（激活）">解挂（激活）</h3>
+<p>既然有将内存中的进程挂起到外存的，那么也会有解挂重新激活进程的操作：即将一个进程从外存转到内存。</p>
+<p><strong>就绪挂起 -&gt; 就绪态</strong>：</p>
+<p>条件：内存中没有就绪进程，或挂起的就绪进程优先级高于内存中的就绪进程时，会进行这种转换。但一般情况下也会发生这种转换，不一定是上述两种条件。</p>
+<p><strong>阻塞挂起 -&gt; 阻塞态</strong>：</p>
+<p>条件：当一个进程释放足够内存时，系统会把一个高优先级阻塞挂起（系统认为会很快出现所等待的事件）进程转换为阻塞进程。</p>
+<h1 id="状态队列">状态队列</h1>
+<p>状态队列（State Queue）是操作系统中用于管理进程状态的数据结构，用于存储不同状态的进程。</p>
+<p><strong>状态队列</strong>：</p>
+<ul>
+<li>由操作系统来维护 <strong> 一组 </strong> 队列，用来表示系统当中所有进程的当前状态；</li>
+<li>不同的状态分别用不同的队列来表示，如就绪队列、各种类型的阻塞队列；</li>
+<li>每个进程的 PCB 都根据它的状态加入到相应的队列当中，当一个进程的状态发生变化时，它的 PCB 从一个状态队列中脱离出来，加入到另外一个状态队列中。</li>
+</ul>
+<details>
+  <summary>操作系统如何通过 PCB 和定义的进程状态来管理和调度进程的？</summary>
+<ol>
+<li>将进程根据其状态放入对应的队列中。</li>
+<li>根据调度算法从就绪队列中选择一个进程进行执行。</li>
+<li>将选中的进程的 PCB 信息加载到 CPU 寄存器中，设置进程状态为运行态。</li>
+<li>执行选中的进程，根据需要进行上下文切换。</li>
+<li>如果进程遇到事件（如等待 I/O 完成），将进程状态设置为阻塞态，记录事件信息到 PCB 中。</li>
+<li>当事件发生后，将进程状态设置为就绪态，将其放回就绪队列中等待调度。</li>
+<li>重复步骤 2 至步骤 6，实现多任务的并发执行和合理的进程调度。【由 GPT 生成】</li>
+</ol>
+</details>
+<blockquote>
+<p>参考资料：</p>
+<ol>
+<li><a target="_blank" rel="noopener" href="https://github.com/OXygenMoon/OperatingSystemInDepth">https://github.com/OXygenMoon/OperatingSystemInDepth</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_53407527/article/details/125027431">https://blog.csdn.net/weixin_53407527/article/details/125027431</a></li>
+</ol>
+</blockquote>
+
+</div>
+
+
+  <div class="book-comments">
+    
+
+
+
+
+  </div>
+
+
+
+<script src="/js/book-post.js"></script>
+
+
+            </div>
+          </div>
+          <div class="column col-2 hide-lg">
+            <div class="book-post-info">
+  
+    <div class="book-post-meta">
+
+  <div class="author">
+
+    <!-- Author image -->
+    <div class="author-img">
+      
+        <figure
+          class="avatar avatar-lg"
+          data-initial="A"
+          style="background-color: #3b4351;">
+        </figure>
+      
+    </div>
+
+    <!-- Author title -->
+    <div class="author-title">
+      <div>aha</div>
+      <div>2023-12-10</div>
+    </div>
+  </div>
+
+  
+    <div class="divider"></div>
+
+    <div class="link">
+      <a class="category-link" href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">操作系统</a> <a class="category-link" href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E8%BF%9B%E7%A8%8B%E4%B8%8E%E7%BA%BF%E7%A8%8B/">进程与线程</a>
+
+      <a class="tag-none-link" href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" rel="tag">#操作系统</a> <a class="tag-none-link" href="/tags/%E8%BF%9B%E7%A8%8B/" rel="tag">#进程</a>
+    </div>
+    
+  
+
+  <div class="divider"></div>
+</div>
+  
+
+  <div class="book-tocbot">
+</div>
+<div class="book-tocbot-menu">
+  <a class="book-toc-expand" onclick="expand_toc()">Expand all</a>
+  <a onclick="go_top()">Back to top</a>
+  <a onclick="go_bottom()">Go to bottom</a>
+  <a onclick="toggleSearch()">Search in blogs</a> <!-- 添加搜索文字的点击事件 -->
+</div>
+
+<div id="search-overlay" class="search-overlay" style="display: none;"> <!-- 初始状态为隐藏 -->
+  <div class="search-box">
+    <input type="text" id="search-input" placeholder="Search in all blogs...">
+    <button onclick="closeSearch()">Close</button> <!-- 添加关闭按钮 -->
+    <div id="search-results" class="search-results"></div>
+  </div>
+</div>
+
+<script>
+  function performSearch(query) {
+    if (!query.trim()) {
+      return;
+    }
+
+    fetch('/search.xml')
+      .then(response => response.text())
+      .then(data => {
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(data, "text/xml");
+        const entries = xmlDoc.getElementsByTagName('entry');
+        let results = '';
+
+        for (let i = 0; i < entries.length; i++) {
+          const title = entries[i].getElementsByTagName('title')[0].textContent;
+          const content = entries[i].getElementsByTagName('content')[0].textContent;
+          const url = entries[i].getElementsByTagName('url')[0].textContent;
+
+          let count = (title.match(new RegExp(query, "gi")) || []).length; // 统计查询词出现的次数
+          count += (content.match(new RegExp(query, "gi")) || []).length;
+
+          if (count > 0) { // title.includes(query) || content.includes(query)
+            results += `
+              <div class="search-result-item">
+                <a href="${url}">${title}</a> (${count})
+              </div>`;
+          }
+        }
+
+        const searchResultsElement = document.getElementById('search-results');
+        searchResultsElement.innerHTML = results;
+        searchResultsElement.classList.add('active');
+      });
+  }
+
+  function toggleSearch() {
+    const searchOverlay = document.getElementById('search-overlay');
+    searchOverlay.style.display = searchOverlay.style.display === 'none' ? 'flex' : 'none';
+  }
+
+  function closeSearch() {
+    document.getElementById('search-overlay').style.display = 'none';
+  }
+
+  document.getElementById('search-input').addEventListener('input', function() {
+    const query = this.value;
+    performSearch(query);
+  });
+</script>
+
+<style>
+  .search-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  .search-box {
+    background: white;
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+    width: 80%;
+    max-width: 500px;
+  }
+
+  .search-results {
+    margin-top: 10px;
+    max-height: 300px;
+    overflow-y: auto;
+    background: white;
+    padding: 10px;
+    border-radius: 5px;
+    width: 100%;
+  }
+
+  .search-result-item {
+    margin: 10px 0;
+  }
+
+  .search-result-item a {
+    color: blue; /* 设置链接颜色为蓝色 */
+    text-decoration: none;
+  }
+
+  .search-result-item a:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+<script src="/js/book-toc.js"></script>
+
+
+</div>
+          </div>
+        </div>
+      </div>
+
+      <a class="off-canvas-overlay" onclick="hide_canvas()"></a>
+
+      <button class="floating-button" onclick="toggleDropdownMenu()"></button>
+
+      <div class="dropdown-menu">
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FFFFFF', '#000000')">银河白</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#C7EDCC', '#000000')">豆沙绿</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FAF9DE', '#000000')">杏仁黄</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#E3EDCD', '#000000')">青草绿</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FFF2E2', '#000000')">秋叶褐</div>
+      </div>
+  </div>
+
+  <script>
+    function toggleDropdownMenu() {
+      document.querySelector('.floating-button').classList.toggle('active');
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      var storedBackgroundColor = localStorage.getItem('blogBackgroundColor');
+      var storedColor = localStorage.getItem('blogColor');
+
+      if (storedBackgroundColor && storedColor) {
+        document.body.style.backgroundColor = storedBackgroundColor;
+        document.body.style.color = storedColor;
+      }
+    });
+
+    function changeBackgroundColor(backgroundColor, color) {
+      document.body.style.backgroundColor = backgroundColor;
+      document.body.style.color = color;
+
+      localStorage.setItem('blogBackgroundColor', backgroundColor);
+      localStorage.setItem('blogColor', color);
+
+      document.querySelector('.floating-button').classList.remove('active');
+    }
+  </script>
+</body>
+
+</html>
+
+
+<script src="/js/book.js"></script>

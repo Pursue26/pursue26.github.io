@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
+
+    
+      <link rel="icon" href="/favicon.png" />
+    
+
+    <title>
+        
+          LeetCode 刷题之 2477 达到首都的最少油耗 - aha&#39;s book
+        
+    </title>
+
+    <!-- Spectre.css framework -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre-exp.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre-icons.min.css">
+
+    <!-- theme css & js -->
+    
+<link rel="stylesheet" href="/css/book.css">
+
+    
+<script src="/js/book.js"></script>
+
+
+    <!-- tocbot -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.css">
+    
+    <!-- katex -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/zooming/2.1.1/zooming.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const zooming = new Zooming()
+    zooming.listen('.book-content img')
+})
+</script>
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+    <style>
+      body {
+        background-color: #FFFFFF;
+        /* color: #000000; */
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+
+      /* Floating Button Styles */
+      .floating-button {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 999;
+        background-color: #000000;
+        color: #ffffff;
+        padding: 12px;
+        border-radius: 50%;
+        cursor: pointer;
+        border: 2px solid #000000;
+      }
+
+      .floating-button:hover {
+        background-color: #FFFFFF;
+      }
+
+      /* Dropdown Menu Styles */
+      .dropdown-menu {
+        position: fixed;
+        bottom: 60px;
+        right: 10px;
+        display: none;
+        min-width: 60px;
+        padding: 2px;
+        background-color: #fff;
+        /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
+        z-index: 1000;
+      }
+
+      .floating-button.active+.dropdown-menu {
+        display: block;
+      }
+
+      .dropdown-item {
+        display: block;
+        padding: 8px 16px;
+        cursor: pointer;
+      }
+
+      .dropdown-item:hover {
+        background-color: #f5f5f5;
+      }
+    </style>
+<style>.darkmode--activated{--body-bg-color:#282828;--content-bg-color:#333;--card-bg-color:#555;--text-color:#ccc;--blockquote-color:#bbb;--link-color:#ccc;--link-hover-color:#eee;--brand-color:#ddd;--brand-hover-color:#ddd;--table-row-odd-bg-color:#282828;--table-row-hover-bg-color:#363636;--menu-item-bg-color:#555;--btn-default-bg:#222;--btn-default-color:#ccc;--btn-default-border-color:#555;--btn-default-hover-bg:#666;--btn-default-hover-color:#ccc;--btn-default-hover-border-color:#666;--highlight-background:#282b2e;--highlight-foreground:#a9b7c6;--highlight-gutter-background:#34393d;--highlight-gutter-foreground:#9ca9b6}.darkmode--activated img{opacity:.75}.darkmode--activated img:hover{opacity:.9}.darkmode--activated code{color:#69dbdc;background:0 0}button.darkmode-toggle{z-index:9999}.darkmode-ignore,img{display:flex!important}.beian img{display:inline-block!important}</style></head>
+
+<body>
+  <div class="book-container">
+    <div class="book-sidebar">
+      <div class="book-brand">
+  <a href="/">
+    <img src="/favicon.png">
+    <span>AHA&#39;S BOOK</span>
+  </a>
+</div>
+        <div id="menu" class="book-menu hide">
+  <h2 id="基础知识"> 基础知识 </h2>
+<ul>
+<li><a href="/posts/231010144856.html"> 模运算 </a></li>
+<li><a href="/posts/231014105311.html"> 异或运算 </a></li>
+<li><a href="/posts/231210181853.html"> 计算机中的寄存器 </a></li>
+<li><a href="/posts/231213183051.html"> 正则表达式基础 </a></li>
+</ul>
+<h2 id="C 语言">C 语言 </h2>
+<ul>
+<li><a href="/posts/230916171929.html">main 函数参数 </a></li>
+<li><a href="/posts/231214192113.html"> 关键字与专有名词 </a></li>
+<li><a href="/posts/240103180653.html"> 输出打印函数 </a></li>
+<li><a href="/posts/230922143003.html"> 多维数组 </a></li>
+<li><a href="/posts/230913200729.html">const 关键字 </a></li>
+<li><a href="/posts/230918174223.html">typedef 类型基础 </a></li>
+<li><a href="/posts/230920172849.html">typedef 类型实践 </a></li>
+<li><a href="/posts/240224193217.html"> 二级指针 </a></li>
+<li><a href="/posts/240307195203.html"> 代码 TOP-K 问题 </a></li>
+<li><a href="/posts/230922172626.html">uthash 哈希表基础 </a></li>
+<li><a href="/posts/230918114841.html"> 大小端知识 </a></li>
+</ul>
+<h2 id="Golang 语言">Golang 语言 </h2>
+<ul>
+<li><a href="/posts/230907162612.html"> 变量与常量 </a></li>
+<li><a href="/posts/230909120145.html"> 函数 &amp; 包 &amp; 判断 &amp; 循环 </a></li>
+<li><a href="/posts/230912152800.html"> 数组与切片 </a></li>
+<li><a href="/posts/230913161326.html"> 可变参数函数与 Map 集合 </a></li>
+<li><a href="/posts/230915155105.html"> 字符串和指针 </a></li>
+</ul>
+<h2 id="数据结构"> 数据结构 </h2>
+<ul>
+<li><a href="/posts/231007174854.html"> 链表（数组实现）</a></li>
+<li><a href="/posts/231008213450.html"> 链表（链式实现）</a></li>
+<li><a href="/posts/231016161508.html"> 堆栈（数组实现）</a></li>
+<li><a href="/posts/231016184406.html"> 堆栈（链表实现）</a></li>
+<li><a href="/posts/231127185207.html"> 单调栈 </a></li>
+<li><a href="/posts/231017105123.html"> 队列（链表实现）</a></li>
+<li><a href="/posts/231017154121.html"> 双端队列（链表实现）</a></li>
+<li><a href="/posts/231018102559.html"> 堆基础与堆结构（数组实现）</a></li>
+<li><a href="/posts/231019102311.html"> 优先队列（堆实现）</a></li>
+<li><a href="/posts/230905224335.html"> 二叉树的遍历 </a></li>
+<li><a href="/posts/231020174358.html"> 二叉搜索树 </a></li>
+<li><a href="/posts/230916094606.html"> 拓扑排序 </a></li>
+<li><a href="/posts/230925185057.html">Trie 字典树 </a></li>
+<li><a href="/posts/231023164532.html"> 并查集（数组实现）</a></li>
+<li><a href="/posts/240702200642.html">Linux 数据结构之队列 </a></li>
+</ul>
+<h2 id="数据结构算法"> 数据结构算法 </h2>
+<ul>
+<li><a href="/posts/231218181635.html"> 归并排序 </a></li>
+<li><a href="/posts/231108163339.html"> 快速排序 </a></li>
+<li><a href="/posts/231107171607.html"> 堆排序 </a></li>
+<li><a href="/posts/231124181658.html"> 二分查找 </a></li>
+<li><a href="/posts/231227190828.html"> 哈希表实现 </a></li>
+<li><a href="/posts/240313193201.html"> 字符串哈希函数 </a></li>
+<li><a href="/posts/231116150205.html">Floyd 多源最短路径 </a></li>
+<li><a href="/posts/231117095232.html">Dijkstra 单源最短路径（原理部分）</a></li>
+<li><a href="/posts/231121152713.html">Dijkstra 单源最短路径（实现部分）</a></li>
+</ul>
+<h2 id="数据库"> 数据库 </h2>
+<ul>
+<li><a href="/posts/250605180332.html">MySQL 基础 </a></li>
+</ul>
+<h2 id="计算机网络"> 计算机网络 </h2>
+<ul>
+<li><a href="/posts/231011192359.html">OSI 参考模型 </a></li>
+<li><a href="/posts/240329202000.html"> 计网 CyC2018 之概述 </a></li>
+<li><a href="/posts/240329202004.html"> 计网 CyC2018 之链路层 </a></li>
+<li><a href="/posts/240329202003.html"> 计网 CyC2018 之网络层 </a></li>
+<li><a href="/posts/240329202002.html"> 计网 CyC2018 之传输层 </a></li>
+<li><a href="/posts/240329202001.html"> 计网 CyC2018 之应用层 </a></li>
+<li><a href="/posts/240306203742.html">ACL 访问控制列表 </a></li>
+<li><a href="/posts/240130190208.html"> 路由表、转发表与快速转发工作原理 </a></li>
+<li><a href="/posts/231221200716.html">VXLAN 网络虚拟化技术 </a></li>
+<li><a href="/posts/240903191243.html">TCP/IP checksum 计算 </a></li>
+<li><a href="/posts/240911185603.html"> 抓包分析 TCP 三次握手与四次挥手过程 </a></li>
+</ul>
+<h2 id="操作系统"> 操作系统 </h2>
+<ul>
+<li><a href="/posts/230921190726.html"> 概述 </a></li>
+<li><a href="/posts/230924172528.html"> 中断 &amp; 异常 &amp; 系统调用 </a></li>
+<li><a href="/posts/231017195157.html"> 内存分层体系与地址空间生成 </a></li>
+<li><a href="/posts/231108195351.html"> 连续内存分配 </a></li>
+<li><a href="/posts/231111172507.html"> 非连续内存分配之分段与分页 </a></li>
+<li><a href="/posts/231119170537.html"> 非连续内存分配之页表 </a></li>
+<li><a href="/posts/231123184526.html"> 内存管理之覆盖技术与交换技术 </a></li>
+<li><a href="/posts/231127193658.html"> 内存管理之虚存技术 </a></li>
+<li><a href="/posts/231129182631.html"> 局部页面置换算法 </a></li>
+<li><a href="/posts/231207184239.html"> 全局页面置换算法 </a></li>
+<li><a href="/posts/231207204958.html"> 进程描述 </a></li>
+<li><a href="/posts/231210211306.html"> 进程状态 </a></li>
+<li><a href="/posts/231215213932.html"> 线程 </a></li>
+<li><a href="/posts/231218220813.html"> 进程控制 </a></li>
+<li><a href="/posts/231228193143.html"> 调度 </a></li>
+<li><a href="/posts/240104202828.html"> 同步与互斥 </a></li>
+<li><a href="/posts/240113115605.html"> 信号量与管程 </a></li>
+<li><a href="/posts/240205182643.html"> 经典同步问题 </a></li>
+<li><a href="/posts/240310162231.html"> 死锁 </a></li>
+</ul>
+<h2 id="系统与网络编程"> 系统与网络编程 </h2>
+<ul>
+<li><a href="/posts/230911151334.html">pthread 库 </a></li>
+<li><a href="/posts/230921094127.html"> 锁与原子操作 </a></li>
+<li><a href="/posts/240319195609.html"> 读者写者问题 </a></li>
+<li><a href="/posts/240527200241.html"> 网络编程卷一阅读随笔 </a></li>
+<li><a href="/posts/240414190410.html"> 进程间通信 IPC 机制 </a></li>
+<li><a href="/posts/240424200123.html"> 多进程相关练习 </a></li>
+<li><a href="/posts/240516221527.html">I/O 模式与 I/O 多路复用 </a></li>
+<li><a href="/posts/240626192803.html">Linux 内核 kfifo 环形队列 </a></li>
+<li><a href="/posts/241009203126.html">Linux 内核等待队列 </a></li>
+<li><a href="/posts/240627210637.html">DPDK 无锁环形队列 </a></li>
+<li><a href="/posts/240919200410.html"> 解密内存屏障 </a></li>
+<li><a href="/posts/240927202500.html"> 内核线程的创建 </a></li>
+<li><a href="/posts/241015195205.html">Linux 网络数据包接收过程 </a></li>
+<li><a href="/posts/2410232111015.html"> 源码解读 epoll 实现原理 </a></li>
+<li><a href="/posts/241106182619.html">Linux 文件系统 </a></li>
+<li><a href="/posts/250619154429.html">Libevent 高性能 IO 事件驱动库 </a></li>
+</ul>
+<h2 id="工具与命令"> 工具与命令 </h2>
+<ul>
+<li><a href="/posts/240207180410.html">GCC 编译过程分解 </a></li>
+<li><a href="/posts/240312184132.html">GDB 调试入门 </a></li>
+<li><a href="/posts/240512184921.html">Makefile 学习 </a></li>
+<li><a href="/posts/250629214430.html">CMake 学习 </a></li>
+<li><a href="/posts/240417193754.html">Linux 命令之文件权限 </a></li>
+</ul>
+<h2 id="开源项目"> 开源项目 </h2>
+<ul>
+<li><a href="/posts/240303201855.html"> 线程池原理与实现 </a></li>
+<li><a href="/posts/240507194549.html">HTTP 服务器实现 </a></li>
+<li><a href="/posts/240904203605.html"> 聊天服务器实现 </a></li>
+<li><a href="/posts/241119182636.html">Linux 文件系统 </a></li>
+</ul>
+<h2 id="Docker">Docker</h2>
+<ul>
+<li><a href="/posts/230909171809.html">Docker 学习笔记 </a></li>
+</ul>
+<h1 id="LeetCode 刷题">LeetCode 刷题 </h1>
+<h2 id="链表相关"> 链表相关 </h2>
+<ul>
+<li><a href="/posts/231025143947.html">160 相交链表 </a></li>
+<li><a href="/posts/231025185947.html">206 反转链表 </a></li>
+<li><a href="/posts/231026101239.html">21 合并两个有序链表 </a></li>
+<li><a href="/posts/231026184514.html">83 删除排序链表中的重复元素 </a></li>
+<li><a href="/posts/231027150243.html">19 删除链表的倒数第 N 个节点 </a></li>
+<li><a href="/posts/231031120718.html">2 两数相加 </a></li>
+<li><a href="/posts/231031163133.html">445 两数相加 II</a></li>
+<li><a href="/posts/231101094219.html">234 回文链表 </a></li>
+<li><a href="/posts/231101135228.html">725 分隔链表 </a></li>
+<li><a href="/posts/231102120708.html">328 奇偶链表 </a></li>
+<li><a href="/posts/231102165703.html">142 环形链表 II</a></li>
+</ul>
+<h2 id="设计"> 设计 </h2>
+<ul>
+<li><a href="/posts/231201184542.html">146 LRU 缓存 </a></li>
+</ul>
+<h2 id="贪心算法"> 贪心算法 </h2>
+<ul>
+<li><a href="/posts/231107094652.html">1029 两地调度 </a></li>
+<li><a href="/posts/231109150855.html">435 无重叠区间 </a></li>
+</ul>
+<h2 id="哈希表"> 哈希表 </h2>
+<ul>
+<li><a href="/posts/231123181539.html">1410 实体解析器 </a></li>
+</ul>
+<h2 id="树的遍历"> 树的遍历 </h2>
+<ul>
+<li><a href="/posts/231103121209.html">117 填充每个节点的下一个右侧节点指针 II</a></li>
+</ul>
+<h2 id="深度优先搜索（递归）"> 深度优先搜索（递归）</h2>
+<ul>
+<li><a href="/posts/231206201243.html">2477 达到首都的最少油耗 </a></li>
+</ul>
+<h2 id="图或路径问题"> 图或路径问题 </h2>
+<ul>
+<li><a href="/posts/231211184652.html">1631 最小体力消耗路径 </a></li>
+</ul>
+<h2 id="其它"> 其它 </h2>
+<ul>
+<li><a href="/posts/230101120000.html"> 备忘录 </a></li>
+</ul>
+
+</div>
+
+
+<script src="/js/book-menu.js"></script>
+
+    </div>
+    <div class="sidebar-toggle" onclick="sidebar_toggle()" onmouseover="add_inner()" onmouseleave="remove_inner()">
+  <div class="sidebar-toggle-inner"></div>
+</div>
+
+<script>
+function add_inner() {
+  let inner = document.querySelector('.sidebar-toggle-inner')
+  inner.classList.add('show')  
+}
+
+function remove_inner() {
+  let inner = document.querySelector('.sidebar-toggle-inner')
+  inner.classList.remove('show')
+}
+
+function sidebar_toggle() {
+    let sidebar_toggle = document.querySelector('.sidebar-toggle')
+    let sidebar = document.querySelector('.book-sidebar')
+    let content = document.querySelector('.off-canvas-content')
+    if (sidebar_toggle.classList.contains('extend')) { // show
+        sidebar_toggle.classList.remove('extend')
+        sidebar.classList.remove('hide')
+        content.classList.remove('extend')
+    }
+    else { // hide
+        sidebar_toggle.classList.add('extend')
+        sidebar.classList.add('hide')
+        content.classList.add('extend')
+    }
+}
+</script>
+
+      <div class="off-canvas-content">
+        <div class="columns">
+          <div class="column col-10 col-lg-12">
+            <div class="book-navbar">
+              <!-- For Responsive Layout -->
+
+<header class="navbar">
+  <section class="navbar-section">
+    <a onclick="open_sidebar()">
+      <i class="icon icon-menu"></i>
+    </a>
+  </section>
+</header>
+
+            </div>
+            <div class="book-content">
+              <div class="book-post">
+  <p><a target="_blank" rel="noopener" href="https://leetcode.cn/problems/minimum-fuel-cost-to-report-to-the-capital/">2477 达到首都的最少油耗</a>：给你一棵 <code>n</code> 个节点的树（一个无向、连通、无环图），每个节点表示一个城市，编号从 <code>0</code> 到 <code>n - 1</code> ，且恰好有 <code>n - 1</code> 条路，<code>0</code> 是首都。给你一个二维整数数组 <code>roads</code> ，其中 <code>roads[i] = [a_i, b_i]</code> ，表示城市 <code>a_i</code> 和 <code>b_i</code> 之间有一条双向路。</p>
+<ul>
+<li>每个城市有一辆车（均有 <code>seats</code> 个座位），且每个城市需要一名代表去首都参加会议。</li>
+<li>代表可以选择乘坐自己所在城市的车辆，也可以选择乘坐其他城市的车辆。</li>
+<li>相邻城市之间的车辆油耗是一升。</li>
+</ul>
+<p>你需要计算所有代表到达首都所需的最少汽油量。</p>
+<span id="more"></span>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">输入：roads = [[3,1],[3,2],[1,0],[0,4],[0,5],[4,6]], seats = 2</span><br><span class="line">输出：7</span><br><span class="line">解释：</span><br><span class="line">- 代表 2 到达城市 3 ，消耗 1 升汽油。</span><br><span class="line">- 代表 2 和代表 3 一起到达城市 1 ，消耗 1 升汽油。</span><br><span class="line">- 代表 2 和代表 3 一起到达首都，消耗 1 升汽油。</span><br><span class="line">- 代表 1 直接到达首都，消耗 1 升汽油。</span><br><span class="line">- 代表 5 直接到达首都，消耗 1 升汽油。</span><br><span class="line">- 代表 6 到达城市 4 ，消耗 1 升汽油。</span><br><span class="line">- 代表 4 和代表 6 一起到达首都，消耗 1 升汽油。</span><br><span class="line">最少消耗 7 升汽油。</span><br></pre></td></tr></table></figure>
+<h2 id="形象化数组">形象化数组</h2>
+<p>将数组转换为树的形状：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">       0</span><br><span class="line">     / | \</span><br><span class="line">    1  4  5</span><br><span class="line">   /   |</span><br><span class="line">  3    6</span><br><span class="line"> /</span><br><span class="line">2</span><br></pre></td></tr></table></figure>
+<h2 id="问题转换与解题思路">问题转换与解题思路</h2>
+<p>题目等价于给出了一棵以节点 <code>0</code> 为根节点的多叉树，初始时树上的每一个节点都有一个人和一辆车，现在所有人都需要通过「车子」向节点 <code>0</code> 移动。</p>
+<p>我们可以 <strong> 贪心地 </strong> 从每个叶子节点派车出发，只要车上还有空座位，就把该节点的人拉上车，并向根节点移动。要是车上没有座位了，那么就增派一辆车，也向根节点移动。这样就能保证所有人都到达首都，且油耗最少。</p>
+<p>对于上面的示例路径 <code>2-&gt;3-&gt;1-&gt;0</code>，按上面的思路，有：</p>
+<ul>
+<li>三个人需要去首都，在节点 <code>2</code> 派出一辆车，在节点 <code>1</code> 增派了一辆车，一共需要两辆车，消耗 4 升汽油。</li>
+</ul>
+<p>通过观察分析，我们可以发现：</p>
+<ul>
+<li><code>x</code> 个人通过某一段公路到达「该段路的终点」，该段路 <strong> 需要消耗的油量（需要的车辆数）为「人数 / 座位数」向上取整</strong>。如：
+<ul>
+<li>节点 <code>2</code> 一起移动到节点 <code>3</code>，需要的汽油总量为 <code>ceil(1, 2) = 1</code>；</li>
+<li>节点 <code>2,3</code> 一起移动到节点 <code>1</code>，需要的汽油总量为 <code>ceil(2, 2) = 1</code>；</li>
+<li>节点 <code>2,3,1</code> 一起移动到节点 <code>0</code>，需要的汽油总量为 <code>ceil(3, 2) = 2</code>。</li>
+</ul>
+</li>
+<li><strong>一条子树总共需要的油量为每一段路需要的油量（需要的车辆数）之和</strong>。</li>
+</ul>
+<p>那么，我们可以通过从根节点 <code>0</code> 往下进行 <strong> 深度优先搜索 </strong>，根据<strong> 路上累计的人数 </strong> 计算统计每一条边上消耗的汽油（需要的车辆数），把所有边上消耗的汽油相加即为最终答案。</p>
+<h2 id="数据转换与存储">数据转换与存储</h2>
+<p>题目使用了一个二维数组存储图数据，而我们需要的是每一个节点的邻居节点。所以首先需要将二维数组中的数据转换到邻接矩阵中，存储每个节点的邻居节点，而邻居节点的数量是不固定的。</p>
+<p>对于 Python 语言，我们可以使用二维列表完成每个邻居节点的存储：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">n = roadsSize + <span class="number">1</span></span><br><span class="line">graph = [[] <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="built_in">range</span>(n)]</span><br><span class="line"><span class="keyword">for</span> edge <span class="keyword">in</span> roads:</span><br><span class="line">    x, y = edge[<span class="number">0</span>], edge[<span class="number">1</span>]</span><br><span class="line">    graph[x].append(y)</span><br><span class="line">    graph[y].append(x)</span><br></pre></td></tr></table></figure>
+<p>对于 C 语言，我们需要定义一个二维结构体列表，列表中的每一个位置是一个链表，存储它的所有邻居节点（具体看后面的代码实现）。</p>
+<blockquote>
+<p>一个节点的所有邻居节点就是它在树中的父节点和子节点的集合，有些节点可能既有父节点又有子节点，而有些节点只有父节点。</p>
+</blockquote>
+<h2 id="贪心 - 深度优先搜索">贪心 + 深度优先搜索</h2>
+<p>通过从根节点 <code>0</code> 往下进行 <strong> 深度优先搜索 </strong>，根据<strong> 路上累计的人数 </strong> 计算统计每一条边上消耗的汽油（需要的车辆数），把所有边上消耗的汽油相加即为最终答案。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 单链表结构</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> _<span class="title">linked</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> val;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> _<span class="title">linked</span> *<span class="title">next</span>;</span></span><br><span class="line">&#125; ListNode;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 创建一个链表节点</span></span><br><span class="line">ListNode *<span class="title function_">createListNode</span><span class="params">(<span class="type">int</span> val)</span> &#123;</span><br><span class="line">    ListNode *node = (ListNode *)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(ListNode));</span><br><span class="line">    node-&gt;val = val;</span><br><span class="line">    node-&gt;next = <span class="literal">NULL</span>;</span><br><span class="line">    <span class="keyword">return</span> node;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 释放链表空间</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">freeList</span><span class="params">(ListNode *<span class="built_in">list</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">while</span> (<span class="built_in">list</span>) &#123;</span><br><span class="line">        ListNode *cur = <span class="built_in">list</span>;</span><br><span class="line">        <span class="built_in">list</span> = <span class="built_in">list</span>-&gt;next;</span><br><span class="line">        <span class="built_in">free</span>(cur);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 打印链表内容</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">printList</span><span class="params">(ListNode *<span class="built_in">list</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">while</span> (<span class="built_in">list</span>) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%d &quot;</span>, <span class="built_in">list</span>-&gt;val);</span><br><span class="line">        <span class="built_in">list</span> = <span class="built_in">list</span>-&gt;next;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;\n&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 向上取整</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">myCeil</span><span class="params">(<span class="type">int</span> a, <span class="type">int</span> b)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> (a + b - <span class="number">1</span>) / b;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">long</span> <span class="type">long</span> <span class="title function_">minimumFuelCost</span><span class="params">(<span class="type">int</span>** roads, <span class="type">int</span> roadsSize, <span class="type">int</span>* roadsColSize, <span class="type">int</span> seats)</span> &#123;</span><br><span class="line">    <span class="type">int</span> n = roadsSize + <span class="number">1</span>; <span class="comment">// n 个节点有 n-1 条路，n-1=roadsSize</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 定义一个二维列表，存储每个节点的邻居节点（在树中看，邻居就是它的子节点和父节点）</span></span><br><span class="line">    ListNode **graph = (ListNode **)<span class="built_in">malloc</span>(n * <span class="keyword">sizeof</span>(ListNode *));</span><br><span class="line">    <span class="built_in">memset</span>(graph, <span class="literal">NULL</span>, n * <span class="keyword">sizeof</span>(ListNode *));</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; roadsSize; i++) &#123;</span><br><span class="line">        <span class="type">int</span> x = roads[i][<span class="number">0</span>], y = roads[i][<span class="number">1</span>];</span><br><span class="line"></span><br><span class="line">        <span class="comment">// y 的邻居节点是 x，将 x 追加到节点 y 对应的列表中</span></span><br><span class="line">        ListNode *nodeX = createListNode(x);</span><br><span class="line">        nodeX-&gt;next = graph[y];</span><br><span class="line">        graph[y] = nodeX;</span><br><span class="line"></span><br><span class="line">        ListNode *nodeY = createListNode(y);</span><br><span class="line">        nodeY-&gt;next = graph[x];</span><br><span class="line">        graph[x] = nodeY;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 到这里，每个节点的邻居节点就有了（邻居在列表中的顺序无关紧要）</span></span><br><span class="line">    <span class="comment">// for (int i = 0; i &lt; n; i++) &#123;</span></span><br><span class="line">    <span class="comment">//     printf(&quot;node %d can be reached: &quot;, i);</span></span><br><span class="line">    <span class="comment">//     printList(graph[i]);</span></span><br><span class="line">    <span class="comment">// &#125;</span></span><br><span class="line"></span><br><span class="line">    <span class="type">long</span> <span class="type">long</span> res = <span class="number">0</span>;</span><br><span class="line">    dfs(<span class="number">0</span>, <span class="number">-1</span>, seats, &amp;res, graph); <span class="comment">// 从多叉树的根节点出发，向下遍历每棵子树</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">        freeList(graph[i]);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">free</span>(graph);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> res;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">dfs</span><span class="params">(<span class="type">int</span> cur, <span class="type">int</span> father, <span class="type">int</span> seats, <span class="type">long</span> <span class="type">long</span> *res, <span class="type">const</span> ListNode **graph)</span> &#123;</span><br><span class="line">    <span class="type">int</span> peopleSum = <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 遍历当前节点的邻居节点（包含父节点和子节点）</span></span><br><span class="line">    <span class="keyword">for</span> (ListNode *node = graph[cur]; node; node = node-&gt;next) &#123;</span><br><span class="line">        <span class="type">int</span> val = node-&gt;val;</span><br><span class="line">        <span class="comment">// 递归地遍历当前节点的子节点，不递归当前节点的父节点</span></span><br><span class="line">        <span class="keyword">if</span> (val != father) &#123;</span><br><span class="line">            <span class="comment">// 累计以当前节点为根的子节点人数</span></span><br><span class="line">            peopleSum += dfs(val, cur, seats, res, graph);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (cur != <span class="number">0</span>) &#123; <span class="comment">// 不是根节点时，计算耗油</span></span><br><span class="line">        *res += myCeil(peopleSum, seats);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> peopleSum;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="代码分析">代码分析</h2>
+<h3 id="向上取整">向上取整</h3>
+<p><code>a</code> 与 <code>b</code> 相除的向上取整公式：<code>(a + b - 1) / b</code>。因为 <code>a/b</code> 的余数最大为 <code>b-1</code>，我们多加一个 <code>b-1</code> 会使得：</p>
+<ul>
+<li>当原来余数为 <code>0</code> 时，新公式计算出来的商的部分还是原来的值；</li>
+<li>当原来余数不为 <code>0</code> 时，多加的那部分 <code>b-1</code> 结合原来不为 <code>0</code> 的余数，会使得商的值加一。</li>
+</ul>
+<p>这样，便达到一个向上取整的效果。</p>
+<h3 id="邻居节点">邻居节点</h3>
+<p>每个节点的邻居节点打印（以上面的示例为例）：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">node 0 can be reached: 5 4 1 </span><br><span class="line">node 1 can be reached: 0 3 </span><br><span class="line">node 2 can be reached: 3 </span><br><span class="line">node 3 can be reached: 2 1 </span><br><span class="line">node 4 can be reached: 6 0 </span><br><span class="line">node 5 can be reached: 0 </span><br><span class="line">node 6 can be reached: 4 </span><br></pre></td></tr></table></figure>
+<h3 id="DFS 理解">DFS 理解</h3>
+<p>在小破站上看到一个评论：</p>
+<blockquote>
+<p>处理递归，核心就是千万不要想子问题的过程，你的脑子才能处理几层？马上就绕迷糊了。重要的是，要想子问题的结果，思路就清晰了。</p>
+<blockquote>
+<p>是的，只要代码的边界条件和非边界条件的逻辑写对了，其它的事情交给数学归纳法就好了。也就是说，写对了这两个逻辑，你的代码自动就是正确的了，没必要想递归是怎么一层一层走的。</p>
+</blockquote>
+</blockquote>
+<p><strong>基于上面的评论，这道题中的 DFS 需要做的是（个人理解）</strong>：</p>
+<ol>
+<li>从多叉树的根节点出发，向下遍历每棵子树（也就是递归地遍历当前节点的子节点，不递归当前节点的父节点）；</li>
+<li>也就是说，当遍历的节点的邻居节点是父节点时，不再递归，会得到一个返回值 <code>1</code>；</li>
+<li>当遍历的节点的邻居节点是子节点时，递归地遍历它的子节点，累计子树的大小（累计返回值）；</li>
+<li>计算完子树大小后，计算到达该子树的根节点时的油耗，累加到最终结果中。</li>
+</ol>
+<p>例如，对于上面的序号 2，当遍历节点 <code>2</code> 时，递归函数是 <code>dfs(2, 3, ...)</code>，节点 <code>2</code> 中存储的节点是 <code>3</code>，也就是它的父节点，且它没有其它节点了。所以，<code>for</code> 循环结束，不再递归，累计油耗到答案，并返回人数 <code>1</code>。这个返回值后面要累计给 <code>dfs(3, 1, ...)</code> 的返回值 <code>1</code>，即当前的 <code>peopleSum</code> 值就是 <code>dfs(2, 3, ...) + dfs(3, 1, ...) = 2</code>，从节点 <code>3</code> 到它的父节点 <code>1</code> 需要油耗 <code>ceil(2, 2) = 1</code>。</p>
+<p><strong>为什么不需要计算根节点 <code>0</code> 的耗油</strong>？<br>
+根节点 <code>0</code> 不需要累计油耗到答案，是因为累计的是每个节点到其父节点的公路上的油耗，根节点没有它的父节点，即没有公路，也就不需要油耗了。</p>
+
+</div>
+
+
+  <div class="book-comments">
+    
+
+
+
+
+  </div>
+
+
+
+<script src="/js/book-post.js"></script>
+
+
+            </div>
+          </div>
+          <div class="column col-2 hide-lg">
+            <div class="book-post-info">
+  
+    <div class="book-post-meta">
+
+  <div class="author">
+
+    <!-- Author image -->
+    <div class="author-img">
+      
+        <figure
+          class="avatar avatar-lg"
+          data-initial="A"
+          style="background-color: #3b4351;">
+        </figure>
+      
+    </div>
+
+    <!-- Author title -->
+    <div class="author-title">
+      <div>aha</div>
+      <div>2023-12-06</div>
+    </div>
+  </div>
+
+  
+    <div class="divider"></div>
+
+    <div class="link">
+      <a class="category-link" href="/categories/LeetCode/">LeetCode</a> <a class="category-link" href="/categories/LeetCode/%E6%B7%B1%E5%BA%A6%E4%BC%98%E5%85%88%E6%90%9C%E7%B4%A2/">深度优先搜索</a>
+
+      <a class="tag-none-link" href="/tags/LeetCode/" rel="tag">#LeetCode</a> <a class="tag-none-link" href="/tags/%E6%B7%B1%E5%BA%A6%E4%BC%98%E5%85%88%E6%90%9C%E7%B4%A2/" rel="tag">#深度优先搜索</a> <a class="tag-none-link" href="/tags/%E9%80%92%E5%BD%92/" rel="tag">#递归</a>
+    </div>
+    
+  
+
+  <div class="divider"></div>
+</div>
+  
+
+  <div class="book-tocbot">
+</div>
+<div class="book-tocbot-menu">
+  <a class="book-toc-expand" onclick="expand_toc()">Expand all</a>
+  <a onclick="go_top()">Back to top</a>
+  <a onclick="go_bottom()">Go to bottom</a>
+  <a onclick="toggleSearch()">Search in blogs</a> <!-- 添加搜索文字的点击事件 -->
+</div>
+
+<div id="search-overlay" class="search-overlay" style="display: none;"> <!-- 初始状态为隐藏 -->
+  <div class="search-box">
+    <input type="text" id="search-input" placeholder="Search in all blogs...">
+    <button onclick="closeSearch()">Close</button> <!-- 添加关闭按钮 -->
+    <div id="search-results" class="search-results"></div>
+  </div>
+</div>
+
+<script>
+  function performSearch(query) {
+    if (!query.trim()) {
+      return;
+    }
+
+    fetch('/search.xml')
+      .then(response => response.text())
+      .then(data => {
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(data, "text/xml");
+        const entries = xmlDoc.getElementsByTagName('entry');
+        let results = '';
+
+        for (let i = 0; i < entries.length; i++) {
+          const title = entries[i].getElementsByTagName('title')[0].textContent;
+          const content = entries[i].getElementsByTagName('content')[0].textContent;
+          const url = entries[i].getElementsByTagName('url')[0].textContent;
+
+          let count = (title.match(new RegExp(query, "gi")) || []).length; // 统计查询词出现的次数
+          count += (content.match(new RegExp(query, "gi")) || []).length;
+
+          if (count > 0) { // title.includes(query) || content.includes(query)
+            results += `
+              <div class="search-result-item">
+                <a href="${url}">${title}</a> (${count})
+              </div>`;
+          }
+        }
+
+        const searchResultsElement = document.getElementById('search-results');
+        searchResultsElement.innerHTML = results;
+        searchResultsElement.classList.add('active');
+      });
+  }
+
+  function toggleSearch() {
+    const searchOverlay = document.getElementById('search-overlay');
+    searchOverlay.style.display = searchOverlay.style.display === 'none' ? 'flex' : 'none';
+  }
+
+  function closeSearch() {
+    document.getElementById('search-overlay').style.display = 'none';
+  }
+
+  document.getElementById('search-input').addEventListener('input', function() {
+    const query = this.value;
+    performSearch(query);
+  });
+</script>
+
+<style>
+  .search-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  .search-box {
+    background: white;
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+    width: 80%;
+    max-width: 500px;
+  }
+
+  .search-results {
+    margin-top: 10px;
+    max-height: 300px;
+    overflow-y: auto;
+    background: white;
+    padding: 10px;
+    border-radius: 5px;
+    width: 100%;
+  }
+
+  .search-result-item {
+    margin: 10px 0;
+  }
+
+  .search-result-item a {
+    color: blue; /* 设置链接颜色为蓝色 */
+    text-decoration: none;
+  }
+
+  .search-result-item a:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+<script src="/js/book-toc.js"></script>
+
+
+</div>
+          </div>
+        </div>
+      </div>
+
+      <a class="off-canvas-overlay" onclick="hide_canvas()"></a>
+
+      <button class="floating-button" onclick="toggleDropdownMenu()"></button>
+
+      <div class="dropdown-menu">
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FFFFFF', '#000000')">银河白</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#C7EDCC', '#000000')">豆沙绿</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FAF9DE', '#000000')">杏仁黄</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#E3EDCD', '#000000')">青草绿</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FFF2E2', '#000000')">秋叶褐</div>
+      </div>
+  </div>
+
+  <script>
+    function toggleDropdownMenu() {
+      document.querySelector('.floating-button').classList.toggle('active');
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      var storedBackgroundColor = localStorage.getItem('blogBackgroundColor');
+      var storedColor = localStorage.getItem('blogColor');
+
+      if (storedBackgroundColor && storedColor) {
+        document.body.style.backgroundColor = storedBackgroundColor;
+        document.body.style.color = storedColor;
+      }
+    });
+
+    function changeBackgroundColor(backgroundColor, color) {
+      document.body.style.backgroundColor = backgroundColor;
+      document.body.style.color = color;
+
+      localStorage.setItem('blogBackgroundColor', backgroundColor);
+      localStorage.setItem('blogColor', color);
+
+      document.querySelector('.floating-button').classList.remove('active');
+    }
+  </script>
+</body>
+
+</html>
+
+
+<script src="/js/book.js"></script>

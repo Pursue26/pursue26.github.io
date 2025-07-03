@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
+
+    
+      <link rel="icon" href="/favicon.png" />
+    
+
+    <title>
+        
+          C 语言之一、二级指针 - aha&#39;s book
+        
+    </title>
+
+    <!-- Spectre.css framework -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre-exp.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre-icons.min.css">
+
+    <!-- theme css & js -->
+    
+<link rel="stylesheet" href="/css/book.css">
+
+    
+<script src="/js/book.js"></script>
+
+
+    <!-- tocbot -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.css">
+    
+    <!-- katex -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/zooming/2.1.1/zooming.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const zooming = new Zooming()
+    zooming.listen('.book-content img')
+})
+</script>
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+    <style>
+      body {
+        background-color: #FFFFFF;
+        /* color: #000000; */
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+
+      /* Floating Button Styles */
+      .floating-button {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 999;
+        background-color: #000000;
+        color: #ffffff;
+        padding: 12px;
+        border-radius: 50%;
+        cursor: pointer;
+        border: 2px solid #000000;
+      }
+
+      .floating-button:hover {
+        background-color: #FFFFFF;
+      }
+
+      /* Dropdown Menu Styles */
+      .dropdown-menu {
+        position: fixed;
+        bottom: 60px;
+        right: 10px;
+        display: none;
+        min-width: 60px;
+        padding: 2px;
+        background-color: #fff;
+        /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
+        z-index: 1000;
+      }
+
+      .floating-button.active+.dropdown-menu {
+        display: block;
+      }
+
+      .dropdown-item {
+        display: block;
+        padding: 8px 16px;
+        cursor: pointer;
+      }
+
+      .dropdown-item:hover {
+        background-color: #f5f5f5;
+      }
+    </style>
+<style>.darkmode--activated{--body-bg-color:#282828;--content-bg-color:#333;--card-bg-color:#555;--text-color:#ccc;--blockquote-color:#bbb;--link-color:#ccc;--link-hover-color:#eee;--brand-color:#ddd;--brand-hover-color:#ddd;--table-row-odd-bg-color:#282828;--table-row-hover-bg-color:#363636;--menu-item-bg-color:#555;--btn-default-bg:#222;--btn-default-color:#ccc;--btn-default-border-color:#555;--btn-default-hover-bg:#666;--btn-default-hover-color:#ccc;--btn-default-hover-border-color:#666;--highlight-background:#282b2e;--highlight-foreground:#a9b7c6;--highlight-gutter-background:#34393d;--highlight-gutter-foreground:#9ca9b6}.darkmode--activated img{opacity:.75}.darkmode--activated img:hover{opacity:.9}.darkmode--activated code{color:#69dbdc;background:0 0}button.darkmode-toggle{z-index:9999}.darkmode-ignore,img{display:flex!important}.beian img{display:inline-block!important}</style></head>
+
+<body>
+  <div class="book-container">
+    <div class="book-sidebar">
+      <div class="book-brand">
+  <a href="/">
+    <img src="/favicon.png">
+    <span>AHA&#39;S BOOK</span>
+  </a>
+</div>
+        <div id="menu" class="book-menu hide">
+  <h2 id="基础知识"> 基础知识 </h2>
+<ul>
+<li><a href="/posts/231010144856.html"> 模运算 </a></li>
+<li><a href="/posts/231014105311.html"> 异或运算 </a></li>
+<li><a href="/posts/231210181853.html"> 计算机中的寄存器 </a></li>
+<li><a href="/posts/231213183051.html"> 正则表达式基础 </a></li>
+</ul>
+<h2 id="C 语言">C 语言 </h2>
+<ul>
+<li><a href="/posts/230916171929.html">main 函数参数 </a></li>
+<li><a href="/posts/231214192113.html"> 关键字与专有名词 </a></li>
+<li><a href="/posts/240103180653.html"> 输出打印函数 </a></li>
+<li><a href="/posts/230922143003.html"> 多维数组 </a></li>
+<li><a href="/posts/230913200729.html">const 关键字 </a></li>
+<li><a href="/posts/230918174223.html">typedef 类型基础 </a></li>
+<li><a href="/posts/230920172849.html">typedef 类型实践 </a></li>
+<li><a href="/posts/240224193217.html"> 二级指针 </a></li>
+<li><a href="/posts/240307195203.html"> 代码 TOP-K 问题 </a></li>
+<li><a href="/posts/230922172626.html">uthash 哈希表基础 </a></li>
+<li><a href="/posts/230918114841.html"> 大小端知识 </a></li>
+</ul>
+<h2 id="Golang 语言">Golang 语言 </h2>
+<ul>
+<li><a href="/posts/230907162612.html"> 变量与常量 </a></li>
+<li><a href="/posts/230909120145.html"> 函数 &amp; 包 &amp; 判断 &amp; 循环 </a></li>
+<li><a href="/posts/230912152800.html"> 数组与切片 </a></li>
+<li><a href="/posts/230913161326.html"> 可变参数函数与 Map 集合 </a></li>
+<li><a href="/posts/230915155105.html"> 字符串和指针 </a></li>
+</ul>
+<h2 id="数据结构"> 数据结构 </h2>
+<ul>
+<li><a href="/posts/231007174854.html"> 链表（数组实现）</a></li>
+<li><a href="/posts/231008213450.html"> 链表（链式实现）</a></li>
+<li><a href="/posts/231016161508.html"> 堆栈（数组实现）</a></li>
+<li><a href="/posts/231016184406.html"> 堆栈（链表实现）</a></li>
+<li><a href="/posts/231127185207.html"> 单调栈 </a></li>
+<li><a href="/posts/231017105123.html"> 队列（链表实现）</a></li>
+<li><a href="/posts/231017154121.html"> 双端队列（链表实现）</a></li>
+<li><a href="/posts/231018102559.html"> 堆基础与堆结构（数组实现）</a></li>
+<li><a href="/posts/231019102311.html"> 优先队列（堆实现）</a></li>
+<li><a href="/posts/230905224335.html"> 二叉树的遍历 </a></li>
+<li><a href="/posts/231020174358.html"> 二叉搜索树 </a></li>
+<li><a href="/posts/230916094606.html"> 拓扑排序 </a></li>
+<li><a href="/posts/230925185057.html">Trie 字典树 </a></li>
+<li><a href="/posts/231023164532.html"> 并查集（数组实现）</a></li>
+<li><a href="/posts/240702200642.html">Linux 数据结构之队列 </a></li>
+</ul>
+<h2 id="数据结构算法"> 数据结构算法 </h2>
+<ul>
+<li><a href="/posts/231218181635.html"> 归并排序 </a></li>
+<li><a href="/posts/231108163339.html"> 快速排序 </a></li>
+<li><a href="/posts/231107171607.html"> 堆排序 </a></li>
+<li><a href="/posts/231124181658.html"> 二分查找 </a></li>
+<li><a href="/posts/231227190828.html"> 哈希表实现 </a></li>
+<li><a href="/posts/240313193201.html"> 字符串哈希函数 </a></li>
+<li><a href="/posts/231116150205.html">Floyd 多源最短路径 </a></li>
+<li><a href="/posts/231117095232.html">Dijkstra 单源最短路径（原理部分）</a></li>
+<li><a href="/posts/231121152713.html">Dijkstra 单源最短路径（实现部分）</a></li>
+</ul>
+<h2 id="数据库"> 数据库 </h2>
+<ul>
+<li><a href="/posts/250605180332.html">MySQL 基础 </a></li>
+</ul>
+<h2 id="计算机网络"> 计算机网络 </h2>
+<ul>
+<li><a href="/posts/231011192359.html">OSI 参考模型 </a></li>
+<li><a href="/posts/240329202000.html"> 计网 CyC2018 之概述 </a></li>
+<li><a href="/posts/240329202004.html"> 计网 CyC2018 之链路层 </a></li>
+<li><a href="/posts/240329202003.html"> 计网 CyC2018 之网络层 </a></li>
+<li><a href="/posts/240329202002.html"> 计网 CyC2018 之传输层 </a></li>
+<li><a href="/posts/240329202001.html"> 计网 CyC2018 之应用层 </a></li>
+<li><a href="/posts/240306203742.html">ACL 访问控制列表 </a></li>
+<li><a href="/posts/240130190208.html"> 路由表、转发表与快速转发工作原理 </a></li>
+<li><a href="/posts/231221200716.html">VXLAN 网络虚拟化技术 </a></li>
+<li><a href="/posts/240903191243.html">TCP/IP checksum 计算 </a></li>
+<li><a href="/posts/240911185603.html"> 抓包分析 TCP 三次握手与四次挥手过程 </a></li>
+</ul>
+<h2 id="操作系统"> 操作系统 </h2>
+<ul>
+<li><a href="/posts/230921190726.html"> 概述 </a></li>
+<li><a href="/posts/230924172528.html"> 中断 &amp; 异常 &amp; 系统调用 </a></li>
+<li><a href="/posts/231017195157.html"> 内存分层体系与地址空间生成 </a></li>
+<li><a href="/posts/231108195351.html"> 连续内存分配 </a></li>
+<li><a href="/posts/231111172507.html"> 非连续内存分配之分段与分页 </a></li>
+<li><a href="/posts/231119170537.html"> 非连续内存分配之页表 </a></li>
+<li><a href="/posts/231123184526.html"> 内存管理之覆盖技术与交换技术 </a></li>
+<li><a href="/posts/231127193658.html"> 内存管理之虚存技术 </a></li>
+<li><a href="/posts/231129182631.html"> 局部页面置换算法 </a></li>
+<li><a href="/posts/231207184239.html"> 全局页面置换算法 </a></li>
+<li><a href="/posts/231207204958.html"> 进程描述 </a></li>
+<li><a href="/posts/231210211306.html"> 进程状态 </a></li>
+<li><a href="/posts/231215213932.html"> 线程 </a></li>
+<li><a href="/posts/231218220813.html"> 进程控制 </a></li>
+<li><a href="/posts/231228193143.html"> 调度 </a></li>
+<li><a href="/posts/240104202828.html"> 同步与互斥 </a></li>
+<li><a href="/posts/240113115605.html"> 信号量与管程 </a></li>
+<li><a href="/posts/240205182643.html"> 经典同步问题 </a></li>
+<li><a href="/posts/240310162231.html"> 死锁 </a></li>
+</ul>
+<h2 id="系统与网络编程"> 系统与网络编程 </h2>
+<ul>
+<li><a href="/posts/230911151334.html">pthread 库 </a></li>
+<li><a href="/posts/230921094127.html"> 锁与原子操作 </a></li>
+<li><a href="/posts/240319195609.html"> 读者写者问题 </a></li>
+<li><a href="/posts/240527200241.html"> 网络编程卷一阅读随笔 </a></li>
+<li><a href="/posts/240414190410.html"> 进程间通信 IPC 机制 </a></li>
+<li><a href="/posts/240424200123.html"> 多进程相关练习 </a></li>
+<li><a href="/posts/240516221527.html">I/O 模式与 I/O 多路复用 </a></li>
+<li><a href="/posts/240626192803.html">Linux 内核 kfifo 环形队列 </a></li>
+<li><a href="/posts/241009203126.html">Linux 内核等待队列 </a></li>
+<li><a href="/posts/240627210637.html">DPDK 无锁环形队列 </a></li>
+<li><a href="/posts/240919200410.html"> 解密内存屏障 </a></li>
+<li><a href="/posts/240927202500.html"> 内核线程的创建 </a></li>
+<li><a href="/posts/241015195205.html">Linux 网络数据包接收过程 </a></li>
+<li><a href="/posts/2410232111015.html"> 源码解读 epoll 实现原理 </a></li>
+<li><a href="/posts/241106182619.html">Linux 文件系统 </a></li>
+<li><a href="/posts/250619154429.html">Libevent 高性能 IO 事件驱动库 </a></li>
+</ul>
+<h2 id="工具与命令"> 工具与命令 </h2>
+<ul>
+<li><a href="/posts/240207180410.html">GCC 编译过程分解 </a></li>
+<li><a href="/posts/240312184132.html">GDB 调试入门 </a></li>
+<li><a href="/posts/240512184921.html">Makefile 学习 </a></li>
+<li><a href="/posts/250629214430.html">CMake 学习 </a></li>
+<li><a href="/posts/240417193754.html">Linux 命令之文件权限 </a></li>
+</ul>
+<h2 id="开源项目"> 开源项目 </h2>
+<ul>
+<li><a href="/posts/240303201855.html"> 线程池原理与实现 </a></li>
+<li><a href="/posts/240507194549.html">HTTP 服务器实现 </a></li>
+<li><a href="/posts/240904203605.html"> 聊天服务器实现 </a></li>
+<li><a href="/posts/241119182636.html">Linux 文件系统 </a></li>
+</ul>
+<h2 id="Docker">Docker</h2>
+<ul>
+<li><a href="/posts/230909171809.html">Docker 学习笔记 </a></li>
+</ul>
+<h1 id="LeetCode 刷题">LeetCode 刷题 </h1>
+<h2 id="链表相关"> 链表相关 </h2>
+<ul>
+<li><a href="/posts/231025143947.html">160 相交链表 </a></li>
+<li><a href="/posts/231025185947.html">206 反转链表 </a></li>
+<li><a href="/posts/231026101239.html">21 合并两个有序链表 </a></li>
+<li><a href="/posts/231026184514.html">83 删除排序链表中的重复元素 </a></li>
+<li><a href="/posts/231027150243.html">19 删除链表的倒数第 N 个节点 </a></li>
+<li><a href="/posts/231031120718.html">2 两数相加 </a></li>
+<li><a href="/posts/231031163133.html">445 两数相加 II</a></li>
+<li><a href="/posts/231101094219.html">234 回文链表 </a></li>
+<li><a href="/posts/231101135228.html">725 分隔链表 </a></li>
+<li><a href="/posts/231102120708.html">328 奇偶链表 </a></li>
+<li><a href="/posts/231102165703.html">142 环形链表 II</a></li>
+</ul>
+<h2 id="设计"> 设计 </h2>
+<ul>
+<li><a href="/posts/231201184542.html">146 LRU 缓存 </a></li>
+</ul>
+<h2 id="贪心算法"> 贪心算法 </h2>
+<ul>
+<li><a href="/posts/231107094652.html">1029 两地调度 </a></li>
+<li><a href="/posts/231109150855.html">435 无重叠区间 </a></li>
+</ul>
+<h2 id="哈希表"> 哈希表 </h2>
+<ul>
+<li><a href="/posts/231123181539.html">1410 实体解析器 </a></li>
+</ul>
+<h2 id="树的遍历"> 树的遍历 </h2>
+<ul>
+<li><a href="/posts/231103121209.html">117 填充每个节点的下一个右侧节点指针 II</a></li>
+</ul>
+<h2 id="深度优先搜索（递归）"> 深度优先搜索（递归）</h2>
+<ul>
+<li><a href="/posts/231206201243.html">2477 达到首都的最少油耗 </a></li>
+</ul>
+<h2 id="图或路径问题"> 图或路径问题 </h2>
+<ul>
+<li><a href="/posts/231211184652.html">1631 最小体力消耗路径 </a></li>
+</ul>
+<h2 id="其它"> 其它 </h2>
+<ul>
+<li><a href="/posts/230101120000.html"> 备忘录 </a></li>
+</ul>
+
+</div>
+
+
+<script src="/js/book-menu.js"></script>
+
+    </div>
+    <div class="sidebar-toggle" onclick="sidebar_toggle()" onmouseover="add_inner()" onmouseleave="remove_inner()">
+  <div class="sidebar-toggle-inner"></div>
+</div>
+
+<script>
+function add_inner() {
+  let inner = document.querySelector('.sidebar-toggle-inner')
+  inner.classList.add('show')  
+}
+
+function remove_inner() {
+  let inner = document.querySelector('.sidebar-toggle-inner')
+  inner.classList.remove('show')
+}
+
+function sidebar_toggle() {
+    let sidebar_toggle = document.querySelector('.sidebar-toggle')
+    let sidebar = document.querySelector('.book-sidebar')
+    let content = document.querySelector('.off-canvas-content')
+    if (sidebar_toggle.classList.contains('extend')) { // show
+        sidebar_toggle.classList.remove('extend')
+        sidebar.classList.remove('hide')
+        content.classList.remove('extend')
+    }
+    else { // hide
+        sidebar_toggle.classList.add('extend')
+        sidebar.classList.add('hide')
+        content.classList.add('extend')
+    }
+}
+</script>
+
+      <div class="off-canvas-content">
+        <div class="columns">
+          <div class="column col-10 col-lg-12">
+            <div class="book-navbar">
+              <!-- For Responsive Layout -->
+
+<header class="navbar">
+  <section class="navbar-section">
+    <a onclick="open_sidebar()">
+      <i class="icon icon-menu"></i>
+    </a>
+  </section>
+</header>
+
+            </div>
+            <div class="book-content">
+              <div class="book-post">
+  <p>本文介绍了 C 语言中的一级指针和二级指针，并通过示例说明了为什么在函数参数中使用一级指针，函数内部对指针形参本身的修改不会影响外部指针的指向。同时，也演示了如何使用二级指针在函数内部改变指针的指向以及进行内存分配操作。</p>
+<span id="more"></span>
+<h1 id="概念">概念</h1>
+<p>在如下的 A 指向 B、B 指向 C 的指向关系中，首先：</p>
+<p>C 是一个变量，里面是「一段内容」，这段内容需要存储在一个地址空间里。C 的起始地址是 0x00000008。</p>
+<p>B 是一个指针变量，其内容是 C 的地址 0x00000008（专业术语：B 指向 C），但是 B 本身也要占空间的啊，所以 B 也有地址。B 的起始地址是 0x00000004。</p>
+<p>那么，到此为止都比较好理解：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">B == 0x00000008;   // B 的内容，也就是 C 的地址 0x00000008</span><br><span class="line">*B == 一段内容;    // B 解引用，也就是 B 指针指向的 C 的值</span><br><span class="line">&amp;B == 0x00000004;  // B 取地址，B 本身的地址是 0x00000004</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>查看指针变量 B，就是查看 B 的内容（这里是 C 的地址）。对指针变量 B 解引用，就是查看它的内容（内容是一个地址）下的内容。</p>
+</blockquote>
+<img src="../images/language-notes/second-rank-pointer.png" alt="指针访问" width="100%" height="100%">
+<p>A 是二级指针变量，其中存放着 B 的地址 0x00000004。A 本身也有地址，是 0x00000000。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">*A == B == 0x00000008;  // A 解引用，也就是 A 指针指向的 B 的内容（即 B 的内容是 C 的地址）</span><br><span class="line">**A == *B == 一段内容;  // B 解引用，也就是 B 指针指向的 C 的内容</span><br><span class="line">A == &amp;B == 0x00000004;  // A 存的是 B 的地址，B 的地址是 0x00000004</span><br><span class="line">&amp;A == 0x00000000;       // A 取地址，A 本身的地址是 0x00000000</span><br></pre></td></tr></table></figure>
+<p>上面三个变量的 C 语言定义如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> c = <span class="number">123</span>;  <span class="comment">// 一段内容</span></span><br><span class="line"><span class="type">int</span> *b = &amp;c;</span><br><span class="line"><span class="type">int</span> **a = &amp;b;  <span class="comment">// 按顺序定义，定义二级指针前要定义一级指针</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">printf</span>(<span class="string">&quot;&amp;c, &amp;b, &amp;a = %p, %p, %p\n&quot;</span>, &amp;c, &amp;b, &amp;a);</span><br><span class="line"><span class="built_in">printf</span>(<span class="string">&quot;c, b, a = %d, %p, %p\n&quot;</span>, c, b, a);</span><br><span class="line"><span class="built_in">printf</span>(<span class="string">&quot;*b, *a, **a = %d, %p, %d\n&quot;</span>, *b, *a, **a);</span><br></pre></td></tr></table></figure>
+<p>打印结果：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&amp;c, &amp;b, &amp;a = 0x7fff05148014, 0x7fff05148018, 0x7fff05148020</span><br><span class="line">c, b, a = 123, 0x7fff05148014, 0x7fff05148018</span><br><span class="line">*b, *a, **a = 123, 0x7fff05148014, 123</span><br></pre></td></tr></table></figure>
+<p>解释：</p>
+<ul>
+<li>c, b, a 各自有各自的地址；</li>
+<li>c 的内容是 123，b 的内容是 c 的地址，a 的内容是 b 的地址；</li>
+<li>b 解引用是 123，a 解引用就是 b 的内容（即 c 的地址），a 的解引用的解引用（即 b 的解引用）就是 123。</li>
+</ul>
+<h1 id="使用">使用</h1>
+<p>二级指针作为函数参数的作用：在函数外部定义一个指针 p，<strong>在函数内给指针变量（是对指针变量，不是对指针解引用）赋值，函数结束后对指针 p 生效，那么我们就需要二级指针</strong>。</p>
+<p>看看下面一段代码：有两个变量 a 和 b、一个指针 q（q 指向 a）。现在，我们想让 q 指向 b（要在函数里面实现）。</p>
+<h2 id="一级指针的实现">一级指针的实现</h2>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> a = <span class="number">10</span>, b = <span class="number">100</span>;</span><br><span class="line"><span class="type">int</span> *q;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">func</span><span class="params">(<span class="type">int</span>* p)</span> &#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;note:3, func:&amp;p=%p, p=%p\n&quot;</span>, &amp;p, p);</span><br><span class="line">    p = &amp;b;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;note:4, func:&amp;p=%p, p=%p\n&quot;</span>, &amp;p, p);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span>* argv[])</span> &#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;note:1, &amp;a=%p, &amp;b=%p, &amp;q=%p\n&quot;</span>, &amp;a, &amp;b, &amp;q);</span><br><span class="line"></span><br><span class="line">    q = &amp;a;  <span class="comment">// 现在让指针 q 指向 a</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;note:2, *q=%d, q=%p, &amp;q=%p\n&quot;</span>, *q, q, &amp;q);</span><br><span class="line">    func(q);  <span class="comment">// 期望在这个函数里让指针 q 指向 b</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;note:5, *q=%d, q=%p, &amp;q=%p\n&quot;</span>, *q, q, &amp;q);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>打印结果：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">note:1, &amp;a=0x5627cc40d010, &amp;b=0x5627cc40d014, &amp;q=0x5627cc40d020</span><br><span class="line">note:2, *q=10, q=0x5627cc40d010, &amp;q=0x5627cc40d020</span><br><span class="line">note:3, func:&amp;p=0x7ffd3af06678, p=0x5627cc40d010</span><br><span class="line">note:4, func:&amp;p=0x7ffd3af06678, p=0x5627cc40d014</span><br><span class="line">note:5, *q=10, q=0x5627cc40d010, &amp;q=0x5627cc40d020</span><br></pre></td></tr></table></figure>
+<p>从结果可以看出：</p>
+<ul>
+<li>note:1 -&gt; a, b, q 各自有各自的地址</li>
+<li>note:2 -&gt; q 指向了 a，即地址 q 里的内容是 a 的地址</li>
+<li>note:3 -&gt; 把指针 q 作为参数传入了函数，在函数内部参数 p 的地址不再是 q 的地址、但参数 p 的内容是 q 的内容（即 a 的地址）。是的，<strong>参数传递是制作了一个副本，也就是指针 p 和指针 q 不是同一个指针、但是指向的地址却是相同的</strong>。</li>
+<li>note:4 -&gt; p 指向了 b</li>
+<li>note:5 -&gt; 函数退出，<strong>p 的修改并不会对 q 造成影响</strong>。</li>
+</ul>
+<p>结论：</p>
+<p><strong>编译器总是要为函数的每个参数制作临时副本</strong>，指针入参 q 的副本是 p，编译器使得原内存和副本内存指向的内容保持一样，即 <code>p = q</code>，但是这两块内存自身的地址不一样 <code>&amp;p != &amp;q</code>。</p>
+<p>如果函数体内的程序修改了参数 p 这块副本内存的内容（比如在这里它指向 b 的地址），但是原内存 q 指向的内容不受影响。所以，在这里并不影响函数外的指针 q。</p>
+<p><strong>要想在函数内部修改对函数外部可见（生效），这就需要二级指针操作</strong>。</p>
+<h2 id="二级指针的实现">二级指针的实现</h2>
+<h3 id="例子一">例子一</h3>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> a = <span class="number">10</span>, b = <span class="number">100</span>;</span><br><span class="line"><span class="type">int</span>* q;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">func</span><span class="params">(<span class="type">int</span>** p)</span> &#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;note:3, func:&amp;p=%p, p=%p\n&quot;</span>, &amp;p, p);</span><br><span class="line">    *p = &amp;b;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;note:4, func:&amp;p=%p, p=%p\n&quot;</span>, &amp;p, p);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span>* argv[])</span> &#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;note:1, &amp;a=%p, &amp;b=%p, &amp;q=%p\n&quot;</span>, &amp;a, &amp;b, &amp;q);</span><br><span class="line"></span><br><span class="line">    q = &amp;a;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;note:2, *q=%d, q=%p, &amp;q=%p\n&quot;</span>, *q, q, &amp;q);</span><br><span class="line">    func(&amp;q);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;note:5, *q=%d, q=%p, &amp;q=%p\n&quot;</span>, *q, q, &amp;q);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这段代码只修改了三处：</p>
+<ul>
+<li>函数 func 的形参变成了二级指针 int **p</li>
+<li>函数内对二级指针解引用后，指向了 b</li>
+<li>main 函数中，将一级指针 p 的地址（即二级指针）传入了函数 func</li>
+</ul>
+<p>打印结果：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">note:1, &amp;a=0x563b8d952010, &amp;b=0x563b8d952014, &amp;q=0x563b8d952020</span><br><span class="line">note:2, *q=10, q=0x563b8d952010, &amp;q=0x563b8d952020</span><br><span class="line">note:3, func:&amp;p=0x7ffcc73f68b8, p=0x563b8d952020</span><br><span class="line">note:4, func:&amp;p=0x7ffcc73f68b8, p=0x563b8d952020</span><br><span class="line">note:5, *q=100, q=0x563b8d952014, &amp;q=0x563b8d952020</span><br></pre></td></tr></table></figure>
+<p>note:3 -&gt; 将一级指针 p 的地址（即二级指针）传入了函数 func。函数内部 &amp;p 就是 <strong> 副本 </strong>p 本身的地址 (&amp;p=…68b8)，二级指针 p 的值 (p=…2020) 就是指针 q 的地址 (&amp;q=…2020)，即<code>*p == q</code>；通过解引用<code>*p=&amp;b</code> 重新指定了 q 指向的地址（即等价于执行了<code>q=&amp;b</code>）。所以，在函数退出后，q 指向的地址发生改变。</p>
+<p>结论：<strong>在函数中，通过传递指向指针 (q) 的指针 (&amp;q)，可以修改指针 (q) 本身指向的地址 (q=&amp;b)</strong>。</p>
+<h3 id="例子二">例子二</h3>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SIZE (100)</span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">my_malloc1</span><span class="params">(<span class="type">char</span>* s1)</span> &#123;s1 = (<span class="type">char</span>*)<span class="built_in">malloc</span>(SIZE * <span class="keyword">sizeof</span>(<span class="type">char</span>));&#125;</span><br><span class="line"><span class="type">void</span> <span class="title function_">my_malloc2</span><span class="params">(<span class="type">char</span>** s2)</span> &#123;*s2 = (<span class="type">char</span>*)<span class="built_in">malloc</span>(SIZE * <span class="keyword">sizeof</span>(<span class="type">char</span>));&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span>* argv[])</span> &#123;</span><br><span class="line">    <span class="type">const</span> <span class="type">int</span> len = <span class="number">3</span>;</span><br><span class="line">    <span class="type">char</span>** p1 = (<span class="type">char</span>**)<span class="built_in">malloc</span>(len * <span class="keyword">sizeof</span>(<span class="type">char</span>*));</span><br><span class="line">    <span class="type">char</span>** p2 = (<span class="type">char</span>**)<span class="built_in">malloc</span>(len * <span class="keyword">sizeof</span>(<span class="type">char</span>*));</span><br><span class="line"></span><br><span class="line">    <span class="built_in">memset</span>(p1, <span class="number">0</span>, <span class="keyword">sizeof</span>(p1));</span><br><span class="line">    <span class="built_in">memset</span>(p2, <span class="number">0</span>, <span class="keyword">sizeof</span>(p2));</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; len; i++) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;my_malloc1(), before: p1[%d] is %s\n&quot;</span>, i, p1[i] == <span class="literal">NULL</span> ? <span class="string">&quot;NULL&quot;</span> : <span class="string">&quot;NOT NULL&quot;</span>);</span><br><span class="line">        my_malloc1(p1[i]);</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;my_malloc1(), after:  p2[%d] is %s\n&quot;</span>, i, p1[i] == <span class="literal">NULL</span> ? <span class="string">&quot;NULL&quot;</span> : <span class="string">&quot;NOT NULL&quot;</span>);</span><br><span class="line">        <span class="keyword">if</span> (p1[i]) &#123;<span class="built_in">free</span>(p1[i]);&#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; len; i++) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;my_malloc2(), before: p2[%d] is %s\n&quot;</span>, i, p2[i] == <span class="literal">NULL</span> ? <span class="string">&quot;NULL&quot;</span> : <span class="string">&quot;NOT NULL&quot;</span>);</span><br><span class="line">        my_malloc2(&amp;p2[i]);</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;my_malloc2(), after:  p2[%d] is %s\n&quot;</span>, i, p2[i] == <span class="literal">NULL</span> ? <span class="string">&quot;NULL&quot;</span> : <span class="string">&quot;NOT NULL&quot;</span>);</span><br><span class="line">        <span class="keyword">if</span> (p2[i]) &#123;<span class="built_in">free</span>(p2[i]);&#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>打印结果：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">my_malloc1(), before: p1[0] is NULL</span><br><span class="line">my_malloc1(), after:  p2[0] is NULL</span><br><span class="line">my_malloc1(), before: p1[1] is NULL</span><br><span class="line">my_malloc1(), after:  p2[1] is NULL</span><br><span class="line">my_malloc1(), before: p1[2] is NULL</span><br><span class="line">my_malloc1(), after:  p2[2] is NULL</span><br><span class="line">my_malloc2(), before: p2[0] is NULL</span><br><span class="line">my_malloc2(), after:  p2[0] is NOT NULL</span><br><span class="line">my_malloc2(), before: p2[1] is NULL</span><br><span class="line">my_malloc2(), after:  p2[1] is NOT NULL</span><br><span class="line">my_malloc2(), before: p2[2] is NULL</span><br><span class="line">my_malloc2(), after:  p2[2] is NOT NULL</span><br></pre></td></tr></table></figure>
+<p>在这个示例中，我们尝试在函数内部给函数外申请的二级指针（指针数组 <code>p1, p2</code> 的每个位置（初始时都是空地址）分配一块内存。</p>
+<p>在函数 <code>my_malloc1</code> 中，使用一级指针作为函数参数。就相当于给 <code>p1[i]</code> 的拷贝副本 <code>s1</code> 分配内存，<code>p1[i]</code>依然没有分配内存，所以在函数退出后，<code>p1[i]</code>依然是空地址。</p>
+<p>在函数 <code>my_malloc2</code> 中，使用二级指针作为函数参数。<code>&amp;p2[i]</code>的拷贝副本为 <code>s2</code>，<code>*s2</code> 解引用的内容与拷贝前 <code>&amp;p2[i]</code> 指向的内容一致（是 <code>p2[i]</code>），此时对其分配内存，在函数退出后，<code>p2[i]</code> 是一个分配的有效地址。</p>
+<h1 id="总结">总结</h1>
+<p>在函数中，通过传递指向指针的指针（二级指针），可以修改指针本身指向的地址。</p>
+<ul>
+<li>通过二级指针，在函数内部改变指针的指向（例子一）。</li>
+<li>通过二级指针，在函数内部进行内存分配（例子二）。</li>
+</ul>
+<p>注意，函数形参使用的是一级指针，就是值传递，值传递在函数里面 <strong> 修改指针 </strong>，改变的是形参的值，而不是实参的值；但可以通过对形参<strong> 解引用赋值</strong>，来改变实参指向的地址里的值。</p>
+<blockquote>
+<p>参考资料：</p>
+<ol>
+<li><a target="_blank" rel="noopener" href="https://www.techxiaofei.com/post/cpp/secondary_pointer">https://www.techxiaofei.com/post/cpp/secondary_pointer</a></li>
+</ol>
+</blockquote>
+
+</div>
+
+
+  <div class="book-comments">
+    
+
+
+
+
+  </div>
+
+
+
+<script src="/js/book-post.js"></script>
+
+
+            </div>
+          </div>
+          <div class="column col-2 hide-lg">
+            <div class="book-post-info">
+  
+    <div class="book-post-meta">
+
+  <div class="author">
+
+    <!-- Author image -->
+    <div class="author-img">
+      
+        <figure
+          class="avatar avatar-lg"
+          data-initial="A"
+          style="background-color: #3b4351;">
+        </figure>
+      
+    </div>
+
+    <!-- Author title -->
+    <div class="author-title">
+      <div>aha</div>
+      <div>2024-02-24</div>
+    </div>
+  </div>
+
+  
+    <div class="divider"></div>
+
+    <div class="link">
+      <a class="category-link" href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</a> <a class="category-link" href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/C%E8%AF%AD%E8%A8%80/">C语言</a>
+
+      <a class="tag-none-link" href="/tags/%E4%B8%80%E7%BA%A7%E6%8C%87%E9%92%88/" rel="tag">#一级指针</a> <a class="tag-none-link" href="/tags/%E4%BA%8C%E7%BA%A7%E6%8C%87%E9%92%88/" rel="tag">#二级指针</a>
+    </div>
+    
+  
+
+  <div class="divider"></div>
+</div>
+  
+
+  <div class="book-tocbot">
+</div>
+<div class="book-tocbot-menu">
+  <a class="book-toc-expand" onclick="expand_toc()">Expand all</a>
+  <a onclick="go_top()">Back to top</a>
+  <a onclick="go_bottom()">Go to bottom</a>
+  <a onclick="toggleSearch()">Search in blogs</a> <!-- 添加搜索文字的点击事件 -->
+</div>
+
+<div id="search-overlay" class="search-overlay" style="display: none;"> <!-- 初始状态为隐藏 -->
+  <div class="search-box">
+    <input type="text" id="search-input" placeholder="Search in all blogs...">
+    <button onclick="closeSearch()">Close</button> <!-- 添加关闭按钮 -->
+    <div id="search-results" class="search-results"></div>
+  </div>
+</div>
+
+<script>
+  function performSearch(query) {
+    if (!query.trim()) {
+      return;
+    }
+
+    fetch('/search.xml')
+      .then(response => response.text())
+      .then(data => {
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(data, "text/xml");
+        const entries = xmlDoc.getElementsByTagName('entry');
+        let results = '';
+
+        for (let i = 0; i < entries.length; i++) {
+          const title = entries[i].getElementsByTagName('title')[0].textContent;
+          const content = entries[i].getElementsByTagName('content')[0].textContent;
+          const url = entries[i].getElementsByTagName('url')[0].textContent;
+
+          let count = (title.match(new RegExp(query, "gi")) || []).length; // 统计查询词出现的次数
+          count += (content.match(new RegExp(query, "gi")) || []).length;
+
+          if (count > 0) { // title.includes(query) || content.includes(query)
+            results += `
+              <div class="search-result-item">
+                <a href="${url}">${title}</a> (${count})
+              </div>`;
+          }
+        }
+
+        const searchResultsElement = document.getElementById('search-results');
+        searchResultsElement.innerHTML = results;
+        searchResultsElement.classList.add('active');
+      });
+  }
+
+  function toggleSearch() {
+    const searchOverlay = document.getElementById('search-overlay');
+    searchOverlay.style.display = searchOverlay.style.display === 'none' ? 'flex' : 'none';
+  }
+
+  function closeSearch() {
+    document.getElementById('search-overlay').style.display = 'none';
+  }
+
+  document.getElementById('search-input').addEventListener('input', function() {
+    const query = this.value;
+    performSearch(query);
+  });
+</script>
+
+<style>
+  .search-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  .search-box {
+    background: white;
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+    width: 80%;
+    max-width: 500px;
+  }
+
+  .search-results {
+    margin-top: 10px;
+    max-height: 300px;
+    overflow-y: auto;
+    background: white;
+    padding: 10px;
+    border-radius: 5px;
+    width: 100%;
+  }
+
+  .search-result-item {
+    margin: 10px 0;
+  }
+
+  .search-result-item a {
+    color: blue; /* 设置链接颜色为蓝色 */
+    text-decoration: none;
+  }
+
+  .search-result-item a:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+<script src="/js/book-toc.js"></script>
+
+
+</div>
+          </div>
+        </div>
+      </div>
+
+      <a class="off-canvas-overlay" onclick="hide_canvas()"></a>
+
+      <button class="floating-button" onclick="toggleDropdownMenu()"></button>
+
+      <div class="dropdown-menu">
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FFFFFF', '#000000')">银河白</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#C7EDCC', '#000000')">豆沙绿</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FAF9DE', '#000000')">杏仁黄</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#E3EDCD', '#000000')">青草绿</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FFF2E2', '#000000')">秋叶褐</div>
+      </div>
+  </div>
+
+  <script>
+    function toggleDropdownMenu() {
+      document.querySelector('.floating-button').classList.toggle('active');
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      var storedBackgroundColor = localStorage.getItem('blogBackgroundColor');
+      var storedColor = localStorage.getItem('blogColor');
+
+      if (storedBackgroundColor && storedColor) {
+        document.body.style.backgroundColor = storedBackgroundColor;
+        document.body.style.color = storedColor;
+      }
+    });
+
+    function changeBackgroundColor(backgroundColor, color) {
+      document.body.style.backgroundColor = backgroundColor;
+      document.body.style.color = color;
+
+      localStorage.setItem('blogBackgroundColor', backgroundColor);
+      localStorage.setItem('blogColor', color);
+
+      document.querySelector('.floating-button').classList.remove('active');
+    }
+  </script>
+</body>
+
+</html>
+
+
+<script src="/js/book.js"></script>

@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
+
+    
+      <link rel="icon" href="/favicon.png" />
+    
+
+    <title>
+        
+          Linux 网络数据包接收过程 - aha&#39;s book
+        
+    </title>
+
+    <!-- Spectre.css framework -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre-exp.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre-icons.min.css">
+
+    <!-- theme css & js -->
+    
+<link rel="stylesheet" href="/css/book.css">
+
+    
+<script src="/js/book.js"></script>
+
+
+    <!-- tocbot -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.css">
+    
+    <!-- katex -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/zooming/2.1.1/zooming.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const zooming = new Zooming()
+    zooming.listen('.book-content img')
+})
+</script>
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+    <style>
+      body {
+        background-color: #FFFFFF;
+        /* color: #000000; */
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+
+      /* Floating Button Styles */
+      .floating-button {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 999;
+        background-color: #000000;
+        color: #ffffff;
+        padding: 12px;
+        border-radius: 50%;
+        cursor: pointer;
+        border: 2px solid #000000;
+      }
+
+      .floating-button:hover {
+        background-color: #FFFFFF;
+      }
+
+      /* Dropdown Menu Styles */
+      .dropdown-menu {
+        position: fixed;
+        bottom: 60px;
+        right: 10px;
+        display: none;
+        min-width: 60px;
+        padding: 2px;
+        background-color: #fff;
+        /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
+        z-index: 1000;
+      }
+
+      .floating-button.active+.dropdown-menu {
+        display: block;
+      }
+
+      .dropdown-item {
+        display: block;
+        padding: 8px 16px;
+        cursor: pointer;
+      }
+
+      .dropdown-item:hover {
+        background-color: #f5f5f5;
+      }
+    </style>
+<style>.darkmode--activated{--body-bg-color:#282828;--content-bg-color:#333;--card-bg-color:#555;--text-color:#ccc;--blockquote-color:#bbb;--link-color:#ccc;--link-hover-color:#eee;--brand-color:#ddd;--brand-hover-color:#ddd;--table-row-odd-bg-color:#282828;--table-row-hover-bg-color:#363636;--menu-item-bg-color:#555;--btn-default-bg:#222;--btn-default-color:#ccc;--btn-default-border-color:#555;--btn-default-hover-bg:#666;--btn-default-hover-color:#ccc;--btn-default-hover-border-color:#666;--highlight-background:#282b2e;--highlight-foreground:#a9b7c6;--highlight-gutter-background:#34393d;--highlight-gutter-foreground:#9ca9b6}.darkmode--activated img{opacity:.75}.darkmode--activated img:hover{opacity:.9}.darkmode--activated code{color:#69dbdc;background:0 0}button.darkmode-toggle{z-index:9999}.darkmode-ignore,img{display:flex!important}.beian img{display:inline-block!important}</style></head>
+
+<body>
+  <div class="book-container">
+    <div class="book-sidebar">
+      <div class="book-brand">
+  <a href="/">
+    <img src="/favicon.png">
+    <span>AHA&#39;S BOOK</span>
+  </a>
+</div>
+        <div id="menu" class="book-menu hide">
+  <h2 id="基础知识"> 基础知识 </h2>
+<ul>
+<li><a href="/posts/231010144856.html"> 模运算 </a></li>
+<li><a href="/posts/231014105311.html"> 异或运算 </a></li>
+<li><a href="/posts/231210181853.html"> 计算机中的寄存器 </a></li>
+<li><a href="/posts/231213183051.html"> 正则表达式基础 </a></li>
+</ul>
+<h2 id="C 语言">C 语言 </h2>
+<ul>
+<li><a href="/posts/230916171929.html">main 函数参数 </a></li>
+<li><a href="/posts/231214192113.html"> 关键字与专有名词 </a></li>
+<li><a href="/posts/240103180653.html"> 输出打印函数 </a></li>
+<li><a href="/posts/230922143003.html"> 多维数组 </a></li>
+<li><a href="/posts/230913200729.html">const 关键字 </a></li>
+<li><a href="/posts/230918174223.html">typedef 类型基础 </a></li>
+<li><a href="/posts/230920172849.html">typedef 类型实践 </a></li>
+<li><a href="/posts/240224193217.html"> 二级指针 </a></li>
+<li><a href="/posts/240307195203.html"> 代码 TOP-K 问题 </a></li>
+<li><a href="/posts/230922172626.html">uthash 哈希表基础 </a></li>
+<li><a href="/posts/230918114841.html"> 大小端知识 </a></li>
+</ul>
+<h2 id="Golang 语言">Golang 语言 </h2>
+<ul>
+<li><a href="/posts/230907162612.html"> 变量与常量 </a></li>
+<li><a href="/posts/230909120145.html"> 函数 &amp; 包 &amp; 判断 &amp; 循环 </a></li>
+<li><a href="/posts/230912152800.html"> 数组与切片 </a></li>
+<li><a href="/posts/230913161326.html"> 可变参数函数与 Map 集合 </a></li>
+<li><a href="/posts/230915155105.html"> 字符串和指针 </a></li>
+</ul>
+<h2 id="数据结构"> 数据结构 </h2>
+<ul>
+<li><a href="/posts/231007174854.html"> 链表（数组实现）</a></li>
+<li><a href="/posts/231008213450.html"> 链表（链式实现）</a></li>
+<li><a href="/posts/231016161508.html"> 堆栈（数组实现）</a></li>
+<li><a href="/posts/231016184406.html"> 堆栈（链表实现）</a></li>
+<li><a href="/posts/231127185207.html"> 单调栈 </a></li>
+<li><a href="/posts/231017105123.html"> 队列（链表实现）</a></li>
+<li><a href="/posts/231017154121.html"> 双端队列（链表实现）</a></li>
+<li><a href="/posts/231018102559.html"> 堆基础与堆结构（数组实现）</a></li>
+<li><a href="/posts/231019102311.html"> 优先队列（堆实现）</a></li>
+<li><a href="/posts/230905224335.html"> 二叉树的遍历 </a></li>
+<li><a href="/posts/231020174358.html"> 二叉搜索树 </a></li>
+<li><a href="/posts/230916094606.html"> 拓扑排序 </a></li>
+<li><a href="/posts/230925185057.html">Trie 字典树 </a></li>
+<li><a href="/posts/231023164532.html"> 并查集（数组实现）</a></li>
+<li><a href="/posts/240702200642.html">Linux 数据结构之队列 </a></li>
+</ul>
+<h2 id="数据结构算法"> 数据结构算法 </h2>
+<ul>
+<li><a href="/posts/231218181635.html"> 归并排序 </a></li>
+<li><a href="/posts/231108163339.html"> 快速排序 </a></li>
+<li><a href="/posts/231107171607.html"> 堆排序 </a></li>
+<li><a href="/posts/231124181658.html"> 二分查找 </a></li>
+<li><a href="/posts/231227190828.html"> 哈希表实现 </a></li>
+<li><a href="/posts/240313193201.html"> 字符串哈希函数 </a></li>
+<li><a href="/posts/231116150205.html">Floyd 多源最短路径 </a></li>
+<li><a href="/posts/231117095232.html">Dijkstra 单源最短路径（原理部分）</a></li>
+<li><a href="/posts/231121152713.html">Dijkstra 单源最短路径（实现部分）</a></li>
+</ul>
+<h2 id="数据库"> 数据库 </h2>
+<ul>
+<li><a href="/posts/250605180332.html">MySQL 基础 </a></li>
+</ul>
+<h2 id="计算机网络"> 计算机网络 </h2>
+<ul>
+<li><a href="/posts/231011192359.html">OSI 参考模型 </a></li>
+<li><a href="/posts/240329202000.html"> 计网 CyC2018 之概述 </a></li>
+<li><a href="/posts/240329202004.html"> 计网 CyC2018 之链路层 </a></li>
+<li><a href="/posts/240329202003.html"> 计网 CyC2018 之网络层 </a></li>
+<li><a href="/posts/240329202002.html"> 计网 CyC2018 之传输层 </a></li>
+<li><a href="/posts/240329202001.html"> 计网 CyC2018 之应用层 </a></li>
+<li><a href="/posts/240306203742.html">ACL 访问控制列表 </a></li>
+<li><a href="/posts/240130190208.html"> 路由表、转发表与快速转发工作原理 </a></li>
+<li><a href="/posts/231221200716.html">VXLAN 网络虚拟化技术 </a></li>
+<li><a href="/posts/240903191243.html">TCP/IP checksum 计算 </a></li>
+<li><a href="/posts/240911185603.html"> 抓包分析 TCP 三次握手与四次挥手过程 </a></li>
+</ul>
+<h2 id="操作系统"> 操作系统 </h2>
+<ul>
+<li><a href="/posts/230921190726.html"> 概述 </a></li>
+<li><a href="/posts/230924172528.html"> 中断 &amp; 异常 &amp; 系统调用 </a></li>
+<li><a href="/posts/231017195157.html"> 内存分层体系与地址空间生成 </a></li>
+<li><a href="/posts/231108195351.html"> 连续内存分配 </a></li>
+<li><a href="/posts/231111172507.html"> 非连续内存分配之分段与分页 </a></li>
+<li><a href="/posts/231119170537.html"> 非连续内存分配之页表 </a></li>
+<li><a href="/posts/231123184526.html"> 内存管理之覆盖技术与交换技术 </a></li>
+<li><a href="/posts/231127193658.html"> 内存管理之虚存技术 </a></li>
+<li><a href="/posts/231129182631.html"> 局部页面置换算法 </a></li>
+<li><a href="/posts/231207184239.html"> 全局页面置换算法 </a></li>
+<li><a href="/posts/231207204958.html"> 进程描述 </a></li>
+<li><a href="/posts/231210211306.html"> 进程状态 </a></li>
+<li><a href="/posts/231215213932.html"> 线程 </a></li>
+<li><a href="/posts/231218220813.html"> 进程控制 </a></li>
+<li><a href="/posts/231228193143.html"> 调度 </a></li>
+<li><a href="/posts/240104202828.html"> 同步与互斥 </a></li>
+<li><a href="/posts/240113115605.html"> 信号量与管程 </a></li>
+<li><a href="/posts/240205182643.html"> 经典同步问题 </a></li>
+<li><a href="/posts/240310162231.html"> 死锁 </a></li>
+</ul>
+<h2 id="系统与网络编程"> 系统与网络编程 </h2>
+<ul>
+<li><a href="/posts/230911151334.html">pthread 库 </a></li>
+<li><a href="/posts/230921094127.html"> 锁与原子操作 </a></li>
+<li><a href="/posts/240319195609.html"> 读者写者问题 </a></li>
+<li><a href="/posts/240527200241.html"> 网络编程卷一阅读随笔 </a></li>
+<li><a href="/posts/240414190410.html"> 进程间通信 IPC 机制 </a></li>
+<li><a href="/posts/240424200123.html"> 多进程相关练习 </a></li>
+<li><a href="/posts/240516221527.html">I/O 模式与 I/O 多路复用 </a></li>
+<li><a href="/posts/240626192803.html">Linux 内核 kfifo 环形队列 </a></li>
+<li><a href="/posts/241009203126.html">Linux 内核等待队列 </a></li>
+<li><a href="/posts/240627210637.html">DPDK 无锁环形队列 </a></li>
+<li><a href="/posts/240919200410.html"> 解密内存屏障 </a></li>
+<li><a href="/posts/240927202500.html"> 内核线程的创建 </a></li>
+<li><a href="/posts/241015195205.html">Linux 网络数据包接收过程 </a></li>
+<li><a href="/posts/2410232111015.html"> 源码解读 epoll 实现原理 </a></li>
+<li><a href="/posts/241106182619.html">Linux 文件系统 </a></li>
+<li><a href="/posts/250619154429.html">Libevent 高性能 IO 事件驱动库 </a></li>
+</ul>
+<h2 id="工具与命令"> 工具与命令 </h2>
+<ul>
+<li><a href="/posts/240207180410.html">GCC 编译过程分解 </a></li>
+<li><a href="/posts/240312184132.html">GDB 调试入门 </a></li>
+<li><a href="/posts/240512184921.html">Makefile 学习 </a></li>
+<li><a href="/posts/250629214430.html">CMake 学习 </a></li>
+<li><a href="/posts/240417193754.html">Linux 命令之文件权限 </a></li>
+</ul>
+<h2 id="开源项目"> 开源项目 </h2>
+<ul>
+<li><a href="/posts/240303201855.html"> 线程池原理与实现 </a></li>
+<li><a href="/posts/240507194549.html">HTTP 服务器实现 </a></li>
+<li><a href="/posts/240904203605.html"> 聊天服务器实现 </a></li>
+<li><a href="/posts/241119182636.html">Linux 文件系统 </a></li>
+</ul>
+<h2 id="Docker">Docker</h2>
+<ul>
+<li><a href="/posts/230909171809.html">Docker 学习笔记 </a></li>
+</ul>
+<h1 id="LeetCode 刷题">LeetCode 刷题 </h1>
+<h2 id="链表相关"> 链表相关 </h2>
+<ul>
+<li><a href="/posts/231025143947.html">160 相交链表 </a></li>
+<li><a href="/posts/231025185947.html">206 反转链表 </a></li>
+<li><a href="/posts/231026101239.html">21 合并两个有序链表 </a></li>
+<li><a href="/posts/231026184514.html">83 删除排序链表中的重复元素 </a></li>
+<li><a href="/posts/231027150243.html">19 删除链表的倒数第 N 个节点 </a></li>
+<li><a href="/posts/231031120718.html">2 两数相加 </a></li>
+<li><a href="/posts/231031163133.html">445 两数相加 II</a></li>
+<li><a href="/posts/231101094219.html">234 回文链表 </a></li>
+<li><a href="/posts/231101135228.html">725 分隔链表 </a></li>
+<li><a href="/posts/231102120708.html">328 奇偶链表 </a></li>
+<li><a href="/posts/231102165703.html">142 环形链表 II</a></li>
+</ul>
+<h2 id="设计"> 设计 </h2>
+<ul>
+<li><a href="/posts/231201184542.html">146 LRU 缓存 </a></li>
+</ul>
+<h2 id="贪心算法"> 贪心算法 </h2>
+<ul>
+<li><a href="/posts/231107094652.html">1029 两地调度 </a></li>
+<li><a href="/posts/231109150855.html">435 无重叠区间 </a></li>
+</ul>
+<h2 id="哈希表"> 哈希表 </h2>
+<ul>
+<li><a href="/posts/231123181539.html">1410 实体解析器 </a></li>
+</ul>
+<h2 id="树的遍历"> 树的遍历 </h2>
+<ul>
+<li><a href="/posts/231103121209.html">117 填充每个节点的下一个右侧节点指针 II</a></li>
+</ul>
+<h2 id="深度优先搜索（递归）"> 深度优先搜索（递归）</h2>
+<ul>
+<li><a href="/posts/231206201243.html">2477 达到首都的最少油耗 </a></li>
+</ul>
+<h2 id="图或路径问题"> 图或路径问题 </h2>
+<ul>
+<li><a href="/posts/231211184652.html">1631 最小体力消耗路径 </a></li>
+</ul>
+<h2 id="其它"> 其它 </h2>
+<ul>
+<li><a href="/posts/230101120000.html"> 备忘录 </a></li>
+</ul>
+
+</div>
+
+
+<script src="/js/book-menu.js"></script>
+
+    </div>
+    <div class="sidebar-toggle" onclick="sidebar_toggle()" onmouseover="add_inner()" onmouseleave="remove_inner()">
+  <div class="sidebar-toggle-inner"></div>
+</div>
+
+<script>
+function add_inner() {
+  let inner = document.querySelector('.sidebar-toggle-inner')
+  inner.classList.add('show')  
+}
+
+function remove_inner() {
+  let inner = document.querySelector('.sidebar-toggle-inner')
+  inner.classList.remove('show')
+}
+
+function sidebar_toggle() {
+    let sidebar_toggle = document.querySelector('.sidebar-toggle')
+    let sidebar = document.querySelector('.book-sidebar')
+    let content = document.querySelector('.off-canvas-content')
+    if (sidebar_toggle.classList.contains('extend')) { // show
+        sidebar_toggle.classList.remove('extend')
+        sidebar.classList.remove('hide')
+        content.classList.remove('extend')
+    }
+    else { // hide
+        sidebar_toggle.classList.add('extend')
+        sidebar.classList.add('hide')
+        content.classList.add('extend')
+    }
+}
+</script>
+
+      <div class="off-canvas-content">
+        <div class="columns">
+          <div class="column col-10 col-lg-12">
+            <div class="book-navbar">
+              <!-- For Responsive Layout -->
+
+<header class="navbar">
+  <section class="navbar-section">
+    <a onclick="open_sidebar()">
+      <i class="icon icon-menu"></i>
+    </a>
+  </section>
+</header>
+
+            </div>
+            <div class="book-content">
+              <div class="book-post">
+  <p>本文将介绍在 Linux 系统中，数据包是如何一步一步从网卡传到进程手中的。本文只讨论以太网的物理网卡，不涉及虚拟设备，并且以一个 UDP 包的接收过程作为示例。</p>
+<span id="more"></span>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">int</span> serverSocketFd = socket(AF_INET, SOCK_DGRAM, <span class="number">0</span>);</span><br><span class="line">    bind(serverSocketFd, ...);</span><br><span class="line"></span><br><span class="line">    <span class="type">char</span> buff[BUFFSIZE];</span><br><span class="line">    <span class="type">int</span> readCount = recvfrom(serverSocketFd, buff, BUFFSIZE, <span class="number">0</span>, ...);</span><br><span class="line">    buff[readCount] = <span class="string">&#x27;\0&#x27;</span>;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Receive from client:%s\n&quot;</span>, buff);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>上面代码是一段 udp server 接收数据的逻辑。只要客户端有对应的数据发送过来，服务器端执行 recvfrom 后就能收到它，并把它打印出来。那么，<strong>当网络包到达网卡，直到 recvfrom 收到数据，这中间究竟都发生过什么</strong>？</p>
+<h1 id="Linux 网络架构">Linux 网络架构</h1>
+<p>在 Linux 内核实现中，<strong>链路层协议靠网卡驱动来实现，内核协议栈来实现网络层和传输层，内核对更上层的应用层提供 socket 接口来供用户进程访问</strong>。我们用 Linux 的视角看到的 TCP/IP 网络分层模型应该是下面这个样子的。</p>
+<img src="/images/linux-kernel/linux-net-arch.png" alt="Linux 视角的网络协议栈" width="80%" height="80%">
+<p>在 Linux 的源代码中，网络设备驱动对应的逻辑位于 <code>driver/net/ethernet</code>, 其中 intel 系列网卡的驱动在<code>driver/net/ethernet/intel</code> 目录下。协议栈模块代码位于 kernel 和 net 目录。</p>
+<h1 id="内核的软硬中断">内核的软硬中断</h1>
+<p>内核和网络设备驱动是通过中断的方式来处理的。当网络设备上有数据到达的时候，会给 CPU 的相关引脚上触发一个电压变化，以通知 CPU 来处理数据。</p>
+<p>对于网络模块来说，由于处理过程比较复杂和耗时，如果在硬中断函数中完成所有的处理，将会导致中断处理函数（其优先级过高）将过度占据 CPU，将导致 CPU 无法响应其它设备，例如鼠标和键盘的消息。因此，<strong>Linux 中断处理函数是分上半部和下半部的</strong>。</p>
+<p>上半部是只进行最简单的工作，快速处理然后释放 CPU，接着 CPU 就可以允许其它中断进来。剩下的绝大部分工作都被放到下半部中，可以慢慢地从容处理。</p>
+<p>2.4 以后的内核版本采用的下半部实现方式是软中断，由 ksoftirqd 内核线程全权处理。和硬中断不同的是，硬中断是通过给 CPU 物理引脚施加电压变化，而软中断是通过给内存中的一个变量的二进制值以通知软中断处理程序。</p>
+<h1 id="网卡到内存">网卡到内存</h1>
+<p>网卡需要有驱动才能工作，驱动是加载到内核中的一个模块——负责衔接网卡和内核的网络模块。驱动在加载的时候 <strong> 将自己注册进 </strong> 网络模块，当相应的网卡收到数据包时，网络模块 <strong> 会调用 </strong> 相应的驱动程序处理数据。</p>
+<p>下图展示了数据包（packet）如何进入内存，并被内核的网络模块开始处理：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">                   +-----+</span><br><span class="line">                   |     |                            Memroy</span><br><span class="line">+--------+   1     |     |  2  DMA     +--------+--------+--------+--------+</span><br><span class="line">| Packet |--------&gt;| NIC |------------&gt;| Packet | Packet | Packet | ...... |</span><br><span class="line">+--------+         |     |             +--------+--------+--------+--------+</span><br><span class="line">                   |     |&lt;--------+</span><br><span class="line">                   +-----+         |</span><br><span class="line">                      |            +---------------+</span><br><span class="line">                      |                            |</span><br><span class="line">                    3 | Raise IRQ                  | Disable IRQ</span><br><span class="line">                      |                          5 |</span><br><span class="line">                      |                            |</span><br><span class="line">                      ↓                            |</span><br><span class="line">                   +-----+                   +------------+</span><br><span class="line">                   |     |  Run IRQ handler  |            |</span><br><span class="line">                   | CPU |------------------&gt;| NIC Driver |</span><br><span class="line">                   |     |       4           |            |</span><br><span class="line">                   +-----+                   +------------+</span><br><span class="line">                                                   |</span><br><span class="line">                                                6  | Raise soft IRQ</span><br><span class="line">                                                   |</span><br><span class="line">                                                   ↓</span><br></pre></td></tr></table></figure>
+<p>1：数据包从外面的网络进入物理网卡（NIC）。如果目的 MAC 地址不是该网卡，且该网卡没有开启混杂模式，该包会被网卡丢弃。</p>
+<p>2：网卡将数据包通过 DMA 的方式写入到指定的内存地址，该地址由网卡驱动分配并初始化。注：老的网卡可能不支持 DMA，不过新的网卡一般都支持。</p>
+<p>3：网卡通过硬件中断（IRQ）通知 CPU，告诉它有数据来了。</p>
+<p>4：CPU 根据中断表，调用已经注册的中断函数，这个中断函数会调到驱动程序（NIC Driver）中相应的函数。</p>
+<p>5：驱动先禁用网卡的中断，表示驱动程序已经知道内存中有数据了，告诉网卡下次再收到数据包时，直接写内存就可以了，不要再通知 CPU 了。这样可以提高效率，避免 CPU 不停的被中断。</p>
+<p>6：启动软中断。这步结束后，硬件中断处理函数就结束返回了。</p>
+<p><strong>由于硬中断处理程序执行的过程中不能被中断，所以如果它执行时间过长，会导致 CPU 没法响应其它硬件的中断，于是内核引入软中断，这样可以将硬中断处理函数中耗时的部分移到软中断处理函数里面来慢慢处理</strong>。</p>
+<h1 id="内核的网络模块">内核的网络模块</h1>
+<p>软中断会触发内核网络模块中的软中断处理函数，后续流程如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">                                            +-----+</span><br><span class="line">                                    17      |     |</span><br><span class="line">                               +-----------&gt;| NIC |</span><br><span class="line">                               |            |     |</span><br><span class="line">                               |Enable IRQ  +-----+</span><br><span class="line">                               |</span><br><span class="line">                               |</span><br><span class="line">                         +------------+                                      Memroy</span><br><span class="line">                         |            |        Read           +--------+--------+--------+--------+</span><br><span class="line">        +---------------&gt;| NIC Driver |&lt;--------------------- | Packet | Packet | Packet | ...... |</span><br><span class="line">        |                |            |          9            +--------+--------+--------+--------+</span><br><span class="line">        |                +------------+</span><br><span class="line">        |                      |    |        skb</span><br><span class="line">   Poll | 8      Raise softIRQ | 6  +-----------------+</span><br><span class="line">        |                      |             10       |</span><br><span class="line">        |                      ↓                      ↓</span><br><span class="line">+---------------+  Call  +-----------+        +------------------+        +--------------------+  12  +---------------------+</span><br><span class="line">| net_rx_action |&lt;-------| ksoftirqd |        | napi_gro_receive |-------&gt;| enqueue_to_backlog |-----&gt;| CPU input_pkt_queue |</span><br><span class="line">+---------------+   7    +-----------+        +------------------+   11   +--------------------+      +---------------------+</span><br><span class="line">                                                      |                                                      | 13</span><br><span class="line">                                                   14 |        + - - - - - - - - - - - - - - - - - - - - - - +</span><br><span class="line">                                                      ↓        ↓</span><br><span class="line">                                           +--------------------------+    15      +------------------------+</span><br><span class="line">                                           | __netif_receive_skb_core |-----------&gt;| packet taps(AF_PACKET) |</span><br><span class="line">                                           +--------------------------+            +------------------------+</span><br><span class="line">                                                      |</span><br><span class="line">                                                      | 16</span><br><span class="line">                                                      ↓</span><br><span class="line">                                             +-----------------+</span><br><span class="line">                                             | protocol layers |</span><br><span class="line">                                             +-----------------+</span><br></pre></td></tr></table></figure>
+<p>7：内核中的 ksoftirqd 进程专门负责软中断的处理，当它收到软中断后，就会调用相应软中断所对应的处理函数，对于上面第 6 步中是网卡驱动模块抛出的软中断，ksoftirqd 会调用网络模块的 net_rx_action 函数。</p>
+<p>8：net_rx_action 函数调用网卡驱动里的 poll 函数来一个一个的处理数据包，如 Intel 的 IGB 网卡的 igb_poll 函数。</p>
+<p>9：在 pool 函数中，驱动会一个接一个的读取网卡写到内存中的数据包，内存中数据包的格式只有驱动知道。</p>
+<p>10：驱动程序将内存中的数据包转换成内核网络模块能识别的 skb 格式，然后调用 napi_gro_receive 函数，将数据包交给内核。</p>
+<p>11：napi_gro_receive 会处理 GRO 相关的内容，也就是将可以合并的数据包进行合并，这样就只需要调用一次协议栈。然后判断是否开启了 RPS，如果开启了，将会调用 enqueue_to_backlog。</p>
+<p>12：在 enqueue_to_backlog 函数中，会将数据包放入 CPU 的 softnet_data 结构体的 input_pkt_queue 中，然后返回。如果 input_pkt_queue 满了的话，该数据包将会被丢弃，queue 的大小可以通过 net.core.netdev_max_backlog 来配置。</p>
+<p>13：CPU 会接着在自己的软中断上下文中处理自己 input_pkt_queue 里的网络数据（调用__netif_receive_skb_core）。</p>
+<p>14：如果没开启 RPS，napi_gro_receive 会直接调用__netif_receive_skb_core。</p>
+<p>15：看是不是有 AF_PACKET 类型的 socket（也就是我们常说的原始套接字），如果有的话，拷贝一份数据给它。tcpdump 抓包就是抓的这里的包。</p>
+<p>16：调用协议栈相应的函数，将数据包交给协议栈处理。</p>
+<p>17：待内存中的所有数据包被处理完成后（即 poll 函数执行完成），启用网卡的硬中断，这样下次网卡再收到数据的时候就会通知 CPU。</p>
+<blockquote>
+<p>enqueue_to_backlog 函数也会被 netif_rx 函数调用，而 netif_rx 正是 lo 设备发送数据包时调用的函数。</p>
+</blockquote>
+<h1 id="协议栈">协议栈</h1>
+<h2 id="IP 层">IP 层</h2>
+<p>由于是 UDP 包，所以第一步会进入 IP 层，然后一级一级的函数往下调：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">          |</span><br><span class="line">          | 16</span><br><span class="line">          ↓         promiscuous mode &amp;&amp;</span><br><span class="line">      +--------+    PACKET_OTHERHOST (set by driver)   +-----------------+</span><br><span class="line">      | ip_rcv |--------------------------------------&gt;| drop this packet|</span><br><span class="line">      +--------+                                       +-----------------+</span><br><span class="line">          |</span><br><span class="line">          |</span><br><span class="line">          ↓</span><br><span class="line">+---------------------+</span><br><span class="line">| NF_INET_PRE_ROUTING |</span><br><span class="line">+---------------------+</span><br><span class="line">          |</span><br><span class="line">          |</span><br><span class="line">          ↓</span><br><span class="line">      +---------+</span><br><span class="line">      |         | enabled ip forword  +------------+        +----------------+</span><br><span class="line">      | routing |--------------------&gt;| ip_forward |-------&gt;| NF_INET_FORWARD|</span><br><span class="line">      |         |  DIP is not local   +------------+        +----------------+</span><br><span class="line">      +---------+                                                   |</span><br><span class="line">          |                                                         |</span><br><span class="line">          | destination IP is local                                 ↓</span><br><span class="line">          ↓                                                 +---------------+</span><br><span class="line"> +------------------+                                       | dst_output_sk |</span><br><span class="line"> | ip_local_deliver |                                       +---------------+</span><br><span class="line"> +------------------+</span><br><span class="line">          |</span><br><span class="line">          |</span><br><span class="line">          ↓</span><br><span class="line"> +------------------+</span><br><span class="line"> | NF_INET_LOCAL_IN |</span><br><span class="line"> +------------------+</span><br><span class="line">          |</span><br><span class="line">          |</span><br><span class="line">          ↓</span><br><span class="line">    +-----------+</span><br><span class="line">    | UDP layer |</span><br><span class="line">    +-----------+</span><br></pre></td></tr></table></figure>
+<ul>
+<li><strong>ip_rcv</strong>：该函数是 IP 模块的入口函数，在该函数里面，第一件事就是将垃圾数据包（目的 MAC 地址不是当前网卡，但由于网卡设置了混杂模式而被接收进来）直接丢掉，然后调用注册在 NF_INET_PRE_ROUTING 上的函数。</li>
+<li><strong>NF_INET_PRE_ROUTING</strong>：netfilter 放在协议栈中的钩子，可以通过 iptables 来注入一些数据包处理函数，用来修改或者丢弃数据包，如果数据包没被丢弃，将继续往下走。</li>
+<li><strong>routing</strong>：进行路由，如果是目的 IP 不是本地 IP，且没有开启 ip forward 功能，那么数据包将被丢弃，如果开启了 ip forward 功能，那将进入 ip_forward 函数。</li>
+<li><strong>ip_forward</strong>：ip_forward 会先调用 netfilter 注册的 NF_INET_FORWARD 相关函数，如果数据包没有被丢弃，那么将继续往后调用 dst_output_sk 函数。</li>
+<li><strong>dst_output_sk</strong>：该函数会调用 IP 层的相应函数将该数据包发送出去，同下一篇要介绍的数据包发送流程的后半部分一样。</li>
+<li><strong>ip_local_deliver</strong>：如果上面 routing 的时候发现目的 IP 是本地 IP，那么将会调用该函数。在该函数中，会先调用 NF_INET_LOCAL_IN 相关的钩子程序，如果通过，数据包将会向下发送到 UDP 层。</li>
+</ul>
+<h2 id="UDP 层">UDP 层</h2>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">         |</span><br><span class="line">         |</span><br><span class="line">         ↓</span><br><span class="line">     +---------+            +-----------------------+</span><br><span class="line">     | udp_rcv |-----------&gt;| __udp4_lib_lookup_skb |</span><br><span class="line">     +---------+            +-----------------------+</span><br><span class="line">         |</span><br><span class="line">         |</span><br><span class="line">         ↓</span><br><span class="line">+--------------------+      +-----------+</span><br><span class="line">| sock_queue_rcv_skb |-----&gt;| sk_filter |</span><br><span class="line">+--------------------+      +-----------+</span><br><span class="line">         |</span><br><span class="line">         |</span><br><span class="line">         ↓</span><br><span class="line">+------------------+</span><br><span class="line">| __skb_queue_tail |</span><br><span class="line">+------------------+</span><br><span class="line">         |</span><br><span class="line">         |</span><br><span class="line">         ↓</span><br><span class="line"> +---------------+</span><br><span class="line"> | sk_data_ready |</span><br><span class="line"> +---------------+</span><br></pre></td></tr></table></figure>
+<ul>
+<li><strong>udp_rcv</strong>：该函数是 UDP 模块的入口函数，它里面会调用其它的函数，主要是做一些必要的检查，其中一个重要的调用是__udp4_lib_lookup_skb，该函数会根据目的 IP 和端口找对应的 socket，如果没有找到相应的 socket，那么该数据包将会被丢弃，否则继续。</li>
+<li><strong>sock_queue_rcv_skb</strong>：主要干了两件事，一是检查这个 socket 的 receive buffer 是不是满了，如果满了的话，丢弃该数据包，然后就是调用 sk_filter 看这个包是否是满足条件的包，如果当前 socket 上设置了 filter，且该包不满足条件的话，这个数据包也将被丢弃（在 Linux 里面，每个 socket 上都可以像 tcpdump 里面一样定义 filter，不满足条件的数据包将会被丢弃）。</li>
+<li><strong>__skb_queue_tail</strong>：将数据包放入 socket 接收队列的末尾。</li>
+<li><strong>sk_data_ready</strong>：通知 socket 数据包已经准备好。</li>
+</ul>
+<blockquote>
+<p>调用完 sk_data_ready 之后，一个数据包处理完成，等待应用层程序来读取，上面所有函数的执行过程都在软中断的上下文中。</p>
+</blockquote>
+<h1 id="socket">socket</h1>
+<p>应用层一般有两种方式接收数据，一种是 recvfrom 函数阻塞在那里等着数据来，这种情况下当 socket 收到通知后，recvfrom 就会被唤醒，然后读取接收队列的数据；另一种是通过 epoll 或者 select 监听相应的 socket，当收到通知后，再调用 recvfrom 函数去读取接收队列的数据。两种情况都能正常的接收到相应的数据包。</p>
+<blockquote>
+<p>了解数据包的接收流程有助于帮助我们搞清楚我们可以在哪些地方监控和修改数据包，哪些情况下数据包可能被丢弃，为我们处理网络问题提供了一些参考。同时了解 netfilter 中相应钩子的位置，对于了解 iptables 的用法有一定的帮助，同时也会帮助我们后续更好的理解 Linux 下的网络虚拟设备。</p>
+</blockquote>
+<h1 id="Linux 启动">Linux 启动</h1>
+<p>内核协议栈等模块在具备接收网卡数据包之前，要做很多的准备工作才行。比如，<strong>要提前创建好 ksoftirqd 内核线程，要注册好各个协议对应的处理函数，网络设备子系统要提前初始化好，网卡要启动好</strong>。只有这些都 Ready 之后，我们才能真正开始接收数据包。那么，我们现在来看看这些准备工作都是怎么做的。</p>
+<p>下面主要结合 Linux 3.10 内核代码，对上面的流程概述进行更详细的分析。</p>
+<h2 id="ksoftirqd 线程创建">ksoftirqd 线程创建</h2>
+<p>Linux 的软中断都是在专门的内核线程（ksoftirqd）中进行的。因此，我们非常有必要看一下这些线程是怎么初始化的，这样我们才能在后面更准确地了解收包过程。该线程数量不是 1 个，而是 N 个，其中 N 等于你的机器的核数。</p>
+<p>定义用于管理 SoftIRQ 处理的线程化机制的全局变量：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// file: kernel/softirq.c</span></span><br><span class="line"><span class="type">static</span> <span class="class"><span class="keyword">struct</span> <span class="title">smp_hotplug_thread</span> <span class="title">softirq_threads</span> =</span> &#123;</span><br><span class="line">    .store = &amp;ksoftirqd,                        <span class="comment">// 指向每个 CPU 的 ksoftirqd 线程的地址</span></span><br><span class="line">    .thread_should_run = ksoftirqd_should_run,  <span class="comment">// 线程是否需要被唤醒执行的回调函数</span></span><br><span class="line">    .thread_fn = run_ksoftirqd,                 <span class="comment">// 实际执行软中断处理的回调函数</span></span><br><span class="line">    .thread_comm = <span class="string">&quot;ksoftirqd/%u&quot;</span>,              <span class="comment">// 线程的名称，%u 用于表示对应的 CPU 编号</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">DEFINE_PER_CPU(<span class="keyword">struct</span> task_struct *, ksoftirqd);  <span class="comment">// 定义每个 CPU 都有的线程任务</span></span><br></pre></td></tr></table></figure>
+<p>定义一个内核初始化函数，用于启动每个 CPU 上的 ksoftirqd 线程：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// file: kernel/softirq.c</span></span><br><span class="line"><span class="type">static</span> __init <span class="type">int</span> <span class="title function_">spawn_ksoftirqd</span><span class="params">(<span class="type">void</span>)</span> &#123;</span><br><span class="line">    <span class="comment">// 注册 SoftIRQ 线程。如果注册失败，触发 BUG 并停止系统</span></span><br><span class="line">    BUG_ON(smpboot_register_percpu_thread(&amp;softirq_threads));</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 系统启动的早期阶段调用这个函数，确保 SoftIRQ 线程在系统初始化时被注册</span></span><br><span class="line">early_initcall(spawn_ksoftirqd);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// file: kernel/smpboot.c</span></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * smpboot_register_percpu_thread - Register a per_cpu thread related to hotplug</span></span><br><span class="line"><span class="comment"> * @plug_thread:    Hotplug thread descriptor</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * Creates and starts the threads on all online cpus.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">smpboot_register_percpu_thread</span><span class="params">(<span class="keyword">struct</span> smp_hotplug_thread* plug_thread)</span> &#123;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> cpu;</span><br><span class="line">    <span class="type">int</span> ret = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    mutex_lock(&amp;smpboot_threads_lock);</span><br><span class="line">    for_each_online_cpu(cpu) &#123;</span><br><span class="line">        ret = __smpboot_create_thread(plug_thread, cpu);  <span class="comment">// 为当前 CPU 创建线程</span></span><br><span class="line">        <span class="keyword">if</span> (ret) &#123;</span><br><span class="line">            smpboot_destroy_threads(plug_thread);  <span class="comment">// 销毁所有已创建的线程</span></span><br><span class="line">            <span class="keyword">goto</span> out;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 唤醒新创建的线程，使其开始处理 SoftIRQ</span></span><br><span class="line">        smpboot_unpark_thread(plug_thread, cpu);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 将当前线程 fd 添加到热插拔线程的全局链表中，以便后续管理</span></span><br><span class="line">    list_add(&amp;plug_thread-&gt;<span class="built_in">list</span>, &amp;hotplug_threads);</span><br><span class="line">out:</span><br><span class="line">    mutex_unlock(&amp;smpboot_threads_lock);</span><br><span class="line">    <span class="keyword">return</span> ret;</span><br><span class="line">&#125;</span><br><span class="line">EXPORT_SYMBOL_GPL(smpboot_register_percpu_thread);</span><br></pre></td></tr></table></figure>
+<p>当 ksoftirqd 被创建出来以后，它就会进入自己的线程循环函数 ksoftirqd_should_run 和 run_ksoftirqd 了。不停地判断有没有软中断需要被处理。这里需要注意的一点是，软中断不仅仅只有网络软中断，还有其它类型。</p>
+<h2 id="网络子系统初始化">网络子系统初始化</h2>
+<p>Linux 内核通过调用 subsys_initcall 来初始化各个子系统，其中网络子系统的初始化会执行到 net_dev_init 函数：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// file: net/core/dev.c</span></span><br><span class="line"><span class="type">static</span> <span class="type">int</span> __init <span class="title function_">net_dev_init</span><span class="params">(<span class="type">void</span>)</span>&#123;</span><br><span class="line">    <span class="comment">// ......</span></span><br><span class="line">    for_each_possible_cpu(i) &#123;</span><br><span class="line">        <span class="comment">// 获取每个 CPU 的 softnet_data 结构</span></span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">softnet_data</span> *<span class="title">sd</span> =</span> &amp;per_cpu(softnet_data, i);</span><br><span class="line"></span><br><span class="line">        <span class="built_in">memset</span>(sd, <span class="number">0</span>, <span class="keyword">sizeof</span>(*sd));</span><br><span class="line">        <span class="comment">// 初始化接收数据包的队列（尚未处理）、处理数据包的队列</span></span><br><span class="line">        skb_queue_head_init(&amp;sd-&gt;input_pkt_queue);</span><br><span class="line">        skb_queue_head_init(&amp;sd-&gt;process_queue);</span><br><span class="line">        sd-&gt;completion_queue = <span class="literal">NULL</span>;</span><br><span class="line">        INIT_LIST_HEAD(&amp;sd-&gt;poll_list);  <span class="comment">// 初始化轮询列表</span></span><br><span class="line">        <span class="comment">// ......</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// ......</span></span><br><span class="line">    <span class="comment">// 打开网络发送和接收的软中断，并注册处理函数</span></span><br><span class="line">    open_softirq(NET_TX_SOFTIRQ, net_tx_action);</span><br><span class="line">    open_softirq(NET_RX_SOFTIRQ, net_rx_action);</span><br><span class="line">    <span class="comment">// ......</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">subsys_initcall(net_dev_init);</span><br></pre></td></tr></table></figure>
+<p>在这个函数里，会为每个 CPU 都申请一个 softnet_data 数据结构，在这个数据结构里的 poll_list (struct list_head) 是 <strong> 等待驱动程序将其 poll 函数注册进来的</strong>，稍后网卡驱动初始化的时候我们可以看到这一过程。</p>
+<p>另外，open_softirq 函数为每一种软中断都注册一个处理函数。NET_TX_SOFTIRQ 的处理函数为 net_tx_action，NET_RX_SOFTIRQ 的处理函数为 net_rx_action。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// file: kernel/softirq.c</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">open_softirq</span><span class="params">(<span class="type">int</span> nr, <span class="type">void</span> (*action)(<span class="keyword">struct</span> softirq_action*))</span> &#123;</span><br><span class="line">    softirq_vec[nr].action = action;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 管理 SoftIRQ 的数组，它存储了每种软中断类型对应的处理函数</span></span><br><span class="line"><span class="type">static</span> <span class="class"><span class="keyword">struct</span> <span class="title">softirq_action</span> <span class="title">softirq_vec</span>[<span class="title">NR_SOFTIRQS</span>];</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// file: include/linux/interrupt.h</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">softirq_action</span> &#123;</span></span><br><span class="line">    <span class="type">void</span> (*action)(<span class="keyword">struct</span> softirq_action*);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>open_softirq 会把不同的 action 记录在 softirq_vec 全局变量里的。后面 ksoftirqd 线程收到软中断的时候，也会使用这个全局变量来找到每一种软中断对应的处理函数。</p>
+<h2 id="协议栈注册">协议栈注册</h2>
+<p>内核实现了网络层的 ip 协议，也实现了传输层的 tcp 协议和 udp 协议。这些协议对应的实现函数分别是 ip_rcv(), tcp_v4_rcv() 和 udp_rcv()。和我们平时写代码的方式不一样的是，<strong>内核是通过注册的方式来实现的</strong>。</p>
+<p>Linux 内核中的 fs_initcall 和 subsys_initcall 类似，也是初始化模块的入口。fs_initcall 调用 inet_init 函数后开始网络协议栈注册。通过 inet_init，将这些函数注册到了 inet_protos 和 ptype_base 全局变量中。</p>
+<img src="/images/linux-kernel/linux-inet-init.png" alt="协议栈注册" width="100%" height="100%">
+<p>相关代码如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// file: net/ipv4/af_inet.c</span></span><br><span class="line"><span class="type">static</span> <span class="class"><span class="keyword">struct</span> <span class="title">packet_type</span> <span class="title">ip_packet_type</span> __<span class="title">read_mostly</span> =</span> &#123;</span><br><span class="line">    .type = cpu_to_be16(ETH_P_IP),  <span class="comment">// 指定包类型为 IPv4 包，Big-Endian 16-bits</span></span><br><span class="line">    .func = ip_rcv,                 <span class="comment">// 接收到 IP 包时的处理函数</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">net_protocol</span> <span class="title">udp_protocol</span> =</span> &#123;</span><br><span class="line">    .handler = udp_rcv,      <span class="comment">// 接收到 UDP 包时的处理函数</span></span><br><span class="line">    .err_handler = udp_err,  <span class="comment">// 发生错误时的处理函数</span></span><br><span class="line">    .no_policy = <span class="number">1</span>,          <span class="comment">// 不使用安全策略</span></span><br><span class="line">    .netns_ok = <span class="number">1</span>,           <span class="comment">// 支持网络命名空间（Network Namespaces）</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">net_protocol</span> <span class="title">tcp_protocol</span> =</span> &#123;</span><br><span class="line">    .early_demux = tcp_v4_early_demux,  <span class="comment">// 在早期阶段做 TCP 的多路分解</span></span><br><span class="line">    .handler = tcp_v4_rcv,</span><br><span class="line">    .err_handler = tcp_v4_err,</span><br><span class="line">    .no_policy = <span class="number">1</span>,</span><br><span class="line">    .netns_ok = <span class="number">1</span>,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 初始化 IPv4 协议栈的函数，__init 宏表示该函数在内核启动时调用</span></span><br><span class="line"><span class="type">static</span> <span class="type">int</span> __init <span class="title function_">inet_init</span><span class="params">(<span class="type">void</span>)</span> &#123;</span><br><span class="line">    <span class="comment">// ......</span></span><br><span class="line">    <span class="comment">// 将 ICMP(1), UDP(17), TCP(6) 协议处理程序注册到 IPv4 协议栈</span></span><br><span class="line">    <span class="keyword">if</span> (inet_add_protocol(&amp;icmp_protocol, IPPROTO_ICMP) &lt; <span class="number">0</span>)</span><br><span class="line">        pr_crit(<span class="string">&quot;%s: Cannot add ICMP protocol\n&quot;</span>, __func__);</span><br><span class="line">    <span class="keyword">if</span> (inet_add_protocol(&amp;udp_protocol, IPPROTO_UDP) &lt; <span class="number">0</span>)</span><br><span class="line">        pr_crit(<span class="string">&quot;%s: Cannot add UDP protocol\n&quot;</span>, __func__);</span><br><span class="line">    <span class="keyword">if</span> (inet_add_protocol(&amp;tcp_protocol, IPPROTO_TCP) &lt; <span class="number">0</span>)</span><br><span class="line">        pr_crit(<span class="string">&quot;%s: Cannot add TCP protocol\n&quot;</span>, __func__);</span><br><span class="line">    <span class="comment">// ......</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 注册 IP 数据包处理函数</span></span><br><span class="line">    dev_add_pack(&amp;ip_packet_type);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>上面的代码中我们可以看到，全局变量 udp_protocol 中的.handler 是 udp_rcv，tcp_protocol 中的.handler 是 tcp_v4_rcv，都通过 inet_add_protocol 被初始化了进来。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">inet_add_protocol</span><span class="params">(<span class="type">const</span> <span class="keyword">struct</span> net_protocol *prot, <span class="type">unsigned</span> <span class="type">char</span> protocol)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (!prot-&gt;netns_ok) &#123;</span><br><span class="line">        <span class="comment">// 如果该协议不支持网络命名空间，打印错误并返回</span></span><br><span class="line">        pr_err(<span class="string">&quot;Protocol %u is not namespace aware, cannot register.\n&quot;</span>, protocol);</span><br><span class="line">        <span class="keyword">return</span> -EINVAL;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 使用 cmpxchg(compare-and-swap) 原子操作尝试将 inet_protos[protocol] 赋值为 prot，</span></span><br><span class="line">    <span class="comment">// 如果 inet_protos[protocol] 之前是 NULL，则设置为 prot 并返回 0</span></span><br><span class="line">    <span class="comment">// 如果已经有协议注册在该位置，则返回 -1，表示注册失败</span></span><br><span class="line">    <span class="keyword">return</span> !cmpxchg((<span class="type">const</span> <span class="keyword">struct</span> net_protocol **)&amp;inet_protos[protocol], <span class="literal">NULL</span>, prot) ? <span class="number">0</span> : <span class="number">-1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">net_protocol</span> *<span class="title">inet_protos</span>[<span class="title">MAX_INET_PROTOS</span>];</span></span><br></pre></td></tr></table></figure>
+<p>inet_add_protocol 函数将 tcp 和 udp 对应的处理函数都注册到了 <strong>inet_protos 全局数组</strong> 中了。</p>
+<p>再看 dev_add_pack(&amp;ip_packet_type)这一行，全局变量 ip_packet_type 中的.type 是协议类型，.func 是 ip_rcv 函数，在 dev_add_pack 中会被注册到 <strong>ptype_base 全局哈希表</strong> 中。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">dev_add_pack</span><span class="params">(<span class="keyword">struct</span> packet_type *pt)</span> &#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> *<span class="title">head</span> =</span> ptype_head(pt);</span><br><span class="line"></span><br><span class="line">    spin_lock(&amp;ptype_lock);</span><br><span class="line">    list_add_rcu(&amp;pt-&gt;<span class="built_in">list</span>, head);</span><br><span class="line">    spin_unlock(&amp;ptype_lock);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="keyword">struct</span> list_head *<span class="title function_">ptype_head</span><span class="params">(<span class="type">const</span> <span class="keyword">struct</span> packet_type *pt)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (pt-&gt;type == htons(ETH_P_ALL)) &#123;</span><br><span class="line">        <span class="keyword">return</span> &amp;ptype_all;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// PTYPE_HASH_MASK 用来计算哈希值（哈希桶）</span></span><br><span class="line">        <span class="keyword">return</span> &amp;ptype_base[ntohs(pt-&gt;type) &amp; PTYPE_HASH_MASK];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// 基于特定数据包的协议类型（如 IPv4、IPv6、ARP 等）</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> <span class="title">ptype_base</span>[<span class="title">PTYPE_HASH_SIZE</span>] __<span class="title">read_mostly</span>;</span></span><br><span class="line"><span class="comment">// 不论协议类型是什么，用于处理所有接收到的数据包</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> <span class="title">ptype_all</span> __<span class="title">read_mostly</span>;</span></span><br></pre></td></tr></table></figure>
+<p>这里我们需要记住 inet_protos 数组记录着 udp，tcp 的处理函数地址，ptype_base 数组存储着 ip_rcv 函数的处理地址。后面我们会看到软中断中会通过 ptype_base 找到 ip_rcv 函数地址，进而将 ip 包正确地送到 ip_rcv() 中执行。在 ip_rcv 中将会通过 inet_protos 数组找到 tcp 或者 udp 的处理函数，再而把包转发给 udp_rcv() 或 tcp_v4_rcv() 函数。</p>
+<blockquote>
+<p>扩展一下，如果看一下 ip_rcv 和 udp_rcv 等函数的代码能看到很多协议的处理过程。例如，ip_rcv 中会处理 netfilter 和 iptable 过滤，如果你有很多或者很复杂的 netfilter 或 iptables 规则，这些规则都是在软中断的上下文中执行的，会加大网络延迟。再例如，udp_rcv 中会判断 socket 接收队列是否满了。对应的相关内核参数是 net.core.rmem_max 和 net.core.rmem_default。如果有兴趣，建议大家好好读一下 inet_init 这个函数的代码。</p>
+</blockquote>
+<h2 id="网卡驱动初始化">网卡驱动初始化</h2>
+<p>每一个驱动程序（不仅仅只是网卡驱动）会使用 module_init 向内核注册一个初始化函数，当驱动被加载时，内核会调用这个初始化函数。比如 igb 网卡驱动的代码位于 drivers/net/ethernet/intel/igb/igb_main.c</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// file: drivers/net/ethernet/intel/igb/igb_main.c</span></span><br><span class="line"><span class="type">static</span> <span class="class"><span class="keyword">struct</span> <span class="title">pci_driver</span> <span class="title">igb_driver</span> =</span> &#123;</span><br><span class="line">    .name     = igb_driver_name,  <span class="comment">// &quot;igb&quot;</span></span><br><span class="line">    .id_table = igb_pci_tbl,</span><br><span class="line">    .probe    = igb_probe,</span><br><span class="line">    .remove   = igb_remove,</span><br><span class="line">    <span class="comment">// ......</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="type">static</span> <span class="type">int</span> __init <span class="title function_">igb_init_module</span><span class="params">(<span class="type">void</span>)</span>&#123;</span><br><span class="line">    <span class="comment">// ......</span></span><br><span class="line">    ret = pci_register_driver(&amp;igb_driver);</span><br><span class="line">    <span class="keyword">return</span> ret;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">module_init(igb_init_module);</span><br></pre></td></tr></table></figure>
+<p>驱动的 pci_register_driver 调用完成后，Linux 内核就知道了该驱动的相关信息，比如 igb 网卡驱动的 igb_driver_name 和 igb_probe 函数地址等等。当网卡设备被识别以后，内核会调用其驱动的.probe 方法（这里是 igb_probe）。驱动.probe 方法执行的目的就是让设备 ready，对于 igb 网卡，其 igb_probe 位于 drivers/net/ethernet/intel/igb/igb_main.c 下。主要执行的操作如下：</p>
+<img src="/images/linux-kernel/linux-igb-nic-int.png" alt="网卡驱动初始化" width="100%" height="100%">
+<p>第 5 步中我们看到，网卡驱动实现了 ethtool 所需要的接口，也在这里注册完成函数地址的注册。当 ethtool 发起一个系统调用之后，内核会找到对应操作的回调函数。对于 igb 网卡来说，其实现函数都在 drivers/net/ethernet/intel/igb/igb_ethtool.c 下。相信你这次能彻底理解 ethtool 的工作原理了吧？这个命令之所以能查看网卡收发包统计、能修改网卡自适应模式、能调整 RX 队列的数量和大小，是因为 ethtool 命令最终调用到了网卡驱动的相应方法，而不是 ethtool 本身有这个超能力。</p>
+<p>第 6 步注册的 igb_netdev_ops 中包含的是 igb_open 等函数，该函数在网卡被启动的时候会被调用。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// file: drivers/net/ethernet/intel/igb/igb_main.c</span></span><br><span class="line"><span class="type">static</span> <span class="type">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">net_device_ops</span> <span class="title">igb_netdev_ops</span> =</span> &#123;</span><br><span class="line">    .ndo_open               = igb_open,</span><br><span class="line">    .ndo_stop               = igb_close,</span><br><span class="line">    .ndo_start_xmit         = igb_xmit_frame,</span><br><span class="line">    .ndo_get_stats64        = igb_get_stats64,</span><br><span class="line">    .ndo_set_rx_mode        = igb_set_rx_mode,</span><br><span class="line">    .ndo_set_mac_address    = igb_set_mac,</span><br><span class="line">    .ndo_change_mtu         = igb_change_mtu,</span><br><span class="line">    .ndo_do_ioctl           = igb_ioctl,</span><br><span class="line">    <span class="comment">// ......</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>第 7 步中，在 igb_probe 初始化过程中，还调用到了 igb_alloc_q_vector。<strong>它注册了一个 NAPI 机制所必须的 poll 函数，对于 igb 网卡驱动来说，这个函数就是 igb_poll</strong>，如下代码所示。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">igb_alloc_q_vector</span><span class="params">(<span class="keyword">struct</span> igb_adapter *adapter,</span></span><br><span class="line"><span class="params">            <span class="type">int</span> v_count, <span class="type">int</span> v_idx,</span></span><br><span class="line"><span class="params">            <span class="type">int</span> txr_count, <span class="type">int</span> txr_idx,</span></span><br><span class="line"><span class="params">            <span class="type">int</span> rxr_count, <span class="type">int</span> rxr_idx)</span>&#123;</span><br><span class="line">    <span class="comment">// ......</span></span><br><span class="line">    <span class="comment">/* initialize NAPI */</span></span><br><span class="line">    netif_napi_add(adapter-&gt;netdev, &amp;q_vector-&gt;napi, igb_poll, <span class="number">64</span>);</span><br><span class="line">    <span class="comment">// ......</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>NAPI（New API）机制：Linux 内核中的一种网络中断处理机制——在网卡收到数据包后，触发一次中断，然后通过 poll 机制处理接收和发送队列中的数据。处理完成后会根据需要重新启用中断。目的：通过将高频中断转换为轮询，可以在网络负载较高时提高系统的处理效率，减少由于中断频率过高导致的 CPU 开销。</p>
+</blockquote>
+<h2 id="启动网卡">启动网卡</h2>
+<p>当上面的初始化都完成以后，就可以启动网卡了。回忆前面网卡驱动初始化时，我们提到了驱动向内核注册了 igb_netdev_ops 变量，它包含着网卡启用、发包、设置 MAC 地址等回调函数。当启用一个网卡时（例如，通过 ifconfig eth0 up），net_device_ops 中的 igb_open 方法会被调用。它通常会做以下事情：</p>
+<img src="/images/linux-kernel/linux-igb-nic-start.png" alt="启动网卡" width="100%" height="100%">
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// file: drivers/net/ethernet/intel/igb/igb_main.c</span></span><br><span class="line"><span class="type">static</span> <span class="type">int</span> __igb_open(<span class="keyword">struct</span> net_device* netdev, <span class="type">bool</span> resuming) &#123;</span><br><span class="line">    <span class="comment">/* allocate transmit descriptors */</span></span><br><span class="line">    err = igb_setup_all_tx_resources(adapter);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* allocate receive descriptors */</span></span><br><span class="line">    err = igb_setup_all_rx_resources(adapter);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 注册中断处理函数 */</span></span><br><span class="line">    err = igb_request_irq(adapter);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 启用 NAPI */</span></span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; adapter-&gt;num_q_vectors; i++)</span><br><span class="line">        napi_enable(&amp;(adapter-&gt;q_vector[i]-&gt;napi));</span><br><span class="line">    <span class="comment">// ......</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在上面__igb_open 函数调用了 igb_setup_all_tx_resources 和 igb_setup_all_rx_resources。在 igb_setup_all_rx_resources 这一步操作中，分配了 RingBuffer，并建立内存和 Rx 队列的映射关系（Rx/Tx 队列的数量和大小可以通过 ethtool 进行配置）。我们再接着看中断函数注册 igb_request_irq；</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">igb_request_irq</span><span class="params">(<span class="keyword">struct</span> igb_adapter* adapter)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (adapter-&gt;msix_entries) &#123;</span><br><span class="line">        err = igb_request_msix(adapter);</span><br><span class="line">        <span class="comment">// ......</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// ......</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">igb_request_msix</span><span class="params">(<span class="keyword">struct</span> igb_adapter* adapter)</span> &#123;</span><br><span class="line">    <span class="comment">// ......</span></span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; adapter-&gt;num_q_vectors; i++) &#123;</span><br><span class="line">        <span class="comment">// ......</span></span><br><span class="line">        err = request_irq(adapter-&gt;msix_entries[<span class="built_in">vector</span>].<span class="built_in">vector</span>,</span><br><span class="line">                  igb_msix_ring, <span class="number">0</span>, q_vector-&gt;name, q_vector);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在上面的代码中跟踪函数调用，__igb_open =&gt; igb_request_irq =&gt; igb_request_msix, 在 igb_request_msix 中我们看到了，对于多队列的网卡，为每一个队列都注册了中断，其对应的中断处理函数是 igb_msix_ring（该函数也在 drivers/net/ethernet/intel/igb/igb_main.c 下）。我们也可以看到，msix 方式下，每个 RX 队列有独立的 MSI-X 中断，从网卡硬件中断的层面就可以设置让收到的包被不同的 CPU 处理。（可以通过 irqbalance，或者修改 /proc/irq/IRQ_NUMBER/smp_affinity，能够修改和 CPU 的绑定行为）。</p>
+<p>当做好以上准备工作以后，就可以开门迎客（数据包）了！</p>
+<h1 id="中断与协议栈处理">中断与协议栈处理</h1>
+<h2 id="硬中断处理">硬中断处理</h2>
+<p>首先，当数据帧从网线到达网卡时，第一站是网卡的接收队列。网卡在分配给自己的 RingBuffer 中寻找可用的内存位置，找到后 DMA 会把数据拷贝到网卡之前关联的内存里，这个时候 CPU 都是无感的。当 DMA 操作完成以后，网卡会向 CPU 发起一个硬中断，通知 CPU 有数据到达。</p>
+<img src="/images/linux-kernel/linux-nic-hardware-irq.png" alt="网卡数据硬中断处理过程" width="100%" height="100%">
+<blockquote>
+<p>注意：当 RingBuffer 满的时候，新来的数据包将给丢弃。ifconfig 查看网卡的时候，可以里面有个 overruns，表示因为环形队列满被丢弃的包。如果发现有丢包，可能需要通过 ethtool 命令来加大环形队列的长度。</p>
+</blockquote>
+<p>在《启动网卡》一节，我们说到了网卡的硬中断注册的处理函数是 igb_msix_ring。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// file: drivers/net/ethernet/intel/igb/igb_main.c</span></span><br><span class="line"><span class="type">static</span> <span class="type">irqreturn_t</span> <span class="title function_">igb_msix_ring</span><span class="params">(<span class="type">int</span> irq, <span class="type">void</span>* data)</span> &#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">igb_q_vector</span>* <span class="title">q_vector</span> =</span> data;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Write the ITR value calculated from the previous interrupt. */</span></span><br><span class="line">    igb_write_itr(q_vector);</span><br><span class="line"></span><br><span class="line">    napi_schedule(&amp;q_vector-&gt;napi);</span><br><span class="line">    <span class="keyword">return</span> IRQ_HANDLED;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>igb_write_itr 只是记录一下硬件中断频率（据说目的是在减少对 CPU 的中断频率时用到）。顺着 napi_schedule 调用一路跟踪下去，__napi_schedule =&gt; ____napi_schedule</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* Called with irq disabled */</span></span><br><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">void</span> ____napi_schedule(<span class="keyword">struct</span> softnet_data* sd, <span class="keyword">struct</span> napi_struct* napi) &#123;</span><br><span class="line">    list_add_tail(&amp;napi-&gt;poll_list, &amp;sd-&gt;poll_list);</span><br><span class="line">    __raise_softirq_irqoff(NET_RX_SOFTIRQ);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里我们看到，<strong>list_add_tail 修改了 CPU 变量 softnet_data 里的 poll_list，将驱动 napi_struct 传过来的 poll_list 添加了进来 </strong>。其中 softnet_data 中的 poll_list 是一个双向列表，其中的设备都带有输入帧等着被处理。紧接着__raise_softirq_irqoff 触发了一个软中断 NET_RX_SOFTIRQ，<strong> 这个所谓的触发过程只是对一个变量进行了一次或运算而已</strong>。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 在禁用中断的情况下触发软中断（softirq）</span></span><br><span class="line"><span class="type">void</span> __raise_softirq_irqoff(<span class="type">unsigned</span> <span class="type">int</span> nr) &#123;</span><br><span class="line">    trace_softirq_raise(nr);  <span class="comment">// 记录软中断触发事件</span></span><br><span class="line">    or_softirq_pending(<span class="number">1UL</span> &lt;&lt; nr);  <span class="comment">// 设置相应的软中断挂起标志，表明该软中断需要稍后处理</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// file: include/linux/irq_cpustat.h</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> or_softirq_pending(x) (local_softirq_pending() |= (x))  <span class="comment">// 添加新的中断类型：与当前 CPU 上的软中断挂起标志按位“或”</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> local_softirq_pending() \ __IRQ_STAT(smp_processor_id(), __softirq_pending)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> __IRQ_STAT(cpu, member) (irq_stat[cpu].member)</span></span><br></pre></td></tr></table></figure>
+<p>我们说过，Linux 在硬中断里只完成简单必要的工作，剩下的大部分的处理都是转交给软中断的。通过上面代码可以看到，硬中断处理过程真的是非常短。只是记录了一个寄存器，<strong>修改了一下 CPU 的 poll_list，然后发出个软中断</strong>。就这么简单，硬中断工作就算是完成了。</p>
+<h2 id="ksoftirqd 线程处理">ksoftirqd 线程处理</h2>
+<img src="/images/linux-kernel/linux-ksoftirqd-softirq.png" alt="ksoftirqd 内核线程处理软中断" width="100%" height="100%">
+<p>内核线程初始化的时候，我们介绍了 ksoftirqd 线程中的两个函数 ksoftirqd_should_run 和 run_ksoftirqd。其中 ksoftirqd_should_run 代码如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">ksoftirqd_should_run</span><span class="params">(<span class="type">unsigned</span> <span class="type">int</span> cpu)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> local_softirq_pending();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里看到和硬中断中调用了同一个函数 local_softirq_pending。使用方式不同的是硬中断位置是为了写入标记，这里仅仅只是读取。如果硬中断中设置了 NET_RX_SOFTIRQ，这里自然能读取的到。接下来会真正进入线程函数 run_ksoftirqd 中处理：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">void</span> <span class="title function_">run_ksoftirqd</span><span class="params">(<span class="type">unsigned</span> <span class="type">int</span> cpu)</span> &#123;</span><br><span class="line">    local_irq_disable();  <span class="comment">// 禁用本地中断，防止处理中断时被其他中断打断</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 检查当前 CPU 上是否有挂起的软中断</span></span><br><span class="line">    <span class="keyword">if</span> (local_softirq_pending()) &#123;</span><br><span class="line">        __do_softirq();  <span class="comment">// 遍历处理挂起的所有软中断，调用相应的处理函数来处理事件</span></span><br><span class="line">        <span class="comment">// ......</span></span><br><span class="line">        local_irq_enable();  <span class="comment">// 重新启用本地中断</span></span><br><span class="line">        cond_resched();  <span class="comment">// 判断是否需要主动让出 CPU 给其他任务，防止占用过多时间</span></span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    local_irq_enable();  <span class="comment">// 如果没有软中断挂起，直接启用本地中断</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在__do_softirq 函数中，遍历当前 CPU 挂起的软中断类型，调用其注册的 action 方法。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">asmlinkage <span class="type">void</span> __do_softirq(<span class="type">void</span>) &#123;</span><br><span class="line">    pending = local_softirq_pending();  <span class="comment">// 获取当前 CPU 挂起的软中断 bitmap</span></span><br><span class="line">    h = softirq_vec;  <span class="comment">// 指向 struct softirq_action softirq_vec[NR_SOFTIRQS]数组首地址</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">do</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (pending &amp; <span class="number">1</span>) &#123;  <span class="comment">// 检查最低位是否有挂起的软中断</span></span><br><span class="line">            <span class="type">unsigned</span> <span class="type">int</span> vec_nr = h - softirq_vec;  <span class="comment">// 计算当前处理的软中断编号（指针运算）</span></span><br><span class="line">            <span class="comment">// ......</span></span><br><span class="line">            trace_softirq_entry(vec_nr);  <span class="comment">// 跟踪进入软中断处理（调试使用）</span></span><br><span class="line">            h-&gt;action(h);  <span class="comment">// 执行软中断处理函数（核心）</span></span><br><span class="line">            trace_softirq_exit(vec_nr);  <span class="comment">// 跟踪退出软中断处理（调试使用）</span></span><br><span class="line">        &#125;</span><br><span class="line">        h++;  <span class="comment">// 移动到下一个软中断处理程序</span></span><br><span class="line">        pending &gt;&gt;= <span class="number">1</span>;  <span class="comment">// 将挂起的软中断 bitmap 右移，检查下一个软中断</span></span><br><span class="line">    &#125; <span class="keyword">while</span> (pending);  <span class="comment">// 当有挂起的软中断时，继续处理</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在《网络子系统初始化》小节， 我们看到我们为 NET_RX_SOFTIRQ 注册了处理函数 net_rx_action。所以 net_rx_action 函数就会被执行到了。</p>
+<blockquote>
+<p>这里需要注意一个细节，硬中断中设置软中断标记，和 ksoftirq 的判断是否有软中断到达，都是基于 smp_processor_id() 的。这意味着只要硬中断在哪个 CPU 上被响应，那么软中断也是在这个 CPU 上被处理。所以说，如果你发现你的 Linux 软中断 CPU 消耗都集中在一个核上的话，做法是要把调整硬中断的 CPU 亲和性，来将硬中断打散到不同的 CPU 核上去。</p>
+</blockquote>
+<p>我们再来把精力集中到这个核心函数 net_rx_action 上来。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* </span></span><br><span class="line"><span class="comment"> * 用于处理网络接收（NET_RX_SOFTIRQ）的软中断处理函数 </span></span><br><span class="line"><span class="comment"> * 通过遍历每个网络设备的 NAPI 对象，调用对应的 poll 函数来处理网卡接收的网络数据包</span></span><br><span class="line"><span class="comment"> * 它有一定的时间和工作量限制（通过 time_limit 和 budget），以防止一次软中断</span></span><br><span class="line"><span class="comment"> * 处理时间过长或处理过多网络数据包，确保系统的响应性</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="type">static</span> <span class="type">void</span> <span class="title function_">net_rx_action</span><span class="params">(<span class="keyword">struct</span> softirq_action* h)</span> &#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">softnet_data</span>* <span class="title">sd</span> =</span> &amp;__get_cpu_var(softnet_data); <span class="comment">// 获取当前 CPU 的网络相关软中断数据</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> time_limit = jiffies + <span class="number">2</span>;  <span class="comment">// 设置时间限制，最多处理到两个 jiffies 后</span></span><br><span class="line">    <span class="type">int</span> budget = netdev_budget;  <span class="comment">// 获取当前可处理的网络包数量的“预算”</span></span><br><span class="line"></span><br><span class="line">    local_irq_disable();  <span class="comment">// 禁用本地中断，确保处理过程中不会被打断</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 当 poll_list 中还有网络设备的 NAPI(napi_struct) 对象时，继续处理</span></span><br><span class="line">    <span class="keyword">while</span> (!list_empty(&amp;sd-&gt;poll_list)) &#123;</span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">napi_struct</span>* <span class="title">n</span>;</span></span><br><span class="line">        <span class="comment">// ......</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">// 获取 poll_list 中的第一个 NAPI 对象</span></span><br><span class="line">        n = list_first_entry(&amp;sd-&gt;poll_list, <span class="keyword">struct</span> napi_struct, poll_list);</span><br><span class="line">        weight = n-&gt;weight; <span class="comment">// 一次最多处理多少个包</span></span><br><span class="line"></span><br><span class="line">        work = <span class="number">0</span>;  <span class="comment">// 记录在本次循环中处理的网络数据包数量</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">// 检查 NAPI 对象是否处于调度状态（是否被安排处理网络数据包）</span></span><br><span class="line">        <span class="keyword">if</span> (test_bit(NAPI_STATE_SCHED, &amp;n-&gt;state)) &#123;</span><br><span class="line">            work = n-&gt;poll(n, weight);  <span class="comment">// 调用 NAPI poll 函数处理网络包（核心）</span></span><br><span class="line">            trace_napi_poll(n);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        budget -= work;  <span class="comment">// 减少剩余预算</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>函数开头的 time_limit 和 budget 是用来控制 net_rx_action 函数主动退出的，目的是保证网络包的接收不霸占 CPU 不放。等下次网卡再有硬中断过来的时候再处理剩下的接收数据包。其中 budget 可以通过内核参数调整。这个函数中剩下的核心逻辑是获取到当前 CPU 变量 softnet_data，对其 poll_list 进行遍历, 然后执行到网卡驱动注册到的 poll 函数。对于 igb 网卡来说，就是 igb 驱动的 igb_poll 函数了。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">igb_poll</span><span class="params">(<span class="keyword">struct</span> napi_struct* napi, <span class="type">int</span> budget)</span> &#123;</span><br><span class="line">    <span class="comment">// 从 napi 结构体中获取 igb_q_vector 结构体指针，包含了网络数据发送和接收的队列</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">napi_struct</span>* <span class="title">q_vector</span> =</span> container_of(napi, <span class="keyword">struct</span> igb_q_vector, napi);</span><br><span class="line">    <span class="type">bool</span> clean_complete = <span class="literal">true</span>;</span><br><span class="line">    <span class="comment">// ......</span></span><br><span class="line">    <span class="keyword">if</span> (q_vector-&gt;tx.ring)</span><br><span class="line">        clean_complete = igb_clean_tx_irq(q_vector);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (q_vector-&gt;rx.ring)</span><br><span class="line">        <span class="comment">// 清理接收队列中的中断、网络数据包（给定 budget 下）</span></span><br><span class="line">        clean_complete &amp;= igb_clean_rx_irq(q_vector, budget);</span><br><span class="line">    <span class="keyword">if</span> (!clean_complete)</span><br><span class="line">        <span class="keyword">return</span> budget</span><br><span class="line">    <span class="comment">// ......</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在读取操作中，igb_poll 的重点工作是对 igb_clean_rx_irq 的调用。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * 在网卡接收到网络数据包后，负责从接收队列中提取这些数据包，</span></span><br><span class="line"><span class="comment"> * 处理包头信息，进行校验，并将其交给上层网络栈。</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="type">static</span> <span class="type">bool</span> <span class="title function_">igb_clean_rx_irq</span><span class="params">(<span class="keyword">struct</span> igb_q_vector* q_vector, <span class="type">const</span> <span class="type">int</span> budget)</span> &#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">igb_ring</span>* <span class="title">rx_ring</span> =</span> q_vector-&gt;rx.ring;  <span class="comment">// 获取接收队列（接收环形缓冲区）</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">sk_buff</span>* <span class="title">skb</span> =</span> rx_ring-&gt;skb;  <span class="comment">// 获取当前用于存储数据包的缓冲区</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> total_packets = <span class="number">0</span>;  <span class="comment">// 统计本次处理的数据包数量</span></span><br><span class="line">    <span class="comment">// ......</span></span><br><span class="line">    <span class="keyword">do</span> &#123;</span><br><span class="line">        <span class="comment">/* retrieve a skb buffer from the ring */</span></span><br><span class="line">        skb = igb_fetch_rx_buffer(rx_ring, rx_desc, skb);</span><br><span class="line">        <span class="keyword">if</span> (!skb)</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* fetch next skb buffer in frame if non-eop (end of packet) */</span></span><br><span class="line">        <span class="keyword">if</span> (igb_is_non_eop(rx_ring, rx_desc)) &#123;</span><br><span class="line">            <span class="keyword">continue</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* verify the packet layout is correct */</span></span><br><span class="line">        <span class="keyword">if</span> (igb_cleanup_headers(rx_ring, rx_desc, skb)) &#123;</span><br><span class="line">            skb = <span class="literal">NULL</span>;  <span class="comment">// 如果包头信息有问题，释放 skb，跳过处理</span></span><br><span class="line">            <span class="keyword">continue</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* populate checksum, timestamp, VLAN, and protocol */</span></span><br><span class="line">        igb_process_skb_fields(rx_ring, rx_desc, skb);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 将处理好的 skb 交给上层协议栈进行进一步处理</span></span><br><span class="line">        napi_gro_receive(&amp;q_vector-&gt;napi, skb);</span><br><span class="line">        </span><br><span class="line">        skb = <span class="literal">NULL</span>;</span><br><span class="line">        total_packets++;</span><br><span class="line">    &#125; <span class="keyword">while</span> (likely(total_packets &lt; budget));</span><br><span class="line">    <span class="comment">// ......</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>igb_fetch_rx_buffer 和 igb_is_non_eop 的作用就是把数据帧从 RingBuffer 上取下来。为什么需要两个函数呢？因为有可能一个帧要占多个 RingBuffer，所以是在一个循环中获取的，直到帧尾部。获取下来的一个数据帧用一个 sk_buff 来表示。获取完数据以后，对其进行一些校验，然后开始设置 skb 变量的 timestamp, VLAN id, protocol 等字段。接下来进入到 napi_gro_receive 中：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// file: net/core/dev.c</span></span><br><span class="line"><span class="type">gro_result_t</span> <span class="title function_">napi_gro_receive</span><span class="params">(<span class="keyword">struct</span> napi_struct* napi, <span class="keyword">struct</span> sk_buff* skb)</span> &#123;</span><br><span class="line">    skb_gro_reset_offset(skb);  <span class="comment">// 重置数据包的 GRO 偏移信息，准备进行 GRO 处理</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 调用 dev_gro_receive 尝试合并数据包，并根据其结果决定是否将数据包传递到网络协议栈进行处理</span></span><br><span class="line">    <span class="keyword">return</span> napi_skb_finish(dev_gro_receive(napi, skb), skb);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>dev_gro_receive 这个函数代表的是网卡 GRO 特性，可以简单理解成能够将多个小的 TCP 包合并为一个大的包进行处理，目的是减少传送给网络栈的包数，这有助于减少 CPU 的使用量。我们暂且忽略，直接看 napi_skb_finish, 这个函数主要就是调用了 netif_receive_skb。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// file: net/core/dev.c</span></span><br><span class="line"><span class="type">static</span> <span class="type">gro_result_t</span> <span class="title function_">napi_skb_finish</span><span class="params">(<span class="type">gro_result_t</span> ret, <span class="keyword">struct</span> sk_buff* skb)</span> &#123;</span><br><span class="line">    <span class="keyword">switch</span> (ret) &#123;</span><br><span class="line">        <span class="keyword">case</span> GRO_NORMAL: <span class="comment">// 数据包无法合并或需要进一步处理，则将数据包传递到上层网络协议栈</span></span><br><span class="line">            <span class="keyword">if</span> (netif_receive_skb(skb))</span><br><span class="line">                ret = GRO_DROP;  <span class="comment">// 如果数据包处理失败，标记为 GRO_DROP</span></span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        <span class="comment">// ......</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> ret;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>netif_receive_skb 是 Linux 内核中接收数据包的通用接口，它会将数据包传递到相应的网络协议栈进行处理，例如 TCP/IP 协议栈。</p>
+<p>声明，后面的小节也都属于软中断的处理过程，只不过由于篇幅太长，单独拿出来成小节。</p>
+<h2 id="网络协议栈处理">网络协议栈处理</h2>
+<p>netif_receive_skb 函数会根据包的协议，假如是 udp 包，会将包依次送到 ip_rcv(), udp_rcv()协议处理函数中进行处理。</p>
+<img src="/images/linux-kernel/linux-netif-receive-skb.png" alt="网络协议栈处理流程" width="100%" height="100%">
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * Linux 内核网络栈中接收到数据包后，通过 netif_receive_skb 函数将数据包传递给协议处理层</span></span><br><span class="line"><span class="comment"> * 它展示了接收的数据包在网络设备驱动层和上层网络协议栈之间的传递流程</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">netif_receive_skb</span><span class="params">(<span class="keyword">struct</span> sk_buff* skb)</span> &#123;</span><br><span class="line">    <span class="comment">// ......</span></span><br><span class="line">    <span class="keyword">return</span> __netif_receive_skb(skb);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">int</span> __netif_receive_skb(<span class="keyword">struct</span> sk_buff* skb) &#123;</span><br><span class="line">    <span class="comment">// ......</span></span><br><span class="line">    ret = __netif_receive_skb_core(skb, <span class="literal">false</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 处理接收到的数据包（核心）：为每个接收到的数据包找到合适的处理器，并将其交由合适的协议栈进行处理</span></span><br><span class="line"><span class="type">static</span> <span class="type">int</span> __netif_receive_skb_core(<span class="keyword">struct</span> sk_buff* skb, <span class="type">bool</span> pfmemalloc) &#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">net_device</span>* <span class="title">orig_dev</span>;</span></span><br><span class="line"></span><br><span class="line">    orig_dev = skb-&gt;dev;</span><br><span class="line">    <span class="comment">// ......</span></span><br><span class="line">    <span class="comment">// 遍历 ptype_all 列表中的所有协议类型</span></span><br><span class="line">    list_for_each_entry_rcu(ptype, &amp;ptype_all, <span class="built_in">list</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (!ptype-&gt;dev || ptype-&gt;dev == skb-&gt;dev) &#123;</span><br><span class="line">            <span class="keyword">if</span> (pt_prev)</span><br><span class="line">                ret = deliver_skb(skb, pt_prev, orig_dev);  <span class="comment">// 传递数据包给前一个协议类型</span></span><br><span class="line">            pt_prev = ptype;  <span class="comment">// 更新 pt_prev 为当前协议类型</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// ......</span></span><br><span class="line">    type = skb-&gt;protocol;</span><br><span class="line">    <span class="comment">// 在 ptype_base 哈希表中查找与数据包协议类型匹配的处理器，处理与 skb 类型匹配的协议</span></span><br><span class="line">    list_for_each_entry_rcu(ptype, &amp;ptype_base[ntohs(type) &amp; PTYPE_HASH_MASK], <span class="built_in">list</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (ptype-&gt;type == type &amp;&amp; </span><br><span class="line">                (ptype-&gt;dev == null_or_dev || ptype-&gt;dev == skb-&gt;dev || ptype-&gt;dev == orig_dev)) &#123;</span><br><span class="line">            <span class="keyword">if</span> (pt_prev)</span><br><span class="line">                ret = deliver_skb(skb, pt_prev, orig_dev);  <span class="comment">// 传递数据包给前一个协议类型</span></span><br><span class="line">            pt_prev = ptype;  <span class="comment">// 更新 pt_prev 为当前协议类型</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>在__netif_receive_skb_core 中，我看着原来经常使用的 tcpdump 的抓包点，很是激动，看来读一遍源代码时间真的没白浪费。接着__netif_receive_skb_core 取出 protocol，它会从数据包中取出协议信息，然后遍历注册在这个协议上的回调函数列表。ptype_base 是一个 hash table，在《协议注册》小节我们提到过。ip_rcv 函数地址就是存在这个 hash table 中的。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// file: net/core/dev.c</span></span><br><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">int</span> <span class="title function_">deliver_skb</span><span class="params">(<span class="keyword">struct</span> sk_buff* skb, </span></span><br><span class="line"><span class="params">                              <span class="keyword">struct</span> packet_type* pt_prev, </span></span><br><span class="line"><span class="params">                              <span class="keyword">struct</span> net_device* orig_dev)</span> &#123;</span><br><span class="line">    <span class="comment">// ......</span></span><br><span class="line">    <span class="keyword">return</span> pt_prev-&gt;func(skb, skb-&gt;dev, pt_prev, orig_dev);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>pt_prev-&gt;func 这一行就调用到了协议层注册的处理函数了。对于 ip 包来讲，就会进入到 ip_rcv（如果是 arp 包的话，会进入到 arp_rcv）。</p>
+<h2 id="IP 协议层处理">IP 协议层处理</h2>
+<p>我们再来大致看一下 Linux 在 ip 协议层都做了什么，包又是怎么样进一步被送到 udp 或 tcp 协议处理函数中的。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// file: net/ipv4/ip_input.c</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">ip_rcv</span><span class="params">(<span class="keyword">struct</span> sk_buff* skb, <span class="keyword">struct</span> net_device* dev, <span class="keyword">struct</span> packet_type* pt, <span class="keyword">struct</span> net_device* orig_dev)</span> &#123;</span><br><span class="line">    <span class="comment">// ......</span></span><br><span class="line">    <span class="keyword">return</span> NF_HOOK(NFPROTO_IPV4, NF_INET_PRE_ROUTING, skb, dev, <span class="literal">NULL</span>, ip_rcv_finish);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> NF_HOOK(pf, hook, skb, indev, outdev, okfn) (okfn)(skb)  <span class="comment">/* #ifndef CONFIG_NETFILTER */</span></span></span><br></pre></td></tr></table></figure>
+<p>这里 NF_HOOK 是一个钩子函数，当执行完注册的钩子后就会执行到最后一个参数指向的函数 ip_rcv_finish(skb)。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">ip_rcv_finish</span><span class="params">(<span class="keyword">struct</span> sk_buff* skb)</span> &#123;</span><br><span class="line">    <span class="comment">// ......</span></span><br><span class="line">    <span class="keyword">if</span> (!skb_dst(skb)) &#123;</span><br><span class="line">        <span class="type">int</span> err = ip_route_input_noref(skb, iph-&gt;daddr, iph-&gt;saddr, iph-&gt;tos, skb-&gt;dev);</span><br><span class="line">        <span class="comment">// ......</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// ......</span></span><br><span class="line">    <span class="keyword">return</span> dst_input(skb);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>跟踪 ip_route_input_noref 后看到它又调用了 ip_route_input_mc。在 ip_route_input_mc 中，函数 ip_local_deliver 被赋值给了 dst.input, 如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// file: net/ipv4/route.c</span></span><br><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">ip_route_input_mc</span><span class="params">(<span class="keyword">struct</span> sk_buff* skb, __be32 daddr, __be32 saddr, u8 tos, <span class="keyword">struct</span> net_device* dev, <span class="type">int</span> our)</span> &#123;</span><br><span class="line">    <span class="comment">// ......</span></span><br><span class="line">    <span class="keyword">if</span> (our) &#123;</span><br><span class="line">        rth-&gt;dst.input = ip_local_deliver;</span><br><span class="line">        rth-&gt;rt_flags |= RTCF_LOCAL;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// ......</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>所以回到 ip_rcv_finish 中的 return dst_input(skb)。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* Input packet from network to transport.  */</span></span><br><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">int</span> <span class="title function_">dst_input</span><span class="params">(<span class="keyword">struct</span> sk_buff* skb)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> skb_dst(skb)-&gt;input(skb);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>skb_dst(skb)-&gt;input 调用的 input 方法就是路由子系统赋的 ip_local_deliver。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// file: net/ipv4/ip_input.c</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">ip_local_deliver</span><span class="params">(<span class="keyword">struct</span> sk_buff* skb)</span> &#123;</span><br><span class="line">    <span class="comment">/* 检查 IP 分片重组，如果是，调用 ip_defrag 进行分片重组 */</span></span><br><span class="line">    <span class="keyword">if</span> (ip_is_fragment(ip_hdr(skb))) &#123;</span><br><span class="line">        <span class="keyword">if</span> (ip_defrag(skb, IP_DEFRAG_LOCAL_DELIVER))</span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span>;  <span class="comment">// 重组失败或数据包需要等待其他分片到达</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 在本地 LOCAL_IN 输入链中处理 IPv4 数据包</span></span><br><span class="line">    <span class="keyword">return</span> NF_HOOK(NFPROTO_IPV4, NF_INET_LOCAL_IN, skb, skb-&gt;dev, <span class="literal">NULL</span>, ip_local_deliver_finish);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">ip_local_deliver_finish</span><span class="params">(<span class="keyword">struct</span> sk_buff* skb)</span> &#123;</span><br><span class="line">    <span class="comment">// ......</span></span><br><span class="line">    <span class="type">int</span> protocol = ip_hdr(skb)-&gt;protocol;  <span class="comment">// 从 IP 头部获取协议号</span></span><br><span class="line">    <span class="type">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">net_protocol</span>* <span class="title">ipprot</span>;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 使用 RCU 机制安全地获取 inet_protos 表中的协议处理器</span></span><br><span class="line">    ipprot = rcu_dereference(inet_protos[protocol]);</span><br><span class="line">    <span class="keyword">if</span> (ipprot != <span class="literal">NULL</span>) &#123;</span><br><span class="line">        ret = ipprot-&gt;handler(skb);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如《协议栈注册》小节看到 inet_protos 中保存着 tcp_rcv 和 udp_rcv 的函数地址。这里将会根据包中的协议类型选择进行分发，在这里 skb 包将会进一步被派送到更上层的协议中——udp 和 tcp。</p>
+<h2 id="UDP 协议层处理">UDP 协议层处理</h2>
+<p>在《协议栈注册》小节的时候我们说过，udp 协议的处理函数是 udp_rcv。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// file: net/ipv4/udp.c</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">udp_rcv</span><span class="params">(<span class="keyword">struct</span> sk_buff* skb)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> __udp4_lib_rcv(skb, &amp;udp_table, IPPROTO_UDP);</span><br><span class="line">&#125;</span><br><span class="line"><span class="type">int</span> __udp4_lib_rcv(<span class="keyword">struct</span> sk_buff* skb, <span class="keyword">struct</span> udp_table* udptable, <span class="type">int</span> proto) &#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">sock</span>* <span class="title">sk</span>;</span></span><br><span class="line">    <span class="comment">// ......</span></span><br><span class="line">    <span class="comment">// 根据数据包的源端口和目标端口在 UDP 协议表中查找相应的 socket</span></span><br><span class="line">    sk = __udp4_lib_lookup_skb(skb, uh-&gt;source, uh-&gt;dest, udptable);</span><br><span class="line">    <span class="keyword">if</span> (sk != <span class="literal">NULL</span>) &#123;</span><br><span class="line">        <span class="comment">// 找到了，数据包 skb 排队到套接字的接收队列中，等待应用程序进一步处理</span></span><br><span class="line">        <span class="type">int</span> ret = udp_queue_rcv_skb(sk, skb);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// ......</span></span><br><span class="line">    <span class="comment">// 没找到，发送 ICMP 目标不可达消息，告知发送方无法到达目标端口</span></span><br><span class="line">    icmp_send(skb, ICMP_DEST_UNREACH, ICMP_PORT_UNREACH, <span class="number">0</span>);</span><br><span class="line">    <span class="comment">// ......</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>__udp4_lib_lookup_skb 是根据 skb 来寻找对应的 socket，当找到以后将数据包放到 socket 的缓存队列里。如果没有找到，则发送一个目标不可达的 icmp 包。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// file: net/ipv4/udp.c</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">udp_queue_rcv_skb</span><span class="params">(<span class="keyword">struct</span> sock* sk, <span class="keyword">struct</span> sk_buff* skb)</span> &#123;</span><br><span class="line">    <span class="comment">// 检查套接字的接收队列是否已满</span></span><br><span class="line">    <span class="keyword">if</span> (sk_rcvqueues_full(sk, skb, sk-&gt;sk_rcvbuf))</span><br><span class="line">        <span class="keyword">goto</span> drop;  <span class="comment">// 如果接收队列已满，则丢弃数据包</span></span><br><span class="line"></span><br><span class="line">    ipv4_pktinfo_prepare(skb);  <span class="comment">// 准备 IPv4 数据包信息</span></span><br><span class="line">    bh_lock_sock(sk);</span><br><span class="line">    <span class="comment">// 检查套接字是否未被用户空间持有</span></span><br><span class="line">    <span class="keyword">if</span> (!sock_owned_by_user(sk)) &#123;</span><br><span class="line">        rc = __udp_queue_rcv_skb(sk, skb);  <span class="comment">// 将数据包排队到套接字的接收队列中</span></span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// 如果套接字被用户空间持有，将数据包添加到套接字的后备（backlog）队列中</span></span><br><span class="line">        <span class="keyword">if</span> (sk_add_backlog(sk, skb, sk-&gt;sk_rcvbuf)) &#123;</span><br><span class="line">            bh_unlock_sock(sk);</span><br><span class="line">            <span class="keyword">goto</span> drop;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    bh_unlock_sock(sk);</span><br><span class="line">    <span class="keyword">return</span> rc;</span><br><span class="line"></span><br><span class="line">drop:</span><br><span class="line">    kfree_skb(skb);</span><br><span class="line">    <span class="keyword">return</span> rc;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>sock_owned_by_user 判断的是用户是不是正在这个 socket 上进行系统调用（socket 被占用），如果没有，那就可以直接放到 socket 的接收队列中。如果有，那就通过 sk_add_backlog 把数据包添加到 backlog 队列。当用户释放 socket 的时候，内核会检查 backlog 队列，如果有数据再移动到接收队列中。</p>
+<p>sk_rcvqueues_full 接收队列如果满了的话，将直接把包丢弃。接收队列大小受内核参数 net.core.rmem_max 和 net.core.rmem_default 影响。</p>
+<h1 id="recvfrom 系统调用">recvfrom 系统调用</h1>
+<p>花开两朵，各表一枝。上面我们说完了整个 Linux 内核对数据包的接收和处理过程，最后把数据包放到 socket 的接收队列中了。那么我们再回头看用户进程调用 recvfrom 后是发生了什么。我们在代码里调用的 recvfrom 是一个 glibc 的库函数，该函数在执行后会将用户进程陷入到内核态，进入到 Linux 实现的系统调用 sys_recvfrom。在理解 Linux 对 sys_recvfrom 之前，我们先来简单看一下 socket 这个核心数据结构。这个数据结构太大了，我们只把对和我们今天主题相关的内容画出来，如下：</p>
+<img src="/images/linux-kernel/linux-struct-socket.png" alt="socket 内核数据结构" width="100%" height="100%">
+<p>socket 数据结构中的 struct proto_ops 对应的是协议的方法集合。每个协议都会实现不同的方法集，对于 IPv4 协议族来说，每种协议都有对应的处理方法，如下。对于 udp 来说，是通过 inet_dgram_ops 来定义的，其中注册了 inet_recvmsg 方法。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// file: net/ipv4/af_inet.c</span></span><br><span class="line"><span class="type">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">proto_ops</span> <span class="title">inet_stream_ops</span> =</span> &#123;</span><br><span class="line">    <span class="comment">// ......</span></span><br><span class="line">    .recvmsg = inet_recvmsg,</span><br><span class="line">    .mmap = sock_no_mmap,</span><br><span class="line">    <span class="comment">// ......</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">proto_ops</span> <span class="title">inet_dgram_ops</span> =</span> &#123;</span><br><span class="line">    <span class="comment">// ......</span></span><br><span class="line">    .sendmsg = inet_sendmsg,</span><br><span class="line">    .recvmsg = inet_recvmsg,</span><br><span class="line">    <span class="comment">// ......</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>socket 数据结构中的另一个数据结构 struct sock *sk 是一个非常大，非常重要的子结构体。其中的 sk_prot 又定义了二级处理函数。对于 UDP 协议来说，会被设置成 UDP 协议实现的方法集 udp_prot。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// file: net/ipv4/udp.c</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">proto</span> <span class="title">udp_prot</span> =</span> &#123;</span><br><span class="line">    .name = <span class="string">&quot;UDP&quot;</span>,</span><br><span class="line">    .owner = THIS_MODULE,</span><br><span class="line">    .close = udp_lib_close,</span><br><span class="line">    .connect = ip4_datagram_connect,</span><br><span class="line">    <span class="comment">// ......</span></span><br><span class="line">    .sendmsg = udp_sendmsg,</span><br><span class="line">    .recvmsg = udp_recvmsg,</span><br><span class="line">    .sendpage = udp_sendpage,</span><br><span class="line">    <span class="comment">// ......</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>看完了 socket 变量之后，我们再来看 sys_recvfrom 的实现过程。</p>
+<img src="/images/linux-kernel/linux-recvfrom.png" alt="recvfrom 函数内部实现过程" width="100%" height="100%">
+<p>在 inet_recvmsg 调用了 sk-&gt;sk_prot-&gt;recvmsg。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// file: net/ipv4/af_inet.c</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">inet_recvmsg</span><span class="params">(<span class="keyword">struct</span> kiocb* iocb, <span class="keyword">struct</span> socket* sock, </span></span><br><span class="line"><span class="params">                 <span class="keyword">struct</span> msghdr* msg, <span class="type">size_t</span> size, <span class="type">int</span> flags)</span> &#123;</span><br><span class="line">    <span class="comment">// ......</span></span><br><span class="line">    err = sk-&gt;sk_prot-&gt;recvmsg(iocb, sk, msg, size, </span><br><span class="line">                flags &amp; MSG_DONTWAIT, flags &amp; ~MSG_DONTWAIT, &amp;addr_len);</span><br><span class="line">    <span class="keyword">if</span> (err &gt;= <span class="number">0</span>)</span><br><span class="line">        msg-&gt;msg_namelen = addr_len;</span><br><span class="line">    <span class="keyword">return</span> err;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>上面我们说过这个对于 udp 协议的 socket 来说，这个 sk_prot 就是 net/ipv4/udp.c 下的 struct proto udp_prot。由此我们找到了 udp_recvmsg 方法。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// file:net/core/datagram.c:EXPORT_SYMBOL(__skb_recv_datagram);</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">sk_buff</span>* __<span class="title">skb_recv_datagram</span>(<span class="keyword">struct</span> <span class="title">sock</span>* <span class="title">sk</span>, <span class="title">unsigned</span> <span class="title">int</span> <span class="title">flags</span>, <span class="title">int</span>* <span class="title">peeked</span>, <span class="title">int</span>* <span class="title">off</span>, <span class="title">int</span>* <span class="title">err</span>) &#123;</span></span><br><span class="line">    <span class="comment">// ......</span></span><br><span class="line">    <span class="keyword">do</span> &#123;</span><br><span class="line">        <span class="class"><span class="keyword">struct</span> <span class="title">sk_buff_head</span>* <span class="title">queue</span> =</span> &amp;sk-&gt;sk_receive_queue;</span><br><span class="line">        skb_queue_walk(<span class="built_in">queue</span>, skb) &#123;</span><br><span class="line">            <span class="comment">// ......</span></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* User doesn&#x27;t want to wait */</span></span><br><span class="line">        error = -EAGAIN;</span><br><span class="line">        <span class="keyword">if</span> (!timeo)</span><br><span class="line">            <span class="keyword">goto</span> no_packet;</span><br><span class="line">    &#125; <span class="keyword">while</span> (!wait_for_more_packets(sk, err, &amp;timeo, last));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>终于我们找到了我们想要看的重点，在上面我们看到了所谓的读取过程，就是访问 sk-&gt;sk_receive_queue。如果没有数据，且用户也允许等待，则将调用 wait_for_more_packets()执行等待操作，它加入会让用户进程进入睡眠状态。</p>
+<h1 id="总结">总结</h1>
+<p>网络模块是 Linux 内核中最复杂的模块了，看起来一个简简单单的收包过程就涉及到许多内核组件之间的交互，如网卡驱动、协议栈，内核 ksoftirqd 线程等。看起来很复杂，本文想通过图示的方式，尽量以容易理解的方式来将内核收包过程讲清楚。现在让我们再串一串整个收包过程。</p>
+<p>当用户执行完 recvfrom 调用后，用户进程就通过系统调用进行到内核态工作了。如果接收队列没有数据，进程就进入睡眠状态被操作系统挂起。这块相对比较简单，剩下大部分的戏份都是由 Linux 内核其它模块来表演了。</p>
+<p>首先在开始收包之前，Linux 要做许多的准备工作：</p>
+<ol>
+<li>创建 ksoftirqd 线程，为它设置好它自己的线程函数，后面指望着它来处理软中断呢。</li>
+<li>协议栈注册，Linux 要实现许多协议，比如 arp，icmp，ip，udp，tcp，每一个协议都会将自己的处理函数注册一下，方便包来了迅速找到对应的处理函数。</li>
+<li>网卡驱动初始化，每个驱动都有一个初始化函数，内核会让驱动也初始化一下。在这个初始化过程中，把自己的 DMA 准备好，把 NAPI 的 poll 函数地址告诉内核。</li>
+<li>启动网卡，分配 RX，TX 队列，注册中断对应的处理函数。</li>
+</ol>
+<p>以上是内核准备收包之前的重要工作，当上面都 ready 之后，就可以打开硬中断，等待数据包的到来了。</p>
+<p>当数据到来了以后，第一个迎接它的是网卡（我去，这不是废话么）：</p>
+<ol>
+<li>网卡将数据帧 DMA 到内存的 RingBuffer 中，然后向 CPU 发起中断通知。</li>
+<li>CPU 响应中断请求，调用网卡启动时注册的中断处理函数。</li>
+<li>中断处理函数几乎没干啥，就发起了软中断请求。</li>
+<li>内核线程 ksoftirqd 线程发现有软中断请求到来，先关闭硬中断。</li>
+<li>ksoftirqd 线程开始调用驱动的 poll 函数收包。</li>
+<li>poll 函数将收到的包送到协议栈注册的 ip_rcv 函数中。</li>
+<li>ip_rcv 函数再讲包送到 udp_rcv 函数中（对于 tcp 包就送到 tcp_rcv）。</li>
+</ol>
+<p>现在我们可以回到开篇的问题了，我们在用户层看到的简单一行 recvfrom，Linux 内核要替我们做如此之多的工作，才能让我们顺利收到数据。这还是简简单单的 UDP，如果是 TCP，内核要做的工作更多，不由得感叹内核的开发者们真的是用心良苦。</p>
+<p>理解了整个收包过程以后，我们就能明确知道 Linux 收一个包的 CPU 开销了。首先第一块是用户进程调用系统调用陷入内核态的开销。第二块是 CPU 响应包的硬中断的 CPU 开销。第三块是 ksoftirqd 内核线程的软中断上下文花费的。</p>
+<p>另外网络收发中有很多末支细节咱们并没有展开了说，比如说 no NAPI， GRO，RPS 等。因为我觉得说的太对了反而会影响大家对整个流程的把握，所以尽量只保留主框架了，少即是多！</p>
+<blockquote>
+<p>参考资料：</p>
+<ol>
+<li><a target="_blank" rel="noopener" href="https://segmentfault.com/a/1190000008836467">https://segmentfault.com/a/1190000008836467</a></li>
+<li><a target="_blank" rel="noopener" href="https://cloud.tencent.com/developer/article/1966873">https://cloud.tencent.com/developer/article/1966873</a></li>
+<li><a target="_blank" rel="noopener" href="https://cloud.tencent.com/developer/article/2378177">https://cloud.tencent.com/developer/article/2378177</a></li>
+</ol>
+</blockquote>
+
+</div>
+
+
+  <div class="book-comments">
+    
+
+
+
+
+  </div>
+
+
+
+<script src="/js/book-post.js"></script>
+
+
+            </div>
+          </div>
+          <div class="column col-2 hide-lg">
+            <div class="book-post-info">
+  
+    <div class="book-post-meta">
+
+  <div class="author">
+
+    <!-- Author image -->
+    <div class="author-img">
+      
+        <figure
+          class="avatar avatar-lg"
+          data-initial="A"
+          style="background-color: #3b4351;">
+        </figure>
+      
+    </div>
+
+    <!-- Author title -->
+    <div class="author-title">
+      <div>aha</div>
+      <div>2024-10-15</div>
+    </div>
+  </div>
+
+  
+    <div class="divider"></div>
+
+    <div class="link">
+      <a class="category-link" href="/categories/Linux%E5%86%85%E6%A0%B8/">Linux内核</a>
+
+      <a class="tag-none-link" href="/tags/%E6%95%B0%E6%8D%AE%E5%8C%85%E6%8E%A5%E6%94%B6/" rel="tag">#数据包接收</a>
+    </div>
+    
+  
+
+  <div class="divider"></div>
+</div>
+  
+
+  <div class="book-tocbot">
+</div>
+<div class="book-tocbot-menu">
+  <a class="book-toc-expand" onclick="expand_toc()">Expand all</a>
+  <a onclick="go_top()">Back to top</a>
+  <a onclick="go_bottom()">Go to bottom</a>
+  <a onclick="toggleSearch()">Search in blogs</a> <!-- 添加搜索文字的点击事件 -->
+</div>
+
+<div id="search-overlay" class="search-overlay" style="display: none;"> <!-- 初始状态为隐藏 -->
+  <div class="search-box">
+    <input type="text" id="search-input" placeholder="Search in all blogs...">
+    <button onclick="closeSearch()">Close</button> <!-- 添加关闭按钮 -->
+    <div id="search-results" class="search-results"></div>
+  </div>
+</div>
+
+<script>
+  function performSearch(query) {
+    if (!query.trim()) {
+      return;
+    }
+
+    fetch('/search.xml')
+      .then(response => response.text())
+      .then(data => {
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(data, "text/xml");
+        const entries = xmlDoc.getElementsByTagName('entry');
+        let results = '';
+
+        for (let i = 0; i < entries.length; i++) {
+          const title = entries[i].getElementsByTagName('title')[0].textContent;
+          const content = entries[i].getElementsByTagName('content')[0].textContent;
+          const url = entries[i].getElementsByTagName('url')[0].textContent;
+
+          let count = (title.match(new RegExp(query, "gi")) || []).length; // 统计查询词出现的次数
+          count += (content.match(new RegExp(query, "gi")) || []).length;
+
+          if (count > 0) { // title.includes(query) || content.includes(query)
+            results += `
+              <div class="search-result-item">
+                <a href="${url}">${title}</a> (${count})
+              </div>`;
+          }
+        }
+
+        const searchResultsElement = document.getElementById('search-results');
+        searchResultsElement.innerHTML = results;
+        searchResultsElement.classList.add('active');
+      });
+  }
+
+  function toggleSearch() {
+    const searchOverlay = document.getElementById('search-overlay');
+    searchOverlay.style.display = searchOverlay.style.display === 'none' ? 'flex' : 'none';
+  }
+
+  function closeSearch() {
+    document.getElementById('search-overlay').style.display = 'none';
+  }
+
+  document.getElementById('search-input').addEventListener('input', function() {
+    const query = this.value;
+    performSearch(query);
+  });
+</script>
+
+<style>
+  .search-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  .search-box {
+    background: white;
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+    width: 80%;
+    max-width: 500px;
+  }
+
+  .search-results {
+    margin-top: 10px;
+    max-height: 300px;
+    overflow-y: auto;
+    background: white;
+    padding: 10px;
+    border-radius: 5px;
+    width: 100%;
+  }
+
+  .search-result-item {
+    margin: 10px 0;
+  }
+
+  .search-result-item a {
+    color: blue; /* 设置链接颜色为蓝色 */
+    text-decoration: none;
+  }
+
+  .search-result-item a:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+<script src="/js/book-toc.js"></script>
+
+
+</div>
+          </div>
+        </div>
+      </div>
+
+      <a class="off-canvas-overlay" onclick="hide_canvas()"></a>
+
+      <button class="floating-button" onclick="toggleDropdownMenu()"></button>
+
+      <div class="dropdown-menu">
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FFFFFF', '#000000')">银河白</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#C7EDCC', '#000000')">豆沙绿</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FAF9DE', '#000000')">杏仁黄</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#E3EDCD', '#000000')">青草绿</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FFF2E2', '#000000')">秋叶褐</div>
+      </div>
+  </div>
+
+  <script>
+    function toggleDropdownMenu() {
+      document.querySelector('.floating-button').classList.toggle('active');
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      var storedBackgroundColor = localStorage.getItem('blogBackgroundColor');
+      var storedColor = localStorage.getItem('blogColor');
+
+      if (storedBackgroundColor && storedColor) {
+        document.body.style.backgroundColor = storedBackgroundColor;
+        document.body.style.color = storedColor;
+      }
+    });
+
+    function changeBackgroundColor(backgroundColor, color) {
+      document.body.style.backgroundColor = backgroundColor;
+      document.body.style.color = color;
+
+      localStorage.setItem('blogBackgroundColor', backgroundColor);
+      localStorage.setItem('blogColor', color);
+
+      document.querySelector('.floating-button').classList.remove('active');
+    }
+  </script>
+</body>
+
+</html>
+
+
+<script src="/js/book.js"></script>

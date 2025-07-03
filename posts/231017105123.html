@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
+
+    
+      <link rel="icon" href="/favicon.png" />
+    
+
+    <title>
+        
+          数据结构之队列（链表实现） - aha&#39;s book
+        
+    </title>
+
+    <!-- Spectre.css framework -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre-exp.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre-icons.min.css">
+
+    <!-- theme css & js -->
+    
+<link rel="stylesheet" href="/css/book.css">
+
+    
+<script src="/js/book.js"></script>
+
+
+    <!-- tocbot -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.css">
+    
+    <!-- katex -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/zooming/2.1.1/zooming.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const zooming = new Zooming()
+    zooming.listen('.book-content img')
+})
+</script>
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+    <style>
+      body {
+        background-color: #FFFFFF;
+        /* color: #000000; */
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+
+      /* Floating Button Styles */
+      .floating-button {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 999;
+        background-color: #000000;
+        color: #ffffff;
+        padding: 12px;
+        border-radius: 50%;
+        cursor: pointer;
+        border: 2px solid #000000;
+      }
+
+      .floating-button:hover {
+        background-color: #FFFFFF;
+      }
+
+      /* Dropdown Menu Styles */
+      .dropdown-menu {
+        position: fixed;
+        bottom: 60px;
+        right: 10px;
+        display: none;
+        min-width: 60px;
+        padding: 2px;
+        background-color: #fff;
+        /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
+        z-index: 1000;
+      }
+
+      .floating-button.active+.dropdown-menu {
+        display: block;
+      }
+
+      .dropdown-item {
+        display: block;
+        padding: 8px 16px;
+        cursor: pointer;
+      }
+
+      .dropdown-item:hover {
+        background-color: #f5f5f5;
+      }
+    </style>
+<style>.darkmode--activated{--body-bg-color:#282828;--content-bg-color:#333;--card-bg-color:#555;--text-color:#ccc;--blockquote-color:#bbb;--link-color:#ccc;--link-hover-color:#eee;--brand-color:#ddd;--brand-hover-color:#ddd;--table-row-odd-bg-color:#282828;--table-row-hover-bg-color:#363636;--menu-item-bg-color:#555;--btn-default-bg:#222;--btn-default-color:#ccc;--btn-default-border-color:#555;--btn-default-hover-bg:#666;--btn-default-hover-color:#ccc;--btn-default-hover-border-color:#666;--highlight-background:#282b2e;--highlight-foreground:#a9b7c6;--highlight-gutter-background:#34393d;--highlight-gutter-foreground:#9ca9b6}.darkmode--activated img{opacity:.75}.darkmode--activated img:hover{opacity:.9}.darkmode--activated code{color:#69dbdc;background:0 0}button.darkmode-toggle{z-index:9999}.darkmode-ignore,img{display:flex!important}.beian img{display:inline-block!important}</style></head>
+
+<body>
+  <div class="book-container">
+    <div class="book-sidebar">
+      <div class="book-brand">
+  <a href="/">
+    <img src="/favicon.png">
+    <span>AHA&#39;S BOOK</span>
+  </a>
+</div>
+        <div id="menu" class="book-menu hide">
+  <h2 id="基础知识"> 基础知识 </h2>
+<ul>
+<li><a href="/posts/231010144856.html"> 模运算 </a></li>
+<li><a href="/posts/231014105311.html"> 异或运算 </a></li>
+<li><a href="/posts/231210181853.html"> 计算机中的寄存器 </a></li>
+<li><a href="/posts/231213183051.html"> 正则表达式基础 </a></li>
+</ul>
+<h2 id="C 语言">C 语言 </h2>
+<ul>
+<li><a href="/posts/230916171929.html">main 函数参数 </a></li>
+<li><a href="/posts/231214192113.html"> 关键字与专有名词 </a></li>
+<li><a href="/posts/240103180653.html"> 输出打印函数 </a></li>
+<li><a href="/posts/230922143003.html"> 多维数组 </a></li>
+<li><a href="/posts/230913200729.html">const 关键字 </a></li>
+<li><a href="/posts/230918174223.html">typedef 类型基础 </a></li>
+<li><a href="/posts/230920172849.html">typedef 类型实践 </a></li>
+<li><a href="/posts/240224193217.html"> 二级指针 </a></li>
+<li><a href="/posts/240307195203.html"> 代码 TOP-K 问题 </a></li>
+<li><a href="/posts/230922172626.html">uthash 哈希表基础 </a></li>
+<li><a href="/posts/230918114841.html"> 大小端知识 </a></li>
+</ul>
+<h2 id="Golang 语言">Golang 语言 </h2>
+<ul>
+<li><a href="/posts/230907162612.html"> 变量与常量 </a></li>
+<li><a href="/posts/230909120145.html"> 函数 &amp; 包 &amp; 判断 &amp; 循环 </a></li>
+<li><a href="/posts/230912152800.html"> 数组与切片 </a></li>
+<li><a href="/posts/230913161326.html"> 可变参数函数与 Map 集合 </a></li>
+<li><a href="/posts/230915155105.html"> 字符串和指针 </a></li>
+</ul>
+<h2 id="数据结构"> 数据结构 </h2>
+<ul>
+<li><a href="/posts/231007174854.html"> 链表（数组实现）</a></li>
+<li><a href="/posts/231008213450.html"> 链表（链式实现）</a></li>
+<li><a href="/posts/231016161508.html"> 堆栈（数组实现）</a></li>
+<li><a href="/posts/231016184406.html"> 堆栈（链表实现）</a></li>
+<li><a href="/posts/231127185207.html"> 单调栈 </a></li>
+<li><a href="/posts/231017105123.html"> 队列（链表实现）</a></li>
+<li><a href="/posts/231017154121.html"> 双端队列（链表实现）</a></li>
+<li><a href="/posts/231018102559.html"> 堆基础与堆结构（数组实现）</a></li>
+<li><a href="/posts/231019102311.html"> 优先队列（堆实现）</a></li>
+<li><a href="/posts/230905224335.html"> 二叉树的遍历 </a></li>
+<li><a href="/posts/231020174358.html"> 二叉搜索树 </a></li>
+<li><a href="/posts/230916094606.html"> 拓扑排序 </a></li>
+<li><a href="/posts/230925185057.html">Trie 字典树 </a></li>
+<li><a href="/posts/231023164532.html"> 并查集（数组实现）</a></li>
+<li><a href="/posts/240702200642.html">Linux 数据结构之队列 </a></li>
+</ul>
+<h2 id="数据结构算法"> 数据结构算法 </h2>
+<ul>
+<li><a href="/posts/231218181635.html"> 归并排序 </a></li>
+<li><a href="/posts/231108163339.html"> 快速排序 </a></li>
+<li><a href="/posts/231107171607.html"> 堆排序 </a></li>
+<li><a href="/posts/231124181658.html"> 二分查找 </a></li>
+<li><a href="/posts/231227190828.html"> 哈希表实现 </a></li>
+<li><a href="/posts/240313193201.html"> 字符串哈希函数 </a></li>
+<li><a href="/posts/231116150205.html">Floyd 多源最短路径 </a></li>
+<li><a href="/posts/231117095232.html">Dijkstra 单源最短路径（原理部分）</a></li>
+<li><a href="/posts/231121152713.html">Dijkstra 单源最短路径（实现部分）</a></li>
+</ul>
+<h2 id="数据库"> 数据库 </h2>
+<ul>
+<li><a href="/posts/250605180332.html">MySQL 基础 </a></li>
+</ul>
+<h2 id="计算机网络"> 计算机网络 </h2>
+<ul>
+<li><a href="/posts/231011192359.html">OSI 参考模型 </a></li>
+<li><a href="/posts/240329202000.html"> 计网 CyC2018 之概述 </a></li>
+<li><a href="/posts/240329202004.html"> 计网 CyC2018 之链路层 </a></li>
+<li><a href="/posts/240329202003.html"> 计网 CyC2018 之网络层 </a></li>
+<li><a href="/posts/240329202002.html"> 计网 CyC2018 之传输层 </a></li>
+<li><a href="/posts/240329202001.html"> 计网 CyC2018 之应用层 </a></li>
+<li><a href="/posts/240306203742.html">ACL 访问控制列表 </a></li>
+<li><a href="/posts/240130190208.html"> 路由表、转发表与快速转发工作原理 </a></li>
+<li><a href="/posts/231221200716.html">VXLAN 网络虚拟化技术 </a></li>
+<li><a href="/posts/240903191243.html">TCP/IP checksum 计算 </a></li>
+<li><a href="/posts/240911185603.html"> 抓包分析 TCP 三次握手与四次挥手过程 </a></li>
+</ul>
+<h2 id="操作系统"> 操作系统 </h2>
+<ul>
+<li><a href="/posts/230921190726.html"> 概述 </a></li>
+<li><a href="/posts/230924172528.html"> 中断 &amp; 异常 &amp; 系统调用 </a></li>
+<li><a href="/posts/231017195157.html"> 内存分层体系与地址空间生成 </a></li>
+<li><a href="/posts/231108195351.html"> 连续内存分配 </a></li>
+<li><a href="/posts/231111172507.html"> 非连续内存分配之分段与分页 </a></li>
+<li><a href="/posts/231119170537.html"> 非连续内存分配之页表 </a></li>
+<li><a href="/posts/231123184526.html"> 内存管理之覆盖技术与交换技术 </a></li>
+<li><a href="/posts/231127193658.html"> 内存管理之虚存技术 </a></li>
+<li><a href="/posts/231129182631.html"> 局部页面置换算法 </a></li>
+<li><a href="/posts/231207184239.html"> 全局页面置换算法 </a></li>
+<li><a href="/posts/231207204958.html"> 进程描述 </a></li>
+<li><a href="/posts/231210211306.html"> 进程状态 </a></li>
+<li><a href="/posts/231215213932.html"> 线程 </a></li>
+<li><a href="/posts/231218220813.html"> 进程控制 </a></li>
+<li><a href="/posts/231228193143.html"> 调度 </a></li>
+<li><a href="/posts/240104202828.html"> 同步与互斥 </a></li>
+<li><a href="/posts/240113115605.html"> 信号量与管程 </a></li>
+<li><a href="/posts/240205182643.html"> 经典同步问题 </a></li>
+<li><a href="/posts/240310162231.html"> 死锁 </a></li>
+</ul>
+<h2 id="系统与网络编程"> 系统与网络编程 </h2>
+<ul>
+<li><a href="/posts/230911151334.html">pthread 库 </a></li>
+<li><a href="/posts/230921094127.html"> 锁与原子操作 </a></li>
+<li><a href="/posts/240319195609.html"> 读者写者问题 </a></li>
+<li><a href="/posts/240527200241.html"> 网络编程卷一阅读随笔 </a></li>
+<li><a href="/posts/240414190410.html"> 进程间通信 IPC 机制 </a></li>
+<li><a href="/posts/240424200123.html"> 多进程相关练习 </a></li>
+<li><a href="/posts/240516221527.html">I/O 模式与 I/O 多路复用 </a></li>
+<li><a href="/posts/240626192803.html">Linux 内核 kfifo 环形队列 </a></li>
+<li><a href="/posts/241009203126.html">Linux 内核等待队列 </a></li>
+<li><a href="/posts/240627210637.html">DPDK 无锁环形队列 </a></li>
+<li><a href="/posts/240919200410.html"> 解密内存屏障 </a></li>
+<li><a href="/posts/240927202500.html"> 内核线程的创建 </a></li>
+<li><a href="/posts/241015195205.html">Linux 网络数据包接收过程 </a></li>
+<li><a href="/posts/2410232111015.html"> 源码解读 epoll 实现原理 </a></li>
+<li><a href="/posts/241106182619.html">Linux 文件系统 </a></li>
+<li><a href="/posts/250619154429.html">Libevent 高性能 IO 事件驱动库 </a></li>
+</ul>
+<h2 id="工具与命令"> 工具与命令 </h2>
+<ul>
+<li><a href="/posts/240207180410.html">GCC 编译过程分解 </a></li>
+<li><a href="/posts/240312184132.html">GDB 调试入门 </a></li>
+<li><a href="/posts/240512184921.html">Makefile 学习 </a></li>
+<li><a href="/posts/250629214430.html">CMake 学习 </a></li>
+<li><a href="/posts/240417193754.html">Linux 命令之文件权限 </a></li>
+</ul>
+<h2 id="开源项目"> 开源项目 </h2>
+<ul>
+<li><a href="/posts/240303201855.html"> 线程池原理与实现 </a></li>
+<li><a href="/posts/240507194549.html">HTTP 服务器实现 </a></li>
+<li><a href="/posts/240904203605.html"> 聊天服务器实现 </a></li>
+<li><a href="/posts/241119182636.html">Linux 文件系统 </a></li>
+</ul>
+<h2 id="Docker">Docker</h2>
+<ul>
+<li><a href="/posts/230909171809.html">Docker 学习笔记 </a></li>
+</ul>
+<h1 id="LeetCode 刷题">LeetCode 刷题 </h1>
+<h2 id="链表相关"> 链表相关 </h2>
+<ul>
+<li><a href="/posts/231025143947.html">160 相交链表 </a></li>
+<li><a href="/posts/231025185947.html">206 反转链表 </a></li>
+<li><a href="/posts/231026101239.html">21 合并两个有序链表 </a></li>
+<li><a href="/posts/231026184514.html">83 删除排序链表中的重复元素 </a></li>
+<li><a href="/posts/231027150243.html">19 删除链表的倒数第 N 个节点 </a></li>
+<li><a href="/posts/231031120718.html">2 两数相加 </a></li>
+<li><a href="/posts/231031163133.html">445 两数相加 II</a></li>
+<li><a href="/posts/231101094219.html">234 回文链表 </a></li>
+<li><a href="/posts/231101135228.html">725 分隔链表 </a></li>
+<li><a href="/posts/231102120708.html">328 奇偶链表 </a></li>
+<li><a href="/posts/231102165703.html">142 环形链表 II</a></li>
+</ul>
+<h2 id="设计"> 设计 </h2>
+<ul>
+<li><a href="/posts/231201184542.html">146 LRU 缓存 </a></li>
+</ul>
+<h2 id="贪心算法"> 贪心算法 </h2>
+<ul>
+<li><a href="/posts/231107094652.html">1029 两地调度 </a></li>
+<li><a href="/posts/231109150855.html">435 无重叠区间 </a></li>
+</ul>
+<h2 id="哈希表"> 哈希表 </h2>
+<ul>
+<li><a href="/posts/231123181539.html">1410 实体解析器 </a></li>
+</ul>
+<h2 id="树的遍历"> 树的遍历 </h2>
+<ul>
+<li><a href="/posts/231103121209.html">117 填充每个节点的下一个右侧节点指针 II</a></li>
+</ul>
+<h2 id="深度优先搜索（递归）"> 深度优先搜索（递归）</h2>
+<ul>
+<li><a href="/posts/231206201243.html">2477 达到首都的最少油耗 </a></li>
+</ul>
+<h2 id="图或路径问题"> 图或路径问题 </h2>
+<ul>
+<li><a href="/posts/231211184652.html">1631 最小体力消耗路径 </a></li>
+</ul>
+<h2 id="其它"> 其它 </h2>
+<ul>
+<li><a href="/posts/230101120000.html"> 备忘录 </a></li>
+</ul>
+
+</div>
+
+
+<script src="/js/book-menu.js"></script>
+
+    </div>
+    <div class="sidebar-toggle" onclick="sidebar_toggle()" onmouseover="add_inner()" onmouseleave="remove_inner()">
+  <div class="sidebar-toggle-inner"></div>
+</div>
+
+<script>
+function add_inner() {
+  let inner = document.querySelector('.sidebar-toggle-inner')
+  inner.classList.add('show')  
+}
+
+function remove_inner() {
+  let inner = document.querySelector('.sidebar-toggle-inner')
+  inner.classList.remove('show')
+}
+
+function sidebar_toggle() {
+    let sidebar_toggle = document.querySelector('.sidebar-toggle')
+    let sidebar = document.querySelector('.book-sidebar')
+    let content = document.querySelector('.off-canvas-content')
+    if (sidebar_toggle.classList.contains('extend')) { // show
+        sidebar_toggle.classList.remove('extend')
+        sidebar.classList.remove('hide')
+        content.classList.remove('extend')
+    }
+    else { // hide
+        sidebar_toggle.classList.add('extend')
+        sidebar.classList.add('hide')
+        content.classList.add('extend')
+    }
+}
+</script>
+
+      <div class="off-canvas-content">
+        <div class="columns">
+          <div class="column col-10 col-lg-12">
+            <div class="book-navbar">
+              <!-- For Responsive Layout -->
+
+<header class="navbar">
+  <section class="navbar-section">
+    <a onclick="open_sidebar()">
+      <i class="icon icon-menu"></i>
+    </a>
+  </section>
+</header>
+
+            </div>
+            <div class="book-content">
+              <div class="book-post">
+  <p> 队列是一种特殊的线性表，特殊之处在于它只允许在表的前端（front）进行删除操作，在表的后端（rear）进行插入操作。与堆栈一样，队列也是一种操作受限制的线性表，进行插入操作的端称为队尾，进行删除操作的端称为队头。数据的入队和出队遵循先进先出（FIFO, First-In First-Out）的原则。</p>
+<span id="more"></span>
+<p> 这篇文章主要介绍通过链表实现队列，但会首先介绍一下队列的几种实现方式和各自的特点、适用场景。</p>
+<h2 id="队列的实现方式"> 队列的实现方式 </h2>
+<p> 在 C 语言中，FIFO 队列的实现方式有以下几种：</p>
+<ol>
+<li>
+<p> 数组实现：使用一个固定大小的数组作为队列的存储空间，使用两个指针 front 和 rear 分别指向队列的头部和尾部，通过不断移动指针和调整数组元素的位置来实现入队和出队操作。</p>
+</li>
+<li>
+<p> 链表实现：使用链表作为队列的存储结构，通过定义一个链表节点结构体来存储队列元素的值和指向下一个节点的指针。通过调整链表节点的指针关系来实现入队和出队操作。</p>
+</li>
+<li>
+<p> 循环队列实现：使用一个固定大小的数组作为队列的存储空间，同时使用两个指针 front 和 rear 分别指向队列的头部和尾部。当 rear 指针到达数组末尾时，再次从数组头部开始存储元素，实现循环利用数组空间的效果。</p>
+</li>
+</ol>
+<h2 id="不同实现方式适用的场景"> 不同实现方式适用的场景 </h2>
+<p> 数组实现队列、链表实现队列和循环队列实现，都有各自的特点和适用场景，以下是不同实现方式的一些适用场景：</p>
+<ol>
+<li>
+<p> 数组实现适用于以下场景：</p>
+<ul>
+<li> 队列大小固定，不需要频繁进行大小调整。</li>
+<li> 元素个数相对较少，不会造成数组空间的浪费。</li>
+<li> 需要快速随机访问队列元素。</li>
+</ul>
+</li>
+<li>
+<p> 链表实现适用于以下场景：</p>
+<ul>
+<li> 队列大小不确定，会频繁进行大小调整。</li>
+<li> 元素个数可能非常大，链表能够动态分配内存。</li>
+<li> 需要频繁进行插入和删除操作。</li>
+</ul>
+</li>
+<li>
+<p> 循环队列实现适用于以下场景：</p>
+<ul>
+<li> 队列大小固定，不需要频繁进行大小调整。</li>
+<li> 队列元素个数可能会超过数组大小，但是可以接受覆盖旧元素的方式。</li>
+<li> 需要快速入队和出队操作。</li>
+</ul>
+</li>
+</ol>
+<p> 根据实际需求和对性能的要求，可以选择适合的实现方式。例如，如果队列大小固定且元素个数不会超过数组大小，可以选择数组实现；如果队列大小不确定且需要频繁进行插入和删除操作，可以选择链表实现；如果队列大小固定但元素个数可能超过数组大小且需要快速入队和出队操作，可以选择循环队列实现。</p>
+<h2 id="链表实现队列"> 链表实现队列 </h2>
+<h3 id="定义基于链表的队列结构"> 定义基于链表的队列结构 </h3>
+<p><strong> 为了体现队列中数据的复杂性 </strong>，这里不再使用基本数据类型（如整形、字符型）作为队列中的数据，而是使用了二叉树结构，即在队列中保存的数据是一个二叉树节点，节点中包含节点值、节点的左子树指针和节点的右子树指针。</p>
+<img src="../images/data-structure/fifo-queue-struct.png" alt="FIFO 队列数据结构" width="80%" height="80%">
+<p> 首先，定义二叉树的结构：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Definition for a binary tree node.</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">tagTreeNode</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> val;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">tagTreeNode</span> *<span class="title">left</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">tagTreeNode</span> *<span class="title">right</span>;</span></span><br><span class="line">&#125; TreeNode_t;</span><br></pre></td></tr></table></figure>
+<p> 然后，定义链表的结构：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Define the structure for a node in the queue</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">tagLinkedNode</span> &#123;</span></span><br><span class="line">    TreeNode_t *data;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">tagLinkedNode</span> *<span class="title">next</span>;</span></span><br><span class="line">&#125; LinkedNode_t;</span><br></pre></td></tr></table></figure>
+<p> 在这里，链表中的成员就是：用于存储二叉树节点数据的结构体和指向下一个链表节点的指针。</p>
+<p> 最后，定义队列的结构：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Define the structure for the queue</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">tagQueue</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> size;</span><br><span class="line">    <span class="type">int</span> max;</span><br><span class="line">    LinkedNode_t *front;</span><br><span class="line">    LinkedNode_t *rear;</span><br><span class="line">&#125; Queue_t;</span><br></pre></td></tr></table></figure>
+<p> 在这里，队列中的成员就是：队头指针和队尾指针，以及一个记录队列中数据数量的成员变量和一个标记队列可以容纳的最大数据量的成员变量。</p>
+<h3 id="队列的创建与初始化"> 队列的创建与初始化 </h3>
+<p> 首先，创建一个空队列（队列中还没有存储数据），并初始化成员变量。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Function to create an empty queue</span></span><br><span class="line">Queue_t *<span class="title function_">createQueue</span><span class="params">(<span class="type">int</span> max_size)</span> &#123;</span><br><span class="line">    Queue_t *<span class="built_in">queue</span> = (Queue_t *)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(Queue_t));</span><br><span class="line">    <span class="built_in">queue</span>-&gt;front = <span class="literal">NULL</span>;</span><br><span class="line">    <span class="built_in">queue</span>-&gt;rear = <span class="literal">NULL</span>;</span><br><span class="line">    <span class="built_in">queue</span>-&gt;size = <span class="number">0</span>;</span><br><span class="line">    <span class="built_in">queue</span>-&gt;max = max_size;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">queue</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p> 然后，对于空队列，后续入队操作会有数据存储到队列中，数据需要必要的存储空间来存储。在这里，我们创建并初始化一段空间用于存储数据。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Function to create a new node</span></span><br><span class="line">LinkedNode_t *<span class="title function_">createNode</span><span class="params">(TreeNode_t *data)</span> &#123;</span><br><span class="line">    LinkedNode_t *newNode = (LinkedNode_t *)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(LinkedNode_t));</span><br><span class="line">    newNode-&gt;data = data;</span><br><span class="line">    newNode-&gt;next = <span class="literal">NULL</span>;</span><br><span class="line">    <span class="keyword">return</span> newNode;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="判断队列是否为空"> 判断队列是否为空 </h3>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Function to check if the queue is empty</span></span><br><span class="line"><span class="type">bool</span> <span class="title function_">isEmpty</span><span class="params">(Queue_t *<span class="built_in">queue</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">queue</span>-&gt;size == <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p> 当然，也可以使用 <code>(!queue-&gt;front) &amp;&amp; (queue-&gt;front == queue-&gt;rear)</code> 判断队列是否为空。</p>
+<h3 id="判断队列是否已满"> 判断队列是否已满 </h3>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Function to check if the queue is full</span></span><br><span class="line"><span class="type">bool</span> <span class="title function_">isFull</span><span class="params">(Queue_t *<span class="built_in">queue</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">queue</span>-&gt;size &gt;= <span class="built_in">queue</span>-&gt;max;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="入队操作"> 入队操作 </h3>
+<p> 入队操作，即在队列的尾部插入一个数据。</p>
+<ul>
+<li> 如果队列已满，则无法继续执行入队操作；</li>
+<li> 如果队列为空，则队列的头指针（front）和尾指针（rear）都指向新插入的数据的存放地址；</li>
+<li> 否则，链接并更新队列的尾指针（rear）为新插入的数据的存放地址。</li>
+</ul>
+<p> 入队操作后需要更新队列的大小。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Function to enqueue an element into the queue</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">enQueue</span><span class="params">(Queue_t *<span class="built_in">queue</span>, TreeNode_t *data)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (isFull(<span class="built_in">queue</span>)) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;queue is full.\n&quot;</span>);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        LinkedNode_t *newNode = createNode(data);</span><br><span class="line">        <span class="keyword">if</span> (isEmpty(<span class="built_in">queue</span>)) &#123;</span><br><span class="line">            <span class="built_in">queue</span>-&gt;front = <span class="built_in">queue</span>-&gt;rear = newNode;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="built_in">queue</span>-&gt;rear-&gt;next = newNode;  <span class="comment">// 尾指针链接新数据 </span></span><br><span class="line">            <span class="built_in">queue</span>-&gt;rear = newNode;  <span class="comment">// 尾指针指向新数据 </span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">queue</span>-&gt;size += <span class="number">1</span>;  <span class="comment">// 更新队列大小 </span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="出队操作"> 出队操作 </h3>
+<p> 出队操作，即在队列的头部删除一个数据。出队操作需要依次执行以下操作：</p>
+<ol>
+<li> 获取头指针地址 &amp; 数据；</li>
+<li> 更新队列头指针；</li>
+<li> 更新队列大小；</li>
+<li> 释放原头指针内存空间；</li>
+<li> 返回数据。</li>
+</ol>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Function to dequeue an element from the queue</span></span><br><span class="line">TreeNode_t *<span class="title function_">deQueue</span><span class="params">(Queue_t* <span class="built_in">queue</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (isEmpty(<span class="built_in">queue</span>)) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    LinkedNode_t *node = <span class="built_in">queue</span>-&gt;front;</span><br><span class="line">    TreeNode_t *data = node-&gt;data;</span><br><span class="line">    <span class="comment">// 根据当前队列中节点的数量，决定是否同步更新队列的尾指针 </span></span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">queue</span>-&gt;size &gt; <span class="number">1</span>) &#123;</span><br><span class="line">        <span class="built_in">queue</span>-&gt;front = <span class="built_in">queue</span>-&gt;front-&gt;next;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="built_in">queue</span>-&gt;front = <span class="built_in">queue</span>-&gt;rear = <span class="literal">NULL</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">queue</span>-&gt;size -= <span class="number">1</span>;</span><br><span class="line">    <span class="built_in">free</span>(node);</span><br><span class="line">    <span class="keyword">return</span> data;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>Tips：出队操作在在更新队列头指针时，需要根据当前队列中节点的数量，决定是否同步更新队列的尾指针。</p>
+</blockquote>
+<blockquote>
+<p> 释放 <code>node</code> 内存空间后，不会造成 <code>data</code> 数据无法访问吗？<br>
+不会。这是因为，在释放节点之前，我们先将数据指针 <code>node-&gt;data</code> 保存到一个新的变量 <code>data</code> 中，然后释放节点，最后返回保存的数据指针。这样可以确保返回的数据指针依然有效。</p>
+</blockquote>
+<h3 id="打印队列数据"> 打印队列数据 </h3>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Function to print all elements from the queue</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">printQueue</span><span class="params">(Queue_t* <span class="built_in">queue</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (isEmpty(<span class="built_in">queue</span>)) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Queue is empty\n&quot;</span>);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Queue: &quot;</span>);</span><br><span class="line">        LinkedNode_t *node = <span class="built_in">queue</span>-&gt;front;</span><br><span class="line">        <span class="keyword">while</span> (node != <span class="literal">NULL</span>) &#123;</span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">&quot;%d &quot;</span>, node-&gt;data-&gt;val);</span><br><span class="line">            node = node-&gt;next;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;\n&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="释放队列"> 释放队列 </h3>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Function to free all memory from the queue</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">freeQueue</span><span class="params">(Queue_t* <span class="built_in">queue</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">queue</span>) &#123;</span><br><span class="line">        LinkedNode_t *node = <span class="built_in">queue</span>-&gt;front;</span><br><span class="line">        <span class="keyword">while</span> (node) &#123;</span><br><span class="line">            LinkedNode_t *temp = node;</span><br><span class="line">            node = node-&gt;next;</span><br><span class="line">            <span class="built_in">free</span>(node);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">free</span>(<span class="built_in">queue</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p> 释放队列内存空间时，需要依次释放队列中的每一个节点的空间，最后再释放队列结构本身的数据空间。</p>
+<h2 id="链表实现队列完整代码"> 链表实现队列完整代码 </h2>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdbool.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">tagTreeNode</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> val;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">tagTreeNode</span> *<span class="title">left</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">tagTreeNode</span> *<span class="title">right</span>;</span></span><br><span class="line">&#125; TreeNode_t;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">tagLinkedNode</span> &#123;</span></span><br><span class="line">    TreeNode_t *data;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">tagLinkedNode</span> *<span class="title">next</span>;</span></span><br><span class="line">&#125; LinkedNode_t;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">tagQueue</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> size;</span><br><span class="line">    <span class="type">int</span> max;</span><br><span class="line">    LinkedNode_t *front;</span><br><span class="line">    LinkedNode_t *rear;</span><br><span class="line">&#125; Queue_t;</span><br><span class="line"></span><br><span class="line">Queue_t *<span class="title function_">createQueue</span><span class="params">(<span class="type">int</span> max_size)</span> &#123;</span><br><span class="line">    Queue_t *<span class="built_in">queue</span> = (Queue_t *)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(Queue_t));</span><br><span class="line">    <span class="built_in">queue</span>-&gt;front = <span class="literal">NULL</span>;</span><br><span class="line">    <span class="built_in">queue</span>-&gt;rear = <span class="literal">NULL</span>;</span><br><span class="line">    <span class="built_in">queue</span>-&gt;size = <span class="number">0</span>;</span><br><span class="line">    <span class="built_in">queue</span>-&gt;max = max_size;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">queue</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">LinkedNode_t *<span class="title function_">createNode</span><span class="params">(TreeNode_t *data)</span> &#123;</span><br><span class="line">    LinkedNode_t *newNode = (LinkedNode_t *)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(LinkedNode_t));</span><br><span class="line">    newNode-&gt;data = data;</span><br><span class="line">    newNode-&gt;next = <span class="literal">NULL</span>;</span><br><span class="line">    <span class="keyword">return</span> newNode;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">bool</span> <span class="title function_">isEmpty</span><span class="params">(Queue_t *<span class="built_in">queue</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">queue</span>-&gt;size == <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">bool</span> <span class="title function_">isFull</span><span class="params">(Queue_t *<span class="built_in">queue</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">queue</span>-&gt;size &gt;= <span class="built_in">queue</span>-&gt;max;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">enQueue</span><span class="params">(Queue_t *<span class="built_in">queue</span>, TreeNode_t *data)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (isFull(<span class="built_in">queue</span>)) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;queue is full.\n&quot;</span>);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        LinkedNode_t *newNode = createNode(data);</span><br><span class="line">        <span class="keyword">if</span> (isEmpty(<span class="built_in">queue</span>)) &#123;</span><br><span class="line">            <span class="built_in">queue</span>-&gt;front = <span class="built_in">queue</span>-&gt;rear = newNode;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="built_in">queue</span>-&gt;rear-&gt;next = newNode;  <span class="comment">// 尾指针链接新数据 </span></span><br><span class="line">            <span class="built_in">queue</span>-&gt;rear = newNode;  <span class="comment">// 尾指针指向新数据 </span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">queue</span>-&gt;size += <span class="number">1</span>;  <span class="comment">// 更新队列大小 </span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">TreeNode_t *<span class="title function_">deQueue</span><span class="params">(Queue_t* <span class="built_in">queue</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (isEmpty(<span class="built_in">queue</span>)) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    LinkedNode_t *node = <span class="built_in">queue</span>-&gt;front;</span><br><span class="line">    TreeNode_t *data = node-&gt;data;</span><br><span class="line">    <span class="comment">// 根据当前队列中节点的数量，决定是否同步更新队列的尾指针 </span></span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">queue</span>-&gt;size &gt; <span class="number">1</span>) &#123;</span><br><span class="line">        <span class="built_in">queue</span>-&gt;front = <span class="built_in">queue</span>-&gt;front-&gt;next;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="built_in">queue</span>-&gt;front = <span class="built_in">queue</span>-&gt;rear = <span class="literal">NULL</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">queue</span>-&gt;size -= <span class="number">1</span>;</span><br><span class="line">    <span class="built_in">free</span>(node);</span><br><span class="line">    <span class="keyword">return</span> data;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">printQueue</span><span class="params">(Queue_t* <span class="built_in">queue</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (isEmpty(<span class="built_in">queue</span>)) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Queue is empty\n&quot;</span>);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Queue: &quot;</span>);</span><br><span class="line">        LinkedNode_t *node = <span class="built_in">queue</span>-&gt;front;</span><br><span class="line">        <span class="keyword">while</span> (node != <span class="literal">NULL</span>) &#123;</span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">&quot;%d &quot;</span>, node-&gt;data-&gt;val);</span><br><span class="line">            node = node-&gt;next;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;\n&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">freeQueue</span><span class="params">(Queue_t* <span class="built_in">queue</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">queue</span>) &#123;</span><br><span class="line">        LinkedNode_t *node = <span class="built_in">queue</span>-&gt;front;</span><br><span class="line">        <span class="keyword">while</span> (node) &#123;</span><br><span class="line">            LinkedNode_t *temp = node;</span><br><span class="line">            node = node-&gt;next;</span><br><span class="line">            <span class="built_in">free</span>(node);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">free</span>(<span class="built_in">queue</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span> &#123;</span><br><span class="line">    Queue_t *<span class="built_in">queue</span> = createQueue(<span class="number">3</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 创建一些测试用的树节点 </span></span><br><span class="line">    TreeNode_t *node = (TreeNode_t *)<span class="built_in">malloc</span>(<span class="number">4</span> * <span class="keyword">sizeof</span>(TreeNode_t));</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">4</span>; ++i) &#123;</span><br><span class="line">        node[i].val = <span class="number">10</span> + i;</span><br><span class="line">        node[i].left = <span class="literal">NULL</span>;</span><br><span class="line">        node[i].right = <span class="literal">NULL</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    printQueue(<span class="built_in">queue</span>);</span><br><span class="line"></span><br><span class="line">    enQueue(<span class="built_in">queue</span>, &amp;node[<span class="number">0</span>]);</span><br><span class="line">    enQueue(<span class="built_in">queue</span>, &amp;node[<span class="number">1</span>]);</span><br><span class="line">    enQueue(<span class="built_in">queue</span>, &amp;node[<span class="number">2</span>]);</span><br><span class="line">    printQueue(<span class="built_in">queue</span>);</span><br><span class="line"></span><br><span class="line">    enQueue(<span class="built_in">queue</span>, &amp;node[<span class="number">3</span>]);</span><br><span class="line">    printQueue(<span class="built_in">queue</span>);</span><br><span class="line"></span><br><span class="line">    TreeNode_t *data1 = deQueue(<span class="built_in">queue</span>);</span><br><span class="line">    TreeNode_t *data2 = deQueue(<span class="built_in">queue</span>);</span><br><span class="line">    TreeNode_t *data3 = deQueue(<span class="built_in">queue</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Dequeued data: %d %d %d\n&quot;</span>, data1-&gt;val, data2-&gt;val, data3-&gt;val); <span class="comment">// 实际工程中要先判非空再取数据 </span></span><br><span class="line">    printQueue(<span class="built_in">queue</span>);</span><br><span class="line"></span><br><span class="line">    freeQueue(<span class="built_in">queue</span>);</span><br><span class="line">    <span class="built_in">free</span>(node);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p> 程序的输出结果为：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Queue is empty</span><br><span class="line">Queue: 10 11 12</span><br><span class="line">queue is full.</span><br><span class="line">Queue: 10 11 12</span><br><span class="line">Dequeued data: 10 11 12</span><br><span class="line">Queue is empty</span><br></pre></td></tr></table></figure>
+
+</div>
+
+
+  <div class="book-comments">
+    
+
+
+
+
+  </div>
+
+
+
+<script src="/js/book-post.js"></script>
+
+
+            </div>
+          </div>
+          <div class="column col-2 hide-lg">
+            <div class="book-post-info">
+  
+    <div class="book-post-meta">
+
+  <div class="author">
+
+    <!-- Author image -->
+    <div class="author-img">
+      
+        <figure
+          class="avatar avatar-lg"
+          data-initial="A"
+          style="background-color: #3b4351;">
+        </figure>
+      
+    </div>
+
+    <!-- Author title -->
+    <div class="author-title">
+      <div>aha</div>
+      <div>2023-10-17</div>
+    </div>
+  </div>
+
+  
+    <div class="divider"></div>
+
+    <div class="link">
+      <a class="category-link" href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/">数据结构</a> <a class="category-link" href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/%E9%98%9F%E5%88%97/">队列</a>
+
+      <a class="tag-none-link" href="/tags/%E9%98%9F%E5%88%97/" rel="tag">#队列</a>
+    </div>
+    
+  
+
+  <div class="divider"></div>
+</div>
+  
+
+  <div class="book-tocbot">
+</div>
+<div class="book-tocbot-menu">
+  <a class="book-toc-expand" onclick="expand_toc()">Expand all</a>
+  <a onclick="go_top()">Back to top</a>
+  <a onclick="go_bottom()">Go to bottom</a>
+  <a onclick="toggleSearch()">Search in blogs</a> <!-- 添加搜索文字的点击事件 -->
+</div>
+
+<div id="search-overlay" class="search-overlay" style="display: none;"> <!-- 初始状态为隐藏 -->
+  <div class="search-box">
+    <input type="text" id="search-input" placeholder="Search in all blogs...">
+    <button onclick="closeSearch()">Close</button> <!-- 添加关闭按钮 -->
+    <div id="search-results" class="search-results"></div>
+  </div>
+</div>
+
+<script>
+  function performSearch(query) {
+    if (!query.trim()) {
+      return;
+    }
+
+    fetch('/search.xml')
+      .then(response => response.text())
+      .then(data => {
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(data, "text/xml");
+        const entries = xmlDoc.getElementsByTagName('entry');
+        let results = '';
+
+        for (let i = 0; i < entries.length; i++) {
+          const title = entries[i].getElementsByTagName('title')[0].textContent;
+          const content = entries[i].getElementsByTagName('content')[0].textContent;
+          const url = entries[i].getElementsByTagName('url')[0].textContent;
+
+          let count = (title.match(new RegExp(query, "gi")) || []).length; // 统计查询词出现的次数
+          count += (content.match(new RegExp(query, "gi")) || []).length;
+
+          if (count > 0) { // title.includes(query) || content.includes(query)
+            results += `
+              <div class="search-result-item">
+                <a href="${url}">${title}</a> (${count})
+              </div>`;
+          }
+        }
+
+        const searchResultsElement = document.getElementById('search-results');
+        searchResultsElement.innerHTML = results;
+        searchResultsElement.classList.add('active');
+      });
+  }
+
+  function toggleSearch() {
+    const searchOverlay = document.getElementById('search-overlay');
+    searchOverlay.style.display = searchOverlay.style.display === 'none' ? 'flex' : 'none';
+  }
+
+  function closeSearch() {
+    document.getElementById('search-overlay').style.display = 'none';
+  }
+
+  document.getElementById('search-input').addEventListener('input', function() {
+    const query = this.value;
+    performSearch(query);
+  });
+</script>
+
+<style>
+  .search-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  .search-box {
+    background: white;
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+    width: 80%;
+    max-width: 500px;
+  }
+
+  .search-results {
+    margin-top: 10px;
+    max-height: 300px;
+    overflow-y: auto;
+    background: white;
+    padding: 10px;
+    border-radius: 5px;
+    width: 100%;
+  }
+
+  .search-result-item {
+    margin: 10px 0;
+  }
+
+  .search-result-item a {
+    color: blue; /* 设置链接颜色为蓝色 */
+    text-decoration: none;
+  }
+
+  .search-result-item a:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+<script src="/js/book-toc.js"></script>
+
+
+</div>
+          </div>
+        </div>
+      </div>
+
+      <a class="off-canvas-overlay" onclick="hide_canvas()"></a>
+
+      <button class="floating-button" onclick="toggleDropdownMenu()"></button>
+
+      <div class="dropdown-menu">
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FFFFFF', '#000000')">银河白</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#C7EDCC', '#000000')">豆沙绿</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FAF9DE', '#000000')">杏仁黄</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#E3EDCD', '#000000')">青草绿</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FFF2E2', '#000000')">秋叶褐</div>
+      </div>
+  </div>
+
+  <script>
+    function toggleDropdownMenu() {
+      document.querySelector('.floating-button').classList.toggle('active');
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      var storedBackgroundColor = localStorage.getItem('blogBackgroundColor');
+      var storedColor = localStorage.getItem('blogColor');
+
+      if (storedBackgroundColor && storedColor) {
+        document.body.style.backgroundColor = storedBackgroundColor;
+        document.body.style.color = storedColor;
+      }
+    });
+
+    function changeBackgroundColor(backgroundColor, color) {
+      document.body.style.backgroundColor = backgroundColor;
+      document.body.style.color = color;
+
+      localStorage.setItem('blogBackgroundColor', backgroundColor);
+      localStorage.setItem('blogColor', color);
+
+      document.querySelector('.floating-button').classList.remove('active');
+    }
+  </script>
+</body>
+
+</html>
+
+
+<script src="/js/book.js"></script>

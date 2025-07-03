@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
+
+    
+      <link rel="icon" href="/favicon.png" />
+    
+
+    <title>
+        
+          工具之 CMake - aha&#39;s book
+        
+    </title>
+
+    <!-- Spectre.css framework -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre-exp.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre-icons.min.css">
+
+    <!-- theme css & js -->
+    
+<link rel="stylesheet" href="/css/book.css">
+
+    
+<script src="/js/book.js"></script>
+
+
+    <!-- tocbot -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.css">
+    
+    <!-- katex -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/zooming/2.1.1/zooming.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const zooming = new Zooming()
+    zooming.listen('.book-content img')
+})
+</script>
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+    <style>
+      body {
+        background-color: #FFFFFF;
+        /* color: #000000; */
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+
+      /* Floating Button Styles */
+      .floating-button {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 999;
+        background-color: #000000;
+        color: #ffffff;
+        padding: 12px;
+        border-radius: 50%;
+        cursor: pointer;
+        border: 2px solid #000000;
+      }
+
+      .floating-button:hover {
+        background-color: #FFFFFF;
+      }
+
+      /* Dropdown Menu Styles */
+      .dropdown-menu {
+        position: fixed;
+        bottom: 60px;
+        right: 10px;
+        display: none;
+        min-width: 60px;
+        padding: 2px;
+        background-color: #fff;
+        /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
+        z-index: 1000;
+      }
+
+      .floating-button.active+.dropdown-menu {
+        display: block;
+      }
+
+      .dropdown-item {
+        display: block;
+        padding: 8px 16px;
+        cursor: pointer;
+      }
+
+      .dropdown-item:hover {
+        background-color: #f5f5f5;
+      }
+    </style>
+<style>.darkmode--activated{--body-bg-color:#282828;--content-bg-color:#333;--card-bg-color:#555;--text-color:#ccc;--blockquote-color:#bbb;--link-color:#ccc;--link-hover-color:#eee;--brand-color:#ddd;--brand-hover-color:#ddd;--table-row-odd-bg-color:#282828;--table-row-hover-bg-color:#363636;--menu-item-bg-color:#555;--btn-default-bg:#222;--btn-default-color:#ccc;--btn-default-border-color:#555;--btn-default-hover-bg:#666;--btn-default-hover-color:#ccc;--btn-default-hover-border-color:#666;--highlight-background:#282b2e;--highlight-foreground:#a9b7c6;--highlight-gutter-background:#34393d;--highlight-gutter-foreground:#9ca9b6}.darkmode--activated img{opacity:.75}.darkmode--activated img:hover{opacity:.9}.darkmode--activated code{color:#69dbdc;background:0 0}button.darkmode-toggle{z-index:9999}.darkmode-ignore,img{display:flex!important}.beian img{display:inline-block!important}</style></head>
+
+<body>
+  <div class="book-container">
+    <div class="book-sidebar">
+      <div class="book-brand">
+  <a href="/">
+    <img src="/favicon.png">
+    <span>AHA&#39;S BOOK</span>
+  </a>
+</div>
+        <div id="menu" class="book-menu hide">
+  <h2 id="基础知识"> 基础知识 </h2>
+<ul>
+<li><a href="/posts/231010144856.html"> 模运算 </a></li>
+<li><a href="/posts/231014105311.html"> 异或运算 </a></li>
+<li><a href="/posts/231210181853.html"> 计算机中的寄存器 </a></li>
+<li><a href="/posts/231213183051.html"> 正则表达式基础 </a></li>
+</ul>
+<h2 id="C 语言">C 语言 </h2>
+<ul>
+<li><a href="/posts/230916171929.html">main 函数参数 </a></li>
+<li><a href="/posts/231214192113.html"> 关键字与专有名词 </a></li>
+<li><a href="/posts/240103180653.html"> 输出打印函数 </a></li>
+<li><a href="/posts/230922143003.html"> 多维数组 </a></li>
+<li><a href="/posts/230913200729.html">const 关键字 </a></li>
+<li><a href="/posts/230918174223.html">typedef 类型基础 </a></li>
+<li><a href="/posts/230920172849.html">typedef 类型实践 </a></li>
+<li><a href="/posts/240224193217.html"> 二级指针 </a></li>
+<li><a href="/posts/240307195203.html"> 代码 TOP-K 问题 </a></li>
+<li><a href="/posts/230922172626.html">uthash 哈希表基础 </a></li>
+<li><a href="/posts/230918114841.html"> 大小端知识 </a></li>
+</ul>
+<h2 id="Golang 语言">Golang 语言 </h2>
+<ul>
+<li><a href="/posts/230907162612.html"> 变量与常量 </a></li>
+<li><a href="/posts/230909120145.html"> 函数 &amp; 包 &amp; 判断 &amp; 循环 </a></li>
+<li><a href="/posts/230912152800.html"> 数组与切片 </a></li>
+<li><a href="/posts/230913161326.html"> 可变参数函数与 Map 集合 </a></li>
+<li><a href="/posts/230915155105.html"> 字符串和指针 </a></li>
+</ul>
+<h2 id="数据结构"> 数据结构 </h2>
+<ul>
+<li><a href="/posts/231007174854.html"> 链表（数组实现）</a></li>
+<li><a href="/posts/231008213450.html"> 链表（链式实现）</a></li>
+<li><a href="/posts/231016161508.html"> 堆栈（数组实现）</a></li>
+<li><a href="/posts/231016184406.html"> 堆栈（链表实现）</a></li>
+<li><a href="/posts/231127185207.html"> 单调栈 </a></li>
+<li><a href="/posts/231017105123.html"> 队列（链表实现）</a></li>
+<li><a href="/posts/231017154121.html"> 双端队列（链表实现）</a></li>
+<li><a href="/posts/231018102559.html"> 堆基础与堆结构（数组实现）</a></li>
+<li><a href="/posts/231019102311.html"> 优先队列（堆实现）</a></li>
+<li><a href="/posts/230905224335.html"> 二叉树的遍历 </a></li>
+<li><a href="/posts/231020174358.html"> 二叉搜索树 </a></li>
+<li><a href="/posts/230916094606.html"> 拓扑排序 </a></li>
+<li><a href="/posts/230925185057.html">Trie 字典树 </a></li>
+<li><a href="/posts/231023164532.html"> 并查集（数组实现）</a></li>
+<li><a href="/posts/240702200642.html">Linux 数据结构之队列 </a></li>
+</ul>
+<h2 id="数据结构算法"> 数据结构算法 </h2>
+<ul>
+<li><a href="/posts/231218181635.html"> 归并排序 </a></li>
+<li><a href="/posts/231108163339.html"> 快速排序 </a></li>
+<li><a href="/posts/231107171607.html"> 堆排序 </a></li>
+<li><a href="/posts/231124181658.html"> 二分查找 </a></li>
+<li><a href="/posts/231227190828.html"> 哈希表实现 </a></li>
+<li><a href="/posts/240313193201.html"> 字符串哈希函数 </a></li>
+<li><a href="/posts/231116150205.html">Floyd 多源最短路径 </a></li>
+<li><a href="/posts/231117095232.html">Dijkstra 单源最短路径（原理部分）</a></li>
+<li><a href="/posts/231121152713.html">Dijkstra 单源最短路径（实现部分）</a></li>
+</ul>
+<h2 id="数据库"> 数据库 </h2>
+<ul>
+<li><a href="/posts/250605180332.html">MySQL 基础 </a></li>
+</ul>
+<h2 id="计算机网络"> 计算机网络 </h2>
+<ul>
+<li><a href="/posts/231011192359.html">OSI 参考模型 </a></li>
+<li><a href="/posts/240329202000.html"> 计网 CyC2018 之概述 </a></li>
+<li><a href="/posts/240329202004.html"> 计网 CyC2018 之链路层 </a></li>
+<li><a href="/posts/240329202003.html"> 计网 CyC2018 之网络层 </a></li>
+<li><a href="/posts/240329202002.html"> 计网 CyC2018 之传输层 </a></li>
+<li><a href="/posts/240329202001.html"> 计网 CyC2018 之应用层 </a></li>
+<li><a href="/posts/240306203742.html">ACL 访问控制列表 </a></li>
+<li><a href="/posts/240130190208.html"> 路由表、转发表与快速转发工作原理 </a></li>
+<li><a href="/posts/231221200716.html">VXLAN 网络虚拟化技术 </a></li>
+<li><a href="/posts/240903191243.html">TCP/IP checksum 计算 </a></li>
+<li><a href="/posts/240911185603.html"> 抓包分析 TCP 三次握手与四次挥手过程 </a></li>
+</ul>
+<h2 id="操作系统"> 操作系统 </h2>
+<ul>
+<li><a href="/posts/230921190726.html"> 概述 </a></li>
+<li><a href="/posts/230924172528.html"> 中断 &amp; 异常 &amp; 系统调用 </a></li>
+<li><a href="/posts/231017195157.html"> 内存分层体系与地址空间生成 </a></li>
+<li><a href="/posts/231108195351.html"> 连续内存分配 </a></li>
+<li><a href="/posts/231111172507.html"> 非连续内存分配之分段与分页 </a></li>
+<li><a href="/posts/231119170537.html"> 非连续内存分配之页表 </a></li>
+<li><a href="/posts/231123184526.html"> 内存管理之覆盖技术与交换技术 </a></li>
+<li><a href="/posts/231127193658.html"> 内存管理之虚存技术 </a></li>
+<li><a href="/posts/231129182631.html"> 局部页面置换算法 </a></li>
+<li><a href="/posts/231207184239.html"> 全局页面置换算法 </a></li>
+<li><a href="/posts/231207204958.html"> 进程描述 </a></li>
+<li><a href="/posts/231210211306.html"> 进程状态 </a></li>
+<li><a href="/posts/231215213932.html"> 线程 </a></li>
+<li><a href="/posts/231218220813.html"> 进程控制 </a></li>
+<li><a href="/posts/231228193143.html"> 调度 </a></li>
+<li><a href="/posts/240104202828.html"> 同步与互斥 </a></li>
+<li><a href="/posts/240113115605.html"> 信号量与管程 </a></li>
+<li><a href="/posts/240205182643.html"> 经典同步问题 </a></li>
+<li><a href="/posts/240310162231.html"> 死锁 </a></li>
+</ul>
+<h2 id="系统与网络编程"> 系统与网络编程 </h2>
+<ul>
+<li><a href="/posts/230911151334.html">pthread 库 </a></li>
+<li><a href="/posts/230921094127.html"> 锁与原子操作 </a></li>
+<li><a href="/posts/240319195609.html"> 读者写者问题 </a></li>
+<li><a href="/posts/240527200241.html"> 网络编程卷一阅读随笔 </a></li>
+<li><a href="/posts/240414190410.html"> 进程间通信 IPC 机制 </a></li>
+<li><a href="/posts/240424200123.html"> 多进程相关练习 </a></li>
+<li><a href="/posts/240516221527.html">I/O 模式与 I/O 多路复用 </a></li>
+<li><a href="/posts/240626192803.html">Linux 内核 kfifo 环形队列 </a></li>
+<li><a href="/posts/241009203126.html">Linux 内核等待队列 </a></li>
+<li><a href="/posts/240627210637.html">DPDK 无锁环形队列 </a></li>
+<li><a href="/posts/240919200410.html"> 解密内存屏障 </a></li>
+<li><a href="/posts/240927202500.html"> 内核线程的创建 </a></li>
+<li><a href="/posts/241015195205.html">Linux 网络数据包接收过程 </a></li>
+<li><a href="/posts/2410232111015.html"> 源码解读 epoll 实现原理 </a></li>
+<li><a href="/posts/241106182619.html">Linux 文件系统 </a></li>
+<li><a href="/posts/250619154429.html">Libevent 高性能 IO 事件驱动库 </a></li>
+</ul>
+<h2 id="工具与命令"> 工具与命令 </h2>
+<ul>
+<li><a href="/posts/240207180410.html">GCC 编译过程分解 </a></li>
+<li><a href="/posts/240312184132.html">GDB 调试入门 </a></li>
+<li><a href="/posts/240512184921.html">Makefile 学习 </a></li>
+<li><a href="/posts/250629214430.html">CMake 学习 </a></li>
+<li><a href="/posts/240417193754.html">Linux 命令之文件权限 </a></li>
+</ul>
+<h2 id="开源项目"> 开源项目 </h2>
+<ul>
+<li><a href="/posts/240303201855.html"> 线程池原理与实现 </a></li>
+<li><a href="/posts/240507194549.html">HTTP 服务器实现 </a></li>
+<li><a href="/posts/240904203605.html"> 聊天服务器实现 </a></li>
+<li><a href="/posts/241119182636.html">Linux 文件系统 </a></li>
+</ul>
+<h2 id="Docker">Docker</h2>
+<ul>
+<li><a href="/posts/230909171809.html">Docker 学习笔记 </a></li>
+</ul>
+<h1 id="LeetCode 刷题">LeetCode 刷题 </h1>
+<h2 id="链表相关"> 链表相关 </h2>
+<ul>
+<li><a href="/posts/231025143947.html">160 相交链表 </a></li>
+<li><a href="/posts/231025185947.html">206 反转链表 </a></li>
+<li><a href="/posts/231026101239.html">21 合并两个有序链表 </a></li>
+<li><a href="/posts/231026184514.html">83 删除排序链表中的重复元素 </a></li>
+<li><a href="/posts/231027150243.html">19 删除链表的倒数第 N 个节点 </a></li>
+<li><a href="/posts/231031120718.html">2 两数相加 </a></li>
+<li><a href="/posts/231031163133.html">445 两数相加 II</a></li>
+<li><a href="/posts/231101094219.html">234 回文链表 </a></li>
+<li><a href="/posts/231101135228.html">725 分隔链表 </a></li>
+<li><a href="/posts/231102120708.html">328 奇偶链表 </a></li>
+<li><a href="/posts/231102165703.html">142 环形链表 II</a></li>
+</ul>
+<h2 id="设计"> 设计 </h2>
+<ul>
+<li><a href="/posts/231201184542.html">146 LRU 缓存 </a></li>
+</ul>
+<h2 id="贪心算法"> 贪心算法 </h2>
+<ul>
+<li><a href="/posts/231107094652.html">1029 两地调度 </a></li>
+<li><a href="/posts/231109150855.html">435 无重叠区间 </a></li>
+</ul>
+<h2 id="哈希表"> 哈希表 </h2>
+<ul>
+<li><a href="/posts/231123181539.html">1410 实体解析器 </a></li>
+</ul>
+<h2 id="树的遍历"> 树的遍历 </h2>
+<ul>
+<li><a href="/posts/231103121209.html">117 填充每个节点的下一个右侧节点指针 II</a></li>
+</ul>
+<h2 id="深度优先搜索（递归）"> 深度优先搜索（递归）</h2>
+<ul>
+<li><a href="/posts/231206201243.html">2477 达到首都的最少油耗 </a></li>
+</ul>
+<h2 id="图或路径问题"> 图或路径问题 </h2>
+<ul>
+<li><a href="/posts/231211184652.html">1631 最小体力消耗路径 </a></li>
+</ul>
+<h2 id="其它"> 其它 </h2>
+<ul>
+<li><a href="/posts/230101120000.html"> 备忘录 </a></li>
+</ul>
+
+</div>
+
+
+<script src="/js/book-menu.js"></script>
+
+    </div>
+    <div class="sidebar-toggle" onclick="sidebar_toggle()" onmouseover="add_inner()" onmouseleave="remove_inner()">
+  <div class="sidebar-toggle-inner"></div>
+</div>
+
+<script>
+function add_inner() {
+  let inner = document.querySelector('.sidebar-toggle-inner')
+  inner.classList.add('show')  
+}
+
+function remove_inner() {
+  let inner = document.querySelector('.sidebar-toggle-inner')
+  inner.classList.remove('show')
+}
+
+function sidebar_toggle() {
+    let sidebar_toggle = document.querySelector('.sidebar-toggle')
+    let sidebar = document.querySelector('.book-sidebar')
+    let content = document.querySelector('.off-canvas-content')
+    if (sidebar_toggle.classList.contains('extend')) { // show
+        sidebar_toggle.classList.remove('extend')
+        sidebar.classList.remove('hide')
+        content.classList.remove('extend')
+    }
+    else { // hide
+        sidebar_toggle.classList.add('extend')
+        sidebar.classList.add('hide')
+        content.classList.add('extend')
+    }
+}
+</script>
+
+      <div class="off-canvas-content">
+        <div class="columns">
+          <div class="column col-10 col-lg-12">
+            <div class="book-navbar">
+              <!-- For Responsive Layout -->
+
+<header class="navbar">
+  <section class="navbar-section">
+    <a onclick="open_sidebar()">
+      <i class="icon icon-menu"></i>
+    </a>
+  </section>
+</header>
+
+            </div>
+            <div class="book-content">
+              <div class="book-post">
+  <span id="more"></span>
+<h1 id="基础知识简介">基础知识简介</h1>
+<h2 id="最基础知识">最基础知识</h2>
+<h3 id="最低版本要求">最低版本要求</h3>
+<p>这是每个 <code>CMakeLists.txt</code> 都必须包含的第一行：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">cmake_minimum_required</span>(VERSION <span class="number">3.1</span>) <span class="comment"># 指定该工程最低支持的版本号</span></span><br></pre></td></tr></table></figure>
+<p>从 CMake 3.12 开始，版本号可以声明为一个范围，例如 <code>VERSION 3.1...3.15</code>；这意味着这个工程最低可以支持 3.1 版本，但是也最高在 3.15 版本上测试成功过。</p>
+<p>当你开始一个新项目，起始推荐这么写：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">cmake_minimum_required</span>(VERSION <span class="number">3.7</span>...<span class="number">3.21</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span>(<span class="variable">$&#123;CMAKE_VERSION&#125;</span> <span class="keyword">VERSION_LESS</span> <span class="number">3.12</span>) <span class="comment"># CMake 3.12 开始支持版本范围</span></span><br><span class="line">    <span class="keyword">cmake_policy</span>(VERSION <span class="variable">$&#123;CMAKE_MAJOR_VERSION&#125;</span>.<span class="variable">$&#123;CMAKE_MINOR_VERSION&#125;</span>)</span><br><span class="line"><span class="keyword">endif</span>()</span><br></pre></td></tr></table></figure>
+<p>如果 CMake 的版本低于 3.12，CMake 将会被设置为当前版本；否则，将会遵守 <code>cmake_minimum_required</code> 中的规定，程序将继续正常运行。</p>
+<h3 id="设置一个项目">设置一个项目</h3>
+<p>接下来，每一个顶层 <code>CMakelists.txt</code> 文件都应该加入下面这一行：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">project</span>(MyProject</span><br><span class="line">        VERSION <span class="number">1.6</span>.<span class="number">2</span></span><br><span class="line">        DESCRIPTION <span class="string">&quot;Very nice project&quot;</span></span><br><span class="line">        LANGUAGES C)</span><br></pre></td></tr></table></figure>
+<p>现在我们看到了更多的语法。项目名称是这里的第一个参数。所有的关键字参数都可选的。语言可以是 C, CXX, …，默认是 C 和 CXX。</p>
+<p>项目名称就没有什么特别要注意的。目前为止，我们还没有添加任何的目标 (target)。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">$ grep <span class="string">&quot;VERSION&quot;</span> ./CMakeCache.txt</span><br><span class="line">CMAKE_PROJECT_VERSION:STATIC=1.6.2      <span class="comment"># 完整版本号</span></span><br><span class="line">CMAKE_PROJECT_VERSION_MAJOR:STATIC=1    <span class="comment"># 主版本号，重大变更或可能不兼容 API 修改</span></span><br><span class="line">CMAKE_PROJECT_VERSION_NINOR:STATIC=6    <span class="comment"># 次版本号，向后兼容的功能新增或改进</span></span><br><span class="line">CMAKE_PROJECT_VERSION_PATCH:STATIC=2    <span class="comment"># 修订号，向后兼容的问题修复</span></span><br><span class="line">CMAKE_PROJECT_VERSION_TWEAK:STATIC=     <span class="comment"># 微调整号，可选，极小调整</span></span><br><span class="line">$ grep <span class="string">&quot;MyProject&quot;</span> ./CMakeCache.txt</span><br><span class="line">CMAKE_PROJECT_NAME:STATIC=MyProject</span><br></pre></td></tr></table></figure>
+<h3 id="生成一个可执行文件">生成一个可执行文件</h3>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">add_executable</span>(one two.cpp three.h)</span><br></pre></td></tr></table></figure>
+<p>这里有一些语法需要解释。one 既是生成的可执行文件的名称，<strong>也是创建的 CMake 目标 (target) 的名称</strong>。紧接着是源文件的列表，你想列多少个都可以。</p>
+<blockquote>
+<p>CMake 很聪明，它根据拓展名只编译源文件。在大多数情况下，头文件将会被忽略；列出它们的唯一原因是为了让它们在 IDE 中被展示出来，目标文件在许多 IDE 中被显示为文件夹。</p>
+</blockquote>
+<h3 id="生成一个库">生成一个库</h3>
+<p>制作一个库是通过 <code>add_library</code> 命令完成的，并且非常简单：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">add_library</span>(one STATIC two.cpp three.h)</span><br></pre></td></tr></table></figure>
+<p>你可以选择库的类型，可以是 <code>STATIC</code>, <code>SHARED</code>, <code>MODULE</code>。如果你不选择它，CMake 将会通过 <code>BUILD_SHARED_LIBS</code> 的值来选择构建 <code>STATIC</code> 还是 <code>SHARED</code> 类型的库。</p>
+<p>你经常需要生成一个 <strong> 虚构的目标，也就是说，一个不需要编译的目标</strong>。例如，只有一个头文件的库。这被叫做 <code>INTERFACE</code> 库，这是另一种选择，和上面唯一的区别是后面不能有文件名。</p>
+<p>【虚拟目标示例 - 只有一个头文件的库：目录树】</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">$ tree ./interface-lib/ --dirsfirst -a</span><br><span class="line">./interface-lib/</span><br><span class="line">├── app</span><br><span class="line">│   └── main.c</span><br><span class="line">├── include</span><br><span class="line">│   └── only_header_lib <span class="comment"># 仅包含头文件的库</span></span><br><span class="line">│       └── utils.h</span><br><span class="line">└── CMakeLists.txt</span><br></pre></td></tr></table></figure>
+<p>【虚拟目标示例 - 只有一个头文件的库：CMakeLists.txt】</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">cmake_minimum_required</span>(VERSION <span class="number">3.10</span>.<span class="number">2</span>)</span><br><span class="line"><span class="keyword">project</span>(learn-cmake-interface-lib</span><br><span class="line">        VERSION <span class="number">1.0</span>.<span class="number">0</span></span><br><span class="line">        DESCRIPTION <span class="string">&quot;good good study, day day up.&quot;</span></span><br><span class="line">        LANGUAGES C)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建一个 INTERFACE 库，它不会编译生成任何 .so 或 .a 文件，仅用于向其它依赖传递属性</span></span><br><span class="line"><span class="keyword">add_library</span>(only_header_lib INTERFACE)</span><br><span class="line"><span class="comment"># 添加头文件目录到 INTERFACE 属性中（供其它目标使用），任何链接此库的目标会自动获得该头文件搜索路径</span></span><br><span class="line"><span class="keyword">target_include_directories</span>(only_header_lib</span><br><span class="line">    INTERFACE</span><br><span class="line">    <span class="string">&quot;$&#123;CMAKE_CURRENT_SOURCE_DIR&#125;/include/only_header_lib&quot;</span>) <span class="comment"># 将该目录暴露给依赖项</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建一个可执行文件并链接到 INTERFACE 库，以继承该库的头文件路径以及编译选项（如有）</span></span><br><span class="line"><span class="keyword">add_executable</span>(app <span class="string">&quot;app/main.c&quot;</span>)</span><br><span class="line"><span class="keyword">target_link_libraries</span>(app PRIVATE only_header_lib)</span><br></pre></td></tr></table></figure>
+<p>【虚拟目标示例 - 只有一个头文件的库：源代码】</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// $ cat include/only_header_lib/utils.h</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> TEST_DEFINE (10)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// $ cat app/main.c</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;utils.h&quot;</span> <span class="comment">// 已经获得了该头文件搜索路径</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> **argv)</span> &#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;TEST_DEFINE=%d\n&quot;</span>, TEST_DEFINE);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>【虚拟目标示例 - 一个虚拟的编译选项目标：CMakeLists.txt】</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">cmake_minimum_required</span>(VERSION <span class="number">3.10</span>.<span class="number">2</span>)</span><br><span class="line"><span class="keyword">project</span>(learn-cmake-interface-lib</span><br><span class="line">    VERSION <span class="number">1.0</span>.<span class="number">0</span></span><br><span class="line">    DESCRIPTION <span class="string">&quot;good good study, day day up.&quot;</span></span><br><span class="line">    LANGUAGES C)</span><br><span class="line"></span><br><span class="line"><span class="keyword">add_library</span>(compiler_flags INTERFACE)</span><br><span class="line"><span class="keyword">target_compile_options</span>(compiler_flags INTERFACE</span><br><span class="line">    <span class="string">&quot;$&lt;$&lt;CONFIG:DEBUG&gt;:-O0;-g;-std=gnu11;-Wall&gt;&quot;</span></span><br><span class="line">    <span class="string">&quot;$&lt;$&lt;CONFIG:RELEASE&gt;:-O2;-std=gnu11;-Wall&gt;&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (<span class="keyword">NOT</span> CMAKE_SYSTEM_NAME <span class="keyword">MATCHES</span> <span class="string">&quot;Windows&quot;</span>)</span><br><span class="line">    <span class="keyword">target_compile_options</span>(compiler_flags INTERFACE <span class="string">&quot;-Werror;-Wno-unused;-Wno-pointer-sign&quot;</span>)</span><br><span class="line"><span class="keyword">endif</span>()</span><br><span class="line"></span><br><span class="line"><span class="keyword">add_executable</span>(app <span class="string">&quot;app/main.c&quot;</span>)</span><br><span class="line"><span class="keyword">target_link_libraries</span>(app PRIVATE compiler_flags)</span><br></pre></td></tr></table></figure>
+<h3 id="目标时常伴随着你">目标时常伴随着你</h3>
+<p>现在我们已经指定了一个目标，那我们如何添加关于它的信息呢？例如，它可能需要包含一个目录：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">target_include_directories</span>(one PUBLIC <span class="string">&quot;include&quot;</span>) <span class="comment"># 为目标添加了一个目录</span></span><br></pre></td></tr></table></figure>
+<p><code>PUBLIC</code> 对于一个可执行文件目标没有什么含义；<strong>但对于库来说，它让 CMake 知道，任何链接到这个目标的目标也必须包含这个目录。其他选项还有 <code>PRIVATE</code>（只影响当前目标，不影响依赖），以及 <code>INTERFACE</code>（只影响依赖）</strong>。</p>
+<p>接下来，我们可以将目标之间链接起来：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">add_library</span>(another STATIC another.c another.h)</span><br><span class="line"><span class="comment"># 这里使用 PUBLIC，也就是目标 anthor 也会包含 include 这个目录</span></span><br><span class="line"><span class="keyword">target_link_libraries</span>(another PUBLIC one) <span class="comment"># 为目标链接另一个目标</span></span><br></pre></td></tr></table></figure>
+<p><code>target_link_libraries</code> 可能是 CMake 中最有用也最令人迷惑的命令。这个命令需要指定一个目标 another，并且在给出该目标的名字（another）后为此目标添加一个依赖 one。</p>
+<p>如果 CMake 项目中不存在名称为 one 的目标（没有定义该 target），那它会直接添加名字为 one 的库到依赖中（一般而言，会去 /usr、CMake 项目指定寻找库的路径等所有能找的路径找到叫 one 的库——译者注）（这也是命令叫 <code>target_link_libraries</code> 的原因）。或者你可以给定一个库的完整路径，或者是链接器标志。</p>
+<blockquote>
+<p>链接的目标可以有包含的目录、链接库（或链接目标）、编译选项、编译定义、编译特性等等。</p>
+</blockquote>
+<h3 id="更进一步">更进一步</h3>
+<p>看看你是否能理解以下文件。它生成了一个简单的 C11 的库并且在程序中使用了它。没有依赖。代码中使用的是 CMake 3.8。</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">cmake_minimum_required</span>(VERSION <span class="number">3.8</span>)</span><br><span class="line"><span class="keyword">project</span>(Calculator LANGUAGES C)</span><br><span class="line"></span><br><span class="line"><span class="keyword">add_library</span>(calclib STATIC <span class="string">&quot;src/calclib.c&quot;</span> <span class="string">&quot;include/calc/lib.h&quot;</span>)</span><br><span class="line"><span class="keyword">target_include_directories</span>(calclib PUBLIC <span class="string">&quot;include&quot;</span>)</span><br><span class="line"><span class="keyword">target_compile_features</span>(calclib PUBLIC c_std_11)</span><br><span class="line"></span><br><span class="line"><span class="keyword">add_executable</span>(calc <span class="string">&quot;apps/calc.c&quot;</span>)</span><br><span class="line"><span class="keyword">target_link_libraries</span>(calc PUBLIC calclib)</span><br></pre></td></tr></table></figure>
+<h2 id="实用函数">实用函数</h2>
+<p>获取一个目录的父目录（上级目录）：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">get_filename_component</span>(PARENT_DIR <span class="string">&quot;$&#123;CMAKE_CURRENT_SOURCE_DIR&#125;&quot;</span> DIRECTORY)</span><br></pre></td></tr></table></figure>
+<p>目录存在性检查：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(<span class="keyword">EXISTS</span> <span class="string">&quot;$&#123;PARENT_DIR&#125;&quot;</span>/testfile.txt)</span><br><span class="line">    <span class="comment"># do something</span></span><br><span class="line"><span class="keyword">endif</span>()</span><br></pre></td></tr></table></figure>
+<h2 id="变量与缓存">变量与缓存</h2>
+<h3 id="本地变量">本地变量</h3>
+<p>我们首先讨论变量。你可以这样声明一个本地 (local) 变量：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">set</span>(MY_VARIABLE <span class="string">&quot;value&quot;</span>)</span><br></pre></td></tr></table></figure>
+<p>变量名通常全部用大写，变量值跟在其后。你可以通过 <code>$&#123;&#125;</code> 来解析一个变量，例如 <code>$&#123;MY_VARIABLE&#125;</code>。</p>
+<blockquote>
+<p>CMake 有作用域的概念，在声明一个变量后，你只可以在它的作用域内访问这个变量。如果你将一个函数或一个文件放到一个子目录中，这个变量将不再被定义。你可以通过在变量声明末尾添加 <code>PARENT_SCOPE</code> 来将它的作用域指定为当前的上一级作用域。</p>
+</blockquote>
+<p>列表就是简单地包含一系列变量：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">set</span>(MY_LIST <span class="string">&quot;one&quot;</span> <span class="string">&quot;two&quot;</span> <span class="string">&quot;three&quot;</span>) <span class="comment"># 也可以这样写: set(MY_LIST &quot;one;two;three&quot;)</span></span><br></pre></td></tr></table></figure>
+<p>有一些和列表进行协同的命令，<code>separate_arguments</code> 可以把一个以空格分隔的字符串分割成一个列表。当一个变量用 <code>$&#123;&#125;</code> 括起来的时候，空格的解析规则和上述相同。</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">set</span>(ARGS_STRING <span class="string">&quot;hello world &#x27;CMake example&#x27; 123&quot;</span>)</span><br><span class="line"><span class="keyword">separate_arguments</span>(SPLIT_ARGS UNIX_COMMAND <span class="string">&quot;$&#123;ARGS_STRING&#125;&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">foreach</span>(arg IN LISTS SPLIT_ARGS)</span><br><span class="line">    <span class="keyword">message</span>(<span class="string">&quot;- $&#123;arg&#125;&quot;</span>)</span><br><span class="line"><span class="keyword">endforeach</span>()</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>对于路径来说要特别小心，路径很有可能会包含空格，因此你应该总是将解析变量得到的值用引号括起来，也就是，应该这样 <code>&quot;$&#123;MY_PATH&#125;&quot;</code> 。</p>
+</blockquote>
+<h3 id="缓存变量（从命令行中设置变量）">缓存变量（从命令行中设置变量）</h3>
+<p>CMake 提供了一个缓存变量，来允许你从命令行中设置变量。CMake 中已经有一些预置的变量，像 <code>CMAKE_BUILD_TYPE</code>。如果一个变量还没有被定义，你可以这样声明并设置它。</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">set</span>(CACHE_VAR <span class="string">&quot;VALUE&quot;</span> CACHE <span class="keyword">STRING</span> <span class="string">&quot;Description info for the cache variable&quot;</span>)</span><br><span class="line"><span class="keyword">set</span>(CACHE_ENABLE_DEBUG <span class="keyword">ON</span> CACHE BOOL <span class="string">&quot;enable debug&quot;</span>)</span><br><span class="line"><span class="comment"># 还可以用 option 来设置 BOOL 类型的变量</span></span><br><span class="line"><span class="keyword">option</span>(MY_OPTION <span class="string">&quot;This is settable from the command line&quot;</span> <span class="keyword">OFF</span>)</span><br></pre></td></tr></table></figure>
+<p>这么写不会覆盖 <code>CMakeCache.txt</code> 中已定义的值——这是为了让你只能在命令行中设置这些变量，而不会在 CMake 文件执行的时候被重新覆盖。这是什么意思呢？</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">$ cmake -L .                            <span class="comment"># 不设置该缓存值（执行时还不存在 CMakeCache.txt 文件）</span></span><br><span class="line">CACHE_VAR:STRING=VALUE</span><br><span class="line">$ grep <span class="string">&quot;CACHE_VAR&quot;</span> ./CMakeCache.txt</span><br><span class="line">./CMakeCache.txt:CACHE_VAR:STRING=VALUE <span class="comment"># 缓存中读出了 CMakeLists.txt 中的默认值</span></span><br><span class="line">$ </span><br><span class="line">$ cmake -L -DCACHE_VAR=ABCD .           <span class="comment"># 设置了新值</span></span><br><span class="line">CACHE_VAR:STRING=ABCD</span><br><span class="line">$ grep <span class="string">&quot;CACHE_VAR&quot;</span> ./CMakeCache.txt</span><br><span class="line">./CMakeCache.txt:CACHE_VAR:STRING=ABCD  <span class="comment"># 缓存中读出了新值</span></span><br><span class="line">$ </span><br><span class="line">$ cmake -L -DCACHE_VAR=xyz .            <span class="comment"># 又设置了新值，缓存中更新了其值</span></span><br><span class="line">CACHE_VAR:STRING=xyz</span><br><span class="line">$ </span><br><span class="line">$ cmake -L .                            <span class="comment"># 不设置该缓存值</span></span><br><span class="line">CACHE_VAR:STRING=xyz</span><br><span class="line">$ grep <span class="string">&quot;CACHE_VAR&quot;</span> ./CMakeCache.txt</span><br><span class="line">./CMakeCache.txt:CACHE_VAR:STRING=xyz   <span class="comment"># 缓存中读出的是上一次从命令行中设置的值，不会是 CMakeLists.txt 中的默认值</span></span><br></pre></td></tr></table></figure>
+<p>如果你想把这些变量作为一个临时的全局变量，你可以这样做：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">set</span>(CACHE_VAR_FORCE <span class="string">&quot;VALUE_FORCE&quot;</span> CACHE <span class="keyword">STRING</span> <span class="string">&quot;&quot;</span> FORCE)</span><br><span class="line"><span class="keyword">mark_as_advanced</span>(CACHE_VAR)</span><br><span class="line"><span class="comment"># 你也可以通过 `INTERNAL` 这个类型来达到同样的目的</span></span><br><span class="line"><span class="keyword">set</span>(CACHE_VAR_FORCE <span class="string">&quot;VALUE_FORCE&quot;</span> CACHE INTERNAL <span class="string">&quot;&quot;</span>)</span><br></pre></td></tr></table></figure>
+<p>【示例 - 缓存变量：CMakeLists.txt】：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">set</span>(CACHE_VAR <span class="string">&quot;VALUE&quot;</span> CACHE <span class="keyword">STRING</span> <span class="string">&quot;Description info for the cache variable&quot;</span>)</span><br><span class="line"><span class="keyword">set</span>(CACHE_ENABLE_DEBUG <span class="keyword">ON</span> CACHE BOOL <span class="string">&quot;enable debug&quot;</span>)</span><br><span class="line"><span class="keyword">option</span>(MY_OPTION <span class="string">&quot;This is settable from the command line&quot;</span> <span class="keyword">OFF</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">set</span>(CACHE_VAR_FORCE1 <span class="string">&quot;VALUE_FORCE1&quot;</span> CACHE <span class="keyword">STRING</span> <span class="string">&quot;&quot;</span> FORCE)</span><br><span class="line"><span class="keyword">mark_as_advanced</span>(CACHE_VAR_FORCE)</span><br><span class="line"></span><br><span class="line"><span class="keyword">set</span>(CACHE_VAR_FORCE2 <span class="string">&quot;VALUE_FORCE1&quot;</span> CACHE INTERNAL <span class="string">&quot;&quot;</span>)</span><br></pre></td></tr></table></figure>
+<p>【示例 - 缓存变量：cmake 输出】：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 每次都从命令行设置缓存变量的值，就不会使用 CMakeCache.txt 中已经缓存的旧值了</span></span><br><span class="line">$ cmake -DCACHE_VAR=<span class="string">&quot;VALUE_FROM_CMD&quot;</span> -DMY_OPTION=ON -L .</span><br><span class="line">-- Cache values <span class="comment"># 没有 CACHE_VAR_FORCE1/2 哦</span></span><br><span class="line">CMAKE_BUILD_TYPE:STRING=</span><br><span class="line">CMAKE_INSTALL_PREFIX:PATH=/usr/local</span><br><span class="line">CACHE_ENABLE_DEBUG:BOOL=ON</span><br><span class="line">CACHE_VAR:STRING=VALUE_FROM_CMD</span><br><span class="line">MY_OPTION:BOOL=ON</span><br></pre></td></tr></table></figure>
+<h3 id="环境变量">环境变量</h3>
+<p>你也可以通过 <code>set(ENV&#123;variable_name&#125; value)</code> 和 <code>$ENV&#123;variable_name&#125;</code> 来设置和获取环境变量，不过一般来说，我们最好避免这么用。</p>
+<h3 id="缓存">缓存</h3>
+<p>缓存实际上就是个文本文件（CMakeCache.txt），当你运行 CMake 构建目录时会创建它。 CMake 可以通过它来记住你设置的所有东西，因此你可以在不重新运行 CMake 的情况下，再次列出所有的选项。</p>
+<h3 id="属性">属性</h3>
+<p>CMake 也可以通过属性来存储信息。这就像是一个变量，但它被附加到一些其他的物体 (item) 上，<strong>像是一个目录或者是一个目标</strong>。</p>
+<p>一个全局的属性可以是一个有用的、非缓存的全局变量。许多目标属性都是被以 <code>CMAKE_</code> 为前缀的变量来初始化的。例如你设置 <code>CMAKE_CXX_STANDARD</code> 这个变量，这意味着你之后创建的所有目标的 <code>CXX_STANDARD</code> 都将被设为 <code>CMAKE_CXX_STANDARD</code> 变量的值。</p>
+<p>你可以这样来设置属性：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 该方法可以一次性设置多个目标、文件</span></span><br><span class="line"><span class="keyword">set_property</span>(<span class="keyword">TARGET</span> TargetName</span><br><span class="line">             PROPERTY CXX_STANDARD <span class="number">11</span>)</span><br><span class="line"><span class="comment"># 该方法可以为一个目标设置多个属性</span></span><br><span class="line"><span class="keyword">set_target_properties</span>(TargetName PROPERTIES</span><br><span class="line">                      CXX_STANDARD <span class="number">11</span>)</span><br></pre></td></tr></table></figure>
+<p>第一种方式更加通用 (general) ，它可以一次性设置多个目标、文件、或测试，并且有一些非常有用的选项。第二种方式是为一个目标设置多个属性的快捷方式。此外，你可以通过类似于下面的方式来获得属性：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">get_property</span>(ResultVariable <span class="keyword">TARGET</span> TargetName PROPERTY CXX_STANDARD)</span><br></pre></td></tr></table></figure>
+<h2 id="用 -CMake- 进行编程">用 CMake 进行编程</h2>
+<h3 id="控制流程">控制流程</h3>
+<p>如果你的 CMake 版本不大于 3.1：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(variable)</span><br><span class="line">    <span class="comment"># If variable is `ON`, `YES`, `TRUE`, `Y`, or non zero number</span></span><br><span class="line"><span class="keyword">elseif</span>(variable2)</span><br><span class="line">    <span class="comment"># allow multiple elseif </span></span><br><span class="line"><span class="keyword">else</span>()</span><br><span class="line">    <span class="comment"># If variable is `0`, `OFF`, `NO`, `FALSE`, `N`, `IGNORE`, `NOTFOUND`, `&quot;&quot;`, or ends in `-NOTFOUND`</span></span><br><span class="line"><span class="keyword">endif</span>()</span><br><span class="line"><span class="comment"># If variable does not expand to one of the above, CMake will expand it then try again</span></span><br></pre></td></tr></table></figure>
+<p>如果你的 CMake 版本大于 3.1 ，那么你也可以这么写：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(<span class="string">&quot;$&#123;variable&#125;&quot;</span>)</span><br><span class="line">    <span class="comment"># True if variable is not false-like</span></span><br><span class="line"><span class="keyword">else</span>()</span><br><span class="line">    <span class="comment"># Note that undefined variables would be `&quot;&quot;` thus false</span></span><br><span class="line"><span class="keyword">endif</span>()</span><br></pre></td></tr></table></figure>
+<p>这里还有一些关键字可以设置，例如：</p>
+<ul>
+<li>一元的: <code>NOT</code>, <code>TARGET</code>, <code>EXISTS</code> (文件), <code>DEFINED</code> 等。</li>
+<li>二元的: <code>STREQUAL</code>, <code>AND</code>, <code>OR</code>, <code>MATCHES</code> (正则表达式), <code>VERSION_LESS</code>, <code>VERSION_LESS_EQUAL</code> (CMake 3.7+) 等。</li>
+<li>括号可以用来分组</li>
+</ul>
+<h3 id="宏定义与函数">宏定义与函数</h3>
+<p>CMake 函数和宏只有作用域上存在区别，宏没有作用域的限制。所以说，如果你想让函数中定义的变量对外部可见，你需要使用 <code>PARENT_SCOPE</code> 来改变其作用域。</p>
+<p>如果是在嵌套函数中，这会变得异常繁琐，因为你必须在想要变量对外的可见的所有函数中添加 <code>PARENT_SCOPE</code> 标志。但是这样也有好处，函数不会像宏那样对外“泄漏”所有的变量。接下来用函数举一个例子：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span>(SIMPLE REQUIRED_ARG)</span><br><span class="line">    <span class="keyword">message</span>(STATUS <span class="string">&quot;Simple arguments: $&#123;REQUIRED_ARG&#125;, followed by $&#123;ARGN&#125;&quot;</span>)</span><br><span class="line">    <span class="keyword">set</span>(<span class="variable">$&#123;REQUIRED_ARG&#125;</span> <span class="string">&quot;From SIMPLE&quot;</span> PARENT_SCOPE)</span><br><span class="line"><span class="keyword">endfunction</span>()</span><br><span class="line"></span><br><span class="line">simple(This Foo Bar)</span><br><span class="line"><span class="keyword">message</span>(<span class="string">&quot;Output: $&#123;This&#125;&quot;</span>)</span><br></pre></td></tr></table></figure>
+<p>输出如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">-- Simple arguments: This, followed by Foo;Bar</span><br><span class="line">Output: From SIMPLE</span><br></pre></td></tr></table></figure>
+<p>如果你想要有一个指定的参数，你应该在列表中明确的列出，除此之外的所有参数都会被存储在 <code>ARGN</code> 这个变量中（ <code>ARGV</code> 中存储了所有的变量，包括你明确列出的 ）。</p>
+<p>CMake 的函数没有返回值，你可以通过设定变量值的形式来达到同样地目的。在上面的例子中，你可以通过指定变量名来设置一个变量的值。</p>
+<h3 id="参数的控制">参数的控制</h3>
+<p>CMake 拥有一个变量命名系统。你可以通过 <code>cmake_parse_arguments</code> 函数来对变量进行命名与解析。如果你想在低于 3.5 版本的 CMake 系统中使用它，你应该包含 <code>CMakeParseArguments</code> 模块，此函数在 CMake 3.5 之前一直存在于上述模块中。这是使用它的一个例子：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span>(COMPLEX)</span><br><span class="line">    <span class="keyword">cmake_parse_arguments</span>(</span><br><span class="line">        COMPLEX_PREFIX              <span class="comment"># 变量前缀</span></span><br><span class="line">        <span class="string">&quot;SINGLE;ANOTHER&quot;</span>            <span class="comment"># 布尔类型变量，默认全为 FALSE</span></span><br><span class="line">        <span class="string">&quot;ONE_VALUE;ALSO_ONE_VALUE&quot;</span>  <span class="comment"># 多个单一变量</span></span><br><span class="line">        <span class="string">&quot;MULTI_VALUES&quot;</span>              <span class="comment"># 一个可变参数变量</span></span><br><span class="line">        <span class="variable">$&#123;ARGN&#125;</span>                     <span class="comment"># 可变参数列表</span></span><br><span class="line">    )</span><br><span class="line"></span><br><span class="line">    <span class="keyword">message</span>(STATUS <span class="string">&quot;COMPLEX_PREFIX_SINGLE = $&#123;COMPLEX_PREFIX_SINGLE&#125;&quot;</span>)</span><br><span class="line">    <span class="keyword">message</span>(STATUS <span class="string">&quot;COMPLEX_PREFIX_ANOTHER = $&#123;COMPLEX_PREFIX_ANOTHER&#125;&quot;</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">message</span>(STATUS <span class="string">&quot;COMPLEX_PREFIX_ONE_VALUE = $&#123;COMPLEX_PREFIX_ONE_VALUE&#125;&quot;</span>)</span><br><span class="line">    <span class="keyword">message</span>(STATUS <span class="string">&quot;COMPLEX_PREFIX_ALSO_ONE_VALUE = $&#123;COMPLEX_PREFIX_ALSO_ONE_VALUE&#125;&quot;</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">message</span>(STATUS <span class="string">&quot;COMPLEX_PREFIX_MULTI_VALUES = $&#123;COMPLEX_PREFIX_MULTI_VALUES&#125;&quot;</span>)</span><br><span class="line"><span class="keyword">endfunction</span>()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 如果你在调用函数的同级下打印这些变量，看到的全是未定义，因为它们的作用域在函数内</span></span><br><span class="line">complex(SINGLE ONE_VALUE value MULTI_VALUES some other values)</span><br></pre></td></tr></table></figure>
+<p>在调用这个函数后，会生成以下变量：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">COMPLEX_PREFIX_SINGLE = TRUE</span><br><span class="line">COMPLEX_PREFIX_ANOTHER = FALSE</span><br><span class="line">COMPLEX_PREFIX_ONE_VALUE = &quot;value&quot;</span><br><span class="line">COMPLEX_PREFIX_ALSO_ONE_VALUE = &lt;UNDEFINED&gt;</span><br><span class="line">COMPLEX_PREFIX_MULTI_VALUES = &quot;some;other;values&quot;</span><br></pre></td></tr></table></figure>
+<p>你可以通过 <code>set</code> 来避免在 list 中使用分号。此外，其他剩余的参数（因此参数的指定是可选的）都会被保存在 <code>COMPLEX_PREFIX_UNPARSED_ARGUMENTS</code> 变量中。</p>
+<h2 id="与你的代码交互">与你的代码交互</h2>
+<h3 id="通过 -CMake- 配置文件">通过 CMake 配置文件</h3>
+<p>CMake 允许你在代码中使用 <code>configure_file</code> 来访问 CMake 变量。该命令将一个文件（ 一般以 <code>.in</code> 结尾 ）的内容复制到另一个文件中，并替换其中它找到的所有 CMake 变量。如果你想要在你的输入文件中避免替换掉使用 <code>$&#123;&#125;</code> 包含的内容，你可以使用 <code>@ONLY</code> 关键字。</p>
+<p>这个功能在 CMake 中使用的相当频繁，例如在下面的 <code>Version.h.in</code> 中：</p>
+<p>Version.h.in:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">ifndef</span> MY_VERSION_H</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> MY_VERSION_H</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> APP_NAME <span class="string">&quot;@PROJECT_NAME@&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> MY_VERSION_MAJOR @PROJECT_VERSION_MAJOR@</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> MY_VERSION_MINOR @PROJECT_VERSION_MINOR@</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> MY_VERSION_PATCH @PROJECT_VERSION_PATCH@</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> MY_VERSION <span class="string">&quot;@PROJECT_VERSION@&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SHELL_VAR <span class="string">&quot;$&#123;SHEEL_VAR&#125;&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 特性开关</span></span><br><span class="line"><span class="meta">#cmakedefine ENABLE_LOGGING</span></span><br><span class="line">#cmakedefine01 USE_GPU_ACCELERATION</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span> <span class="comment">// MY_VERSION_H</span></span></span><br></pre></td></tr></table></figure>
+<p>CMake lines:</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">cmake_minimum_required</span>(VERSION <span class="number">3.22</span>.<span class="number">1</span>)</span><br><span class="line"><span class="keyword">project</span>(MyApp VERSION <span class="number">1.2</span>.<span class="number">3</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">option</span>(ENABLE_LOGGING <span class="string">&quot;Enable logging&quot;</span> <span class="keyword">ON</span>)</span><br><span class="line"><span class="keyword">option</span>(USE_GPU_ACCELERATION <span class="string">&quot;Use GPU&quot;</span> <span class="keyword">OFF</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 生成 Version.h</span></span><br><span class="line"><span class="keyword">configure_file</span> (</span><br><span class="line">    <span class="string">&quot;$&#123;PROJECT_SOURCE_DIR&#125;/Version.h.in&quot;</span>        <span class="comment"># input file</span></span><br><span class="line">    <span class="string">&quot;$&#123;PROJECT_BINARY_DIR&#125;/include/Version.h&quot;</span>   <span class="comment"># output file</span></span><br><span class="line">    @ONLY                                       <span class="comment"># 避免变量 $&#123;&#125; 被替换</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 在构建你的项目时，你也应该包括二进制头文件路径（将生成的头文件目录加入包含路径）</span></span><br><span class="line"><span class="keyword">include_directories</span>(<span class="string">&quot;$&#123;PROJECT_BINARY_DIR&#125;/include&quot;</span>)</span><br></pre></td></tr></table></figure>
+<p>cmake 后在 include 目录下生成的 Version.h 头文件：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">ifndef</span> MY_VERSION_H</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> MY_VERSION_H</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> APP_NAME <span class="string">&quot;MyApp&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> MY_VERSION_MAJOR 1</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> MY_VERSION_MINOR 2</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> MY_VERSION_PATCH 3</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> MY_VERSION <span class="string">&quot;1.2.3&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SHELL_VAR <span class="string">&quot;$&#123;SHEEL_VAR&#125;&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 特性开关</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> ENABLE_LOGGING</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> USE_GPU_ACCELERATION 0</span></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span> <span class="comment">// MY_VERSION_H</span></span></span><br></pre></td></tr></table></figure>
+<p>总结：</p>
+<table>
+<thead>
+<tr>
+<th>场景</th>
+<th>用法</th>
+<th>示例输入</th>
+<th>示例输出</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>普通变量替换</strong></td>
+<td><code>@VAR@</code></td>
+<td><code>&quot;@PROJECT_NAME@&quot;</code></td>
+<td><code>&quot;MyApp&quot;</code></td>
+</tr>
+<tr>
+<td><strong>条件定义</strong></td>
+<td><code>#cmakedefine VAR</code></td>
+<td><code>#cmakedefine FOO</code></td>
+<td><code>#define FOO</code> 或 <code>/* #undef FOO */</code></td>
+</tr>
+<tr>
+<td><strong>强制 0/1 定义</strong></td>
+<td><code>#cmakedefine01 VAR</code></td>
+<td><code>#cmakedefine01 BAR</code></td>
+<td><code>#define BAR 1</code> 或 <code>#define BAR 0</code></td>
+</tr>
+<tr>
+<td><strong>避免 <code>$&#123;&#125;</code> 替换</strong></td>
+<td><code>@ONLY</code> 选项</td>
+<td><code>$&#123;SHELL_VAR&#125;</code></td>
+<td>保留 <code>$&#123;SHELL_VAR&#125;</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="读入文件">读入文件</h3>
+<p>另外一个方向也是行得通的， 你也可以从源文件中读取一些东西（例如版本号）。例如，你有一个仅包含头文件的库，你想要其在无论有无 CMake 的情况下都可以使用，上述方式将是你处理版本的最优方案。可以像下面这么写：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Assuming the canonical version is listed in a single line</span></span><br><span class="line"><span class="comment"># This would be in several parts if picking up from MAJOR, MINOR, etc.</span></span><br><span class="line"><span class="keyword">set</span>(VERSION_REGEX <span class="string">&quot;#define MY_VERSION[\t]+\&quot;(.+)\&quot;&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Read in the line containing the version</span></span><br><span class="line"><span class="keyword">file</span>(STRINGS <span class="string">&quot;$&#123;CMAKE_CURRENT_SOURCE_DIR&#125;/include/My/Version.h&quot;</span></span><br><span class="line">    VERSION_STRING REGEX <span class="variable">$&#123;VERSION_REGEX&#125;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Pick out just the version</span></span><br><span class="line"><span class="keyword">string</span>(REGEX REPLACE <span class="variable">$&#123;VERSION_REGEX&#125;</span> <span class="string">&quot;\\1&quot;</span> VERSION_STRING <span class="string">&quot;$&#123;VERSION_STRING&#125;&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Automatically getting PROJECT_VERSION_MAJOR, My_VERSION_MAJOR, etc.</span></span><br><span class="line"><span class="keyword">project</span>(My LANGUAGES CXX VERSION <span class="variable">$&#123;VERSION_STRING&#125;</span>)</span><br></pre></td></tr></table></figure>
+<p>如上所示，<code>file(STRINGS file_name variable_name REGEX regex)</code> 选择了与正则表达式相匹配的行，并且使用了相同的正则表达式来匹配出其中版本号的部分。</p>
+<h3 id="一个简单的例子">一个简单的例子</h3>
+<p>这是一个简单、完整并且合理的 <code>CMakeLists.txt</code> 的例子。对于这个程序，我们有一个带有头文件与源文件的库文件（MyLibExample），以及一个带有源文件的应用程序（MyExample）。</p>
+<p>目录树结构：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">$ tree ./simple-project/ --dirsfirst -a</span><br><span class="line">./simple-project/</span><br><span class="line">├── CMakeLists.txt</span><br><span class="line">├── simple_example.c</span><br><span class="line">├── simple_lib.c</span><br><span class="line">└── simple_lib.h</span><br></pre></td></tr></table></figure>
+<p>CMakeLists.txt:</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># CMake simple example</span></span><br><span class="line"></span><br><span class="line"><span class="comment">## [main]</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Almost all CMake files should start with this</span></span><br><span class="line"><span class="comment"># You should always specify a range with the newest</span></span><br><span class="line"><span class="comment"># and oldest tested versions of CMake. This will ensure</span></span><br><span class="line"><span class="comment"># you pick up the best policies.</span></span><br><span class="line"><span class="keyword">cmake_minimum_required</span>(VERSION <span class="number">3.1</span>...<span class="number">3.21</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># This is your project statement. You should always list languages;</span></span><br><span class="line"><span class="comment"># Listing the version is nice here since it sets lots of useful variables</span></span><br><span class="line"><span class="keyword">project</span>(</span><br><span class="line">  ModernCMakeExample</span><br><span class="line">  VERSION <span class="number">1.0</span></span><br><span class="line">  DESCRIPTION <span class="string">&quot;a nice example&quot;</span></span><br><span class="line">  LANGUAGES C)</span><br><span class="line"></span><br><span class="line"><span class="comment"># If you set any CMAKE_ variables, that can go here.</span></span><br><span class="line"><span class="comment"># (But usually don&#x27;t do this, except maybe for C++ standard)</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Find packages go here.</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># You should usually split this into folders, but this is a simple example</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># This is a &quot;default&quot; library, and will match the *** variable setting.</span></span><br><span class="line"><span class="comment"># Other common choices are STATIC, SHARED, and MODULE</span></span><br><span class="line"><span class="comment"># Including header files here helps IDEs but is not required.</span></span><br><span class="line"><span class="comment"># Output libname matches target name, with the usual extensions on your system</span></span><br><span class="line"><span class="keyword">add_library</span>(MyLibExample STATIC simple_lib.c simple_lib.h)  <span class="comment"># 生成静态库</span></span><br><span class="line"><span class="comment">#add_library(MyLibExample SHARED simple_lib.c simple_lib.h) # 生成动态库</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Link each target with other targets or add options, etc.</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Adding something we can run - Output name matches target name</span></span><br><span class="line"><span class="keyword">add_executable</span>(MyExample simple_example.c)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Make sure you link your targets with this command. It can also link libraries and</span></span><br><span class="line"><span class="comment"># even flags, so linking a target that does not exist will not give a configure-time error.</span></span><br><span class="line"><span class="keyword">target_link_libraries</span>(MyExample PRIVATE MyLibExample)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 安装规则 - 这会在 `make install` 时将文件复制到指定目录（默认可能是系统目录，可以通过 CMAKE_* 变量重新指定）</span></span><br><span class="line"><span class="keyword">install</span>(TARGETS MyLibExample</span><br><span class="line">  ARCHIVE DESTINATION lib    <span class="comment"># 静态库 (.a)</span></span><br><span class="line">  LIBRARY DESTINATION lib    <span class="comment"># 动态库 (.so)</span></span><br><span class="line">  RUNTIME DESTINATION bin    <span class="comment"># Windows DLL</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">install</span>(TARGETS MyExample</span><br><span class="line">  RUNTIME DESTINATION bin    <span class="comment"># 可执行文件</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 可选：安装头文件</span></span><br><span class="line"><span class="keyword">install</span>(FILES simple_lib.h DESTINATION <span class="keyword">include</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">## [main]</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># This part is so the Modern CMake book can verify this example builds. For your code,</span></span><br><span class="line"><span class="comment"># you&#x27;ll probably want tests too</span></span><br><span class="line"><span class="keyword">enable_testing</span>()</span><br><span class="line"><span class="keyword">add_test</span>(NAME MyExample <span class="keyword">COMMAND</span> MyExample)</span><br></pre></td></tr></table></figure>
+<p>其它源文件的代码：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// $ cat simple_lib.c</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">char</span> *<span class="title function_">simple_lib_function</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="string">&quot;Compiled in library.\n&quot;</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// $ cat simple_lib.h</span></span><br><span class="line"><span class="meta">#<span class="keyword">ifndef</span> SIMPLE_LIB_H</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SIMPLE_LIB_H</span></span><br><span class="line"></span><br><span class="line"><span class="type">char</span> *<span class="title function_">simple_lib_function</span><span class="params">()</span>;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span> <span class="comment">// SIMPLE_LIB_H</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">// $ cat simple_example.c</span></span><br><span class="line"><span class="comment">// This is an example file as part of Modern-CMake</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;simple_lib.h&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> **argv)</span> &#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Simple example C compiled correctly and ran.\n&quot;</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Output of calling lib function: %s&quot;</span>, simple_lib_function());</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>创建构建目录并编译：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">mkdir</span> build &amp;&amp; <span class="built_in">cd</span> build</span><br><span class="line">$ cmake -DCMAKE_INSTALL_PREFIX=./output ..</span><br><span class="line">$ make &amp;&amp; make install</span><br></pre></td></tr></table></figure>
+<p>生成静态库的可执行文件执行方式：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">cd</span> output &amp;&amp; ./bin/MyExample</span><br><span class="line">Simple example C compiled correctly and ran.</span><br><span class="line">Output of calling lib <span class="keyword">function</span>: Compiled <span class="keyword">in</span> library.</span><br></pre></td></tr></table></figure>
+<p>生成动态库的可执行文件执行方式：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">export</span> LD_LIBRARY_PATH=/home/simple-project/build/output/lib/:<span class="variable">$&#123;LD_LIBRARY_PATH&#125;</span></span><br><span class="line">$ <span class="built_in">cd</span> output &amp;&amp; ./bin/MyExample -L./lib -I./include</span><br></pre></td></tr></table></figure>
+<h3 id="如何组织你的项目">如何组织你的项目</h3>
+<p>下面的说法可能存在一些偏见，但我认为这是一种好的组织方式。我将会讲解如何组织项目的目录结构，这是基于以往的惯例来写的，这么做对你有以下好处：</p>
+<ul>
+<li>可以很容易阅读以相同模式组织的项目</li>
+<li>避免可能造成冲突的组织形式</li>
+<li>避免使目录结构变得混乱和复杂</li>
+</ul>
+<p>首先，如果你创建一个名为 project 的项目，它有一个名为 lib 的库，有一个名为 app 的可执行文件，那么目录结构应该如下所示：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">$ tree ./project/ --dirsfirst -a</span><br><span class="line">./project/</span><br><span class="line">├── apps</span><br><span class="line">│   ├── app.c</span><br><span class="line">│   └── CMakeLists.txt</span><br><span class="line">├── cmake</span><br><span class="line">│   ├── FindSomeLib.cmake</span><br><span class="line">│   └── something_else.cmake</span><br><span class="line">├── docs</span><br><span class="line">│   └── CMakeLists.txt</span><br><span class="line">├── include</span><br><span class="line">│   └── project</span><br><span class="line">│       └── lib.h</span><br><span class="line">├── scripts</span><br><span class="line">│   └── helper.py</span><br><span class="line">├── src</span><br><span class="line">│   ├── CMakeLists.txt</span><br><span class="line">│   └── lib.c</span><br><span class="line">├── CMakeLists.txt</span><br><span class="line">├── .gitignore</span><br><span class="line">└── README.md</span><br></pre></td></tr></table></figure>
+<p>其中，文件的名称不是绝对的，并且应用程序所在的文件夹可能为其他的名称（或者一个项目只有库文件）。你也许也会看到 cmake 文件夹用于存储如 <code>Find&lt;library&gt;.cmake</code> 这样的 .cmake 辅助文件。但是一些比较基础的东西都在上面包括了。</p>
+<p>可以注意到一些很明显的问题， <code>CMakeLists.txt</code> 文件被分割到除了 <code>include</code> 目录外的所有源代码目录下。这是为了能够将 <code>include</code> 目录下的所有文件拷贝到 <code>/usr/include</code> 目录或其他类似的目录下，因此为了避免冲突等问题，其中不能有除了头文件外的其他文件。这也是为什么在 <code>include</code> 目录下有一个名为项目名的目录。顶层 <code>CMakeLists.txt</code> 中应使用 <code>add_subdirectory</code> 命令来添加一个包含 <code>CMakeLists.txt</code> 的子目录。</p>
+<p>你经常会需要一个 cmake 文件夹，里面包含所有用到的辅助模块。你可以通过以下语句将 cmake 目录添加到你的 CMake Path 中：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">set</span>(CMAKE_MODULE_PATH <span class="string">&quot;$&#123;PROJECT_SOURCE_DIR&#125;/cmake&quot;</span> <span class="variable">$&#123;CMAKE_MODULE_PATH&#125;</span>)</span><br></pre></td></tr></table></figure>
+<p>你应该在 <code>.gitignore</code> 中添加形如 <code>build*</code> 的规则，这样用户就可以在源代码目录下创建 <code>build</code> 目录来构建项目，而不用担心将生成的目标文件添加到 <code>.git</code> 中。</p>
+<p>如果你想要避免构建目录在有效的源代码目录中，你可以在顶层 <code>CMakeLists.txt</code> 文件头部添加如下语句：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">### Require out-of-source builds</span></span><br><span class="line"><span class="keyword">file</span>(TO_CMAKE_PATH <span class="string">&quot;$&#123;PROJECT_BINARY_DIR&#125;/CMakeLists.txt&quot;</span> LOC_PATH)</span><br><span class="line"><span class="keyword">if</span>(<span class="keyword">EXISTS</span> <span class="string">&quot;$&#123;LOC_PATH&#125;&quot;</span>)</span><br><span class="line">    <span class="keyword">message</span>(FATAL_ERROR <span class="string">&quot;You cannot build in a source directory (or any directory with a CMakeLists.txt file). </span></span><br><span class="line"><span class="string">                         Please make a build subdirectory. Feel free to remove CMakeCache.txt and CMakeFiles.&quot;</span>)</span><br><span class="line"><span class="keyword">endif</span>()</span><br></pre></td></tr></table></figure>
+<h3 id="一个完整的例子">一个完整的例子</h3>
+<p>略。</p>
+<h1 id="为 CMake 项目添加特性">为 CMake 项目添加特性</h1>
+<h2 id="默认的构建类型">默认的构建类型</h2>
+<p>CMake 通常会设置一个 “既不是 Release 也不是 Debug” 的空构建类型来作为默认的构建类型，如果你想要自己设置默认的构建类型，可以参考如下方法：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Set a default build type if none was specified</span></span><br><span class="line"><span class="keyword">set</span>(default_build_type <span class="string">&quot;Release&quot;</span>)</span><br><span class="line"><span class="keyword">if</span>(<span class="keyword">EXISTS</span> <span class="string">&quot;$&#123;CMAKE_SOURCE_DIR&#125;/.git&quot;</span>) <span class="comment"># 当然，这里可以有其它处理逻辑</span></span><br><span class="line">  <span class="keyword">set</span>(default_build_type <span class="string">&quot;Debug&quot;</span>)</span><br><span class="line"><span class="keyword">endif</span>()</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span>(<span class="keyword">NOT</span> CMAKE_BUILD_TYPE <span class="keyword">AND</span> <span class="keyword">NOT</span> CMAKE_CONFIGURATION_TYPES) <span class="comment"># 单构建模式 AND 多构建模式</span></span><br><span class="line">  <span class="keyword">message</span>(STATUS <span class="string">&quot;Setting build type to &#x27;$&#123;default_build_type&#125;&#x27; as none was specified.&quot;</span>)</span><br><span class="line">  <span class="keyword">set</span>(CMAKE_BUILD_TYPE <span class="string">&quot;$&#123;default_build_type&#125;&quot;</span> CACHE</span><br><span class="line">      <span class="keyword">STRING</span> <span class="string">&quot;Choose the type of build.&quot;</span> FORCE)</span><br><span class="line">  <span class="comment"># Set the possible values of build type for cmake-gui</span></span><br><span class="line">  <span class="keyword">set_property</span>(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS</span><br><span class="line">    <span class="string">&quot;Debug&quot;</span> <span class="string">&quot;Release&quot;</span> <span class="string">&quot;MinSizeRel&quot;</span> <span class="string">&quot;RelWithDebInfo&quot;</span>)</span><br><span class="line"><span class="keyword">endif</span>()</span><br></pre></td></tr></table></figure>
+<p>当然，如果你已经知道用什么构建类型了，你也可以在命令行中指定：如 <code>cmake -DCMAKE_BUILD_TYPE=Debug ..</code>。</p>
+<h2 id="CMake-3-1- 全局设置以及属性设置">CMake 3.1+: 全局设置以及属性设置</h2>
+<p>这是支持 C 标准的一种方式，（在目标及全局级别）设置三个特定属性的值。这是全局的属性：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 将 C 标准设为缓存变量，允许用户通过 -D 覆盖</span></span><br><span class="line"><span class="keyword">set</span>(CMAKE_C_STANDARD <span class="number">11</span> CACHE <span class="keyword">STRING</span> <span class="string">&quot;The C standard to use (e.g., 90, 99, 11, 17, 23)&quot;</span>)</span><br><span class="line"><span class="keyword">set</span>(CMAKE_C_STANDARD_REQUIRED <span class="keyword">ON</span>)   <span class="comment"># 告诉 CMake 使用上述设置</span></span><br><span class="line"><span class="keyword">set</span>(CMAKE_C_EXTENSIONS <span class="keyword">OFF</span>)         <span class="comment"># 是否启用拓展，来明确使用 -std=c11 还是 -std=gnu11</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建可执行文件（最终包）</span></span><br><span class="line"><span class="keyword">add_executable</span>(MyApp main.c)</span><br></pre></td></tr></table></figure>
+<p>上述前三条配置，可以在最终包（即可执行程序，如 <code>main()</code> 入口的 final package）中使用，但不推荐在库中使用。原因如下：库通常需要兼容不同调用方的 C 标准，硬编码 <code>CMAKE_C_STANDARD</code> 会限制库的灵活性。</p>
+<ul>
+<li>如果库强制设为 C11，但用户项目用 C17，可能导致兼容性问题。</li>
+<li>更好的方式是用 <code>target_compile_features</code> （见下文）。</li>
+</ul>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 库的 CMakeLists.txt（不硬编码标准）</span></span><br><span class="line"><span class="keyword">add_library</span>(MyLib lib.cpp)</span><br><span class="line"><span class="keyword">target_compile_features</span>(MyLib PUBLIC c_std_11)  <span class="comment"># 仅表示最低要求</span></span><br></pre></td></tr></table></figure>
+<p>你也可以对目标来设置这些属性：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">set_target_properties</span>(myTarget PROPERTIES</span><br><span class="line">    C_STANDARD <span class="number">11</span></span><br><span class="line">    C_STANDARD_REQUIRED <span class="keyword">ON</span></span><br><span class="line">    C_EXTENSIONS NO</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<p>这种方式相比于上面来说更好，但是仍然没法对 <code>PRIVATE</code> 和 <code>INTERFACE</code> 目标的属性有明确的控制，所以他们也仍然只对最终目标 (final targets) 有用。</p>
+<p>如何换一种方式，在 C 代码中使用了 GNU 特性呢？</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 全局启用 gnu11</span></span><br><span class="line"><span class="keyword">set</span>(CMAKE_C_STANDARD <span class="number">11</span>)        <span class="comment"># 先设置 C11</span></span><br><span class="line"><span class="keyword">add_compile_options</span>(-std=gnu11) <span class="comment"># 再覆盖为 GNU11</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 特定目标启用 gnu11</span></span><br><span class="line"><span class="keyword">target_compile_options</span>(YourTarget PUBLIC -std=gnu11)</span><br></pre></td></tr></table></figure>
+<h1 id="一些小而常见的需求">一些小而常见的需求</h1>
+<h2 id="地址无关代码 -Position-independent-code">地址无关代码 (Position independent code)</h2>
+<p>用标志 <code>-fPIC</code> 来设置这个是最常见的。大部分情况下，你不需要去显式地声明它的值。CMake 将会在 <code>SHARED</code> 以及 <code>MODULE</code> 类型的库中自动的包含此标志。如果你需要显式地声明，可以这么写：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">set</span>(CMAKE_POSITION_INDEPENDENT_CODE <span class="keyword">ON</span>)</span><br></pre></td></tr></table></figure>
+<p>这样会对全局的目标进行此设置，或者可以这么写：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">set_target_properties</span>(lib1 PROPERTIES POSITION_INDEPENDENT_CODE <span class="keyword">ON</span>)</span><br></pre></td></tr></table></figure>
+<p>来对某个目标进行设置是否开启此标志。</p>
+<h2 id="调试 -CMake">调试 CMake</h2>
+<p>首先，让我们来盘点一下调试 CMakeLists 和其他 CMake 文件的方法。</p>
+<h3 id="打印变量">打印变量</h3>
+<p>通常我们使用的打印语句如下：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">message</span>(STATUS <span class="string">&quot;MY_VARIABLE=$&#123;MY_VARIABLE&#125;&quot;</span>)</span><br></pre></td></tr></table></figure>
+<p>然而，通过一个内置的模组 <code>CMakePrintHelpoers</code> 可以更方便的打印变量：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">include</span>(CMakePrintHelpers)</span><br><span class="line">cmake_print_variables(MY_VARIABLE)</span><br></pre></td></tr></table></figure>
+<p>如果你只是想要打印一个变量，那么上述方法已经很好用了！如果你想要打印一些关于某些目标 (或者是其他拥有变量的项目，比如 <code>SOURCES</code>、<code>DIRECTORIES</code>、<code>TESTS</code> , 或 <code>CACHE_ENTRIES</code> - 全局变量好像因为某些原因缺失了) 的变量，与其一个一个打印它们，你可以简单的列举并打印它们：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">cmake_print_properties(</span><br><span class="line">    TARGETS my_target</span><br><span class="line">    PROPERTIES POSITION_INDEPENDENT_CODE</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<h3 id="跟踪运行">跟踪运行</h3>
+<p>你可能想知道构建项目的时候你的 CMake 文件究竟发生了什么，以及这些都是如何发生的？用 <code>--trace-source=&quot;filename&quot;</code> 就很不错，它会打印出你指定的文件现在运行到哪一行，让你可以知道当前具体在发生什么。另外还有一些类似的选项，但这些命令通常给出一大堆输出，让你找不着头脑。</p>
+<p>例子：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cmake -S . -B build --trace-source=CMakeLists.txt</span><br></pre></td></tr></table></figure>
+<p>如果你添加了 <code>--trace-expand</code> 选项，变量会直接展开成它们的值。</p>
+<h3 id="以 -debug- 模式构建">以 debug 模式构建</h3>
+<p>对于单一构建模式的生成器 (single-configuration generators)，你可以使用参数 <code>-DCMAKE_BUILD_TYPE=Debug</code> 来构建项目，以获得调试标志 (debugging flags)。对于支持多个构建模式的生成器 (multi-configuration generators)，像是多数 IDE，你可以在 IDE 里打开调试模式。这种模式有不同的标志（变量以 <code>_DEBUG</code> 结尾，而不是 <code>_RELEASE</code> 结尾），以及生成器表达式的值 <code>CONFIG:Debug</code> 或 <code>CONFIG:Release</code>。</p>
+<p>如果你使用了 debug 模式构建，你就可以在上面运行调试器了，比如 gdb 或 lldb。</p>
+
+</div>
+
+
+  <div class="book-comments">
+    
+
+
+
+
+  </div>
+
+
+
+<script src="/js/book-post.js"></script>
+
+
+            </div>
+          </div>
+          <div class="column col-2 hide-lg">
+            <div class="book-post-info">
+  
+    <div class="book-post-meta">
+
+  <div class="author">
+
+    <!-- Author image -->
+    <div class="author-img">
+      
+        <figure
+          class="avatar avatar-lg"
+          data-initial="A"
+          style="background-color: #3b4351;">
+        </figure>
+      
+    </div>
+
+    <!-- Author title -->
+    <div class="author-title">
+      <div>aha</div>
+      <div>2025-06-29</div>
+    </div>
+  </div>
+
+  
+    <div class="divider"></div>
+
+    <div class="link">
+      <a class="category-link" href="/categories/%E5%B7%A5%E5%85%B7/">工具</a>
+
+      <a class="tag-none-link" href="/tags/CMake/" rel="tag">#CMake</a>
+    </div>
+    
+  
+
+  <div class="divider"></div>
+</div>
+  
+
+  <div class="book-tocbot">
+</div>
+<div class="book-tocbot-menu">
+  <a class="book-toc-expand" onclick="expand_toc()">Expand all</a>
+  <a onclick="go_top()">Back to top</a>
+  <a onclick="go_bottom()">Go to bottom</a>
+  <a onclick="toggleSearch()">Search in blogs</a> <!-- 添加搜索文字的点击事件 -->
+</div>
+
+<div id="search-overlay" class="search-overlay" style="display: none;"> <!-- 初始状态为隐藏 -->
+  <div class="search-box">
+    <input type="text" id="search-input" placeholder="Search in all blogs...">
+    <button onclick="closeSearch()">Close</button> <!-- 添加关闭按钮 -->
+    <div id="search-results" class="search-results"></div>
+  </div>
+</div>
+
+<script>
+  function performSearch(query) {
+    if (!query.trim()) {
+      return;
+    }
+
+    fetch('/search.xml')
+      .then(response => response.text())
+      .then(data => {
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(data, "text/xml");
+        const entries = xmlDoc.getElementsByTagName('entry');
+        let results = '';
+
+        for (let i = 0; i < entries.length; i++) {
+          const title = entries[i].getElementsByTagName('title')[0].textContent;
+          const content = entries[i].getElementsByTagName('content')[0].textContent;
+          const url = entries[i].getElementsByTagName('url')[0].textContent;
+
+          let count = (title.match(new RegExp(query, "gi")) || []).length; // 统计查询词出现的次数
+          count += (content.match(new RegExp(query, "gi")) || []).length;
+
+          if (count > 0) { // title.includes(query) || content.includes(query)
+            results += `
+              <div class="search-result-item">
+                <a href="${url}">${title}</a> (${count})
+              </div>`;
+          }
+        }
+
+        const searchResultsElement = document.getElementById('search-results');
+        searchResultsElement.innerHTML = results;
+        searchResultsElement.classList.add('active');
+      });
+  }
+
+  function toggleSearch() {
+    const searchOverlay = document.getElementById('search-overlay');
+    searchOverlay.style.display = searchOverlay.style.display === 'none' ? 'flex' : 'none';
+  }
+
+  function closeSearch() {
+    document.getElementById('search-overlay').style.display = 'none';
+  }
+
+  document.getElementById('search-input').addEventListener('input', function() {
+    const query = this.value;
+    performSearch(query);
+  });
+</script>
+
+<style>
+  .search-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  .search-box {
+    background: white;
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+    width: 80%;
+    max-width: 500px;
+  }
+
+  .search-results {
+    margin-top: 10px;
+    max-height: 300px;
+    overflow-y: auto;
+    background: white;
+    padding: 10px;
+    border-radius: 5px;
+    width: 100%;
+  }
+
+  .search-result-item {
+    margin: 10px 0;
+  }
+
+  .search-result-item a {
+    color: blue; /* 设置链接颜色为蓝色 */
+    text-decoration: none;
+  }
+
+  .search-result-item a:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+<script src="/js/book-toc.js"></script>
+
+
+</div>
+          </div>
+        </div>
+      </div>
+
+      <a class="off-canvas-overlay" onclick="hide_canvas()"></a>
+
+      <button class="floating-button" onclick="toggleDropdownMenu()"></button>
+
+      <div class="dropdown-menu">
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FFFFFF', '#000000')">银河白</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#C7EDCC', '#000000')">豆沙绿</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FAF9DE', '#000000')">杏仁黄</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#E3EDCD', '#000000')">青草绿</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FFF2E2', '#000000')">秋叶褐</div>
+      </div>
+  </div>
+
+  <script>
+    function toggleDropdownMenu() {
+      document.querySelector('.floating-button').classList.toggle('active');
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      var storedBackgroundColor = localStorage.getItem('blogBackgroundColor');
+      var storedColor = localStorage.getItem('blogColor');
+
+      if (storedBackgroundColor && storedColor) {
+        document.body.style.backgroundColor = storedBackgroundColor;
+        document.body.style.color = storedColor;
+      }
+    });
+
+    function changeBackgroundColor(backgroundColor, color) {
+      document.body.style.backgroundColor = backgroundColor;
+      document.body.style.color = color;
+
+      localStorage.setItem('blogBackgroundColor', backgroundColor);
+      localStorage.setItem('blogColor', color);
+
+      document.querySelector('.floating-button').classList.remove('active');
+    }
+  </script>
+</body>
+
+</html>
+
+
+<script src="/js/book.js"></script>

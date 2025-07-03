@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
+
+    
+      <link rel="icon" href="/favicon.png" />
+    
+
+    <title>
+        
+          多线程编程之读者写者问题 - aha&#39;s book
+        
+    </title>
+
+    <!-- Spectre.css framework -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre-exp.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre-icons.min.css">
+
+    <!-- theme css & js -->
+    
+<link rel="stylesheet" href="/css/book.css">
+
+    
+<script src="/js/book.js"></script>
+
+
+    <!-- tocbot -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.css">
+    
+    <!-- katex -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/zooming/2.1.1/zooming.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const zooming = new Zooming()
+    zooming.listen('.book-content img')
+})
+</script>
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+    <style>
+      body {
+        background-color: #FFFFFF;
+        /* color: #000000; */
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+
+      /* Floating Button Styles */
+      .floating-button {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 999;
+        background-color: #000000;
+        color: #ffffff;
+        padding: 12px;
+        border-radius: 50%;
+        cursor: pointer;
+        border: 2px solid #000000;
+      }
+
+      .floating-button:hover {
+        background-color: #FFFFFF;
+      }
+
+      /* Dropdown Menu Styles */
+      .dropdown-menu {
+        position: fixed;
+        bottom: 60px;
+        right: 10px;
+        display: none;
+        min-width: 60px;
+        padding: 2px;
+        background-color: #fff;
+        /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
+        z-index: 1000;
+      }
+
+      .floating-button.active+.dropdown-menu {
+        display: block;
+      }
+
+      .dropdown-item {
+        display: block;
+        padding: 8px 16px;
+        cursor: pointer;
+      }
+
+      .dropdown-item:hover {
+        background-color: #f5f5f5;
+      }
+    </style>
+<style>.darkmode--activated{--body-bg-color:#282828;--content-bg-color:#333;--card-bg-color:#555;--text-color:#ccc;--blockquote-color:#bbb;--link-color:#ccc;--link-hover-color:#eee;--brand-color:#ddd;--brand-hover-color:#ddd;--table-row-odd-bg-color:#282828;--table-row-hover-bg-color:#363636;--menu-item-bg-color:#555;--btn-default-bg:#222;--btn-default-color:#ccc;--btn-default-border-color:#555;--btn-default-hover-bg:#666;--btn-default-hover-color:#ccc;--btn-default-hover-border-color:#666;--highlight-background:#282b2e;--highlight-foreground:#a9b7c6;--highlight-gutter-background:#34393d;--highlight-gutter-foreground:#9ca9b6}.darkmode--activated img{opacity:.75}.darkmode--activated img:hover{opacity:.9}.darkmode--activated code{color:#69dbdc;background:0 0}button.darkmode-toggle{z-index:9999}.darkmode-ignore,img{display:flex!important}.beian img{display:inline-block!important}</style></head>
+
+<body>
+  <div class="book-container">
+    <div class="book-sidebar">
+      <div class="book-brand">
+  <a href="/">
+    <img src="/favicon.png">
+    <span>AHA&#39;S BOOK</span>
+  </a>
+</div>
+        <div id="menu" class="book-menu hide">
+  <h2 id="基础知识"> 基础知识 </h2>
+<ul>
+<li><a href="/posts/231010144856.html"> 模运算 </a></li>
+<li><a href="/posts/231014105311.html"> 异或运算 </a></li>
+<li><a href="/posts/231210181853.html"> 计算机中的寄存器 </a></li>
+<li><a href="/posts/231213183051.html"> 正则表达式基础 </a></li>
+</ul>
+<h2 id="C 语言">C 语言 </h2>
+<ul>
+<li><a href="/posts/230916171929.html">main 函数参数 </a></li>
+<li><a href="/posts/231214192113.html"> 关键字与专有名词 </a></li>
+<li><a href="/posts/240103180653.html"> 输出打印函数 </a></li>
+<li><a href="/posts/230922143003.html"> 多维数组 </a></li>
+<li><a href="/posts/230913200729.html">const 关键字 </a></li>
+<li><a href="/posts/230918174223.html">typedef 类型基础 </a></li>
+<li><a href="/posts/230920172849.html">typedef 类型实践 </a></li>
+<li><a href="/posts/240224193217.html"> 二级指针 </a></li>
+<li><a href="/posts/240307195203.html"> 代码 TOP-K 问题 </a></li>
+<li><a href="/posts/230922172626.html">uthash 哈希表基础 </a></li>
+<li><a href="/posts/230918114841.html"> 大小端知识 </a></li>
+</ul>
+<h2 id="Golang 语言">Golang 语言 </h2>
+<ul>
+<li><a href="/posts/230907162612.html"> 变量与常量 </a></li>
+<li><a href="/posts/230909120145.html"> 函数 &amp; 包 &amp; 判断 &amp; 循环 </a></li>
+<li><a href="/posts/230912152800.html"> 数组与切片 </a></li>
+<li><a href="/posts/230913161326.html"> 可变参数函数与 Map 集合 </a></li>
+<li><a href="/posts/230915155105.html"> 字符串和指针 </a></li>
+</ul>
+<h2 id="数据结构"> 数据结构 </h2>
+<ul>
+<li><a href="/posts/231007174854.html"> 链表（数组实现）</a></li>
+<li><a href="/posts/231008213450.html"> 链表（链式实现）</a></li>
+<li><a href="/posts/231016161508.html"> 堆栈（数组实现）</a></li>
+<li><a href="/posts/231016184406.html"> 堆栈（链表实现）</a></li>
+<li><a href="/posts/231127185207.html"> 单调栈 </a></li>
+<li><a href="/posts/231017105123.html"> 队列（链表实现）</a></li>
+<li><a href="/posts/231017154121.html"> 双端队列（链表实现）</a></li>
+<li><a href="/posts/231018102559.html"> 堆基础与堆结构（数组实现）</a></li>
+<li><a href="/posts/231019102311.html"> 优先队列（堆实现）</a></li>
+<li><a href="/posts/230905224335.html"> 二叉树的遍历 </a></li>
+<li><a href="/posts/231020174358.html"> 二叉搜索树 </a></li>
+<li><a href="/posts/230916094606.html"> 拓扑排序 </a></li>
+<li><a href="/posts/230925185057.html">Trie 字典树 </a></li>
+<li><a href="/posts/231023164532.html"> 并查集（数组实现）</a></li>
+<li><a href="/posts/240702200642.html">Linux 数据结构之队列 </a></li>
+</ul>
+<h2 id="数据结构算法"> 数据结构算法 </h2>
+<ul>
+<li><a href="/posts/231218181635.html"> 归并排序 </a></li>
+<li><a href="/posts/231108163339.html"> 快速排序 </a></li>
+<li><a href="/posts/231107171607.html"> 堆排序 </a></li>
+<li><a href="/posts/231124181658.html"> 二分查找 </a></li>
+<li><a href="/posts/231227190828.html"> 哈希表实现 </a></li>
+<li><a href="/posts/240313193201.html"> 字符串哈希函数 </a></li>
+<li><a href="/posts/231116150205.html">Floyd 多源最短路径 </a></li>
+<li><a href="/posts/231117095232.html">Dijkstra 单源最短路径（原理部分）</a></li>
+<li><a href="/posts/231121152713.html">Dijkstra 单源最短路径（实现部分）</a></li>
+</ul>
+<h2 id="数据库"> 数据库 </h2>
+<ul>
+<li><a href="/posts/250605180332.html">MySQL 基础 </a></li>
+</ul>
+<h2 id="计算机网络"> 计算机网络 </h2>
+<ul>
+<li><a href="/posts/231011192359.html">OSI 参考模型 </a></li>
+<li><a href="/posts/240329202000.html"> 计网 CyC2018 之概述 </a></li>
+<li><a href="/posts/240329202004.html"> 计网 CyC2018 之链路层 </a></li>
+<li><a href="/posts/240329202003.html"> 计网 CyC2018 之网络层 </a></li>
+<li><a href="/posts/240329202002.html"> 计网 CyC2018 之传输层 </a></li>
+<li><a href="/posts/240329202001.html"> 计网 CyC2018 之应用层 </a></li>
+<li><a href="/posts/240306203742.html">ACL 访问控制列表 </a></li>
+<li><a href="/posts/240130190208.html"> 路由表、转发表与快速转发工作原理 </a></li>
+<li><a href="/posts/231221200716.html">VXLAN 网络虚拟化技术 </a></li>
+<li><a href="/posts/240903191243.html">TCP/IP checksum 计算 </a></li>
+<li><a href="/posts/240911185603.html"> 抓包分析 TCP 三次握手与四次挥手过程 </a></li>
+</ul>
+<h2 id="操作系统"> 操作系统 </h2>
+<ul>
+<li><a href="/posts/230921190726.html"> 概述 </a></li>
+<li><a href="/posts/230924172528.html"> 中断 &amp; 异常 &amp; 系统调用 </a></li>
+<li><a href="/posts/231017195157.html"> 内存分层体系与地址空间生成 </a></li>
+<li><a href="/posts/231108195351.html"> 连续内存分配 </a></li>
+<li><a href="/posts/231111172507.html"> 非连续内存分配之分段与分页 </a></li>
+<li><a href="/posts/231119170537.html"> 非连续内存分配之页表 </a></li>
+<li><a href="/posts/231123184526.html"> 内存管理之覆盖技术与交换技术 </a></li>
+<li><a href="/posts/231127193658.html"> 内存管理之虚存技术 </a></li>
+<li><a href="/posts/231129182631.html"> 局部页面置换算法 </a></li>
+<li><a href="/posts/231207184239.html"> 全局页面置换算法 </a></li>
+<li><a href="/posts/231207204958.html"> 进程描述 </a></li>
+<li><a href="/posts/231210211306.html"> 进程状态 </a></li>
+<li><a href="/posts/231215213932.html"> 线程 </a></li>
+<li><a href="/posts/231218220813.html"> 进程控制 </a></li>
+<li><a href="/posts/231228193143.html"> 调度 </a></li>
+<li><a href="/posts/240104202828.html"> 同步与互斥 </a></li>
+<li><a href="/posts/240113115605.html"> 信号量与管程 </a></li>
+<li><a href="/posts/240205182643.html"> 经典同步问题 </a></li>
+<li><a href="/posts/240310162231.html"> 死锁 </a></li>
+</ul>
+<h2 id="系统与网络编程"> 系统与网络编程 </h2>
+<ul>
+<li><a href="/posts/230911151334.html">pthread 库 </a></li>
+<li><a href="/posts/230921094127.html"> 锁与原子操作 </a></li>
+<li><a href="/posts/240319195609.html"> 读者写者问题 </a></li>
+<li><a href="/posts/240527200241.html"> 网络编程卷一阅读随笔 </a></li>
+<li><a href="/posts/240414190410.html"> 进程间通信 IPC 机制 </a></li>
+<li><a href="/posts/240424200123.html"> 多进程相关练习 </a></li>
+<li><a href="/posts/240516221527.html">I/O 模式与 I/O 多路复用 </a></li>
+<li><a href="/posts/240626192803.html">Linux 内核 kfifo 环形队列 </a></li>
+<li><a href="/posts/241009203126.html">Linux 内核等待队列 </a></li>
+<li><a href="/posts/240627210637.html">DPDK 无锁环形队列 </a></li>
+<li><a href="/posts/240919200410.html"> 解密内存屏障 </a></li>
+<li><a href="/posts/240927202500.html"> 内核线程的创建 </a></li>
+<li><a href="/posts/241015195205.html">Linux 网络数据包接收过程 </a></li>
+<li><a href="/posts/2410232111015.html"> 源码解读 epoll 实现原理 </a></li>
+<li><a href="/posts/241106182619.html">Linux 文件系统 </a></li>
+<li><a href="/posts/250619154429.html">Libevent 高性能 IO 事件驱动库 </a></li>
+</ul>
+<h2 id="工具与命令"> 工具与命令 </h2>
+<ul>
+<li><a href="/posts/240207180410.html">GCC 编译过程分解 </a></li>
+<li><a href="/posts/240312184132.html">GDB 调试入门 </a></li>
+<li><a href="/posts/240512184921.html">Makefile 学习 </a></li>
+<li><a href="/posts/250629214430.html">CMake 学习 </a></li>
+<li><a href="/posts/240417193754.html">Linux 命令之文件权限 </a></li>
+</ul>
+<h2 id="开源项目"> 开源项目 </h2>
+<ul>
+<li><a href="/posts/240303201855.html"> 线程池原理与实现 </a></li>
+<li><a href="/posts/240507194549.html">HTTP 服务器实现 </a></li>
+<li><a href="/posts/240904203605.html"> 聊天服务器实现 </a></li>
+<li><a href="/posts/241119182636.html">Linux 文件系统 </a></li>
+</ul>
+<h2 id="Docker">Docker</h2>
+<ul>
+<li><a href="/posts/230909171809.html">Docker 学习笔记 </a></li>
+</ul>
+<h1 id="LeetCode 刷题">LeetCode 刷题 </h1>
+<h2 id="链表相关"> 链表相关 </h2>
+<ul>
+<li><a href="/posts/231025143947.html">160 相交链表 </a></li>
+<li><a href="/posts/231025185947.html">206 反转链表 </a></li>
+<li><a href="/posts/231026101239.html">21 合并两个有序链表 </a></li>
+<li><a href="/posts/231026184514.html">83 删除排序链表中的重复元素 </a></li>
+<li><a href="/posts/231027150243.html">19 删除链表的倒数第 N 个节点 </a></li>
+<li><a href="/posts/231031120718.html">2 两数相加 </a></li>
+<li><a href="/posts/231031163133.html">445 两数相加 II</a></li>
+<li><a href="/posts/231101094219.html">234 回文链表 </a></li>
+<li><a href="/posts/231101135228.html">725 分隔链表 </a></li>
+<li><a href="/posts/231102120708.html">328 奇偶链表 </a></li>
+<li><a href="/posts/231102165703.html">142 环形链表 II</a></li>
+</ul>
+<h2 id="设计"> 设计 </h2>
+<ul>
+<li><a href="/posts/231201184542.html">146 LRU 缓存 </a></li>
+</ul>
+<h2 id="贪心算法"> 贪心算法 </h2>
+<ul>
+<li><a href="/posts/231107094652.html">1029 两地调度 </a></li>
+<li><a href="/posts/231109150855.html">435 无重叠区间 </a></li>
+</ul>
+<h2 id="哈希表"> 哈希表 </h2>
+<ul>
+<li><a href="/posts/231123181539.html">1410 实体解析器 </a></li>
+</ul>
+<h2 id="树的遍历"> 树的遍历 </h2>
+<ul>
+<li><a href="/posts/231103121209.html">117 填充每个节点的下一个右侧节点指针 II</a></li>
+</ul>
+<h2 id="深度优先搜索（递归）"> 深度优先搜索（递归）</h2>
+<ul>
+<li><a href="/posts/231206201243.html">2477 达到首都的最少油耗 </a></li>
+</ul>
+<h2 id="图或路径问题"> 图或路径问题 </h2>
+<ul>
+<li><a href="/posts/231211184652.html">1631 最小体力消耗路径 </a></li>
+</ul>
+<h2 id="其它"> 其它 </h2>
+<ul>
+<li><a href="/posts/230101120000.html"> 备忘录 </a></li>
+</ul>
+
+</div>
+
+
+<script src="/js/book-menu.js"></script>
+
+    </div>
+    <div class="sidebar-toggle" onclick="sidebar_toggle()" onmouseover="add_inner()" onmouseleave="remove_inner()">
+  <div class="sidebar-toggle-inner"></div>
+</div>
+
+<script>
+function add_inner() {
+  let inner = document.querySelector('.sidebar-toggle-inner')
+  inner.classList.add('show')  
+}
+
+function remove_inner() {
+  let inner = document.querySelector('.sidebar-toggle-inner')
+  inner.classList.remove('show')
+}
+
+function sidebar_toggle() {
+    let sidebar_toggle = document.querySelector('.sidebar-toggle')
+    let sidebar = document.querySelector('.book-sidebar')
+    let content = document.querySelector('.off-canvas-content')
+    if (sidebar_toggle.classList.contains('extend')) { // show
+        sidebar_toggle.classList.remove('extend')
+        sidebar.classList.remove('hide')
+        content.classList.remove('extend')
+    }
+    else { // hide
+        sidebar_toggle.classList.add('extend')
+        sidebar.classList.add('hide')
+        content.classList.add('extend')
+    }
+}
+</script>
+
+      <div class="off-canvas-content">
+        <div class="columns">
+          <div class="column col-10 col-lg-12">
+            <div class="book-navbar">
+              <!-- For Responsive Layout -->
+
+<header class="navbar">
+  <section class="navbar-section">
+    <a onclick="open_sidebar()">
+      <i class="icon icon-menu"></i>
+    </a>
+  </section>
+</header>
+
+            </div>
+            <div class="book-content">
+              <div class="book-post">
+  <p>读者写者问题是并发程序设计中的经典问题。问题描述为：对于同一块共享资源，读 - 写操作互斥，写 - 写操作互斥，读 - 读操作允许（读操作可以同时并行）。本文是对 <a href="/posts/240205182643.html"> 操作系统之经典同步问题 </a> 文章中读写问题的具体代码实现。</p>
+<span id="more"></span>
+<p><strong>读者 - 写者问题的读、写操作限制（仅读者优先或写者优先）</strong>：</p>
+<ul>
+<li>写 - 写互斥：即不能有两个写者同时进行写操作。</li>
+<li>读 - 写互斥：即不能同时有一个线程在读，而另一个线程在写。</li>
+<li>读 - 读允许：即可以有一个或多个读者线程在读。</li>
+</ul>
+<h1 id="读者优先信号量实现">读者优先信号量实现</h1>
+<h2 id="模型分析">模型分析</h2>
+<p><strong>读者优先定义</strong>：只要有一个读者正在读取共享资源，后来的读者都会被接纳（即使这些读者是在正在等待的写者之后到来的，也会优先让这些读者读取共享资源）。如果读者源源不断的出现，那么写者将始终处于阻塞状态（可能会出现饿死）。</p>
+<p>例如有以下访问序列：</p>
+<ul>
+<li>到达时刻：读者 1 -&gt; 读者 2 -&gt; 写者 a -&gt; 读者 3，且写者 a 到达时有读者正在访问共享资源。</li>
+<li>访问顺序：读者 1 -&gt; 读者 2 -&gt; 读者 3 -&gt; 写者 a，即写者后的读者 3 可以插队到先来的写者 a 之前，访问共享资源。</li>
+</ul>
+<p><strong>读者优先允许同时有多个读者在读取资源</strong>。若将这些读者分为第一个读者、中间的读者和最后一个读者，那么这三类读者有不同的动作：</p>
+<ul>
+<li>第一个读者：尝试读 -&gt; 可以读 + <strong>不可以写</strong> -&gt; 读操作 -&gt; 结束读；</li>
+<li>中间的读者：尝试读 -&gt; 可以读 -&gt; 读操作 -&gt; 结束读；</li>
+<li>最后的读者：尝试读 -&gt; 可以读 -&gt; 读操作 -&gt; 结束读 + <strong>可以写</strong>。</li>
+</ul>
+<p>也就是，<strong>第一个读者要负责禁止写者执行写操作，最后一个读者负责恢复写者执行写操作</strong>。</p>
+<p>写者线程就简单了，只要你能拿到锁，你就能执行写操作。能拿到锁的场景：没有读者了（一直没有或最后一个读者结束读）。</p>
+<img src="../images/sys-net-program/rdFirst-sem.png" alt="多线程读者优先的信号量实现（代码在后面）" width="60%" height="60%">
+<h2 id="模拟数据">模拟数据</h2>
+<p>测试数据文件包括多行测试数据，每行数据从左到右依次为线程标识、读写类型、动作前等待时间、动作持续时间。其中，</p>
+<ul>
+<li>动作前等待时间：即线程创建后，延迟相应时间（单位为秒）后发出对共享资源的读写申请。</li>
+<li>动作持续时间：一旦线程读写申请成功，开始对共享资源进行读写操作，该操作持续相应时间后结束，并释放共享资源。</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>线程标识</th>
+<th>读写类型</th>
+<th>动作前等待时间 (秒)</th>
+<th>动作持续时间 (秒)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>R</td>
+<td>1</td>
+<td>5</td>
+</tr>
+<tr>
+<td>1</td>
+<td>R</td>
+<td>3</td>
+<td>5</td>
+</tr>
+<tr>
+<td>2</td>
+<td>W</td>
+<td>4</td>
+<td>5</td>
+</tr>
+<tr>
+<td>3</td>
+<td>R</td>
+<td>5</td>
+<td>2</td>
+</tr>
+<tr>
+<td>4</td>
+<td>R</td>
+<td>6</td>
+<td>5</td>
+</tr>
+<tr>
+<td>5</td>
+<td>W</td>
+<td>7</td>
+<td>3</td>
+</tr>
+</tbody>
+</table>
+<p>例如，第四行表示一个读者线程 3，在它被创建 5 秒后，尝试申请读操作；申请成功后，读取资源 2 秒并释放资源、退出线程。</p>
+<h2 id="功能实现">功能实现</h2>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;pthread.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;semaphore.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;time.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> MAX_THREAD_NR (100)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* 线程的动作信息：依次为线程标识、类型、动作前等待时间、动作持续时间 */</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">tagThreadAction</span> &#123;</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> uiTid;</span><br><span class="line">    <span class="type">char</span> cRwType;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> uiDelay;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> uiDuration;</span><br><span class="line">&#125; THREAD_ACTION_S;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 读者优先的锁结构：读者计数器、计数器信号量、写者信号量 ⭐ */</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> uiRdCnt;</span><br><span class="line">    <span class="type">sem_t</span> stRdCntMutex;</span><br><span class="line">    <span class="type">sem_t</span> stWrMutex;</span><br><span class="line">&#125; READ_FIRST_LOCK_S;</span><br><span class="line"></span><br><span class="line">READ_FIRST_LOCK_S g_stRdFirstLock;  <span class="comment">// 多个线程共享的全局资源 ⭐</span></span><br><span class="line"></span><br><span class="line"><span class="type">time_t</span> stStartTime;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span>* <span class="title function_">writer</span><span class="params">(<span class="type">void</span>* arg)</span> &#123;</span><br><span class="line">    THREAD_ACTION_S* pstThrAction = (THREAD_ACTION_S*)arg;</span><br><span class="line"></span><br><span class="line">    sleep(pstThrAction-&gt;uiDelay);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;[%02.0lf 秒] 写者 #%d 等待写入 \n&quot;</span>, difftime(time(<span class="literal">NULL</span>), stStartTime), pstThrAction-&gt;uiTid);</span><br><span class="line"></span><br><span class="line">    sem_wait(&amp;g_stRdFirstLock.stWrMutex);  <span class="comment">// wait-W ⭐</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;[%02.0lf 秒] 写者 #%d 开始写入 \n&quot;</span>, difftime(time(<span class="literal">NULL</span>), stStartTime), pstThrAction-&gt;uiTid);</span><br><span class="line">    sleep(pstThrAction-&gt;uiDuration);       <span class="comment">// 模拟写入操作（这期间要持有写锁）</span></span><br><span class="line">    sem_post(&amp;g_stRdFirstLock.stWrMutex);  <span class="comment">// post-W ⭐</span></span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;[%02.0lf 秒] 写者 #%d 写入结束 \n&quot;</span>, difftime(time(<span class="literal">NULL</span>), stStartTime), pstThrAction-&gt;uiTid);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span>* <span class="title function_">reader</span><span class="params">(<span class="type">void</span>* arg)</span> &#123;</span><br><span class="line">    THREAD_ACTION_S* pstThrAction = (THREAD_ACTION_S*)arg;</span><br><span class="line"></span><br><span class="line">    sleep(pstThrAction-&gt;uiDelay);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;[%02.0lf 秒] 读者 #%d 等待读取 \n&quot;</span>, difftime(time(<span class="literal">NULL</span>), stStartTime), pstThrAction-&gt;uiTid);</span><br><span class="line"></span><br><span class="line">    sem_wait(&amp;g_stRdFirstLock.stRdCntMutex);   <span class="comment">// wait-R-START ⭐</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="number">0</span> == g_stRdFirstLock.uiRdCnt) &#123;        <span class="comment">// 第一个读者</span></span><br><span class="line">        sem_wait(&amp;g_stRdFirstLock.stWrMutex);  <span class="comment">// wait-W ⭐</span></span><br><span class="line">    &#125;</span><br><span class="line">    g_stRdFirstLock.uiRdCnt++;  <span class="comment">// 拿读锁是为了修改共享的读计数变量、释放读锁是为了其它读者可以拿到</span></span><br><span class="line">    sem_post(&amp;g_stRdFirstLock.stRdCntMutex);  <span class="comment">// post-R-START ⭐</span></span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;[%02.0lf 秒] 读者 #%d 开始读取 \n&quot;</span>, difftime(time(<span class="literal">NULL</span>), stStartTime), pstThrAction-&gt;uiTid);</span><br><span class="line">    sleep(pstThrAction-&gt;uiDuration);  <span class="comment">// 模拟读取操作（这期间不用持有读锁、只需要有任一读者持有写锁即可）</span></span><br><span class="line"></span><br><span class="line">    sem_wait(&amp;g_stRdFirstLock.stRdCntMutex);  <span class="comment">// wait-R-END ⭐</span></span><br><span class="line">    g_stRdFirstLock.uiRdCnt--;  <span class="comment">// 拿读锁是为了修改共享的读计数变量、以及最后一个读者释放写锁</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="number">0</span> == g_stRdFirstLock.uiRdCnt) &#123;        <span class="comment">// 最后一个读者</span></span><br><span class="line">        sem_post(&amp;g_stRdFirstLock.stWrMutex);  <span class="comment">// post-W ⭐</span></span><br><span class="line">    &#125;</span><br><span class="line">    sem_post(&amp;g_stRdFirstLock.stRdCntMutex);  <span class="comment">// post-R-END ⭐</span></span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;[%02.0lf 秒] 读者 #%d 读取结束 \n&quot;</span>, difftime(time(<span class="literal">NULL</span>), stStartTime), pstThrAction-&gt;uiTid);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span>* argv[])</span> &#123;</span><br><span class="line">    <span class="type">pthread_t</span> thread[MAX_THREAD_NR];</span><br><span class="line">    THREAD_ACTION_S stThrAction[MAX_THREAD_NR];</span><br><span class="line">    THREAD_ACTION_S stArg;  <span class="comment">// 用于输入参数的存储</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> uiThrNr = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 读者优先锁结构初始化 ⭐ */</span></span><br><span class="line">    g_stRdFirstLock.uiRdCnt = <span class="number">0</span>;</span><br><span class="line">    sem_init(&amp;g_stRdFirstLock.stWrMutex, <span class="number">0</span>, <span class="number">1</span>);</span><br><span class="line">    sem_init(&amp;g_stRdFirstLock.stRdCntMutex, <span class="number">0</span>, <span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 从文件读取每个线程的数据 */</span></span><br><span class="line">    <span class="keyword">while</span> (<span class="number">4</span> == <span class="built_in">scanf</span>(<span class="string">&quot;%d %c %d %d&quot;</span>, &amp;stArg.uiTid, &amp;stArg.cRwType, &amp;stArg.uiDelay, &amp;stArg.uiDuration)) &#123;</span><br><span class="line">        stThrAction[uiThrNr].uiTid = stArg.uiTid;</span><br><span class="line">        stThrAction[uiThrNr].cRwType = stArg.cRwType;</span><br><span class="line">        stThrAction[uiThrNr].uiDelay = stArg.uiDelay;</span><br><span class="line">        stThrAction[uiThrNr].uiDuration = stArg.uiDuration;</span><br><span class="line">        uiThrNr++;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    stStartTime = time(<span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 创建线程，并根据动作类型，绑定线程函数 */</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; uiThrNr; i++) &#123;</span><br><span class="line">        pthread_create(&amp;thread[i], <span class="literal">NULL</span>, <span class="string">&#x27;R&#x27;</span> == stThrAction[i].cRwType ? reader : writer, (<span class="type">void</span>*)(&amp;stThrAction[i]));</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;[%02.0lf 秒] 创建线程 #%d\n&quot;</span>, difftime(time(<span class="literal">NULL</span>), stStartTime), stThrAction[i].uiTid);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 等待线程结束 */</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; uiThrNr; i++) &#123;</span><br><span class="line">        pthread_join(thread[i], <span class="literal">NULL</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 销毁信号量 */</span></span><br><span class="line">    sem_destroy(&amp;g_stRdFirstLock.stRdCntMutex);</span><br><span class="line">    sem_destroy(&amp;g_stRdFirstLock.stWrMutex);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="测试分析">测试分析</h2>
+<p>上述读者优先代码执行结果：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">[00 秒] 创建线程 #0</span><br><span class="line">[00 秒] 创建线程 #1</span><br><span class="line">[00 秒] 创建线程 #2</span><br><span class="line">[00 秒] 创建线程 #3</span><br><span class="line">[00 秒] 创建线程 #4</span><br><span class="line">[00 秒] 创建线程 #5</span><br><span class="line">[01 秒] 读者 #0 等待读取</span><br><span class="line">[01 秒] 读者 #0 开始读取</span><br><span class="line">[03 秒] 读者 #1 等待读取</span><br><span class="line">[03 秒] 读者 #1 开始读取</span><br><span class="line">[04 秒] 写者 #2 等待写入</span><br><span class="line">[05 秒] 读者 #3 等待读取</span><br><span class="line">[05 秒] 读者 #3 开始读取</span><br><span class="line">[06 秒] 读者 #4 等待读取</span><br><span class="line">[06 秒] 读者 #4 开始读取</span><br><span class="line">[06 秒] 读者 #0 读取结束</span><br><span class="line">[07 秒] 写者 #5 等待写入</span><br><span class="line">[07 秒] 读者 #3 读取结束</span><br><span class="line">[08 秒] 读者 #1 读取结束</span><br><span class="line">[11 秒] 读者 #4 读取结束</span><br><span class="line">[11 秒] 写者 #2 开始写入</span><br><span class="line">[16 秒] 写者 #2 写入结束</span><br><span class="line">[16 秒] 写者 #5 开始写入</span><br><span class="line">[19 秒] 写者 #5 写入结束</span><br></pre></td></tr></table></figure>
+<p><strong>分析</strong>：</p>
+<p>所有线程均在 0 秒时被创建，然后 <strong> 第一个尝试访问共享资源的是读者 #0</strong>，此时所有锁都是释放状态。读者 #0 顺利地拿到计数锁、<strong>写锁（禁止写入）</strong>，开始访问资源，并在第 6 秒结束。</p>
+<p>第 3 秒时，读者 #1 尝试访问共享资源，因为它是一个读者，且没有写者在访问共享资源。所以，读者 #1 顺利地开始访问资源，并在第 8 秒结束。</p>
+<p>第 4 秒时，写者 #2 尝试访问共享资源，但此时写锁被读者线程持有。所以，写者 #2 开始等待写锁被释放。</p>
+<p>第 5 秒时，读者 #3 尝试访问共享资源，因为它是一个读者，且没有写者在访问共享资源。所以，读者 #3 顺利地开始访问资源，并在第 7 秒结束。</p>
+<p>第 6 秒时，读者 #4 尝试访问共享资源，因为它是一个读者，且没有写者在访问共享资源。所以，读者 #4 顺利地开始访问资源，并在第 11 秒结束。<strong>此时刻，它是最后一个读者（前面没有读者正在访问者共享资源），它负责通知等待在写锁上的线程（恢复写者执行写操作）</strong>。</p>
+<p>第 7 秒时，写者 #5 尝试访问共享资源，但此时写锁被读者线程持有。所以，写者 #5 开始等待锁被释放。</p>
+<p>第 11 秒，<strong>由于读者 #4 作为最后一个读者，释放了写锁</strong>。因此，写者 #2 开始执行写操作，5 秒后写操作结束，写者 #5 继而开始执行写操作，直到结束。</p>
+<p><strong>结论</strong>：</p>
+<p>即使写者请求访问共享资源的时间靠前，但由于写者请求时有其它读者正在访问共享资源，并在其访问结束前来了新的读者请求。这时，后来的读者访问资源的时间比先来的写者早，这便是读者优先。</p>
+<h1 id="写者优先（非立即访问）管程实现">写者优先（非立即访问）管程实现</h1>
+<h2 id="模型分析 -v2">模型分析</h2>
+<p><strong>写者优先定义</strong>：只要有一个写者处于活跃状态，后来的写者都会被接纳（即使这些写者是在正在等待的读者之后到来的，也会优先让这些写者修改共享资源）。如果写者源源不断的出现，那么读者始终处于阻塞状态（可能会出现饿死）。</p>
+<p>例如有以下访问序列：</p>
+<ul>
+<li>到达时刻：读者 1 -&gt; 读者 2 -&gt; 写者 a -&gt; 读者 3 -&gt; 写者 b，且写者 b 到达时有写者正在访问共享资源。</li>
+<li>访问顺序：读者 1 -&gt; 读者 2 -&gt; 写者 a -&gt; 写者 b -&gt; 读者 3，即首个等待的写者要等正在访问的所有读者结束后才能访问（换句话说，首个等待的写者不能插队、立即访问，但也不会先让后来的读者先访问），但能在写者访问期间优先处理后续等待的写者、滞后读者。</li>
+</ul>
+<p>读者写者问题的写者优先可以 <strong> 抽象为两个方法</strong>：</p>
+<ul>
+<li>读者线程：等待没有写者 -&gt; 读取数据集 -&gt; 检查：唤醒等待的写者。</li>
+<li>写者线程：等待没有读者、写者 -&gt; 往数据集写入数据 -&gt; 检查：唤醒等待的读者或写者。</li>
+</ul>
+<p>具体的实现原理，可以参考 <a href="/posts/240205182643.html#%E7%AE%A1%E7%A8%8B%E6%96%B9%E5%BC%8F%E5%AE%9E%E7%8E%B0%E5%86%99%E8%80%85%E4%BC%98%E5%85%88"> 这篇文章</a>。</p>
+<h2 id="功能实现 -v2">功能实现</h2>
+<p>管程方式实现中的数据结构是 <code>WRITE_FIRST_LOCK_S</code>，并基于这个数据结构实现了多个方法：</p>
+<ul>
+<li><code>wrFirstLockInit()</code>：数据结构初始化；</li>
+<li><code>startRead()</code>：读取共享资源前的动作；</li>
+<li><code>doneRead()</code>：读取共享资源后的动作；</li>
+<li><code>startWrite()</code>：修改共享资源前的动作；</li>
+<li><code>doneWrite()</code>：修改共享资源后的动作；</li>
+<li><code>wrFirstLockDestroy()</code>：数据结构销毁。</li>
+</ul>
+<p>假设这些方法已经正确实现，那么：</p>
+<ul>
+<li>读者线程的一次执行过程就是：<code>startRead()</code> -&gt; 读取共享资源 -&gt; <code>doneRead()</code>。</li>
+<li>读者线程的一次执行过程就是：<code>startWrite()</code> -&gt; 修改共享资源 -&gt; <code>doneWrite()</code>。</li>
+</ul>
+<blockquote>
+<p>特别注意：假如现在前面已经有 100 个读者正在访问着共享资源，此时来了一个写者，接着又来了 10 个读者和 20 个写者。下面实现的代码效果是 <strong> 要等这 100 个读者访问结束后，这个写者才能访问（不能插队、立即访问）</strong>；当这个写者访问完后，先让后面那 20 个写者访问，再让那 10 个读者访问。</p>
+</blockquote>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;pthread.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;semaphore.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;time.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> MAX_THREAD_NR (100)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* 线程的动作信息：依次为线程标识、类型、动作前等待时间、动作持续时间 */</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">tagThreadAction</span> &#123;</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> uiTid;</span><br><span class="line">    <span class="type">char</span> cRwType;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> uiDelay;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> uiDuration;</span><br><span class="line">&#125; THREAD_ACTION_S;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> uiAr;  <span class="comment">// active reader count</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> uiAw;  <span class="comment">// active writer count</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> uiWr;  <span class="comment">// waiting reader count</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> uiWw;  <span class="comment">// waiting writer count</span></span><br><span class="line">    <span class="type">pthread_cond_t</span> stOkToRead;</span><br><span class="line">    <span class="type">pthread_cond_t</span> stOkToWrite;</span><br><span class="line">    <span class="type">pthread_mutex_t</span> stCntMutex;</span><br><span class="line">&#125; WRITE_FIRST_LOCK_S;  <span class="comment">// ⭐</span></span><br><span class="line"></span><br><span class="line">WRITE_FIRST_LOCK_S g_stWrFirstLock;  <span class="comment">// 多个线程共享的全局资源 ⭐</span></span><br><span class="line"></span><br><span class="line"><span class="type">time_t</span> stStartTime;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 写者优先锁结构初始化 */</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">wrFirstLockInit</span><span class="params">(<span class="type">void</span>)</span> &#123;</span><br><span class="line">    g_stWrFirstLock.uiAr = <span class="number">0</span>;</span><br><span class="line">    g_stWrFirstLock.uiAw = <span class="number">0</span>;</span><br><span class="line">    g_stWrFirstLock.uiWr = <span class="number">0</span>;</span><br><span class="line">    g_stWrFirstLock.uiWw = <span class="number">0</span>;</span><br><span class="line">    pthread_cond_init(&amp;g_stWrFirstLock.stOkToRead, <span class="literal">NULL</span>);</span><br><span class="line">    pthread_cond_init(&amp;g_stWrFirstLock.stOkToWrite, <span class="literal">NULL</span>);</span><br><span class="line">    pthread_mutex_init(&amp;g_stWrFirstLock.stCntMutex, <span class="literal">NULL</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 销毁条件变量和互斥锁 */</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">wrFirstLockDestroy</span><span class="params">(<span class="type">void</span>)</span> &#123;</span><br><span class="line">    pthread_cond_destroy(&amp;g_stWrFirstLock.stOkToRead);</span><br><span class="line">    pthread_cond_destroy(&amp;g_stWrFirstLock.stOkToWrite);</span><br><span class="line">    pthread_mutex_destroy(&amp;g_stWrFirstLock.stCntMutex);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 准备读：等待没有写者 */</span></span><br><span class="line"><span class="type">static</span> <span class="type">void</span> <span class="title function_">startRead</span><span class="params">(<span class="type">void</span>)</span> &#123;</span><br><span class="line">    WRITE_FIRST_LOCK_S* pstWrFirstLock = &amp;g_stWrFirstLock;</span><br><span class="line"></span><br><span class="line">    pthread_mutex_lock(&amp;pstWrFirstLock-&gt;stCntMutex);  <span class="comment">// 请求计数锁 ⭐</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 只要有写者（活跃 / 等待），读者就要等待 ⭐</span></span><br><span class="line">    <span class="keyword">while</span> (pstWrFirstLock-&gt;uiAw + pstWrFirstLock-&gt;uiWw &gt; <span class="number">0</span>) &#123;</span><br><span class="line">        pstWrFirstLock-&gt;uiWr++;</span><br><span class="line">        pthread_cond_wait(&amp;pstWrFirstLock-&gt;stOkToRead,</span><br><span class="line">                          &amp;pstWrFirstLock-&gt;stCntMutex);  <span class="comment">// 释放锁，并等待条件变量的唤醒 ⭐</span></span><br><span class="line">        <span class="comment">// 某一个等待的读者可以去读取共享资源了（阻塞结束，必定不会有写者），while 循环结束 ⭐</span></span><br><span class="line">        pstWrFirstLock-&gt;uiWr--;</span><br><span class="line">    &#125;</span><br><span class="line">    pstWrFirstLock-&gt;uiAr++;  <span class="comment">// 这个读者将是活跃状态 ⭐</span></span><br><span class="line"></span><br><span class="line">    pthread_mutex_unlock(&amp;pstWrFirstLock-&gt;stCntMutex);  <span class="comment">// 释放计数锁（以便其它读者可以一起读）⭐</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 读取结束：检查、（条件满足时）唤醒等待的写者 */</span></span><br><span class="line"><span class="type">static</span> <span class="type">void</span> <span class="title function_">doneRead</span><span class="params">(<span class="type">void</span>)</span> &#123;</span><br><span class="line">    WRITE_FIRST_LOCK_S* pstWrFirstLock = &amp;g_stWrFirstLock;</span><br><span class="line"></span><br><span class="line">    pthread_mutex_lock(&amp;pstWrFirstLock-&gt;stCntMutex);  <span class="comment">// 请求计数锁 ⭐</span></span><br><span class="line"></span><br><span class="line">    pstWrFirstLock-&gt;uiAr--;  <span class="comment">// 读完退出，活跃读者减一 ⭐</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="number">0</span> == pstWrFirstLock-&gt;uiAr &amp;&amp; pstWrFirstLock-&gt;uiWw &gt; <span class="number">0</span>) &#123;  <span class="comment">// 在没有活跃的读者时，才有可能唤醒写者 ⭐</span></span><br><span class="line">        pthread_cond_signal(&amp;pstWrFirstLock-&gt;stOkToWrite);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    pthread_mutex_unlock(&amp;pstWrFirstLock-&gt;stCntMutex);  <span class="comment">// 释放计数锁 ⭐</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 准备写：等待没有读者和写者 */</span></span><br><span class="line"><span class="type">static</span> <span class="type">void</span> <span class="title function_">startWrite</span><span class="params">(<span class="type">void</span>)</span> &#123;</span><br><span class="line">    WRITE_FIRST_LOCK_S* pstWrFirstLock = &amp;g_stWrFirstLock;</span><br><span class="line"></span><br><span class="line">    pthread_mutex_lock(&amp;pstWrFirstLock-&gt;stCntMutex);  <span class="comment">// 请求计数锁 ⭐</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 有活跃的写者或读者，新写者必须等待 ⭐</span></span><br><span class="line">    <span class="keyword">while</span> (pstWrFirstLock-&gt;uiAw + pstWrFirstLock-&gt;uiAr &gt; <span class="number">0</span>) &#123;</span><br><span class="line">        pstWrFirstLock-&gt;uiWw++;</span><br><span class="line">        pthread_cond_wait(&amp;pstWrFirstLock-&gt;stOkToWrite,</span><br><span class="line">                          &amp;pstWrFirstLock-&gt;stCntMutex);  <span class="comment">// 释放锁，并等待条件变量的唤醒 ⭐</span></span><br><span class="line">        pstWrFirstLock-&gt;uiWw--;  <span class="comment">// 新写者可以去修改共享资源了，while 循环结束 ⭐</span></span><br><span class="line">    &#125;</span><br><span class="line">    pstWrFirstLock-&gt;uiAw++;  <span class="comment">// 新写者将是活跃状态 ⭐</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 释放计数锁（不会出现后续写者也能写，因为上面的 while 将会出现 Aw&gt;0，新写者会被阻塞）⭐</span></span><br><span class="line">    pthread_mutex_unlock(&amp;pstWrFirstLock-&gt;stCntMutex);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 写结束：检查、（条件满足时）唤醒等待的写者（优先）或所有读者 */</span></span><br><span class="line"><span class="type">static</span> <span class="type">void</span> <span class="title function_">doneWrite</span><span class="params">(<span class="type">void</span>)</span> &#123;</span><br><span class="line">    WRITE_FIRST_LOCK_S* pstWrFirstLock = &amp;g_stWrFirstLock;</span><br><span class="line"></span><br><span class="line">    pthread_mutex_lock(&amp;pstWrFirstLock-&gt;stCntMutex);  <span class="comment">// 请求计数锁 ⭐</span></span><br><span class="line"></span><br><span class="line">    pstWrFirstLock-&gt;uiAw--;  <span class="comment">// 写完退出，活跃写者减一 ⭐</span></span><br><span class="line">    <span class="keyword">if</span> (pstWrFirstLock-&gt;uiWw &gt; <span class="number">0</span>) &#123;  <span class="comment">// 优先唤醒等待的写者，其次广播唤醒所有等待的读者 ⭐</span></span><br><span class="line">        pthread_cond_signal(&amp;pstWrFirstLock-&gt;stOkToWrite);</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (pstWrFirstLock-&gt;uiWr &gt; <span class="number">0</span>) &#123;</span><br><span class="line">        pthread_cond_broadcast(&amp;pstWrFirstLock-&gt;stOkToRead);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    pthread_mutex_unlock(&amp;pstWrFirstLock-&gt;stCntMutex);  <span class="comment">// 释放计数锁 ⭐</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span>* <span class="title function_">reader</span><span class="params">(<span class="type">void</span>* arg)</span> &#123;</span><br><span class="line">    THREAD_ACTION_S* pstThrAction = (THREAD_ACTION_S*)arg;</span><br><span class="line"></span><br><span class="line">    sleep(pstThrAction-&gt;uiDelay);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;[%02.0lf 秒] 读者 #%d 等待读取 \n&quot;</span>, difftime(time(<span class="literal">NULL</span>), stStartTime), pstThrAction-&gt;uiTid);</span><br><span class="line">    startRead();  <span class="comment">// ⭐</span></span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;[%02.0lf 秒] 读者 #%d 开始读取 \n&quot;</span>, difftime(time(<span class="literal">NULL</span>), stStartTime), pstThrAction-&gt;uiTid);</span><br><span class="line">    sleep(pstThrAction-&gt;uiDuration);  <span class="comment">// 模拟读取操作</span></span><br><span class="line"></span><br><span class="line">    doneRead();  <span class="comment">// ⭐</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;[%02.0lf 秒] 读者 #%d 读取结束 \n&quot;</span>, difftime(time(<span class="literal">NULL</span>), stStartTime), pstThrAction-&gt;uiTid);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span>* <span class="title function_">writer</span><span class="params">(<span class="type">void</span>* arg)</span> &#123;</span><br><span class="line">    THREAD_ACTION_S* pstThrAction = (THREAD_ACTION_S*)arg;</span><br><span class="line"></span><br><span class="line">    sleep(pstThrAction-&gt;uiDelay);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;[%02.0lf 秒] 写者 #%d 等待写入 \n&quot;</span>, difftime(time(<span class="literal">NULL</span>), stStartTime), pstThrAction-&gt;uiTid);</span><br><span class="line">    startWrite();  <span class="comment">// ⭐</span></span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;[%02.0lf 秒] 写者 #%d 开始写入 \n&quot;</span>, difftime(time(<span class="literal">NULL</span>), stStartTime), pstThrAction-&gt;uiTid);</span><br><span class="line">    sleep(pstThrAction-&gt;uiDuration);  <span class="comment">// 模拟写入操作</span></span><br><span class="line"></span><br><span class="line">    doneWrite();  <span class="comment">// ⭐</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;[%02.0lf 秒] 写者 #%d 写入结束 \n&quot;</span>, difftime(time(<span class="literal">NULL</span>), stStartTime), pstThrAction-&gt;uiTid);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span>* argv[])</span> &#123;</span><br><span class="line">    <span class="type">pthread_t</span> thread[MAX_THREAD_NR];</span><br><span class="line">    THREAD_ACTION_S stThrAction[MAX_THREAD_NR];</span><br><span class="line">    THREAD_ACTION_S stArg;  <span class="comment">// 用于输入参数的存储</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> uiThrNr = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    wrFirstLockInit();</span><br><span class="line">    <span class="comment">// 同上一个程序，省略...</span></span><br><span class="line">    wrFirstLockDestroy();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="测试分析 -v2">测试分析</h2>
+<p>还是使用上面的模拟数据，上述写者优先代码执行结果：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">[01 秒] 读者 #0 等待读取</span><br><span class="line">[01 秒] 读者 #0 开始读取</span><br><span class="line">[03 秒] 读者 #1 等待读取</span><br><span class="line">[03 秒] 读者 #1 开始读取</span><br><span class="line">[04 秒] 写者 #2 等待写入</span><br><span class="line">[05 秒] 读者 #3 等待读取</span><br><span class="line">[06 秒] 读者 #0 读取结束</span><br><span class="line">[06 秒] 读者 #4 等待读取</span><br><span class="line">[07 秒] 写者 #5 等待写入</span><br><span class="line">[08 秒] 读者 #1 读取结束</span><br><span class="line">[08 秒] 写者 #2 开始写入</span><br><span class="line">[13 秒] 写者 #2 写入结束</span><br><span class="line">[13 秒] 写者 #5 开始写入</span><br><span class="line">[16 秒] 写者 #5 写入结束</span><br><span class="line">[16 秒] 读者 #4 开始读取  // 因为广播唤醒，这里也可能是读者 #3 先读取</span><br><span class="line">[16 秒] 读者 #3 开始读取</span><br><span class="line">[18 秒] 读者 #3 读取结束</span><br><span class="line">[21 秒] 读者 #4 读取结束</span><br></pre></td></tr></table></figure>
+<p><strong>分析</strong>：</p>
+<p>所有线程均在 0 秒时被创建，然后 <strong> 第一个尝试访问共享资源的是读者 #0</strong>，此时所有锁都是释放状态。读者 #0 顺利地拿到计数锁，开始访问资源，并在第 6 秒结束。</p>
+<p>第 4 秒时，写者 #2 尝试访问共享资源，但此时 <strong> 有活跃的读者 #0, #1</strong>。所以，写者 #2 释放锁并等待条件变量的唤醒。</p>
+<p>第 5, 6 秒时，读者 #3, #4 尝试访问共享资源，因为 <strong> 有等待的写者 #2。所以，读者 #3, #4 也必须停下来等待</strong>。</p>
+<p>第 7 秒时，写者 #5 尝试访问共享资源，但此时 <strong> 有活跃的读者 #1</strong>。所以，写者 #5 释放锁并等待条件变量的唤醒。</p>
+<p>第 8 秒时，读者 #1 离开共享资源，并 <strong> 唤醒等待在写条件变量上的写者线程 </strong>。这时<strong> 按照写者优先 + FIFO 队列</strong>，依次是写者 #2, #5 访问共享资源。</p>
+<p>第 16 秒时，没有写者、但有多个等待的读者。此时，通过广播唤醒所有读者，但只有一把锁，谁先拿到谁先访问共享资源（但真正开始访问共享资源时，会释放锁——这时锁已经可以被其它读者线程持有了，所有第 16 秒时一前一后有两个读者线程开始访问共享资源）。</p>
+<p><strong>结论</strong>：</p>
+<p>即使读者（#3, #4）请求访问共享资源的时间靠前，但由于读者请求时有其它写者（#2）正在等待或访问共享资源，并在其访问结束前来了新的写者（#5）请求。这时，后来的写者（#5）访问资源的时间比先来的读者（#3, #4）早，<strong>这便是写者优先、但写者不能插队以求立即访问</strong>。</p>
+<blockquote>
+<p><strong>抛出一个问题</strong>？如何达到真正的写者优先——允许写者插队以立即访问？</p>
+<p>如果能 <strong> 保持最多一个（而不是多个）读者在同时 </strong> 访问共享资源，就能实现写者立即访问。这就需要加锁来约束读者只能一个、一个地访问共享资源。</p>
+</blockquote>
+<h1 id="写者优先（立即访问）管程实现">写者优先（立即访问）管程实现</h1>
+<p>保持最多一个（而不是多个）读者在同时访问共享资源，从而实现写者立即访问。</p>
+<h2 id="改造代码">改造代码</h2>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> uiAr, uiAw, uiWr, uiWw;</span><br><span class="line">    <span class="type">pthread_cond_t</span> stOkToRead, stOkToWrite;</span><br><span class="line">    <span class="type">pthread_mutex_t</span> stCntMutex;</span><br><span class="line">    <span class="type">sem_t</span> stHasReader;  <span class="comment">// 是否有读者正在访问共享资源 ⭐</span></span><br><span class="line">&#125; WRITE_FIRST_LOCK_S;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">wrFirstLockInit</span><span class="params">(<span class="type">void</span>)</span> &#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">    sem_init(&amp;g_stWrFirstLock.stHasReader, <span class="number">0</span>, <span class="number">1</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">wrFirstLockDestroy</span><span class="params">(<span class="type">void</span>)</span> &#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">    sem_destroy(&amp;g_stWrFirstLock.stHasReader);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">void</span> <span class="title function_">startRead</span><span class="params">(<span class="type">void</span>)</span> &#123;</span><br><span class="line">    WRITE_FIRST_LOCK_S* pstWrFirstLock = &amp;g_stWrFirstLock;</span><br><span class="line"></span><br><span class="line">    sem_wait(&amp;pstWrFirstLock-&gt;stHasReader);  <span class="comment">// 有读者正在访问则等待 ⭐</span></span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">void</span> <span class="title function_">doneRead</span><span class="params">(<span class="type">void</span>)</span> &#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">    sem_post(&amp;pstWrFirstLock-&gt;stHasReader);  <span class="comment">// 唤醒可能等待访问的读者 ⭐</span></span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这样，就约束了同一时间只有一个读者可以访问。其访问结束后，若有等待读者和写者，别管谁先来的，写者会先访问共享资源（即立即访问）。</p>
+<h2 id="测试分析 -v3">测试分析</h2>
+<p>还是使用上面的模拟数据，上述写者优先（立即访问）代码执行结果：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">[01 秒] 读者 #0 等待读取</span><br><span class="line">[01 秒] 读者 #0 开始读取</span><br><span class="line">[03 秒] 读者 #1 等待读取</span><br><span class="line">[04 秒] 写者 #2 等待写入</span><br><span class="line">[05 秒] 读者 #3 等待读取</span><br><span class="line">[06 秒] 读者 #4 等待读取</span><br><span class="line">[06 秒] 读者 #0 读取结束</span><br><span class="line">[06 秒] 写者 #2 开始写入</span><br><span class="line">[07 秒] 写者 #5 等待写入</span><br><span class="line">[11 秒] 写者 #2 写入结束</span><br><span class="line">[11 秒] 写者 #5 开始写入</span><br><span class="line">[14 秒] 写者 #5 写入结束</span><br><span class="line">[14 秒] 读者 #4 开始读取  // 因为广播唤醒，这里可能是读者 #4/#3/#1 先读取</span><br><span class="line">[19 秒] 读者 #4 读取结束</span><br><span class="line">[19 秒] 读者 #3 开始读取</span><br><span class="line">[21 秒] 读者 #3 读取结束</span><br><span class="line">[21 秒] 读者 #1 开始读取</span><br><span class="line">[26 秒] 读者 #1 读取结束</span><br></pre></td></tr></table></figure>
+<h1 id="读写公平管程实现">读写公平管程实现</h1>
+<h2 id="模型分析 -v3">模型分析</h2>
+<p><strong>读写公平定义 </strong>：读操作可以同时进行，多个读操作之间不会互相阻塞，<strong> 读、写操作按到达顺序访问共享资源</strong>。</p>
+<p>例如有以下访问序列：</p>
+<ul>
+<li>到达时刻：读者 1 -&gt; 读者 2 -&gt; 写者 a -&gt; 读者 3 -&gt; 写者 b -&gt; 写者 c -&gt; 读者 4</li>
+<li>访问顺序：读者 1 -&gt; 读者 2 -&gt; 写者 a -&gt; 读者 3 -&gt; 写者 b -&gt; 写者 c -&gt; 读者 4</li>
+</ul>
+<h2 id="代码实现">代码实现</h2>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> uiRdCount;</span><br><span class="line">    <span class="type">pthread_mutex_t</span> stCntMutex;</span><br><span class="line">    <span class="type">pthread_mutex_t</span> stOkToWrite;</span><br><span class="line">    <span class="type">sem_t</span> stWantVisit;  <span class="comment">// 访问者想访问共享资源</span></span><br><span class="line">&#125; RW_FAIR_LOCK_S; <span class="comment">// ⭐</span></span><br><span class="line"></span><br><span class="line">RW_FAIR_LOCK_S g_stRwFairLock;</span><br><span class="line"></span><br><span class="line"><span class="type">time_t</span> stStartTime;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">rwFairLockInit</span><span class="params">(<span class="type">void</span>)</span> &#123;</span><br><span class="line">    g_stRwFairLock.uiRdCount = <span class="number">0</span>;</span><br><span class="line">    pthread_mutex_init(&amp;g_stRwFairLock.stCntMutex, <span class="literal">NULL</span>);</span><br><span class="line">    pthread_mutex_init(&amp;g_stRwFairLock.stOkToWrite, <span class="literal">NULL</span>);</span><br><span class="line">    sem_init(&amp;g_stRwFairLock.stWantVisit, <span class="number">0</span>, <span class="number">1</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">rwFairLockDestroy</span><span class="params">(<span class="type">void</span>)</span> &#123;</span><br><span class="line">    pthread_mutex_destroy(&amp;g_stRwFairLock.stCntMutex);</span><br><span class="line">    pthread_mutex_destroy(&amp;g_stRwFairLock.stOkToWrite);</span><br><span class="line">    sem_destroy(&amp;g_stRwFairLock.stWantVisit);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">void</span> <span class="title function_">startRead</span><span class="params">(<span class="type">void</span>)</span> &#123;</span><br><span class="line">    RW_FAIR_LOCK_S* pstRwFairLock = &amp;g_stRwFairLock;</span><br><span class="line"></span><br><span class="line">    sem_wait(&amp;pstRwFairLock-&gt;stWantVisit);  <span class="comment">// 有访问者正在访问则等待 ⭐</span></span><br><span class="line">    pthread_mutex_lock(&amp;pstRwFairLock-&gt;stCntMutex);</span><br><span class="line">    <span class="keyword">if</span> (<span class="number">0</span> == pstRwFairLock-&gt;uiRdCount) &#123;</span><br><span class="line">        pthread_mutex_lock(&amp;pstRwFairLock-&gt;stOkToWrite);</span><br><span class="line">    &#125;</span><br><span class="line">    pstRwFairLock-&gt;uiRdCount++;</span><br><span class="line">    pthread_mutex_unlock(&amp;pstRwFairLock-&gt;stCntMutex);</span><br><span class="line">    sem_post(&amp;pstRwFairLock-&gt;stWantVisit);  <span class="comment">// 唤醒一个等待访问的访问者 ⭐</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">void</span> <span class="title function_">doneRead</span><span class="params">(<span class="type">void</span>)</span> &#123;</span><br><span class="line">    RW_FAIR_LOCK_S* pstRwFairLock = &amp;g_stRwFairLock;</span><br><span class="line"></span><br><span class="line">    pthread_mutex_lock(&amp;pstRwFairLock-&gt;stCntMutex);</span><br><span class="line">    pstRwFairLock-&gt;uiRdCount--;</span><br><span class="line">    <span class="keyword">if</span> (<span class="number">0</span> == pstRwFairLock-&gt;uiRdCount) &#123;</span><br><span class="line">        pthread_mutex_unlock(&amp;pstRwFairLock-&gt;stOkToWrite);</span><br><span class="line">    &#125;</span><br><span class="line">    pthread_mutex_unlock(&amp;pstRwFairLock-&gt;stCntMutex);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">void</span> <span class="title function_">startWrite</span><span class="params">(<span class="type">void</span>)</span> &#123;</span><br><span class="line">    RW_FAIR_LOCK_S* pstRwFairLock = &amp;g_stRwFairLock;</span><br><span class="line"></span><br><span class="line">    sem_wait(&amp;pstRwFairLock-&gt;stWantVisit);  <span class="comment">// 先表明访问想法，从而阻塞后续的读者 ⭐</span></span><br><span class="line">    pthread_mutex_lock(&amp;pstRwFairLock-&gt;stOkToWrite);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">void</span> <span class="title function_">doneWrite</span><span class="params">(<span class="type">void</span>)</span> &#123;</span><br><span class="line">    RW_FAIR_LOCK_S* pstRwFairLock = &amp;g_stRwFairLock;</span><br><span class="line"></span><br><span class="line">    pthread_mutex_unlock(&amp;pstRwFairLock-&gt;stOkToWrite);</span><br><span class="line">    sem_post(&amp;pstRwFairLock-&gt;stWantVisit);  <span class="comment">// 唤醒一个等待访问的访问者 ⭐</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="测试分析 -v4">测试分析</h2>
+<p>还是使用上面的模拟数据，上述读写公平代码执行结果：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">[01 秒] 读者 #0 等待读取</span><br><span class="line">[01 秒] 读者 #0 开始读取</span><br><span class="line">[03 秒] 读者 #1 等待读取</span><br><span class="line">[03 秒] 读者 #1 开始读取</span><br><span class="line">[04 秒] 写者 #2 等待写入</span><br><span class="line">[05 秒] 读者 #3 等待读取</span><br><span class="line">[06 秒] 读者 #0 读取结束</span><br><span class="line">[06 秒] 读者 #4 等待读取</span><br><span class="line">[07 秒] 写者 #5 等待写入</span><br><span class="line">[08 秒] 读者 #1 读取结束</span><br><span class="line">[08 秒] 写者 #2 开始写入</span><br><span class="line">[13 秒] 写者 #2 写入结束</span><br><span class="line">[13 秒] 读者 #3 开始读取  // 按 FIFO 顺序访问</span><br><span class="line">[13 秒] 读者 #4 开始读取</span><br><span class="line">[15 秒] 读者 #3 读取结束</span><br><span class="line">[18 秒] 读者 #4 读取结束</span><br><span class="line">[18 秒] 写者 #5 开始写入</span><br><span class="line">[21 秒] 写者 #5 写入结束</span><br></pre></td></tr></table></figure>
+<h1 id="读者写者实现比较">读者写者实现比较</h1>
+<table>
+<thead>
+<tr>
+<th>读者优先</th>
+<th>写者优先（不可插队）</th>
+<th>写者优先（立即访问）</th>
+<th>读写公平</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>[01 秒] 读者 #0 等待读取</td>
+<td>[01 秒] 读者 #0 等待读取</td>
+<td>[01 秒] 读者 #0 等待读取</td>
+<td>[01 秒] 读者 #0 等待读取</td>
+</tr>
+<tr>
+<td>[01 秒] 读者 #0 开始读取</td>
+<td>[01 秒] 读者 #0 开始读取</td>
+<td>[01 秒] 读者 #0 开始读取</td>
+<td>[01 秒] 读者 #0 开始读取</td>
+</tr>
+<tr>
+<td>[03 秒] 读者 #1 等待读取</td>
+<td>[03 秒] 读者 #1 等待读取</td>
+<td>[03 秒] 读者 #1 等待读取</td>
+<td>[03 秒] 读者 #1 等待读取</td>
+</tr>
+<tr>
+<td>[03 秒] 读者 #1 开始读取</td>
+<td>[03 秒] 读者 #1 开始读取</td>
+<td>[04 秒] 写者 #2 等待写入</td>
+<td>[03 秒] 读者 #1 开始读取</td>
+</tr>
+<tr>
+<td>[04 秒] 写者 #2 等待写入</td>
+<td>[04 秒] 写者 #2 等待写入</td>
+<td>[05 秒] 读者 #3 等待读取</td>
+<td>[04 秒] 写者 #2 等待写入</td>
+</tr>
+<tr>
+<td>[05 秒] 读者 #3 等待读取</td>
+<td>[05 秒] 读者 #3 等待读取</td>
+<td>[06 秒] 读者 #4 等待读取</td>
+<td>[05 秒] 读者 #3 等待读取</td>
+</tr>
+<tr>
+<td>[05 秒] 读者 #3 开始读取</td>
+<td>[06 秒] 读者 #0 读取结束</td>
+<td>[06 秒] 读者 #0 读取结束</td>
+<td>[06 秒] 读者 #0 读取结束</td>
+</tr>
+<tr>
+<td>[06 秒] 读者 #4 等待读取</td>
+<td>[06 秒] 读者 #4 等待读取</td>
+<td>[06 秒] 写者 #2 开始写入</td>
+<td>[06 秒] 读者 #4 等待读取</td>
+</tr>
+<tr>
+<td>[06 秒] 读者 #4 开始读取</td>
+<td>[07 秒] 写者 #5 等待写入</td>
+<td>[07 秒] 写者 #5 等待写入</td>
+<td>[07 秒] 写者 #5 等待写入</td>
+</tr>
+<tr>
+<td>[06 秒] 读者 #0 读取结束</td>
+<td>[08 秒] 读者 #1 读取结束</td>
+<td>[11 秒] 写者 #2 写入结束</td>
+<td>[08 秒] 读者 #1 读取结束</td>
+</tr>
+<tr>
+<td>[07 秒] 写者 #5 等待写入</td>
+<td>[08 秒] 写者 #2 开始写入</td>
+<td>[11 秒] 写者 #5 开始写入</td>
+<td>[08 秒] 写者 #2 开始写入</td>
+</tr>
+<tr>
+<td>[07 秒] 读者 #3 读取结束</td>
+<td>[13 秒] 写者 #2 写入结束</td>
+<td>[14 秒] 写者 #5 写入结束</td>
+<td>[13 秒] 写者 #2 写入结束</td>
+</tr>
+<tr>
+<td>[08 秒] 读者 #1 读取结束</td>
+<td>[13 秒] 写者 #5 开始写入</td>
+<td>[14 秒] 读者 #4 开始读取</td>
+<td>[13 秒] 读者 #3 开始读取</td>
+</tr>
+<tr>
+<td>[11 秒] 读者 #4 读取结束</td>
+<td>[16 秒] 写者 #5 写入结束</td>
+<td>[19 秒] 读者 #4 读取结束</td>
+<td>[13 秒] 读者 #4 开始读取</td>
+</tr>
+<tr>
+<td>[11 秒] 写者 #2 开始写入</td>
+<td>[16 秒] 读者 #4 开始读取</td>
+<td>[19 秒] 读者 #3 开始读取</td>
+<td>[15 秒] 读者 #3 读取结束</td>
+</tr>
+<tr>
+<td>[16 秒] 写者 #2 写入结束</td>
+<td>[16 秒] 读者 #3 开始读取</td>
+<td>[21 秒] 读者 #3 读取结束</td>
+<td>[18 秒] 读者 #4 读取结束</td>
+</tr>
+<tr>
+<td>[16 秒] 写者 #5 开始写入</td>
+<td>[18 秒] 读者 #3 读取结束</td>
+<td>[21 秒] 读者 #1 开始读取</td>
+<td>[18 秒] 写者 #5 开始写入</td>
+</tr>
+<tr>
+<td>[19 秒] 写者 #5 写入结束</td>
+<td>[21 秒] 读者 #4 读取结束</td>
+<td>[26 秒] 读者 #1 读取结束</td>
+<td>[21 秒] 写者 #5 写入结束</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+
+
+  <div class="book-comments">
+    
+
+
+
+
+  </div>
+
+
+
+<script src="/js/book-post.js"></script>
+
+
+            </div>
+          </div>
+          <div class="column col-2 hide-lg">
+            <div class="book-post-info">
+  
+    <div class="book-post-meta">
+
+  <div class="author">
+
+    <!-- Author image -->
+    <div class="author-img">
+      
+        <figure
+          class="avatar avatar-lg"
+          data-initial="A"
+          style="background-color: #3b4351;">
+        </figure>
+      
+    </div>
+
+    <!-- Author title -->
+    <div class="author-title">
+      <div>aha</div>
+      <div>2024-03-19</div>
+    </div>
+  </div>
+
+  
+    <div class="divider"></div>
+
+    <div class="link">
+      <a class="category-link" href="/categories/%E5%A4%9A%E7%BA%BF%E7%A8%8B%E7%BC%96%E7%A8%8B/">多线程编程</a>
+
+      <a class="tag-none-link" href="/tags/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B/" rel="tag">#并发编程</a> <a class="tag-none-link" href="/tags/%E8%AF%BB%E8%80%85%E5%86%99%E8%80%85%E9%97%AE%E9%A2%98/" rel="tag">#读者写者问题</a>
+    </div>
+    
+  
+
+  <div class="divider"></div>
+</div>
+  
+
+  <div class="book-tocbot">
+</div>
+<div class="book-tocbot-menu">
+  <a class="book-toc-expand" onclick="expand_toc()">Expand all</a>
+  <a onclick="go_top()">Back to top</a>
+  <a onclick="go_bottom()">Go to bottom</a>
+  <a onclick="toggleSearch()">Search in blogs</a> <!-- 添加搜索文字的点击事件 -->
+</div>
+
+<div id="search-overlay" class="search-overlay" style="display: none;"> <!-- 初始状态为隐藏 -->
+  <div class="search-box">
+    <input type="text" id="search-input" placeholder="Search in all blogs...">
+    <button onclick="closeSearch()">Close</button> <!-- 添加关闭按钮 -->
+    <div id="search-results" class="search-results"></div>
+  </div>
+</div>
+
+<script>
+  function performSearch(query) {
+    if (!query.trim()) {
+      return;
+    }
+
+    fetch('/search.xml')
+      .then(response => response.text())
+      .then(data => {
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(data, "text/xml");
+        const entries = xmlDoc.getElementsByTagName('entry');
+        let results = '';
+
+        for (let i = 0; i < entries.length; i++) {
+          const title = entries[i].getElementsByTagName('title')[0].textContent;
+          const content = entries[i].getElementsByTagName('content')[0].textContent;
+          const url = entries[i].getElementsByTagName('url')[0].textContent;
+
+          let count = (title.match(new RegExp(query, "gi")) || []).length; // 统计查询词出现的次数
+          count += (content.match(new RegExp(query, "gi")) || []).length;
+
+          if (count > 0) { // title.includes(query) || content.includes(query)
+            results += `
+              <div class="search-result-item">
+                <a href="${url}">${title}</a> (${count})
+              </div>`;
+          }
+        }
+
+        const searchResultsElement = document.getElementById('search-results');
+        searchResultsElement.innerHTML = results;
+        searchResultsElement.classList.add('active');
+      });
+  }
+
+  function toggleSearch() {
+    const searchOverlay = document.getElementById('search-overlay');
+    searchOverlay.style.display = searchOverlay.style.display === 'none' ? 'flex' : 'none';
+  }
+
+  function closeSearch() {
+    document.getElementById('search-overlay').style.display = 'none';
+  }
+
+  document.getElementById('search-input').addEventListener('input', function() {
+    const query = this.value;
+    performSearch(query);
+  });
+</script>
+
+<style>
+  .search-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  .search-box {
+    background: white;
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+    width: 80%;
+    max-width: 500px;
+  }
+
+  .search-results {
+    margin-top: 10px;
+    max-height: 300px;
+    overflow-y: auto;
+    background: white;
+    padding: 10px;
+    border-radius: 5px;
+    width: 100%;
+  }
+
+  .search-result-item {
+    margin: 10px 0;
+  }
+
+  .search-result-item a {
+    color: blue; /* 设置链接颜色为蓝色 */
+    text-decoration: none;
+  }
+
+  .search-result-item a:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+<script src="/js/book-toc.js"></script>
+
+
+</div>
+          </div>
+        </div>
+      </div>
+
+      <a class="off-canvas-overlay" onclick="hide_canvas()"></a>
+
+      <button class="floating-button" onclick="toggleDropdownMenu()"></button>
+
+      <div class="dropdown-menu">
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FFFFFF', '#000000')">银河白</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#C7EDCC', '#000000')">豆沙绿</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FAF9DE', '#000000')">杏仁黄</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#E3EDCD', '#000000')">青草绿</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FFF2E2', '#000000')">秋叶褐</div>
+      </div>
+  </div>
+
+  <script>
+    function toggleDropdownMenu() {
+      document.querySelector('.floating-button').classList.toggle('active');
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      var storedBackgroundColor = localStorage.getItem('blogBackgroundColor');
+      var storedColor = localStorage.getItem('blogColor');
+
+      if (storedBackgroundColor && storedColor) {
+        document.body.style.backgroundColor = storedBackgroundColor;
+        document.body.style.color = storedColor;
+      }
+    });
+
+    function changeBackgroundColor(backgroundColor, color) {
+      document.body.style.backgroundColor = backgroundColor;
+      document.body.style.color = color;
+
+      localStorage.setItem('blogBackgroundColor', backgroundColor);
+      localStorage.setItem('blogColor', color);
+
+      document.querySelector('.floating-button').classList.remove('active');
+    }
+  </script>
+</body>
+
+</html>
+
+
+<script src="/js/book.js"></script>

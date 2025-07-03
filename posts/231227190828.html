@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
+
+    
+      <link rel="icon" href="/favicon.png" />
+    
+
+    <title>
+        
+          数据结构算法之哈希表实现 - aha&#39;s book
+        
+    </title>
+
+    <!-- Spectre.css framework -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre-exp.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre-icons.min.css">
+
+    <!-- theme css & js -->
+    
+<link rel="stylesheet" href="/css/book.css">
+
+    
+<script src="/js/book.js"></script>
+
+
+    <!-- tocbot -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.css">
+    
+    <!-- katex -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/zooming/2.1.1/zooming.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const zooming = new Zooming()
+    zooming.listen('.book-content img')
+})
+</script>
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+    <style>
+      body {
+        background-color: #FFFFFF;
+        /* color: #000000; */
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+
+      /* Floating Button Styles */
+      .floating-button {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 999;
+        background-color: #000000;
+        color: #ffffff;
+        padding: 12px;
+        border-radius: 50%;
+        cursor: pointer;
+        border: 2px solid #000000;
+      }
+
+      .floating-button:hover {
+        background-color: #FFFFFF;
+      }
+
+      /* Dropdown Menu Styles */
+      .dropdown-menu {
+        position: fixed;
+        bottom: 60px;
+        right: 10px;
+        display: none;
+        min-width: 60px;
+        padding: 2px;
+        background-color: #fff;
+        /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
+        z-index: 1000;
+      }
+
+      .floating-button.active+.dropdown-menu {
+        display: block;
+      }
+
+      .dropdown-item {
+        display: block;
+        padding: 8px 16px;
+        cursor: pointer;
+      }
+
+      .dropdown-item:hover {
+        background-color: #f5f5f5;
+      }
+    </style>
+<style>.darkmode--activated{--body-bg-color:#282828;--content-bg-color:#333;--card-bg-color:#555;--text-color:#ccc;--blockquote-color:#bbb;--link-color:#ccc;--link-hover-color:#eee;--brand-color:#ddd;--brand-hover-color:#ddd;--table-row-odd-bg-color:#282828;--table-row-hover-bg-color:#363636;--menu-item-bg-color:#555;--btn-default-bg:#222;--btn-default-color:#ccc;--btn-default-border-color:#555;--btn-default-hover-bg:#666;--btn-default-hover-color:#ccc;--btn-default-hover-border-color:#666;--highlight-background:#282b2e;--highlight-foreground:#a9b7c6;--highlight-gutter-background:#34393d;--highlight-gutter-foreground:#9ca9b6}.darkmode--activated img{opacity:.75}.darkmode--activated img:hover{opacity:.9}.darkmode--activated code{color:#69dbdc;background:0 0}button.darkmode-toggle{z-index:9999}.darkmode-ignore,img{display:flex!important}.beian img{display:inline-block!important}</style></head>
+
+<body>
+  <div class="book-container">
+    <div class="book-sidebar">
+      <div class="book-brand">
+  <a href="/">
+    <img src="/favicon.png">
+    <span>AHA&#39;S BOOK</span>
+  </a>
+</div>
+        <div id="menu" class="book-menu hide">
+  <h2 id="基础知识"> 基础知识 </h2>
+<ul>
+<li><a href="/posts/231010144856.html"> 模运算 </a></li>
+<li><a href="/posts/231014105311.html"> 异或运算 </a></li>
+<li><a href="/posts/231210181853.html"> 计算机中的寄存器 </a></li>
+<li><a href="/posts/231213183051.html"> 正则表达式基础 </a></li>
+</ul>
+<h2 id="C 语言">C 语言 </h2>
+<ul>
+<li><a href="/posts/230916171929.html">main 函数参数 </a></li>
+<li><a href="/posts/231214192113.html"> 关键字与专有名词 </a></li>
+<li><a href="/posts/240103180653.html"> 输出打印函数 </a></li>
+<li><a href="/posts/230922143003.html"> 多维数组 </a></li>
+<li><a href="/posts/230913200729.html">const 关键字 </a></li>
+<li><a href="/posts/230918174223.html">typedef 类型基础 </a></li>
+<li><a href="/posts/230920172849.html">typedef 类型实践 </a></li>
+<li><a href="/posts/240224193217.html"> 二级指针 </a></li>
+<li><a href="/posts/240307195203.html"> 代码 TOP-K 问题 </a></li>
+<li><a href="/posts/230922172626.html">uthash 哈希表基础 </a></li>
+<li><a href="/posts/230918114841.html"> 大小端知识 </a></li>
+</ul>
+<h2 id="Golang 语言">Golang 语言 </h2>
+<ul>
+<li><a href="/posts/230907162612.html"> 变量与常量 </a></li>
+<li><a href="/posts/230909120145.html"> 函数 &amp; 包 &amp; 判断 &amp; 循环 </a></li>
+<li><a href="/posts/230912152800.html"> 数组与切片 </a></li>
+<li><a href="/posts/230913161326.html"> 可变参数函数与 Map 集合 </a></li>
+<li><a href="/posts/230915155105.html"> 字符串和指针 </a></li>
+</ul>
+<h2 id="数据结构"> 数据结构 </h2>
+<ul>
+<li><a href="/posts/231007174854.html"> 链表（数组实现）</a></li>
+<li><a href="/posts/231008213450.html"> 链表（链式实现）</a></li>
+<li><a href="/posts/231016161508.html"> 堆栈（数组实现）</a></li>
+<li><a href="/posts/231016184406.html"> 堆栈（链表实现）</a></li>
+<li><a href="/posts/231127185207.html"> 单调栈 </a></li>
+<li><a href="/posts/231017105123.html"> 队列（链表实现）</a></li>
+<li><a href="/posts/231017154121.html"> 双端队列（链表实现）</a></li>
+<li><a href="/posts/231018102559.html"> 堆基础与堆结构（数组实现）</a></li>
+<li><a href="/posts/231019102311.html"> 优先队列（堆实现）</a></li>
+<li><a href="/posts/230905224335.html"> 二叉树的遍历 </a></li>
+<li><a href="/posts/231020174358.html"> 二叉搜索树 </a></li>
+<li><a href="/posts/230916094606.html"> 拓扑排序 </a></li>
+<li><a href="/posts/230925185057.html">Trie 字典树 </a></li>
+<li><a href="/posts/231023164532.html"> 并查集（数组实现）</a></li>
+<li><a href="/posts/240702200642.html">Linux 数据结构之队列 </a></li>
+</ul>
+<h2 id="数据结构算法"> 数据结构算法 </h2>
+<ul>
+<li><a href="/posts/231218181635.html"> 归并排序 </a></li>
+<li><a href="/posts/231108163339.html"> 快速排序 </a></li>
+<li><a href="/posts/231107171607.html"> 堆排序 </a></li>
+<li><a href="/posts/231124181658.html"> 二分查找 </a></li>
+<li><a href="/posts/231227190828.html"> 哈希表实现 </a></li>
+<li><a href="/posts/240313193201.html"> 字符串哈希函数 </a></li>
+<li><a href="/posts/231116150205.html">Floyd 多源最短路径 </a></li>
+<li><a href="/posts/231117095232.html">Dijkstra 单源最短路径（原理部分）</a></li>
+<li><a href="/posts/231121152713.html">Dijkstra 单源最短路径（实现部分）</a></li>
+</ul>
+<h2 id="数据库"> 数据库 </h2>
+<ul>
+<li><a href="/posts/250605180332.html">MySQL 基础 </a></li>
+</ul>
+<h2 id="计算机网络"> 计算机网络 </h2>
+<ul>
+<li><a href="/posts/231011192359.html">OSI 参考模型 </a></li>
+<li><a href="/posts/240329202000.html"> 计网 CyC2018 之概述 </a></li>
+<li><a href="/posts/240329202004.html"> 计网 CyC2018 之链路层 </a></li>
+<li><a href="/posts/240329202003.html"> 计网 CyC2018 之网络层 </a></li>
+<li><a href="/posts/240329202002.html"> 计网 CyC2018 之传输层 </a></li>
+<li><a href="/posts/240329202001.html"> 计网 CyC2018 之应用层 </a></li>
+<li><a href="/posts/240306203742.html">ACL 访问控制列表 </a></li>
+<li><a href="/posts/240130190208.html"> 路由表、转发表与快速转发工作原理 </a></li>
+<li><a href="/posts/231221200716.html">VXLAN 网络虚拟化技术 </a></li>
+<li><a href="/posts/240903191243.html">TCP/IP checksum 计算 </a></li>
+<li><a href="/posts/240911185603.html"> 抓包分析 TCP 三次握手与四次挥手过程 </a></li>
+</ul>
+<h2 id="操作系统"> 操作系统 </h2>
+<ul>
+<li><a href="/posts/230921190726.html"> 概述 </a></li>
+<li><a href="/posts/230924172528.html"> 中断 &amp; 异常 &amp; 系统调用 </a></li>
+<li><a href="/posts/231017195157.html"> 内存分层体系与地址空间生成 </a></li>
+<li><a href="/posts/231108195351.html"> 连续内存分配 </a></li>
+<li><a href="/posts/231111172507.html"> 非连续内存分配之分段与分页 </a></li>
+<li><a href="/posts/231119170537.html"> 非连续内存分配之页表 </a></li>
+<li><a href="/posts/231123184526.html"> 内存管理之覆盖技术与交换技术 </a></li>
+<li><a href="/posts/231127193658.html"> 内存管理之虚存技术 </a></li>
+<li><a href="/posts/231129182631.html"> 局部页面置换算法 </a></li>
+<li><a href="/posts/231207184239.html"> 全局页面置换算法 </a></li>
+<li><a href="/posts/231207204958.html"> 进程描述 </a></li>
+<li><a href="/posts/231210211306.html"> 进程状态 </a></li>
+<li><a href="/posts/231215213932.html"> 线程 </a></li>
+<li><a href="/posts/231218220813.html"> 进程控制 </a></li>
+<li><a href="/posts/231228193143.html"> 调度 </a></li>
+<li><a href="/posts/240104202828.html"> 同步与互斥 </a></li>
+<li><a href="/posts/240113115605.html"> 信号量与管程 </a></li>
+<li><a href="/posts/240205182643.html"> 经典同步问题 </a></li>
+<li><a href="/posts/240310162231.html"> 死锁 </a></li>
+</ul>
+<h2 id="系统与网络编程"> 系统与网络编程 </h2>
+<ul>
+<li><a href="/posts/230911151334.html">pthread 库 </a></li>
+<li><a href="/posts/230921094127.html"> 锁与原子操作 </a></li>
+<li><a href="/posts/240319195609.html"> 读者写者问题 </a></li>
+<li><a href="/posts/240527200241.html"> 网络编程卷一阅读随笔 </a></li>
+<li><a href="/posts/240414190410.html"> 进程间通信 IPC 机制 </a></li>
+<li><a href="/posts/240424200123.html"> 多进程相关练习 </a></li>
+<li><a href="/posts/240516221527.html">I/O 模式与 I/O 多路复用 </a></li>
+<li><a href="/posts/240626192803.html">Linux 内核 kfifo 环形队列 </a></li>
+<li><a href="/posts/241009203126.html">Linux 内核等待队列 </a></li>
+<li><a href="/posts/240627210637.html">DPDK 无锁环形队列 </a></li>
+<li><a href="/posts/240919200410.html"> 解密内存屏障 </a></li>
+<li><a href="/posts/240927202500.html"> 内核线程的创建 </a></li>
+<li><a href="/posts/241015195205.html">Linux 网络数据包接收过程 </a></li>
+<li><a href="/posts/2410232111015.html"> 源码解读 epoll 实现原理 </a></li>
+<li><a href="/posts/241106182619.html">Linux 文件系统 </a></li>
+<li><a href="/posts/250619154429.html">Libevent 高性能 IO 事件驱动库 </a></li>
+</ul>
+<h2 id="工具与命令"> 工具与命令 </h2>
+<ul>
+<li><a href="/posts/240207180410.html">GCC 编译过程分解 </a></li>
+<li><a href="/posts/240312184132.html">GDB 调试入门 </a></li>
+<li><a href="/posts/240512184921.html">Makefile 学习 </a></li>
+<li><a href="/posts/250629214430.html">CMake 学习 </a></li>
+<li><a href="/posts/240417193754.html">Linux 命令之文件权限 </a></li>
+</ul>
+<h2 id="开源项目"> 开源项目 </h2>
+<ul>
+<li><a href="/posts/240303201855.html"> 线程池原理与实现 </a></li>
+<li><a href="/posts/240507194549.html">HTTP 服务器实现 </a></li>
+<li><a href="/posts/240904203605.html"> 聊天服务器实现 </a></li>
+<li><a href="/posts/241119182636.html">Linux 文件系统 </a></li>
+</ul>
+<h2 id="Docker">Docker</h2>
+<ul>
+<li><a href="/posts/230909171809.html">Docker 学习笔记 </a></li>
+</ul>
+<h1 id="LeetCode 刷题">LeetCode 刷题 </h1>
+<h2 id="链表相关"> 链表相关 </h2>
+<ul>
+<li><a href="/posts/231025143947.html">160 相交链表 </a></li>
+<li><a href="/posts/231025185947.html">206 反转链表 </a></li>
+<li><a href="/posts/231026101239.html">21 合并两个有序链表 </a></li>
+<li><a href="/posts/231026184514.html">83 删除排序链表中的重复元素 </a></li>
+<li><a href="/posts/231027150243.html">19 删除链表的倒数第 N 个节点 </a></li>
+<li><a href="/posts/231031120718.html">2 两数相加 </a></li>
+<li><a href="/posts/231031163133.html">445 两数相加 II</a></li>
+<li><a href="/posts/231101094219.html">234 回文链表 </a></li>
+<li><a href="/posts/231101135228.html">725 分隔链表 </a></li>
+<li><a href="/posts/231102120708.html">328 奇偶链表 </a></li>
+<li><a href="/posts/231102165703.html">142 环形链表 II</a></li>
+</ul>
+<h2 id="设计"> 设计 </h2>
+<ul>
+<li><a href="/posts/231201184542.html">146 LRU 缓存 </a></li>
+</ul>
+<h2 id="贪心算法"> 贪心算法 </h2>
+<ul>
+<li><a href="/posts/231107094652.html">1029 两地调度 </a></li>
+<li><a href="/posts/231109150855.html">435 无重叠区间 </a></li>
+</ul>
+<h2 id="哈希表"> 哈希表 </h2>
+<ul>
+<li><a href="/posts/231123181539.html">1410 实体解析器 </a></li>
+</ul>
+<h2 id="树的遍历"> 树的遍历 </h2>
+<ul>
+<li><a href="/posts/231103121209.html">117 填充每个节点的下一个右侧节点指针 II</a></li>
+</ul>
+<h2 id="深度优先搜索（递归）"> 深度优先搜索（递归）</h2>
+<ul>
+<li><a href="/posts/231206201243.html">2477 达到首都的最少油耗 </a></li>
+</ul>
+<h2 id="图或路径问题"> 图或路径问题 </h2>
+<ul>
+<li><a href="/posts/231211184652.html">1631 最小体力消耗路径 </a></li>
+</ul>
+<h2 id="其它"> 其它 </h2>
+<ul>
+<li><a href="/posts/230101120000.html"> 备忘录 </a></li>
+</ul>
+
+</div>
+
+
+<script src="/js/book-menu.js"></script>
+
+    </div>
+    <div class="sidebar-toggle" onclick="sidebar_toggle()" onmouseover="add_inner()" onmouseleave="remove_inner()">
+  <div class="sidebar-toggle-inner"></div>
+</div>
+
+<script>
+function add_inner() {
+  let inner = document.querySelector('.sidebar-toggle-inner')
+  inner.classList.add('show')  
+}
+
+function remove_inner() {
+  let inner = document.querySelector('.sidebar-toggle-inner')
+  inner.classList.remove('show')
+}
+
+function sidebar_toggle() {
+    let sidebar_toggle = document.querySelector('.sidebar-toggle')
+    let sidebar = document.querySelector('.book-sidebar')
+    let content = document.querySelector('.off-canvas-content')
+    if (sidebar_toggle.classList.contains('extend')) { // show
+        sidebar_toggle.classList.remove('extend')
+        sidebar.classList.remove('hide')
+        content.classList.remove('extend')
+    }
+    else { // hide
+        sidebar_toggle.classList.add('extend')
+        sidebar.classList.add('hide')
+        content.classList.add('extend')
+    }
+}
+</script>
+
+      <div class="off-canvas-content">
+        <div class="columns">
+          <div class="column col-10 col-lg-12">
+            <div class="book-navbar">
+              <!-- For Responsive Layout -->
+
+<header class="navbar">
+  <section class="navbar-section">
+    <a onclick="open_sidebar()">
+      <i class="icon icon-menu"></i>
+    </a>
+  </section>
+</header>
+
+            </div>
+            <div class="book-content">
+              <div class="book-post">
+  <p>本文实现一个简单的哈希表（散列表），包括常见的初始化创建表、查询操作、添加键值对、删除键值对和销毁哈希表等操作。在本次实现中，哈希桶使用双向链表数据结构。</p>
+<span id="more"></span>
+<h1 id="哈希表实现">哈希表实现</h1>
+<p>首先，先抛出本次实现的哈希表的数据结构关系图，其中包括哈希表头结构、哈希表结构、双向链表头结构、双向链表结构、哈希节点结构、哈希桶结构、数据节点结构等。</p>
+<img src="../images/data-structure/hash-table-struct.png" alt="哈希表结构" width="100%" height="100%">
+<blockquote>
+<p>图中，虚线箭头表示结构体使用了 <code>typedef</code> 起别名。</p>
+</blockquote>
+<h2 id="哈希表结构定义">哈希表结构定义</h2>
+<h3 id="双向链表结构">双向链表结构</h3>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 双向链表</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">tagDL_NODE</span> &#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">tagDL_NODE</span> *<span class="title">pstNext</span>;</span> <span class="comment">// A pointer to the next element</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">tagDL_NODE</span> *<span class="title">pstPrev</span>;</span> <span class="comment">// A pointer to the prev element</span></span><br><span class="line">&#125; DL_NODE_S;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 双向链表头节点</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">tagDL_HEAD</span> &#123;</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> ulSize; <span class="comment">// the element numbers in the double-linked</span></span><br><span class="line">    DL_NODE_S *pstFirst; <span class="comment">// the first element in the double-linked</span></span><br><span class="line">&#125; DL_HEAD_S;</span><br></pre></td></tr></table></figure>
+<h3 id="哈希节点结构">哈希节点结构</h3>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 哈希节点结构</span></span><br><span class="line"><span class="keyword">typedef</span> DL_NODE_S HASH_NODE_S;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 哈希桶头节点结构</span></span><br><span class="line"><span class="keyword">typedef</span> DL_HEAD_S HASH_LIST_S;</span><br></pre></td></tr></table></figure>
+<h3 id="哈希表结构">哈希表结构</h3>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> HASH_BUCKET_SIZE (1000)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 哈希表结构</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">tagHASH_TABLE</span> &#123;</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> ulSize;</span><br><span class="line">    <span class="type">unsigned</span> <span class="title function_">long</span> <span class="params">(*pfHash)</span><span class="params">(<span class="type">const</span> <span class="type">void</span> *)</span>;</span><br><span class="line">    HASH_LIST_S *pstBckt; <span class="comment">// 每个哈希桶中始终存储着双向链表的头节点</span></span><br><span class="line">&#125; HASH_TABLE_S;</span><br></pre></td></tr></table></figure>
+<h3 id="哈希表头结构">哈希表头结构</h3>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 哈希表头节点</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">tagHASH_HEAD</span> &#123;</span></span><br><span class="line">    HASH_TABLE_S *pstTable;</span><br><span class="line">    <span class="comment">/* 其它成员，如哈希表创建时间、哈希表状态、节点数量、锁等 */</span></span><br><span class="line">&#125; HASH_HEAD_S;</span><br></pre></td></tr></table></figure>
+<h2 id="数据节点结构">数据节点结构</h2>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 哈希节点（数据节点）</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">tagDataNode</span> &#123;</span></span><br><span class="line">    <span class="comment">/* 哈希节点，不可少，且要作为首位成员 */</span></span><br><span class="line">    HASH_NODE_S stHashNode;</span><br><span class="line">    <span class="comment">/* hash key */</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> ulIdentifier;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">char</span> ucAge;</span><br><span class="line">    <span class="type">char</span> *pcName;</span><br><span class="line">    <span class="comment">/* hash payload */</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> uiHeight;</span><br><span class="line">&#125; DATA_NODE_S;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p><strong>数据节点结构的首位成员必须是 <code>HASH_NODE_S</code> 哈希节点（双链表节点）</strong>。这是因为，后续需要将真正的哈希节点（存储在哈希表中的用户数据节点） <code>DATA_NODE_S</code> 结构强转成 <code>HASH_NODE_S</code> 结构，并修改其 <code>pstNext</code> 和 <code>pstPrev</code> 指针，将「数据」首地址存储在哈希表中。若不是首位成员，会把「数据」成员修改，造成数据错误。</p>
+<p>首位成员必须是 <code>HASH_NODE_S</code> 哈希节点，使得哈希桶中仅存储了数据的首地址，而不会过多的存储数据信息。其次，这样设计，使得数据节点结构可以包含任何你想要的信息，而无需修改哈希表的各个函数接口。</p>
+</blockquote>
+<h2 id="哈希函数">哈希函数</h2>
+<p>哈希函数的作用是将一个较大的输入空间映射到一个较小的输出空间，且尽可能保证均匀映射。在哈希表中，输入空间是所有 <code>key</code>，输出空间是所有哈希桶（数组索引）。换句话说，对于一个输入 <code>key</code>，可以通过哈希函数得到该 <code>key</code> 在数组中的位置。哈希函数应尽可能保证映射后的输出空间尽可能均匀、分散，以减少哈希冲突的发生。</p>
+<p>在这里，我们简单地使用 <code>DATA_NODE_S</code> 节点的 <code>ulIdentifier</code> 模上哈希桶大小，作为哈希函数。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">unsigned</span> <span class="type">long</span> <span class="title function_">hashFunc</span><span class="params">(<span class="type">const</span> <span class="type">void</span> *pKey)</span> &#123;</span><br><span class="line">    <span class="type">const</span> DATA_NODE_S *pstKey = (<span class="type">const</span> DATA_NODE_S *)pKey;</span><br><span class="line">    <span class="keyword">if</span> (<span class="literal">NULL</span> == pstKey) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%s():%d: null pointer\n&quot;</span>, __FUNCTION__, __LINE__);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> (<span class="type">unsigned</span> <span class="type">long</span>)(pstKey-&gt;ulIdentifier % HASH_BUCKET_SIZE);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="哈希键比较函数">哈希键比较函数</h2>
+<p>对于哈希表中的节点，在查询和删除操作时，需要将哈希表中遍历的节点的 key 与给定的数据的 key 进行比较，匹配成功返回 <code>0</code>，否则返回 <code>-1</code>。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">long</span> <span class="title function_">hashKeyCmp</span><span class="params">(<span class="type">const</span> HASH_NODE_S *pstHashNode, <span class="type">const</span> <span class="type">void</span> *pKey)</span> &#123;</span><br><span class="line">    <span class="type">const</span> DATA_NODE_S *pstNode = (<span class="type">const</span> DATA_NODE_S *)pstHashNode;</span><br><span class="line">    <span class="type">const</span> DATA_NODE_S *pstKey = (<span class="type">const</span> DATA_NODE_S *)pKey;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (<span class="literal">NULL</span> == pstNode || <span class="literal">NULL</span> == pstKey) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%s():%d: null pointer\n&quot;</span>, __FUNCTION__, __LINE__);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (pstNode-&gt;ulIdentifier != pstKey-&gt;ulIdentifier || \</span><br><span class="line">        pstNode-&gt;ucAge != pstKey-&gt;ucAge || <span class="built_in">strcmp</span>(pstNode-&gt;pcName, pstKey-&gt;pcName) != <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="双向链表节点删除函数">双向链表节点删除函数</h2>
+<p>当需要删除哈希表中的节点时，需要从双向链表中移除指定的节点 <code>pstNode</code>：</p>
+<ul>
+<li>若 <code>pstNode</code> 不是头节点，则删除节点，并正确处理前、后节点的指向关系。</li>
+<li>若 <code>pstNode</code> 是头节点，则删除节点、<strong>重新指定头节点为链表中的下一个节点</strong>，并正确处理前、后节点的指向关系。</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">void</span> <span class="title function_">dlNodeDel</span><span class="params">(DL_HEAD_S *pstHead, DL_NODE_S *pstNode)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="literal">NULL</span> == pstNode || <span class="literal">NULL</span> == pstHead) &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 前一个节点不为空，则 pstNode 不是头结点 */</span></span><br><span class="line">    <span class="keyword">if</span> (pstNode-&gt;pstPrev != <span class="literal">NULL</span>) &#123;</span><br><span class="line">        <span class="comment">// 将前一个节点的下一个节点指针指向当前节点的下一个节点</span></span><br><span class="line">        pstNode-&gt;pstPrev-&gt;pstNext = pstNode-&gt;pstNext;</span><br><span class="line">        <span class="keyword">if</span> (pstNode-&gt;pstNext != <span class="literal">NULL</span>) &#123;</span><br><span class="line">            <span class="comment">// 将下一个节点的前一个节点指针指向当前节点的前一个节点</span></span><br><span class="line">            pstNode-&gt;pstNext-&gt;pstPrev = pstNode-&gt;pstPrev;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">/* 更新头节点为下一个节点，并将其上一个节点指向 NULL */</span></span><br><span class="line">        pstHead-&gt;pstFirst = pstNode-&gt;pstNext;</span><br><span class="line">        <span class="keyword">if</span> (pstNode-&gt;pstNext != <span class="literal">NULL</span>) &#123;</span><br><span class="line">            pstNode-&gt;pstNext-&gt;pstPrev = <span class="literal">NULL</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    pstHead-&gt;ulSize--;  <span class="comment">// 删除节点后，更新节点数量</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>注意，这里仅仅是从双向链表中移除指定的节点，并没有释放对应的内存空间。</p>
+</blockquote>
+<h2 id="哈希表创建与初始化操作">哈希表创建与初始化操作</h2>
+<p>哈希表创建主要包括申请哈希表本身的空间（即哈希表大小、哈希函数和哈希桶地址空间），以及为每个哈希桶位置分配双向链表头节点空间。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">HASH_TABLE_S *<span class="title function_">hashCreate</span><span class="params">(<span class="type">unsigned</span> <span class="type">long</span> ulSize, <span class="type">unsigned</span> <span class="type">long</span> (*pfHash)(<span class="type">const</span> <span class="type">void</span> *))</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (ulSize &lt;= <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%s():%d: hash bucket size should be large zero\n&quot;</span>, __FUNCTION__, __LINE__);</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    HASH_TABLE_S *pstTable = (HASH_TABLE_S *)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(HASH_TABLE_S));</span><br><span class="line">    <span class="keyword">if</span> (<span class="literal">NULL</span> == pstTable) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%s():%d: Could not allocate memory for hash table\n&quot;</span>, __FUNCTION__, __LINE__);</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    HASH_LIST_S *pstBckt = (HASH_LIST_S *)<span class="built_in">malloc</span>((ulSize + <span class="number">1</span>) * <span class="keyword">sizeof</span>(HASH_LIST_S));</span><br><span class="line">    <span class="keyword">if</span> (<span class="literal">NULL</span> == pstBckt) &#123;</span><br><span class="line">        <span class="built_in">free</span>(pstTable);</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%s():%d: Could not allocate memory for hash bucket\n&quot;</span>, __FUNCTION__, __LINE__);</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">memset</span>(pstBckt, <span class="number">0</span>, (ulSize + <span class="number">1</span>) * <span class="keyword">sizeof</span>(HASH_LIST_S));</span><br><span class="line"></span><br><span class="line">    pstTable-&gt;ulSize = ulSize + <span class="number">1</span>;</span><br><span class="line">    pstTable-&gt;pfHash = pfHash;</span><br><span class="line">    pstTable-&gt;pstBckt = pstBckt;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> pstTable;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="哈希表添加操作">哈希表添加操作</h2>
+<p>哈希表的添加键值对操作的过程为：</p>
+<ol>
+<li>各个指针地址为空判断；</li>
+<li>通过哈希函数获取给定键的哈希索引；</li>
+<li>通过哈希索引，获取对应的哈希桶；</li>
+<li>在哈希桶的头节点前插入新增的节点，并更新头结点。</li>
+</ol>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">hashAdd</span><span class="params">(HASH_TABLE_S *pstTable, HASH_NODE_S *pstNode)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="literal">NULL</span> == pstTable || <span class="literal">NULL</span> == pstNode || <span class="literal">NULL</span> == pstTable-&gt;pfHash) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%s():%d: null pointer\n&quot;</span>, __FUNCTION__, __LINE__);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 通过哈希函数获取指定桶的地址 */</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> ulIndex = pstTable-&gt;pfHash((<span class="type">const</span> <span class="type">void</span> *)pstNode);</span><br><span class="line">    DL_HEAD_S *pstBckt = (DL_HEAD_S *)(&amp;pstTable-&gt;pstBckt[ulIndex]);</span><br><span class="line">    <span class="keyword">if</span> (<span class="literal">NULL</span> == pstBckt) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%s():%d: null pointer of hash bucket head\n&quot;</span>, __FUNCTION__, __LINE__);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 在头节点前插入节点 */</span></span><br><span class="line">    pstNode-&gt;pstPrev = <span class="literal">NULL</span>; <span class="comment">// 新节点的 prev 指向 NULL</span></span><br><span class="line">    pstNode-&gt;pstNext = pstBckt-&gt;pstFirst; <span class="comment">// 新节点的 next 指向头结点</span></span><br><span class="line">    <span class="keyword">if</span> (pstBckt-&gt;pstFirst != <span class="literal">NULL</span>) &#123;</span><br><span class="line">        pstBckt-&gt;pstFirst-&gt;pstPrev = pstNode; <span class="comment">// 原头结点的 prev 指向新节点</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 更新头节点为插入的节点，并更新 DL 节点数量 */</span></span><br><span class="line">    pstBckt-&gt;pstFirst = pstNode; </span><br><span class="line">    pstBckt-&gt;ulSize++;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>注意，该 <strong> 哈希表添加操作并不会判断节点是否存在于对应的桶中，而是直接执行节点添加操作</strong>。用户在使用时，需要先检查节点是否存在，不存在才能执行添加操作。</p>
+</blockquote>
+<h2 id="哈希表查询操作">哈希表查询操作</h2>
+<p>哈希表的查询键值对操作的过程为：</p>
+<ol>
+<li>各个指针地址为空判断；</li>
+<li>通过哈希函数获取给定键的哈希索引；</li>
+<li>通过哈希索引，获取对应的哈希桶；</li>
+<li>获取哈希桶的头节点（双向链表的头节点）地址；</li>
+<li>遍历双向链表中的每一个节点，并使用哈希比较函数与给定的键做比较：
+<ul>
+<li>若匹配成功，则返回哈希节点的地址；</li>
+<li>若匹配失败，则继续向后遍历。</li>
+</ul>
+</li>
+</ol>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">HASH_NODE_S *<span class="title function_">hashFind</span><span class="params">(HASH_TABLE_S *pstTable, <span class="type">const</span> <span class="type">void</span> *pKey, <span class="type">long</span> (*pfKeyCmp)(<span class="type">const</span> HASH_NODE_S *, <span class="type">const</span> <span class="type">void</span> *))</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="literal">NULL</span> == pstTable || <span class="literal">NULL</span> == pKey || <span class="literal">NULL</span> == pfKeyCmp || <span class="literal">NULL</span> == pstTable-&gt;pfHash) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%s():%d: null pointer\n&quot;</span>, __FUNCTION__, __LINE__);</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 通过哈希函数获取指定桶的地址 */</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> ulIndex = pstTable-&gt;pfHash(pKey);</span><br><span class="line">    DL_HEAD_S *pstBckt = (DL_HEAD_S *)(&amp;pstTable-&gt;pstBckt[ulIndex]);</span><br><span class="line">    <span class="keyword">if</span> (<span class="literal">NULL</span> == pstBckt) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%s():%d: null pointer of hash bucket head\n&quot;</span>, __FUNCTION__, __LINE__);</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 这里遍历链表需要 O(N)时间，可考虑优化为红黑树，使得时间为 O(logN) */</span></span><br><span class="line">    DL_NODE_S *pstNode = pstBckt-&gt;pstFirst;</span><br><span class="line">    <span class="keyword">while</span> (pstNode != <span class="literal">NULL</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (pfKeyCmp(pstNode, pKey) == <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> pstNode;</span><br><span class="line">        &#125;</span><br><span class="line">        pstNode = pstNode-&gt;pstNext;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="哈希表删除操作">哈希表删除操作</h2>
+<p>哈希表的删除键值对操作的过程为：</p>
+<ol>
+<li>各个指针地址为空判断；</li>
+<li>通过哈希函数获取给定键的哈希索引；</li>
+<li>通过哈希索引，获取对应的哈希桶；</li>
+<li>获取哈希桶的头节点（双向链表的头节点）地址；</li>
+<li>遍历双向链表中的每一个节点，并使用哈希比较函数与给定的键做比较：
+<ul>
+<li>若匹配成功，则从双向链表中删除该节点；</li>
+<li>若匹配失败，则继续向后遍历。</li>
+</ul>
+</li>
+</ol>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">hashDel</span><span class="params">(HASH_TABLE_S *pstTable, <span class="type">const</span> <span class="type">void</span> *pKey, <span class="type">long</span> (*pfKeyCmp)(<span class="type">const</span> HASH_NODE_S *, <span class="type">const</span> <span class="type">void</span> *))</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="literal">NULL</span> == pstTable || <span class="literal">NULL</span> == pKey || <span class="literal">NULL</span> == pfKeyCmp || <span class="literal">NULL</span> == pstTable-&gt;pfHash) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%s():%d: null pointer\n&quot;</span>, __FUNCTION__, __LINE__);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/* 通过哈希函数获取指定桶的地址 */</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> ulIndex = pstTable-&gt;pfHash(pKey);</span><br><span class="line">    DL_HEAD_S *pstBckt = (DL_HEAD_S *)(&amp;pstTable-&gt;pstBckt[ulIndex]);</span><br><span class="line">    <span class="keyword">if</span> (<span class="literal">NULL</span> == pstBckt) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%s():%d: null pointer of hash bucket head\n&quot;</span>, __FUNCTION__, __LINE__);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 这里遍历链表需要 O(N)时间，可考虑优化为红黑树，使得时间为 O(logN) */</span></span><br><span class="line">    DL_NODE_S *pstNode = pstBckt-&gt;pstFirst;</span><br><span class="line">    <span class="keyword">while</span> (pstNode != <span class="literal">NULL</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (pfKeyCmp(pstNode, pKey) == <span class="number">0</span>) &#123;</span><br><span class="line">            dlNodeDel((DL_HEAD_S *)pstBckt, (DL_NODE_S *)pstNode);</span><br><span class="line">            <span class="comment">/* 从哈希桶中移除 DL 节点，但不释放数据，它由用户决定 */</span></span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        pstNode = pstNode-&gt;pstNext;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>哈希表删除节点操作，只会将节点从双向链表中移除，但 <strong> 不会释放对应的内存空间（释放或不释放节点的内存空间由用户决定）</strong>。</p>
+</blockquote>
+<h2 id="哈希表遍历打印操作">哈希表遍历打印操作</h2>
+<p>哈希表的打印键值对操作的过程为：</p>
+<ol>
+<li>各个指针地址为空判断；</li>
+<li>遍历哈希表中的每一个哈希桶：
+<ul>
+<li>获取哈希桶的头节点（双向链表的头节点）地址；</li>
+<li>遍历双向链表中的每一个节点，并打印数据内容。</li>
+</ul>
+</li>
+</ol>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 因不同数据的结构不同，这里使用宏定义定义指定节点的打印内容</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> DATA_PRINT_INFO(bucketId, pstNode) \</span></span><br><span class="line"><span class="meta">    do &#123; \</span></span><br><span class="line"><span class="meta">        DATA_NODE_S *pstData = (DATA_NODE_S *)(pstNode); \</span></span><br><span class="line"><span class="meta">        printf(<span class="string">&quot;    bucket id = %lu, .ulIdentifier = %lu, .ucAge = %d, .pcName = %s, .Height = %dcm\n&quot;</span>, \</span></span><br><span class="line"><span class="meta">                (bucketId), pstData-&gt;ulIdentifier, pstData-&gt;ucAge, pstData-&gt;pcName, pstData-&gt;uiHeight); \</span></span><br><span class="line"><span class="meta">    &#125; while(0)</span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">hashPrint</span><span class="params">(HASH_TABLE_S *pstTable)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="literal">NULL</span> == pstTable) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%s():%d: null pointer\n&quot;</span>, __FUNCTION__, __LINE__);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/* 遍历哈希表中的每一个哈希桶的所有节点，并对节点执行特定操作 */</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">unsigned</span> <span class="type">long</span> i = <span class="number">0</span>; i &lt; pstTable-&gt;ulSize; i++) &#123;</span><br><span class="line">        DL_HEAD_S *pstBckt = (DL_HEAD_S *)(&amp;pstTable-&gt;pstBckt[i]);</span><br><span class="line">        <span class="keyword">if</span> (pstBckt != <span class="literal">NULL</span>) &#123;</span><br><span class="line">            DL_NODE_S *pstNode = pstBckt-&gt;pstFirst;</span><br><span class="line">            <span class="keyword">if</span> (pstBckt-&gt;ulSize &gt; <span class="number">0</span> &amp;&amp; pstNode != <span class="literal">NULL</span>) &#123;</span><br><span class="line">                <span class="built_in">printf</span>(<span class="string">&quot;No.%lu hash bucket has %lu nodes\n&quot;</span>, i, pstBckt-&gt;ulSize);</span><br><span class="line">                <span class="keyword">while</span> (pstNode != <span class="literal">NULL</span>) &#123;</span><br><span class="line">                    DATA_PRINT_INFO(i, pstNode); <span class="comment">// 打印的内容</span></span><br><span class="line">                    pstNode = pstNode-&gt;pstNext;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="哈希表销毁操作">哈希表销毁操作</h2>
+<p>哈希表的销毁所有键值对操作的过程为：</p>
+<ol>
+<li>各个指针地址为空判断；</li>
+<li>遍历哈希表中的每一个哈希桶：
+<ul>
+<li>获取哈希桶的头节点（双向链表的头节点）地址；</li>
+<li>遍历双向链表中的每一个节点，从哈希表中移除节点，并释放对应的内存空间（可选）。</li>
+</ul>
+</li>
+<li>释放所有哈希桶的内存空间，并释放哈希表内存空间。</li>
+</ol>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 销毁操作是否释放数据的内存空间？这里定义了一个删除并释放的宏（用户可自行设计这个宏）</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> HASH_NODE_DEL_FREE(pstBckt, pstDelNode, bFree) \</span></span><br><span class="line"><span class="meta">    do &#123; \</span></span><br><span class="line"><span class="meta">        dlNodeDel((DL_HEAD_S *)(pstBckt), (DL_NODE_S *)(pstDelNode)); \</span></span><br><span class="line"><span class="meta">        <span class="keyword">if</span> ((bFree) &amp;&amp; (pstDelNode) != NULL) &#123; \</span></span><br><span class="line"><span class="meta">            free((DATA_NODE_S *)(pstDelNode)); \</span></span><br><span class="line"><span class="meta">        &#125; \</span></span><br><span class="line"><span class="meta">    &#125; while(0)</span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">hashDestroy</span><span class="params">(HASH_TABLE_S *pstTable, <span class="type">bool</span> bFree)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="literal">NULL</span> == pstTable) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%s():%d: null pointer\n&quot;</span>, __FUNCTION__, __LINE__);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/* 遍历哈希表中的每一个哈希桶的所有节点，并对节点执行特定操作 */</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">unsigned</span> <span class="type">long</span> i = <span class="number">0</span>; i &lt; pstTable-&gt;ulSize; i++) &#123;</span><br><span class="line">        DL_HEAD_S *pstBckt = (DL_HEAD_S *)(&amp;pstTable-&gt;pstBckt[i]);</span><br><span class="line">        <span class="keyword">if</span> (pstBckt != <span class="literal">NULL</span>) &#123;</span><br><span class="line">            DL_NODE_S *pstNode = pstBckt-&gt;pstFirst;</span><br><span class="line">            <span class="keyword">while</span> (pstNode != <span class="literal">NULL</span>) &#123;</span><br><span class="line">                DL_NODE_S *pstDelNode = pstNode;</span><br><span class="line">                pstNode = pstNode-&gt;pstNext;</span><br><span class="line">                HASH_NODE_DEL_FREE(pstBckt, pstDelNode, bFree); <span class="comment">// 删除节点，按需释放数据内存</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">free</span>(pstTable-&gt;pstBckt);</span><br><span class="line">    <span class="built_in">free</span>(pstTable);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="哈希表测试">哈希表测试</h1>
+<h2 id="测试代码">测试代码</h2>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdbool.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;assert.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    assert(HASH_BUCKET_SIZE &gt; <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">    HASH_HEAD_S *hashHead = (HASH_HEAD_S *)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(HASH_HEAD_S));</span><br><span class="line">    assert(hashHead != <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">    hashHead-&gt;pstTable = hashCreate(HASH_BUCKET_SIZE, hashFunc);</span><br><span class="line">    assert(hashHead-&gt;pstTable != <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">    HASH_TABLE_S *pstTable = hashHead-&gt;pstTable;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 创建测试数据 */</span></span><br><span class="line">    DATA_NODE_S dataList[] = &#123;</span><br><span class="line">        &#123;.stHashNode = &#123;<span class="literal">NULL</span>, <span class="literal">NULL</span>&#125;,</span><br><span class="line">        .ulIdentifier = <span class="number">1</span>,</span><br><span class="line">        .ucAge = <span class="number">18</span>,</span><br><span class="line">        .pcName = <span class="string">&quot;Bob&quot;</span>,</span><br><span class="line">        .uiHeight = <span class="number">178</span>&#125;,</span><br><span class="line">        &#123;.stHashNode = &#123;<span class="literal">NULL</span>, <span class="literal">NULL</span>&#125;,</span><br><span class="line">        .ulIdentifier = <span class="number">2</span>,</span><br><span class="line">        .ucAge = <span class="number">20</span>,</span><br><span class="line">        .pcName = <span class="string">&quot;John&quot;</span>,</span><br><span class="line">        .uiHeight = <span class="number">181</span>&#125;,</span><br><span class="line">        &#123;.stHashNode = &#123;<span class="literal">NULL</span>, <span class="literal">NULL</span>&#125;,</span><br><span class="line">        .ulIdentifier = <span class="number">3</span>,</span><br><span class="line">        .ucAge = <span class="number">18</span>,</span><br><span class="line">        .pcName = <span class="string">&quot;LiHua&quot;</span>,</span><br><span class="line">        .uiHeight = <span class="number">176</span>&#125;,</span><br><span class="line">        &#123;.stHashNode = &#123;<span class="literal">NULL</span>, <span class="literal">NULL</span>&#125;,</span><br><span class="line">        .ulIdentifier = <span class="number">2</span>,</span><br><span class="line">        .ucAge = <span class="number">22</span>,</span><br><span class="line">        .pcName = <span class="string">&quot;Alice&quot;</span>,</span><br><span class="line">        .uiHeight = <span class="number">168</span>&#125;</span><br><span class="line">    &#125;;</span><br><span class="line">    <span class="type">int</span> dataSize = <span class="keyword">sizeof</span>(dataList) / <span class="keyword">sizeof</span>(dataList[<span class="number">0</span>]);</span><br><span class="line"></span><br><span class="line">    DATA_NODE_S **nodeList = (DATA_NODE_S **)<span class="built_in">malloc</span>(dataSize * <span class="keyword">sizeof</span>(DATA_NODE_S *));</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 添加节点，无法确定节点是否重复时，应先执行查找操作 */</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; dataSize; i++) &#123;</span><br><span class="line">        nodeList[i] = (DATA_NODE_S *)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(DATA_NODE_S));</span><br><span class="line">        <span class="built_in">memcpy</span>(nodeList[i], &amp;dataList[i], <span class="keyword">sizeof</span>(DATA_NODE_S));</span><br><span class="line">        <span class="comment">// 因 DATA_NODE_S 的靠前的成员，正好为 HASH_NODE_S 的所有成员；因此，强转 DATA_NODE_S，不会修改其它成员的信息</span></span><br><span class="line">        hashAdd(pstTable, (HASH_NODE_S *)nodeList[i]);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 打印哈希表中的所有节点 */</span></span><br><span class="line">    hashPrint(pstTable);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 创建查找数据 */</span></span><br><span class="line">    DATA_NODE_S keyList[] = &#123;</span><br><span class="line">        &#123;.stHashNode = &#123;<span class="literal">NULL</span>, <span class="literal">NULL</span>&#125;,</span><br><span class="line">        .ulIdentifier = <span class="number">3</span>,</span><br><span class="line">        .ucAge = <span class="number">18</span>,</span><br><span class="line">        .pcName = <span class="string">&quot;LiHua&quot;</span>,</span><br><span class="line">        .uiHeight = <span class="number">176</span>&#125;,</span><br><span class="line">        &#123;.stHashNode = &#123;<span class="literal">NULL</span>, <span class="literal">NULL</span>&#125;,</span><br><span class="line">        .ulIdentifier = <span class="number">2</span>,</span><br><span class="line">        .ucAge = <span class="number">22</span>,</span><br><span class="line">        .pcName = <span class="string">&quot;Alice&quot;</span>,</span><br><span class="line">        .uiHeight = <span class="number">168</span>&#125;,</span><br><span class="line">        &#123;.stHashNode = &#123;<span class="literal">NULL</span>, <span class="literal">NULL</span>&#125;,</span><br><span class="line">        .ulIdentifier = <span class="number">2</span>,</span><br><span class="line">        .ucAge = <span class="number">22</span>,</span><br><span class="line">        .pcName = <span class="string">&quot;Alice&quot;</span>,</span><br><span class="line">        .uiHeight = <span class="number">168</span>&#125;,</span><br><span class="line">        &#123;.stHashNode = &#123;<span class="literal">NULL</span>, <span class="literal">NULL</span>&#125;,</span><br><span class="line">        .ulIdentifier = <span class="number">2</span>,</span><br><span class="line">        .ucAge = <span class="number">20</span>,</span><br><span class="line">        .pcName = <span class="string">&quot;John&quot;</span>,</span><br><span class="line">        .uiHeight = <span class="number">181</span>&#125;</span><br><span class="line">    &#125;;</span><br><span class="line">    <span class="type">int</span> keySize = <span class="keyword">sizeof</span>(keyList) / <span class="keyword">sizeof</span>(keyList[<span class="number">0</span>]);</span><br><span class="line"></span><br><span class="line">    DATA_NODE_S *retNode = <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 查找节点 */</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; keySize; i++) &#123;</span><br><span class="line">        retNode = (DATA_NODE_S *)hashFind(pstTable, (<span class="type">const</span> <span class="type">void</span> *)&amp;keyList[i], hashKeyCmp);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (retNode != <span class="literal">NULL</span>) &#123; <span class="comment">// 查找成功</span></span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">&quot;Found data: \n&quot;</span>);</span><br><span class="line">            DATA_PRINT_INFO(hashFunc(retNode), retNode);</span><br><span class="line">            </span><br><span class="line">            <span class="comment">/* 删除节点，并由用户手动释放数据空间 */</span></span><br><span class="line">            hashDel(pstTable, (<span class="type">const</span> <span class="type">void</span> *)retNode, hashKeyCmp);</span><br><span class="line">            <span class="comment">// free(retNode);  // note1</span></span><br><span class="line">            retNode = <span class="literal">NULL</span>; <span class="comment">// 因后续还要使用变量，这里释放后手动置 NULL</span></span><br><span class="line">            </span><br><span class="line">            <span class="comment">/* 再次查找节点 */</span></span><br><span class="line">            retNode = (DATA_NODE_S *)hashFind(pstTable, (<span class="type">const</span> <span class="type">void</span> *)&amp;keyList[i], hashKeyCmp);</span><br><span class="line">            <span class="keyword">if</span> (retNode != <span class="literal">NULL</span>) &#123;</span><br><span class="line">                <span class="built_in">printf</span>(<span class="string">&quot;Data delete failed\n&quot;</span>);</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="built_in">printf</span>(<span class="string">&quot;Data delete successful\n&quot;</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">&quot;Data not found\n&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        hashPrint(pstTable);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/* 销毁哈希表，并释放数据空间 */</span></span><br><span class="line">    hashDestroy(pstTable, <span class="literal">true</span>);  <span class="comment">// note2</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">    for (int i = 0; i &lt; dataSize; i++) &#123;</span></span><br><span class="line"><span class="comment">        free(nodeList[i]);  // note3</span></span><br><span class="line"><span class="comment">    &#125;</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="built_in">free</span>(nodeList);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>注意：note1~3 选择一处释放即可，否则会出现重复释放，报错 <code>free(): double free detected in tcache 2</code>。</p>
+<h2 id="测试结果">测试结果</h2>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">No.1 hash bucket has 1 nodes</span><br><span class="line">    Bucket id = 1, .Identifier = 1, .Age = 18, .Name = Bob, .Height = 178cm</span><br><span class="line">No.2 hash bucket has 2 nodes</span><br><span class="line">    Bucket id = 2, .Identifier = 2, .Age = 22, .Name = Alice, .Height = 168cm</span><br><span class="line">    Bucket id = 2, .Identifier = 2, .Age = 20, .Name = John, .Height = 181cm</span><br><span class="line">No.3 hash bucket has 1 nodes</span><br><span class="line">    Bucket id = 3, .Identifier = 3, .Age = 18, .Name = LiHua, .Height = 176cm</span><br><span class="line">Found data:</span><br><span class="line">    Bucket id = 3, .Identifier = 3, .Age = 18, .Name = LiHua, .Height = 176cm</span><br><span class="line">Data delete successful</span><br><span class="line">No.1 hash bucket has 1 nodes</span><br><span class="line">    Bucket id = 1, .Identifier = 1, .Age = 18, .Name = Bob, .Height = 178cm</span><br><span class="line">No.2 hash bucket has 2 nodes</span><br><span class="line">    Bucket id = 2, .Identifier = 2, .Age = 22, .Name = Alice, .Height = 168cm</span><br><span class="line">    Bucket id = 2, .Identifier = 2, .Age = 20, .Name = John, .Height = 181cm</span><br><span class="line">Found data:</span><br><span class="line">    Bucket id = 2, .Identifier = 2, .Age = 22, .Name = Alice, .Height = 168cm</span><br><span class="line">Data delete successful</span><br><span class="line">No.1 hash bucket has 1 nodes</span><br><span class="line">    Bucket id = 1, .Identifier = 1, .Age = 18, .Name = Bob, .Height = 178cm</span><br><span class="line">No.2 hash bucket has 1 nodes</span><br><span class="line">    Bucket id = 2, .Identifier = 2, .Age = 20, .Name = John, .Height = 181cm</span><br><span class="line">Data not found</span><br><span class="line">No.1 hash bucket has 1 nodes</span><br><span class="line">    Bucket id = 1, .Identifier = 1, .Age = 18, .Name = Bob, .Height = 178cm</span><br><span class="line">No.2 hash bucket has 1 nodes</span><br><span class="line">    Bucket id = 2, .Identifier = 2, .Age = 20, .Name = John, .Height = 181cm</span><br><span class="line">Found data:</span><br><span class="line">    Bucket id = 2, .Identifier = 2, .Age = 20, .Name = John, .Height = 181cm</span><br><span class="line">Data delete successful</span><br><span class="line">No.1 hash bucket has 1 nodes</span><br><span class="line">    Bucket id = 1, .Identifier = 1, .Age = 18, .Name = Bob, .Height = 178cm</span><br></pre></td></tr></table></figure>
+<h1 id="哈希表实现完整代码">哈希表实现完整代码</h1>
+<details>
+  <summary>哈希表实现完整代码（点击展开）</summary>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br><span class="line">282</span><br><span class="line">283</span><br><span class="line">284</span><br><span class="line">285</span><br><span class="line">286</span><br><span class="line">287</span><br><span class="line">288</span><br><span class="line">289</span><br><span class="line">290</span><br><span class="line">291</span><br><span class="line">292</span><br><span class="line">293</span><br><span class="line">294</span><br><span class="line">295</span><br><span class="line">296</span><br><span class="line">297</span><br><span class="line">298</span><br><span class="line">299</span><br><span class="line">300</span><br><span class="line">301</span><br><span class="line">302</span><br><span class="line">303</span><br><span class="line">304</span><br><span class="line">305</span><br><span class="line">306</span><br><span class="line">307</span><br><span class="line">308</span><br><span class="line">309</span><br><span class="line">310</span><br><span class="line">311</span><br><span class="line">312</span><br><span class="line">313</span><br><span class="line">314</span><br><span class="line">315</span><br><span class="line">316</span><br><span class="line">317</span><br><span class="line">318</span><br><span class="line">319</span><br><span class="line">320</span><br><span class="line">321</span><br><span class="line">322</span><br><span class="line">323</span><br><span class="line">324</span><br><span class="line">325</span><br><span class="line">326</span><br><span class="line">327</span><br><span class="line">328</span><br><span class="line">329</span><br><span class="line">330</span><br><span class="line">331</span><br><span class="line">332</span><br><span class="line">333</span><br><span class="line">334</span><br><span class="line">335</span><br><span class="line">336</span><br><span class="line">337</span><br><span class="line">338</span><br><span class="line">339</span><br><span class="line">340</span><br><span class="line">341</span><br><span class="line">342</span><br><span class="line">343</span><br><span class="line">344</span><br><span class="line">345</span><br><span class="line">346</span><br><span class="line">347</span><br><span class="line">348</span><br><span class="line">349</span><br><span class="line">350</span><br><span class="line">351</span><br><span class="line">352</span><br><span class="line">353</span><br><span class="line">354</span><br><span class="line">355</span><br><span class="line">356</span><br><span class="line">357</span><br><span class="line">358</span><br><span class="line">359</span><br><span class="line">360</span><br><span class="line">361</span><br><span class="line">362</span><br><span class="line">363</span><br><span class="line">364</span><br><span class="line">365</span><br><span class="line">366</span><br><span class="line">367</span><br><span class="line">368</span><br><span class="line">369</span><br><span class="line">370</span><br><span class="line">371</span><br><span class="line">372</span><br><span class="line">373</span><br><span class="line">374</span><br><span class="line">375</span><br><span class="line">376</span><br><span class="line">377</span><br><span class="line">378</span><br><span class="line">379</span><br><span class="line">380</span><br><span class="line">381</span><br><span class="line">382</span><br><span class="line">383</span><br><span class="line">384</span><br><span class="line">385</span><br><span class="line">386</span><br><span class="line">387</span><br><span class="line">388</span><br><span class="line">389</span><br><span class="line">390</span><br><span class="line">391</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 该代码未经过完备的测试验证 </span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdbool.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;assert.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 双向链表</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">tagDL_NODE</span> &#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">tagDL_NODE</span> *<span class="title">pstNext</span>;</span> <span class="comment">// A pointer to the next element</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">tagDL_NODE</span> *<span class="title">pstPrev</span>;</span> <span class="comment">// A pointer to the prev element</span></span><br><span class="line">&#125; DL_NODE_S;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 双向链表头节点</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">tagDL_HEAD</span> &#123;</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> ulSize; <span class="comment">// the element numbers in the double-linked</span></span><br><span class="line">    DL_NODE_S *pstFirst; <span class="comment">// the first element in the double-linked</span></span><br><span class="line">&#125; DL_HEAD_S;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> DL_HEAD_S HASH_LIST_S;</span><br><span class="line"><span class="keyword">typedef</span> DL_NODE_S HASH_NODE_S;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 哈希表结构</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">tagHASH_TABLE</span> &#123;</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> ulSize;</span><br><span class="line">    <span class="type">unsigned</span> <span class="title function_">long</span> <span class="params">(*pfHash)</span><span class="params">(<span class="type">const</span> <span class="type">void</span> *)</span>;</span><br><span class="line">    HASH_LIST_S *pstBckt; <span class="comment">// 哈希桶中始终存储着双向链表的头节点</span></span><br><span class="line">&#125; HASH_TABLE_S;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 哈希表头节点</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">tagHASH_HEAD</span> &#123;</span></span><br><span class="line">    HASH_TABLE_S *pstTable;</span><br><span class="line">    <span class="comment">/* 其它成员，如哈希表创建时间、哈希表状态、节点数量、锁等 */</span></span><br><span class="line">&#125; HASH_HEAD_S;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 数据节点</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">tagDataNode</span> &#123;</span></span><br><span class="line">    <span class="comment">/* 哈希节点，不可少，且要作为首位成员 */</span></span><br><span class="line">    HASH_NODE_S stHashNode;</span><br><span class="line">    <span class="comment">/* hash key */</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> ulIdentifier;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">char</span> ucAge;</span><br><span class="line">    <span class="type">char</span> *pcName;</span><br><span class="line">    <span class="comment">/* hash payload */</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> uiHeight;</span><br><span class="line">&#125; DATA_NODE_S;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> HASH_BUCKET_SIZE (10000)</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> DATA_PRINT_INFO(bucketId, pstNode) \</span></span><br><span class="line"><span class="meta">    do &#123; \</span></span><br><span class="line"><span class="meta">        DATA_NODE_S *pstData = (DATA_NODE_S *)(pstNode); \</span></span><br><span class="line"><span class="meta">        printf(<span class="string">&quot;    Bucket id = %lu, .Identifier = %lu, .Age = %d, .Name = %s, .Height = %dcm\n&quot;</span>, \</span></span><br><span class="line"><span class="meta">                (bucketId), pstData-&gt;ulIdentifier, pstData-&gt;ucAge, pstData-&gt;pcName, pstData-&gt;uiHeight); \</span></span><br><span class="line"><span class="meta">    &#125; while(0)</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> HASH_NODE_DEL_FREE(pstBckt, pstDelNode, bFree) \</span></span><br><span class="line"><span class="meta">    do &#123; \</span></span><br><span class="line"><span class="meta">        dlNodeDel((DL_HEAD_S *)(pstBckt), (DL_NODE_S *)(pstDelNode)); \</span></span><br><span class="line"><span class="meta">        <span class="keyword">if</span> ((bFree) &amp;&amp; (pstDelNode) != NULL) &#123; \</span></span><br><span class="line"><span class="meta">            free((DATA_NODE_S *)(pstDelNode)); \</span></span><br><span class="line"><span class="meta">        &#125; \</span></span><br><span class="line"><span class="meta">    &#125; while(0)</span></span><br><span class="line"></span><br><span class="line"><span class="type">unsigned</span> <span class="type">long</span> <span class="title function_">hashFunc</span><span class="params">(<span class="type">const</span> <span class="type">void</span> *pKey)</span> &#123;</span><br><span class="line">    <span class="type">const</span> DATA_NODE_S *pstKey = (<span class="type">const</span> DATA_NODE_S *)pKey;</span><br><span class="line">    <span class="keyword">if</span> (<span class="literal">NULL</span> == pstKey) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%s():%d: null pointer\n&quot;</span>, __FUNCTION__, __LINE__);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> (<span class="type">unsigned</span> <span class="type">long</span>)(pstKey-&gt;ulIdentifier % HASH_BUCKET_SIZE);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">long</span> <span class="title function_">hashKeyCmp</span><span class="params">(<span class="type">const</span> HASH_NODE_S *pstHashNode, <span class="type">const</span> <span class="type">void</span> *pKey)</span> &#123;</span><br><span class="line">    <span class="type">const</span> DATA_NODE_S *pstNode = (<span class="type">const</span> DATA_NODE_S *)pstHashNode;</span><br><span class="line">    <span class="type">const</span> DATA_NODE_S *pstKey = (<span class="type">const</span> DATA_NODE_S *)pKey;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (<span class="literal">NULL</span> == pstNode || <span class="literal">NULL</span> == pstKey) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%s():%d: null pointer\n&quot;</span>, __FUNCTION__, __LINE__);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (pstNode-&gt;ulIdentifier != pstKey-&gt;ulIdentifier || \</span><br><span class="line">        pstNode-&gt;ucAge != pstKey-&gt;ucAge || <span class="built_in">strcmp</span>(pstNode-&gt;pcName, pstKey-&gt;pcName) != <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">void</span> <span class="title function_">dlNodeDel</span><span class="params">(DL_HEAD_S *pstHead, DL_NODE_S *pstNode)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="literal">NULL</span> == pstNode || <span class="literal">NULL</span> == pstHead) &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 前一个节点不为空，则 pstNode 不是头结点 */</span></span><br><span class="line">    <span class="keyword">if</span> (pstNode-&gt;pstPrev != <span class="literal">NULL</span>) &#123;</span><br><span class="line">        <span class="comment">// 将前一个节点的下一个节点指针指向当前节点的下一个节点</span></span><br><span class="line">        pstNode-&gt;pstPrev-&gt;pstNext = pstNode-&gt;pstNext;</span><br><span class="line">        <span class="keyword">if</span> (pstNode-&gt;pstNext != <span class="literal">NULL</span>) &#123;</span><br><span class="line">            <span class="comment">// 将下一个节点的前一个节点指针指向当前节点的前一个节点</span></span><br><span class="line">            pstNode-&gt;pstNext-&gt;pstPrev = pstNode-&gt;pstPrev;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">/* 更新头节点为下一个节点，并将其上一个节点指向 NULL */</span></span><br><span class="line">        pstHead-&gt;pstFirst = pstNode-&gt;pstNext;</span><br><span class="line">        <span class="keyword">if</span> (pstNode-&gt;pstNext != <span class="literal">NULL</span>) &#123;</span><br><span class="line">            pstNode-&gt;pstNext-&gt;pstPrev = <span class="literal">NULL</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    pstHead-&gt;ulSize--;  <span class="comment">// 删除节点后，更新节点数量</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">HASH_TABLE_S *<span class="title function_">hashCreate</span><span class="params">(<span class="type">unsigned</span> <span class="type">long</span> ulSize, <span class="type">unsigned</span> <span class="type">long</span> (*pfHash)(<span class="type">const</span> <span class="type">void</span> *))</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (ulSize &lt;= <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%s():%d: hash bucket size should be large zero\n&quot;</span>, __FUNCTION__, __LINE__);</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    HASH_TABLE_S *pstTable = (HASH_TABLE_S *)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(HASH_TABLE_S));</span><br><span class="line">    <span class="keyword">if</span> (<span class="literal">NULL</span> == pstTable) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%s():%d: Could not allocate memory for hash table\n&quot;</span>, __FUNCTION__, __LINE__);</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    HASH_LIST_S *pstBckt = (HASH_LIST_S *)<span class="built_in">malloc</span>((ulSize + <span class="number">1</span>) * <span class="keyword">sizeof</span>(HASH_LIST_S));</span><br><span class="line">    <span class="keyword">if</span> (<span class="literal">NULL</span> == pstBckt) &#123;</span><br><span class="line">        <span class="built_in">free</span>(pstTable);</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%s():%d: Could not allocate memory for hash bucket\n&quot;</span>, __FUNCTION__, __LINE__);</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">memset</span>(pstBckt, <span class="number">0</span>, (ulSize + <span class="number">1</span>) * <span class="keyword">sizeof</span>(HASH_LIST_S));</span><br><span class="line"></span><br><span class="line">    pstTable-&gt;ulSize = ulSize + <span class="number">1</span>;</span><br><span class="line">    pstTable-&gt;pfHash = pfHash;</span><br><span class="line">    pstTable-&gt;pstBckt = pstBckt;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> pstTable;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">hashAdd</span><span class="params">(HASH_TABLE_S *pstTable, HASH_NODE_S *pstNode)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="literal">NULL</span> == pstTable || <span class="literal">NULL</span> == pstNode || <span class="literal">NULL</span> == pstTable-&gt;pfHash) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%s():%d: null pointer\n&quot;</span>, __FUNCTION__, __LINE__);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 通过哈希函数获取指定桶的地址 */</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> ulIndex = pstTable-&gt;pfHash((<span class="type">const</span> <span class="type">void</span> *)pstNode);</span><br><span class="line">    DL_HEAD_S *pstBckt = (DL_HEAD_S *)(&amp;pstTable-&gt;pstBckt[ulIndex]);</span><br><span class="line">    <span class="keyword">if</span> (<span class="literal">NULL</span> == pstBckt) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%s():%d: null pointer of hash bucket head\n&quot;</span>, __FUNCTION__, __LINE__);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 在头节点前插入节点 */</span></span><br><span class="line">    pstNode-&gt;pstPrev = <span class="literal">NULL</span>; <span class="comment">// 新节点的 prev 指向 NULL</span></span><br><span class="line">    pstNode-&gt;pstNext = pstBckt-&gt;pstFirst; <span class="comment">// 新节点的 next 指向头结点</span></span><br><span class="line">    <span class="keyword">if</span> (pstBckt-&gt;pstFirst != <span class="literal">NULL</span>) &#123;</span><br><span class="line">        pstBckt-&gt;pstFirst-&gt;pstPrev = pstNode; <span class="comment">// 原头结点的 prev 指向新节点</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 更新头节点为插入的节点，并更新 DL 节点数量 */</span></span><br><span class="line">    pstBckt-&gt;pstFirst = pstNode; </span><br><span class="line">    pstBckt-&gt;ulSize++;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">HASH_NODE_S *<span class="title function_">hashFind</span><span class="params">(HASH_TABLE_S *pstTable, <span class="type">const</span> <span class="type">void</span> *pKey, <span class="type">long</span> (*pfKeyCmp)(<span class="type">const</span> HASH_NODE_S *, <span class="type">const</span> <span class="type">void</span> *))</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="literal">NULL</span> == pstTable || <span class="literal">NULL</span> == pKey || <span class="literal">NULL</span> == pfKeyCmp || <span class="literal">NULL</span> == pstTable-&gt;pfHash) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%s():%d: null pointer\n&quot;</span>, __FUNCTION__, __LINE__);</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 通过哈希函数获取指定桶的地址 */</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> ulIndex = pstTable-&gt;pfHash(pKey);</span><br><span class="line">    DL_HEAD_S *pstBckt = (DL_HEAD_S *)(&amp;pstTable-&gt;pstBckt[ulIndex]);</span><br><span class="line">    <span class="keyword">if</span> (<span class="literal">NULL</span> == pstBckt) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%s():%d: null pointer of hash bucket head\n&quot;</span>, __FUNCTION__, __LINE__);</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 这里遍历链表需要 O(N) 时间，可考虑优化为红黑树，使得时间为 O(logN) */</span></span><br><span class="line">    DL_NODE_S *pstNode = pstBckt-&gt;pstFirst;</span><br><span class="line">    <span class="keyword">while</span> (pstNode != <span class="literal">NULL</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (pfKeyCmp(pstNode, pKey) == <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> pstNode;</span><br><span class="line">        &#125;</span><br><span class="line">        pstNode = pstNode-&gt;pstNext;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">hashDel</span><span class="params">(HASH_TABLE_S *pstTable, <span class="type">const</span> <span class="type">void</span> *pKey, <span class="type">long</span> (*pfKeyCmp)(<span class="type">const</span> HASH_NODE_S *, <span class="type">const</span> <span class="type">void</span> *))</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="literal">NULL</span> == pstTable || <span class="literal">NULL</span> == pKey || <span class="literal">NULL</span> == pfKeyCmp || <span class="literal">NULL</span> == pstTable-&gt;pfHash) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%s():%d: null pointer\n&quot;</span>, __FUNCTION__, __LINE__);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/* 通过哈希函数获取指定桶的地址 */</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> ulIndex = pstTable-&gt;pfHash(pKey);</span><br><span class="line">    DL_HEAD_S *pstBckt = (DL_HEAD_S *)(&amp;pstTable-&gt;pstBckt[ulIndex]);</span><br><span class="line">    <span class="keyword">if</span> (<span class="literal">NULL</span> == pstBckt) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%s():%d: null pointer of hash bucket head\n&quot;</span>, __FUNCTION__, __LINE__);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 这里遍历链表需要 O(N)时间，可考虑优化为红黑树，使得时间为 O(logN) */</span></span><br><span class="line">    DL_NODE_S *pstNode = pstBckt-&gt;pstFirst;</span><br><span class="line">    <span class="keyword">while</span> (pstNode != <span class="literal">NULL</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (pfKeyCmp(pstNode, pKey) == <span class="number">0</span>) &#123;</span><br><span class="line">            dlNodeDel((DL_HEAD_S *)pstBckt, (DL_NODE_S *)pstNode);</span><br><span class="line">            <span class="comment">/* 从哈希桶中移除 DL 节点，但不释放数据，它由用户决定 */</span></span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        pstNode = pstNode-&gt;pstNext;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">hashPrint</span><span class="params">(HASH_TABLE_S *pstTable)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="literal">NULL</span> == pstTable) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%s():%d: null pointer\n&quot;</span>, __FUNCTION__, __LINE__);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/* 遍历哈希表中的每一个哈希桶的所有节点，并对节点执行特定操作 */</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">unsigned</span> <span class="type">long</span> i = <span class="number">0</span>; i &lt; pstTable-&gt;ulSize; i++) &#123;</span><br><span class="line">        DL_HEAD_S *pstBckt = (DL_HEAD_S *)(&amp;pstTable-&gt;pstBckt[i]);</span><br><span class="line">        <span class="keyword">if</span> (pstBckt != <span class="literal">NULL</span>) &#123;</span><br><span class="line">            DL_NODE_S *pstNode = pstBckt-&gt;pstFirst;</span><br><span class="line">            <span class="keyword">if</span> (pstBckt-&gt;ulSize &gt; <span class="number">0</span> &amp;&amp; pstNode != <span class="literal">NULL</span>) &#123;</span><br><span class="line">                <span class="built_in">printf</span>(<span class="string">&quot;No.%lu hash bucket has %lu nodes\n&quot;</span>, i, pstBckt-&gt;ulSize);</span><br><span class="line">                <span class="keyword">while</span> (pstNode != <span class="literal">NULL</span>) &#123;</span><br><span class="line">                    DATA_PRINT_INFO(i, pstNode); <span class="comment">// 打印的内容</span></span><br><span class="line">                    pstNode = pstNode-&gt;pstNext;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">hashDestroy</span><span class="params">(HASH_TABLE_S *pstTable, <span class="type">bool</span> bFree)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="literal">NULL</span> == pstTable) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%s():%d: null pointer\n&quot;</span>, __FUNCTION__, __LINE__);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/* 遍历哈希表中的每一个哈希桶的所有节点，并对节点执行特定操作 */</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">unsigned</span> <span class="type">long</span> i = <span class="number">0</span>; i &lt; pstTable-&gt;ulSize; i++) &#123;</span><br><span class="line">        DL_HEAD_S *pstBckt = (DL_HEAD_S *)(&amp;pstTable-&gt;pstBckt[i]);</span><br><span class="line">        <span class="keyword">if</span> (pstBckt != <span class="literal">NULL</span>) &#123;</span><br><span class="line">            DL_NODE_S *pstNode = pstBckt-&gt;pstFirst;</span><br><span class="line">            <span class="keyword">while</span> (pstNode != <span class="literal">NULL</span>) &#123;</span><br><span class="line">                DL_NODE_S *pstDelNode = pstNode;</span><br><span class="line">                pstNode = pstNode-&gt;pstNext;</span><br><span class="line">                HASH_NODE_DEL_FREE(pstBckt, pstDelNode, bFree); <span class="comment">// 删除节点，按需释放数据内存</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">free</span>(pstTable-&gt;pstBckt);</span><br><span class="line">    <span class="built_in">free</span>(pstTable);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    assert(HASH_BUCKET_SIZE &gt; <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">    HASH_HEAD_S *hashHead = (HASH_HEAD_S *)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(HASH_HEAD_S));</span><br><span class="line">    assert(hashHead != <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">    hashHead-&gt;pstTable = hashCreate(HASH_BUCKET_SIZE, hashFunc);</span><br><span class="line">    assert(hashHead-&gt;pstTable != <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">    HASH_TABLE_S *pstTable = hashHead-&gt;pstTable;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 创建测试数据 */</span></span><br><span class="line">    DATA_NODE_S dataList[] = &#123;</span><br><span class="line">        &#123;.stHashNode = &#123;<span class="literal">NULL</span>, <span class="literal">NULL</span>&#125;,</span><br><span class="line">        .ulIdentifier = <span class="number">1</span>,</span><br><span class="line">        .ucAge = <span class="number">18</span>,</span><br><span class="line">        .pcName = <span class="string">&quot;Bob&quot;</span>,</span><br><span class="line">        .uiHeight = <span class="number">178</span>&#125;,</span><br><span class="line">        &#123;.stHashNode = &#123;<span class="literal">NULL</span>, <span class="literal">NULL</span>&#125;,</span><br><span class="line">        .ulIdentifier = <span class="number">2</span>,</span><br><span class="line">        .ucAge = <span class="number">20</span>,</span><br><span class="line">        .pcName = <span class="string">&quot;John&quot;</span>,</span><br><span class="line">        .uiHeight = <span class="number">181</span>&#125;,</span><br><span class="line">        &#123;.stHashNode = &#123;<span class="literal">NULL</span>, <span class="literal">NULL</span>&#125;,</span><br><span class="line">        .ulIdentifier = <span class="number">3</span>,</span><br><span class="line">        .ucAge = <span class="number">18</span>,</span><br><span class="line">        .pcName = <span class="string">&quot;LiHua&quot;</span>,</span><br><span class="line">        .uiHeight = <span class="number">176</span>&#125;,</span><br><span class="line">        &#123;.stHashNode = &#123;<span class="literal">NULL</span>, <span class="literal">NULL</span>&#125;,</span><br><span class="line">        .ulIdentifier = <span class="number">2</span>,</span><br><span class="line">        .ucAge = <span class="number">22</span>,</span><br><span class="line">        .pcName = <span class="string">&quot;Alice&quot;</span>,</span><br><span class="line">        .uiHeight = <span class="number">168</span>&#125;</span><br><span class="line">    &#125;;</span><br><span class="line">    <span class="type">int</span> dataSize = <span class="keyword">sizeof</span>(dataList) / <span class="keyword">sizeof</span>(dataList[<span class="number">0</span>]);</span><br><span class="line"></span><br><span class="line">    DATA_NODE_S **nodeList = (DATA_NODE_S **)<span class="built_in">malloc</span>(dataSize * <span class="keyword">sizeof</span>(DATA_NODE_S *));</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 添加节点，无法确定节点是否重复时，应先执行查找操作 */</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; dataSize; i++) &#123;</span><br><span class="line">        nodeList[i] = (DATA_NODE_S *)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(DATA_NODE_S));</span><br><span class="line">        <span class="built_in">memcpy</span>(nodeList[i], &amp;dataList[i], <span class="keyword">sizeof</span>(DATA_NODE_S));</span><br><span class="line">        <span class="comment">// 因 DATA_NODE_S 的靠前的成员，正好为 HASH_NODE_S 的所有成员；因此，强转 DATA_NODE_S，不会修改其它成员的信息</span></span><br><span class="line">        hashAdd(pstTable, (HASH_NODE_S *)nodeList[i]);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 打印哈希表中的所有节点 */</span></span><br><span class="line">    hashPrint(pstTable);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 创建查找数据 */</span></span><br><span class="line">    DATA_NODE_S keyList[] = &#123;</span><br><span class="line">        &#123;.stHashNode = &#123;<span class="literal">NULL</span>, <span class="literal">NULL</span>&#125;,</span><br><span class="line">        .ulIdentifier = <span class="number">3</span>,</span><br><span class="line">        .ucAge = <span class="number">18</span>,</span><br><span class="line">        .pcName = <span class="string">&quot;LiHua&quot;</span>,</span><br><span class="line">        .uiHeight = <span class="number">176</span>&#125;,</span><br><span class="line">        &#123;.stHashNode = &#123;<span class="literal">NULL</span>, <span class="literal">NULL</span>&#125;,</span><br><span class="line">        .ulIdentifier = <span class="number">2</span>,</span><br><span class="line">        .ucAge = <span class="number">22</span>,</span><br><span class="line">        .pcName = <span class="string">&quot;Alice&quot;</span>,</span><br><span class="line">        .uiHeight = <span class="number">168</span>&#125;,</span><br><span class="line">        &#123;.stHashNode = &#123;<span class="literal">NULL</span>, <span class="literal">NULL</span>&#125;,</span><br><span class="line">        .ulIdentifier = <span class="number">2</span>,</span><br><span class="line">        .ucAge = <span class="number">22</span>,</span><br><span class="line">        .pcName = <span class="string">&quot;Alice&quot;</span>,</span><br><span class="line">        .uiHeight = <span class="number">168</span>&#125;,</span><br><span class="line">        &#123;.stHashNode = &#123;<span class="literal">NULL</span>, <span class="literal">NULL</span>&#125;,</span><br><span class="line">        .ulIdentifier = <span class="number">2</span>,</span><br><span class="line">        .ucAge = <span class="number">20</span>,</span><br><span class="line">        .pcName = <span class="string">&quot;John&quot;</span>,</span><br><span class="line">        .uiHeight = <span class="number">181</span>&#125;</span><br><span class="line">    &#125;;</span><br><span class="line">    <span class="type">int</span> keySize = <span class="keyword">sizeof</span>(keyList) / <span class="keyword">sizeof</span>(keyList[<span class="number">0</span>]);</span><br><span class="line"></span><br><span class="line">    DATA_NODE_S *retNode = <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* 查找节点 */</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; keySize; i++) &#123;</span><br><span class="line">        retNode = (DATA_NODE_S *)hashFind(pstTable, (<span class="type">const</span> <span class="type">void</span> *)&amp;keyList[i], hashKeyCmp);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (retNode != <span class="literal">NULL</span>) &#123; <span class="comment">// 查找成功</span></span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">&quot;Found data: \n&quot;</span>);</span><br><span class="line">            DATA_PRINT_INFO(hashFunc(retNode), retNode);</span><br><span class="line">            </span><br><span class="line">            <span class="comment">/* 删除节点，并由用户手动释放数据空间 */</span></span><br><span class="line">            hashDel(pstTable, (<span class="type">const</span> <span class="type">void</span> *)retNode, hashKeyCmp);</span><br><span class="line">            <span class="comment">// free(retNode);  // note1</span></span><br><span class="line">            retNode = <span class="literal">NULL</span>; <span class="comment">// 因后续还要使用变量，这里释放后手动置 NULL</span></span><br><span class="line">            </span><br><span class="line">            <span class="comment">/* 再次查找节点 */</span></span><br><span class="line">            retNode = (DATA_NODE_S *)hashFind(pstTable, (<span class="type">const</span> <span class="type">void</span> *)&amp;keyList[i], hashKeyCmp);</span><br><span class="line">            <span class="keyword">if</span> (retNode != <span class="literal">NULL</span>) &#123;</span><br><span class="line">                <span class="built_in">printf</span>(<span class="string">&quot;Data delete failed\n&quot;</span>);</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="built_in">printf</span>(<span class="string">&quot;Data delete successful\n&quot;</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">&quot;Data not found\n&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        hashPrint(pstTable);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/* 销毁哈希表，并释放数据空间 */</span></span><br><span class="line">    hashDestroy(pstTable, <span class="literal">true</span>);  <span class="comment">// note2</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">    for (int i = 0; i &lt; dataSize; i++) &#123;</span></span><br><span class="line"><span class="comment">        free(nodeList[i]);  // note3</span></span><br><span class="line"><span class="comment">    &#125;</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">    <span class="built_in">free</span>(nodeList);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</details>
+
+</div>
+
+
+  <div class="book-comments">
+    
+
+
+
+
+  </div>
+
+
+
+<script src="/js/book-post.js"></script>
+
+
+            </div>
+          </div>
+          <div class="column col-2 hide-lg">
+            <div class="book-post-info">
+  
+    <div class="book-post-meta">
+
+  <div class="author">
+
+    <!-- Author image -->
+    <div class="author-img">
+      
+        <figure
+          class="avatar avatar-lg"
+          data-initial="A"
+          style="background-color: #3b4351;">
+        </figure>
+      
+    </div>
+
+    <!-- Author title -->
+    <div class="author-title">
+      <div>aha</div>
+      <div>2023-12-27</div>
+    </div>
+  </div>
+
+  
+    <div class="divider"></div>
+
+    <div class="link">
+      <a class="category-link" href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/">数据结构</a> <a class="category-link" href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/%E5%93%88%E5%B8%8C%E8%A1%A8/">哈希表</a>
+
+      <a class="tag-none-link" href="/tags/%E5%8F%8C%E5%90%91%E9%93%BE%E8%A1%A8/" rel="tag">#双向链表</a> <a class="tag-none-link" href="/tags/%E5%93%88%E5%B8%8C%E8%A1%A8/" rel="tag">#哈希表</a>
+    </div>
+    
+  
+
+  <div class="divider"></div>
+</div>
+  
+
+  <div class="book-tocbot">
+</div>
+<div class="book-tocbot-menu">
+  <a class="book-toc-expand" onclick="expand_toc()">Expand all</a>
+  <a onclick="go_top()">Back to top</a>
+  <a onclick="go_bottom()">Go to bottom</a>
+  <a onclick="toggleSearch()">Search in blogs</a> <!-- 添加搜索文字的点击事件 -->
+</div>
+
+<div id="search-overlay" class="search-overlay" style="display: none;"> <!-- 初始状态为隐藏 -->
+  <div class="search-box">
+    <input type="text" id="search-input" placeholder="Search in all blogs...">
+    <button onclick="closeSearch()">Close</button> <!-- 添加关闭按钮 -->
+    <div id="search-results" class="search-results"></div>
+  </div>
+</div>
+
+<script>
+  function performSearch(query) {
+    if (!query.trim()) {
+      return;
+    }
+
+    fetch('/search.xml')
+      .then(response => response.text())
+      .then(data => {
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(data, "text/xml");
+        const entries = xmlDoc.getElementsByTagName('entry');
+        let results = '';
+
+        for (let i = 0; i < entries.length; i++) {
+          const title = entries[i].getElementsByTagName('title')[0].textContent;
+          const content = entries[i].getElementsByTagName('content')[0].textContent;
+          const url = entries[i].getElementsByTagName('url')[0].textContent;
+
+          let count = (title.match(new RegExp(query, "gi")) || []).length; // 统计查询词出现的次数
+          count += (content.match(new RegExp(query, "gi")) || []).length;
+
+          if (count > 0) { // title.includes(query) || content.includes(query)
+            results += `
+              <div class="search-result-item">
+                <a href="${url}">${title}</a> (${count})
+              </div>`;
+          }
+        }
+
+        const searchResultsElement = document.getElementById('search-results');
+        searchResultsElement.innerHTML = results;
+        searchResultsElement.classList.add('active');
+      });
+  }
+
+  function toggleSearch() {
+    const searchOverlay = document.getElementById('search-overlay');
+    searchOverlay.style.display = searchOverlay.style.display === 'none' ? 'flex' : 'none';
+  }
+
+  function closeSearch() {
+    document.getElementById('search-overlay').style.display = 'none';
+  }
+
+  document.getElementById('search-input').addEventListener('input', function() {
+    const query = this.value;
+    performSearch(query);
+  });
+</script>
+
+<style>
+  .search-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  .search-box {
+    background: white;
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+    width: 80%;
+    max-width: 500px;
+  }
+
+  .search-results {
+    margin-top: 10px;
+    max-height: 300px;
+    overflow-y: auto;
+    background: white;
+    padding: 10px;
+    border-radius: 5px;
+    width: 100%;
+  }
+
+  .search-result-item {
+    margin: 10px 0;
+  }
+
+  .search-result-item a {
+    color: blue; /* 设置链接颜色为蓝色 */
+    text-decoration: none;
+  }
+
+  .search-result-item a:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+<script src="/js/book-toc.js"></script>
+
+
+</div>
+          </div>
+        </div>
+      </div>
+
+      <a class="off-canvas-overlay" onclick="hide_canvas()"></a>
+
+      <button class="floating-button" onclick="toggleDropdownMenu()"></button>
+
+      <div class="dropdown-menu">
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FFFFFF', '#000000')">银河白</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#C7EDCC', '#000000')">豆沙绿</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FAF9DE', '#000000')">杏仁黄</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#E3EDCD', '#000000')">青草绿</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FFF2E2', '#000000')">秋叶褐</div>
+      </div>
+  </div>
+
+  <script>
+    function toggleDropdownMenu() {
+      document.querySelector('.floating-button').classList.toggle('active');
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      var storedBackgroundColor = localStorage.getItem('blogBackgroundColor');
+      var storedColor = localStorage.getItem('blogColor');
+
+      if (storedBackgroundColor && storedColor) {
+        document.body.style.backgroundColor = storedBackgroundColor;
+        document.body.style.color = storedColor;
+      }
+    });
+
+    function changeBackgroundColor(backgroundColor, color) {
+      document.body.style.backgroundColor = backgroundColor;
+      document.body.style.color = color;
+
+      localStorage.setItem('blogBackgroundColor', backgroundColor);
+      localStorage.setItem('blogColor', color);
+
+      document.querySelector('.floating-button').classList.remove('active');
+    }
+  </script>
+</body>
+
+</html>
+
+
+<script src="/js/book.js"></script>

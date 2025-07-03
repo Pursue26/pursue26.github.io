@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
+
+    
+      <link rel="icon" href="/favicon.png" />
+    
+
+    <title>
+        
+          操作系统之 chapter2 启动 &amp; 中断 &amp; 异常 &amp; 系统调用 - aha&#39;s book
+        
+    </title>
+
+    <!-- Spectre.css framework -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre-exp.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre-icons.min.css">
+
+    <!-- theme css & js -->
+    
+<link rel="stylesheet" href="/css/book.css">
+
+    
+<script src="/js/book.js"></script>
+
+
+    <!-- tocbot -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.css">
+    
+    <!-- katex -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/zooming/2.1.1/zooming.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const zooming = new Zooming()
+    zooming.listen('.book-content img')
+})
+</script>
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+    <style>
+      body {
+        background-color: #FFFFFF;
+        /* color: #000000; */
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+
+      /* Floating Button Styles */
+      .floating-button {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 999;
+        background-color: #000000;
+        color: #ffffff;
+        padding: 12px;
+        border-radius: 50%;
+        cursor: pointer;
+        border: 2px solid #000000;
+      }
+
+      .floating-button:hover {
+        background-color: #FFFFFF;
+      }
+
+      /* Dropdown Menu Styles */
+      .dropdown-menu {
+        position: fixed;
+        bottom: 60px;
+        right: 10px;
+        display: none;
+        min-width: 60px;
+        padding: 2px;
+        background-color: #fff;
+        /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
+        z-index: 1000;
+      }
+
+      .floating-button.active+.dropdown-menu {
+        display: block;
+      }
+
+      .dropdown-item {
+        display: block;
+        padding: 8px 16px;
+        cursor: pointer;
+      }
+
+      .dropdown-item:hover {
+        background-color: #f5f5f5;
+      }
+    </style>
+<style>.darkmode--activated{--body-bg-color:#282828;--content-bg-color:#333;--card-bg-color:#555;--text-color:#ccc;--blockquote-color:#bbb;--link-color:#ccc;--link-hover-color:#eee;--brand-color:#ddd;--brand-hover-color:#ddd;--table-row-odd-bg-color:#282828;--table-row-hover-bg-color:#363636;--menu-item-bg-color:#555;--btn-default-bg:#222;--btn-default-color:#ccc;--btn-default-border-color:#555;--btn-default-hover-bg:#666;--btn-default-hover-color:#ccc;--btn-default-hover-border-color:#666;--highlight-background:#282b2e;--highlight-foreground:#a9b7c6;--highlight-gutter-background:#34393d;--highlight-gutter-foreground:#9ca9b6}.darkmode--activated img{opacity:.75}.darkmode--activated img:hover{opacity:.9}.darkmode--activated code{color:#69dbdc;background:0 0}button.darkmode-toggle{z-index:9999}.darkmode-ignore,img{display:flex!important}.beian img{display:inline-block!important}</style></head>
+
+<body>
+  <div class="book-container">
+    <div class="book-sidebar">
+      <div class="book-brand">
+  <a href="/">
+    <img src="/favicon.png">
+    <span>AHA&#39;S BOOK</span>
+  </a>
+</div>
+        <div id="menu" class="book-menu hide">
+  <h2 id="基础知识"> 基础知识 </h2>
+<ul>
+<li><a href="/posts/231010144856.html"> 模运算 </a></li>
+<li><a href="/posts/231014105311.html"> 异或运算 </a></li>
+<li><a href="/posts/231210181853.html"> 计算机中的寄存器 </a></li>
+<li><a href="/posts/231213183051.html"> 正则表达式基础 </a></li>
+</ul>
+<h2 id="C 语言">C 语言 </h2>
+<ul>
+<li><a href="/posts/230916171929.html">main 函数参数 </a></li>
+<li><a href="/posts/231214192113.html"> 关键字与专有名词 </a></li>
+<li><a href="/posts/240103180653.html"> 输出打印函数 </a></li>
+<li><a href="/posts/230922143003.html"> 多维数组 </a></li>
+<li><a href="/posts/230913200729.html">const 关键字 </a></li>
+<li><a href="/posts/230918174223.html">typedef 类型基础 </a></li>
+<li><a href="/posts/230920172849.html">typedef 类型实践 </a></li>
+<li><a href="/posts/240224193217.html"> 二级指针 </a></li>
+<li><a href="/posts/240307195203.html"> 代码 TOP-K 问题 </a></li>
+<li><a href="/posts/230922172626.html">uthash 哈希表基础 </a></li>
+<li><a href="/posts/230918114841.html"> 大小端知识 </a></li>
+</ul>
+<h2 id="Golang 语言">Golang 语言 </h2>
+<ul>
+<li><a href="/posts/230907162612.html"> 变量与常量 </a></li>
+<li><a href="/posts/230909120145.html"> 函数 &amp; 包 &amp; 判断 &amp; 循环 </a></li>
+<li><a href="/posts/230912152800.html"> 数组与切片 </a></li>
+<li><a href="/posts/230913161326.html"> 可变参数函数与 Map 集合 </a></li>
+<li><a href="/posts/230915155105.html"> 字符串和指针 </a></li>
+</ul>
+<h2 id="数据结构"> 数据结构 </h2>
+<ul>
+<li><a href="/posts/231007174854.html"> 链表（数组实现）</a></li>
+<li><a href="/posts/231008213450.html"> 链表（链式实现）</a></li>
+<li><a href="/posts/231016161508.html"> 堆栈（数组实现）</a></li>
+<li><a href="/posts/231016184406.html"> 堆栈（链表实现）</a></li>
+<li><a href="/posts/231127185207.html"> 单调栈 </a></li>
+<li><a href="/posts/231017105123.html"> 队列（链表实现）</a></li>
+<li><a href="/posts/231017154121.html"> 双端队列（链表实现）</a></li>
+<li><a href="/posts/231018102559.html"> 堆基础与堆结构（数组实现）</a></li>
+<li><a href="/posts/231019102311.html"> 优先队列（堆实现）</a></li>
+<li><a href="/posts/230905224335.html"> 二叉树的遍历 </a></li>
+<li><a href="/posts/231020174358.html"> 二叉搜索树 </a></li>
+<li><a href="/posts/230916094606.html"> 拓扑排序 </a></li>
+<li><a href="/posts/230925185057.html">Trie 字典树 </a></li>
+<li><a href="/posts/231023164532.html"> 并查集（数组实现）</a></li>
+<li><a href="/posts/240702200642.html">Linux 数据结构之队列 </a></li>
+</ul>
+<h2 id="数据结构算法"> 数据结构算法 </h2>
+<ul>
+<li><a href="/posts/231218181635.html"> 归并排序 </a></li>
+<li><a href="/posts/231108163339.html"> 快速排序 </a></li>
+<li><a href="/posts/231107171607.html"> 堆排序 </a></li>
+<li><a href="/posts/231124181658.html"> 二分查找 </a></li>
+<li><a href="/posts/231227190828.html"> 哈希表实现 </a></li>
+<li><a href="/posts/240313193201.html"> 字符串哈希函数 </a></li>
+<li><a href="/posts/231116150205.html">Floyd 多源最短路径 </a></li>
+<li><a href="/posts/231117095232.html">Dijkstra 单源最短路径（原理部分）</a></li>
+<li><a href="/posts/231121152713.html">Dijkstra 单源最短路径（实现部分）</a></li>
+</ul>
+<h2 id="数据库"> 数据库 </h2>
+<ul>
+<li><a href="/posts/250605180332.html">MySQL 基础 </a></li>
+</ul>
+<h2 id="计算机网络"> 计算机网络 </h2>
+<ul>
+<li><a href="/posts/231011192359.html">OSI 参考模型 </a></li>
+<li><a href="/posts/240329202000.html"> 计网 CyC2018 之概述 </a></li>
+<li><a href="/posts/240329202004.html"> 计网 CyC2018 之链路层 </a></li>
+<li><a href="/posts/240329202003.html"> 计网 CyC2018 之网络层 </a></li>
+<li><a href="/posts/240329202002.html"> 计网 CyC2018 之传输层 </a></li>
+<li><a href="/posts/240329202001.html"> 计网 CyC2018 之应用层 </a></li>
+<li><a href="/posts/240306203742.html">ACL 访问控制列表 </a></li>
+<li><a href="/posts/240130190208.html"> 路由表、转发表与快速转发工作原理 </a></li>
+<li><a href="/posts/231221200716.html">VXLAN 网络虚拟化技术 </a></li>
+<li><a href="/posts/240903191243.html">TCP/IP checksum 计算 </a></li>
+<li><a href="/posts/240911185603.html"> 抓包分析 TCP 三次握手与四次挥手过程 </a></li>
+</ul>
+<h2 id="操作系统"> 操作系统 </h2>
+<ul>
+<li><a href="/posts/230921190726.html"> 概述 </a></li>
+<li><a href="/posts/230924172528.html"> 中断 &amp; 异常 &amp; 系统调用 </a></li>
+<li><a href="/posts/231017195157.html"> 内存分层体系与地址空间生成 </a></li>
+<li><a href="/posts/231108195351.html"> 连续内存分配 </a></li>
+<li><a href="/posts/231111172507.html"> 非连续内存分配之分段与分页 </a></li>
+<li><a href="/posts/231119170537.html"> 非连续内存分配之页表 </a></li>
+<li><a href="/posts/231123184526.html"> 内存管理之覆盖技术与交换技术 </a></li>
+<li><a href="/posts/231127193658.html"> 内存管理之虚存技术 </a></li>
+<li><a href="/posts/231129182631.html"> 局部页面置换算法 </a></li>
+<li><a href="/posts/231207184239.html"> 全局页面置换算法 </a></li>
+<li><a href="/posts/231207204958.html"> 进程描述 </a></li>
+<li><a href="/posts/231210211306.html"> 进程状态 </a></li>
+<li><a href="/posts/231215213932.html"> 线程 </a></li>
+<li><a href="/posts/231218220813.html"> 进程控制 </a></li>
+<li><a href="/posts/231228193143.html"> 调度 </a></li>
+<li><a href="/posts/240104202828.html"> 同步与互斥 </a></li>
+<li><a href="/posts/240113115605.html"> 信号量与管程 </a></li>
+<li><a href="/posts/240205182643.html"> 经典同步问题 </a></li>
+<li><a href="/posts/240310162231.html"> 死锁 </a></li>
+</ul>
+<h2 id="系统与网络编程"> 系统与网络编程 </h2>
+<ul>
+<li><a href="/posts/230911151334.html">pthread 库 </a></li>
+<li><a href="/posts/230921094127.html"> 锁与原子操作 </a></li>
+<li><a href="/posts/240319195609.html"> 读者写者问题 </a></li>
+<li><a href="/posts/240527200241.html"> 网络编程卷一阅读随笔 </a></li>
+<li><a href="/posts/240414190410.html"> 进程间通信 IPC 机制 </a></li>
+<li><a href="/posts/240424200123.html"> 多进程相关练习 </a></li>
+<li><a href="/posts/240516221527.html">I/O 模式与 I/O 多路复用 </a></li>
+<li><a href="/posts/240626192803.html">Linux 内核 kfifo 环形队列 </a></li>
+<li><a href="/posts/241009203126.html">Linux 内核等待队列 </a></li>
+<li><a href="/posts/240627210637.html">DPDK 无锁环形队列 </a></li>
+<li><a href="/posts/240919200410.html"> 解密内存屏障 </a></li>
+<li><a href="/posts/240927202500.html"> 内核线程的创建 </a></li>
+<li><a href="/posts/241015195205.html">Linux 网络数据包接收过程 </a></li>
+<li><a href="/posts/2410232111015.html"> 源码解读 epoll 实现原理 </a></li>
+<li><a href="/posts/241106182619.html">Linux 文件系统 </a></li>
+<li><a href="/posts/250619154429.html">Libevent 高性能 IO 事件驱动库 </a></li>
+</ul>
+<h2 id="工具与命令"> 工具与命令 </h2>
+<ul>
+<li><a href="/posts/240207180410.html">GCC 编译过程分解 </a></li>
+<li><a href="/posts/240312184132.html">GDB 调试入门 </a></li>
+<li><a href="/posts/240512184921.html">Makefile 学习 </a></li>
+<li><a href="/posts/250629214430.html">CMake 学习 </a></li>
+<li><a href="/posts/240417193754.html">Linux 命令之文件权限 </a></li>
+</ul>
+<h2 id="开源项目"> 开源项目 </h2>
+<ul>
+<li><a href="/posts/240303201855.html"> 线程池原理与实现 </a></li>
+<li><a href="/posts/240507194549.html">HTTP 服务器实现 </a></li>
+<li><a href="/posts/240904203605.html"> 聊天服务器实现 </a></li>
+<li><a href="/posts/241119182636.html">Linux 文件系统 </a></li>
+</ul>
+<h2 id="Docker">Docker</h2>
+<ul>
+<li><a href="/posts/230909171809.html">Docker 学习笔记 </a></li>
+</ul>
+<h1 id="LeetCode 刷题">LeetCode 刷题 </h1>
+<h2 id="链表相关"> 链表相关 </h2>
+<ul>
+<li><a href="/posts/231025143947.html">160 相交链表 </a></li>
+<li><a href="/posts/231025185947.html">206 反转链表 </a></li>
+<li><a href="/posts/231026101239.html">21 合并两个有序链表 </a></li>
+<li><a href="/posts/231026184514.html">83 删除排序链表中的重复元素 </a></li>
+<li><a href="/posts/231027150243.html">19 删除链表的倒数第 N 个节点 </a></li>
+<li><a href="/posts/231031120718.html">2 两数相加 </a></li>
+<li><a href="/posts/231031163133.html">445 两数相加 II</a></li>
+<li><a href="/posts/231101094219.html">234 回文链表 </a></li>
+<li><a href="/posts/231101135228.html">725 分隔链表 </a></li>
+<li><a href="/posts/231102120708.html">328 奇偶链表 </a></li>
+<li><a href="/posts/231102165703.html">142 环形链表 II</a></li>
+</ul>
+<h2 id="设计"> 设计 </h2>
+<ul>
+<li><a href="/posts/231201184542.html">146 LRU 缓存 </a></li>
+</ul>
+<h2 id="贪心算法"> 贪心算法 </h2>
+<ul>
+<li><a href="/posts/231107094652.html">1029 两地调度 </a></li>
+<li><a href="/posts/231109150855.html">435 无重叠区间 </a></li>
+</ul>
+<h2 id="哈希表"> 哈希表 </h2>
+<ul>
+<li><a href="/posts/231123181539.html">1410 实体解析器 </a></li>
+</ul>
+<h2 id="树的遍历"> 树的遍历 </h2>
+<ul>
+<li><a href="/posts/231103121209.html">117 填充每个节点的下一个右侧节点指针 II</a></li>
+</ul>
+<h2 id="深度优先搜索（递归）"> 深度优先搜索（递归）</h2>
+<ul>
+<li><a href="/posts/231206201243.html">2477 达到首都的最少油耗 </a></li>
+</ul>
+<h2 id="图或路径问题"> 图或路径问题 </h2>
+<ul>
+<li><a href="/posts/231211184652.html">1631 最小体力消耗路径 </a></li>
+</ul>
+<h2 id="其它"> 其它 </h2>
+<ul>
+<li><a href="/posts/230101120000.html"> 备忘录 </a></li>
+</ul>
+
+</div>
+
+
+<script src="/js/book-menu.js"></script>
+
+    </div>
+    <div class="sidebar-toggle" onclick="sidebar_toggle()" onmouseover="add_inner()" onmouseleave="remove_inner()">
+  <div class="sidebar-toggle-inner"></div>
+</div>
+
+<script>
+function add_inner() {
+  let inner = document.querySelector('.sidebar-toggle-inner')
+  inner.classList.add('show')  
+}
+
+function remove_inner() {
+  let inner = document.querySelector('.sidebar-toggle-inner')
+  inner.classList.remove('show')
+}
+
+function sidebar_toggle() {
+    let sidebar_toggle = document.querySelector('.sidebar-toggle')
+    let sidebar = document.querySelector('.book-sidebar')
+    let content = document.querySelector('.off-canvas-content')
+    if (sidebar_toggle.classList.contains('extend')) { // show
+        sidebar_toggle.classList.remove('extend')
+        sidebar.classList.remove('hide')
+        content.classList.remove('extend')
+    }
+    else { // hide
+        sidebar_toggle.classList.add('extend')
+        sidebar.classList.add('hide')
+        content.classList.add('extend')
+    }
+}
+</script>
+
+      <div class="off-canvas-content">
+        <div class="columns">
+          <div class="column col-10 col-lg-12">
+            <div class="book-navbar">
+              <!-- For Responsive Layout -->
+
+<header class="navbar">
+  <section class="navbar-section">
+    <a onclick="open_sidebar()">
+      <i class="icon icon-menu"></i>
+    </a>
+  </section>
+</header>
+
+            </div>
+            <div class="book-content">
+              <div class="book-post">
+  <p>这篇文章主要介绍操作系统的启动，中断、异常、系统调用的特征和差别，以及处理流程（机制）。</p>
+<span id="more"></span>
+<h2 id="操作系统启动">操作系统启动</h2>
+<h3 id="作用解析">作用解析</h3>
+<ul>
+<li>硬盘（disk）：存放 OS 和 BootLoader</li>
+<li>BIOS：基本 I/O 处理系统</li>
+<li>BootLoader：用于加载 OS，将 OS 从 disk 加载到内存中</li>
+</ul>
+<blockquote>
+<p>BIOS 是一种固化在计算机主板上的软件程序，其中的一个主要作用就是：启动计算机 —— 当你启动计算机时，<strong>BIOS 是第一个被执行的程序</strong>。它负责进行硬件自检（POST，Power-On Self-Test）以及初始化计算机的硬件设备，包括处理器、内存、硬盘、显卡等。<strong>BIOS 还负责加载操作系统的引导程序（BootLoader）</strong>。</p>
+</blockquote>
+<h3 id="启动步骤">启动步骤</h3>
+<img src="../images/os-kernel/chapter2/os-startup.png" alt="计算机启动流程" width="80%" height="80%">
+<p>操作系统启动过程可以概括为以下几个步骤：</p>
+<ol>
+<li>电源启动</li>
+<li>BIOS 自检</li>
+<li>加载引导程序（BootLoader）</li>
+<li>引导程序的工作</li>
+<li>内核初始化：操作系统内核接管控制权后，它会进行一系列的初始化工作，包括初始化进程管理、内存管理、文件系统等重要的系统组件</li>
+<li>用户登录</li>
+</ol>
+<h4 id="BIOS 自检">BIOS 自检</h4>
+<img src="../images/os-kernel/chapter2/os-startup-layout.png" alt="计算机启动时内存和硬盘布局" width="80%" height="80%">
+<p>计算机启动时，BIOS 从一个特定地址（CS:IP = 0xF000:FFF0）开始执行，这两个寄存器合在一起可以形成一个具体的物理内存地址。BIOS 就从这个内存地址开始执行 POST（加电自检）、寻找显卡和执行 BIOS。</p>
+<blockquote>
+<p>段寄存器（CS）和指令寄存器（IP）是计算机中的两种不同类型的寄存器：<br>
+<strong>段寄存器 </strong> 是用于存储内存中的段地址的寄存器。在计算机中，内存被划分为多个段，每个段都有一个唯一的段地址。段寄存器存储着当前程序正在访问的段的地址。当程序需要访问内存中的数据时，它会使用段寄存器中的地址来确定要访问的段，并将其与偏移地址（存储在其他寄存器中）相加以获取最终的物理地址。<br>
+** 指令寄存器（也称为程序计数器）** 是用于存储下一条要执行的指令的地址的寄存器。在计算机执行程序时，指令寄存器中保存着当前正在执行的指令的地址。当一条指令执行完毕后，指令寄存器会自动增加，以指向下一条将要执行的指令的地址。这样，计算机可以按顺序执行存储器中的指令序列。指令寄存器的值的改变决定了计算机下一步要执行的操作。</p>
+</blockquote>
+<h4 id="加载 BootLoader">加载 BootLoader</h4>
+<img src="../images/os-kernel/chapter2/os-load-bootloader.png" alt="BIOS 加载引导程序" width="80%" height="80%">
+<p><strong>BIOS 负责加载 BootLoader</strong>：BIOS 会从预设的启动设备（如硬盘、光盘、USB 等）中加载引导程序（BootLoader）到内存中。引导程序通常位于硬盘的特定扇区或光盘的启动区。</p>
+<p><strong>引导程序的工作</strong>：引导程序负责初始化硬件（如 CPU、内存等），加载操作系统内核，并将控制权交给内核。它还可以提供多个操作系统的选择菜单（如 GRUB），以供用户选择启动的操作系统。</p>
+<h4 id="加载 OS">加载 OS</h4>
+<p>BootLoader 放在硬盘的第一个主引导扇区（512 字节）。这样，BIOS 从硬盘的第一个扇区寻找，一下便能找到 BootLoader。</p>
+<img src="../images/os-kernel/chapter2/os-bootloader-address.png" alt="引导程序的内存地址空间" width="80%" height="80%">
+<p><strong>BIOS 负责加载 BootLoader</strong>：将 BootLoader 从磁盘的引导扇区加载到 0x7C00 内存地址处。</p>
+<p><strong>BootLoader 负责加载 OS</strong>：将操作系统的代码和数据从硬盘加载到内存中。之后，控制权交给到 OS（跳转到 OS 的起始地址）。</p>
+<h2 id="中断、异常和系统调用">中断、异常和系统调用</h2>
+<p>操作系统与设备和程序之间的交互可以通过中断、异常和系统调用来实现。</p>
+<h3 id="定义">定义</h3>
+<p><strong>中断（hardware interrupt）</strong>：是指外部事件（如硬件设备请求、定时器中断等）打断程序的正常执行，引发操作系统的处理程序来处理相应的事件。通过中断，设备可以向操作系统发出请求，操作系统可以响应并进行相应的处理。</p>
+<p><strong>异常（exception）</strong>：是指程序执行过程中出现的错误或异常情况，如除零错误、访问非法内存等。当发生异常时，操作系统会捕获并进行相应的处理，例如终止异常程序、显示错误消息等。</p>
+<p><strong>系统调用（system call）</strong>：是应用程序通过操作系统提供的接口来请求操作系统的服务。通过系统调用，应用程序可以访问操作系统提供的功能，如文件读写、网络通信、内存管理等。应用程序通过系统调用将请求传递给操作系统，操作系统执行相应的操作，并将结果返回给应用程序。</p>
+<h3 id="来源">来源</h3>
+<p><strong>中断来源于外设</strong>：来自不同的硬件设备的计时器和网络的中断。</p>
+<p><strong>异常来源于不良的应用程序</strong>：非法指令或者其他坏的处理状态（如：内存出错）。</p>
+<p><strong>系统调用来源于应用程序</strong>：应用程序主动向操作系统发出服务请求。</p>
+<h3 id="处理时间">处理时间</h3>
+<ul>
+<li>中断：异步</li>
+<li>异常：同步</li>
+<li>系统调用：同步或异步
+<ul>
+<li>同步：指应用程序等待系统调用的返回结果</li>
+<li>异步：指应用程序发出系统调用后就去干别的事情了</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>异步：应用程序不知道什么时候会发生<br>
+同步：执行到某一条指令一定会发生该事件</p>
+</blockquote>
+<h3 id="响应状态">响应状态</h3>
+<ul>
+<li>中断：持续，对用户应用程序是透明的（用户程序感知不到）</li>
+<li>异常：杀死或重新执行指令</li>
+<li>系统调用：等待和持续</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>交互方式</th>
+<th>来源</th>
+<th>处理时间</th>
+<th>响应状态</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>中断</td>
+<td>外设</td>
+<td>异步</td>
+<td>持续，对用户应用程序透明</td>
+</tr>
+<tr>
+<td>异常</td>
+<td>不良的应用程序</td>
+<td>同步</td>
+<td>杀死或重新执行指令</td>
+</tr>
+<tr>
+<td>系统调用</td>
+<td>应用程序</td>
+<td>同步或异步</td>
+<td>等待和持续</td>
+</tr>
+</tbody>
+</table>
+<h3 id="中断和异常处理流程">中断和异常处理流程</h3>
+<p>中断是外设的事件，异常是内部 CPU 的事件。中断和异常迫使 CPU 访问一些与中断和异常相关的功能和服务。</p>
+<h4 id="中断处理流程">中断处理流程</h4>
+<p>操作系统的中断处理流程包括硬件中断处理和软件中断处理两个部分。</p>
+<p><strong>硬件中断 </strong> 处理流程如下：</p>
+<ol>
+<li>硬件设备产生中断信号，例如外设完成数据传输、定时器到达计时器溢出等。</li>
+<li><strong>CPU 检测到中断信号后，会立即停止当前正在执行的指令，并将当前执行指令的上下文（包括寄存器状态、程序计数器等）保存到内存中的堆栈中</strong>。</li>
+<li>CPU 根据中断信号的类型，通过中断向量表或中断描述符表（IDT）查找相应的中断处理程序的入口地址。</li>
+<li>CPU 跳转到中断处理程序的入口地址，开始执行中断处理程序。</li>
+<li>中断处理程序根据中断类型执行相应的操作，例如处理设备的数据、更新操作系统状态等。</li>
+<li><strong>中断处理程序执行完毕后，将之前保存的上下文从堆栈中恢复回来</strong>。</li>
+<li>CPU 继续执行被中断的指令或者执行下一个指令。</li>
+</ol>
+<p><strong>软件中断 </strong> 处理流程如下：</p>
+<ol>
+<li>程序通过系统调用或软中断指令触发软件中断。</li>
+<li>CPU 执行软中断指令后，<strong>会暂停当前正在执行的指令，并将当前执行指令的上下文保存到内存中的堆栈中</strong>。</li>
+<li>CPU 根据软中断号，在中断向量表或中断描述符表（IDT）中查找相应的中断处理程序的入口地址。</li>
+<li>CPU 跳转到中断处理程序的入口地址，开始执行中断处理程序。</li>
+<li>中断处理程序根据软中断号执行相应的操作，例如系统调用、异常处理等。</li>
+<li>中断处理程序执行完毕后，<strong>将之前保存的上下文从堆栈中恢复回来</strong>。</li>
+<li>CPU 继续执行被中断的指令或者执行下一个指令。</li>
+</ol>
+<p>总的来说，中断处理流程包括 <strong> 中断信号的检测、上下文的保存与恢复、中断处理程序的执行 </strong> 等步骤，以保证操作系统能够及时响应硬件设备的请求或软件的触发。</p>
+<blockquote>
+<p>应用程序完全不会感知到中断的产生。</p>
+</blockquote>
+<h4 id="异常处理流程">异常处理流程</h4>
+<p>操作系统的异常处理流程如下：</p>
+<ol>
+<li><strong>异常产生</strong>：异常是指在程序执行过程中发生的错误或异常情况，例如访问非法内存、除零错误等。异常可以由硬件产生，也可以由软件产生。</li>
+<li><strong>异常检测</strong>：CPU 会检测到异常的发生，并中断当前正在执行的指令。</li>
+<li><strong>异常处理程序选择</strong>：CPU 会通过中断向量表或中断描述符表（IDT）查找相应的异常处理程序的入口地址。</li>
+<li><strong>上下文保存</strong>：CPU 会将当前执行指令的上下文（包括寄存器状态、程序计数器等）保存到内存中的堆栈中。</li>
+<li><strong>异常处理程序执行</strong>：CPU 跳转到异常处理程序的入口地址，开始执行异常处理程序。</li>
+<li><strong>异常处理</strong>：异常处理程序会根据异常类型执行相应的操作，例如打印错误信息、终止异常进程、恢复系统状态等。</li>
+<li><strong>上下文恢复</strong>：异常处理程序执行完毕后，将之前保存的上下文从堆栈中恢复回来。</li>
+<li><strong>异常返回</strong>：CPU 继续执行被中断（指的是由异常引起的中断，而不是外部设备或事件所引起的中断）的指令或者执行下一个指令。</li>
+</ol>
+<p>总的来说，异常处理流程包括 <strong> 异常信号的检测、上下文的保存与恢复、异常处理程序的执行 </strong> 等步骤，异常处理流程的目的是在程序出现异常时能够及时处理异常情况，保证系统的稳定性和可靠性。</p>
+<h3 id="系统调用">系统调用</h3>
+<p>系统调用来源于应用程序，需要操作系统提供服务，这些服务需要操作系统来执行，这个过程就需要一个接口：<strong>系统调用接口</strong>。应用程序访问主要是通过高层次的 API 接口，而不是直接进行系统调用。</p>
+<img src="../images/os-kernel/chapter2/os-syscall.png" alt="系统调用示例" width="80%" height="80%">
+<p><strong>三种最常用的 APIs</strong>：</p>
+<ul>
+<li>Win32 API：用于 Windows</li>
+<li>POSIX API：用于 POSIX-based systems（包括 UNIX，LINUX，Mac OS X）</li>
+<li>Java API：用于 JAVA 虚拟机（JVM 跨平台）</li>
+</ul>
+<p><strong>特点</strong>：</p>
+<ul>
+<li>通常情况下，每个系统调用对应一个系统调用号，系统调用接口根据这些序号来维护表的索引。</li>
+<li>系统调用接口调用内核态中预期的系统调用，并返回系统调用的状态和其他任何返回值。</li>
+<li>用户不需要知道系统调用是如何实现的，只需要获取 API 和了解操作系统将什么作为返回结果。</li>
+</ul>
+<p><strong>用户态</strong>：操作系统运行中，CPU 所处的特权级别特别低，不能访问特权指令、I/O 指令。</p>
+<p><strong>内核态</strong>：操作系统运行中，CPU 所处的级别很高，可以执行任何一条指令，包括特权指令、I/O 指令。</p>
+<p><strong>系统调用 </strong>：触发 CPU<strong> 从用户态到内核态的转换</strong>。切换程序和内核的堆栈，需要一定的开销，但是换来了安全。</p>
+<p><strong>系统调用是跨越操作系统边界的开销</strong>（值得的且必须的，保证了操作系统的安全性）：</p>
+<ul>
+<li>在执行时间上的开销超过程序调用</li>
+<li>开销：
+<ul>
+<li>建立中断、异常、系统调用号与对应服务例程映射关系的初始化开销</li>
+<li>建立内核堆栈（用于内核退出时保存，内核执行时恢复，类似于应用程序的堆栈）</li>
+<li>验证参数（内核不信任应用程序，故而需要验证参数）</li>
+<li>内核态映射到用户态的地址空间（<strong>通过拷贝的方式传递数据</strong>，不像用户态下的应用程序，可以通过指针传递实现）
+<ul>
+<li>更新页面映射权限</li>
+</ul>
+</li>
+<li>内核态独立地址空间
+<ul>
+<li>通过在 TLB 中维护不同的页表实现</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>「内核态独立地址空间」是指在操作系统中，内核和用户程序所使用的内存地址空间是相互独立的。</p>
+</blockquote>
+<h2 id="什么是更新页面映射权限">什么是更新页面映射权限</h2>
+<p>「更新页面映射权限」是指在操作系统中，<strong>对虚拟内存中的页面进行权限的调整或修改</strong>。</p>
+<p>在虚拟内存管理中，操作系统将物理内存空间映射到进程的虚拟地址空间中，形成了一种虚拟内存映射。每个页面都有对应的权限，例如读、写、执行等。当需要修改某个页面的权限时，就需要进行页面映射权限的更新。</p>
+<p>更新页面映射权限的具体操作包括：</p>
+<ol>
+<li><strong>检查该页面的当前权限</strong>：首先，操作系统会检查该页面的当前权限，确定要进行哪些修改。</li>
+<li><strong>修改页面权限</strong>：根据需要，操作系统会修改页面的权限，例如增加或删除某项权限。</li>
+<li><strong>更新页表 </strong>：在虚拟内存管理中，每个进程都有自己的页表，<strong> 用于记录虚拟地址与物理地址之间的映射关系</strong>。当页面的权限发生变化时，操作系统需要更新相应的页表项，以反映最新的权限信息。</li>
+</ol>
+<p>通过更新页面映射权限，操作系统可以 <strong> 实现对进程的内存访问控制</strong>，保证系统的安全性和稳定性。</p>
+<h2 id="应用程序不能直接访问外设">应用程序不能直接访问外设</h2>
+<p>应用程序不能直接访问外设，而要通过操作系统的原因主要有以下几点：</p>
+<ol>
+<li>安全性：操作系统（内核）是被信任的第三方，只有操作系统才能执行特权指令，保护硬件和系统资源的安全。</li>
+<li>统一性：通过操作系统提供的接口，应用程序可以统一地访问不同的外设，而不需要关心具体的硬件细节。</li>
+<li>方便性：操作系统提供了一些高级功能和服务，如文件系统、网络协议等，应用程序可以更方便地使用这些功能。</li>
+</ol>
+<blockquote>
+<p>参考资料：<br>
+1：<a target="_blank" rel="noopener" href="https://github.com/OXygenMoon/OperatingSystemInDepth">https://github.com/OXygenMoon/OperatingSystemInDepth</a><br>
+2：<a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_53407527/category_11825873.html">https://blog.csdn.net/weixin_53407527/category_11825873.html</a></p>
+</blockquote>
+
+</div>
+
+
+  <div class="book-comments">
+    
+
+
+
+
+  </div>
+
+
+
+<script src="/js/book-post.js"></script>
+
+
+            </div>
+          </div>
+          <div class="column col-2 hide-lg">
+            <div class="book-post-info">
+  
+    <div class="book-post-meta">
+
+  <div class="author">
+
+    <!-- Author image -->
+    <div class="author-img">
+      
+        <figure
+          class="avatar avatar-lg"
+          data-initial="A"
+          style="background-color: #3b4351;">
+        </figure>
+      
+    </div>
+
+    <!-- Author title -->
+    <div class="author-title">
+      <div>aha</div>
+      <div>2023-09-24</div>
+    </div>
+  </div>
+
+  
+    <div class="divider"></div>
+
+    <div class="link">
+      <a class="category-link" href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">操作系统</a> <a class="category-link" href="/categories/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E4%B8%AD%E6%96%AD%E3%80%81%E5%BC%82%E5%B8%B8%E5%92%8C%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8/">中断、异常和系统调用</a>
+
+      <a class="tag-none-link" href="/tags/%E4%B8%AD%E6%96%AD/" rel="tag">#中断</a> <a class="tag-none-link" href="/tags/%E5%BC%82%E5%B8%B8/" rel="tag">#异常</a> <a class="tag-none-link" href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" rel="tag">#操作系统</a> <a class="tag-none-link" href="/tags/%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8/" rel="tag">#系统调用</a>
+    </div>
+    
+  
+
+  <div class="divider"></div>
+</div>
+  
+
+  <div class="book-tocbot">
+</div>
+<div class="book-tocbot-menu">
+  <a class="book-toc-expand" onclick="expand_toc()">Expand all</a>
+  <a onclick="go_top()">Back to top</a>
+  <a onclick="go_bottom()">Go to bottom</a>
+  <a onclick="toggleSearch()">Search in blogs</a> <!-- 添加搜索文字的点击事件 -->
+</div>
+
+<div id="search-overlay" class="search-overlay" style="display: none;"> <!-- 初始状态为隐藏 -->
+  <div class="search-box">
+    <input type="text" id="search-input" placeholder="Search in all blogs...">
+    <button onclick="closeSearch()">Close</button> <!-- 添加关闭按钮 -->
+    <div id="search-results" class="search-results"></div>
+  </div>
+</div>
+
+<script>
+  function performSearch(query) {
+    if (!query.trim()) {
+      return;
+    }
+
+    fetch('/search.xml')
+      .then(response => response.text())
+      .then(data => {
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(data, "text/xml");
+        const entries = xmlDoc.getElementsByTagName('entry');
+        let results = '';
+
+        for (let i = 0; i < entries.length; i++) {
+          const title = entries[i].getElementsByTagName('title')[0].textContent;
+          const content = entries[i].getElementsByTagName('content')[0].textContent;
+          const url = entries[i].getElementsByTagName('url')[0].textContent;
+
+          let count = (title.match(new RegExp(query, "gi")) || []).length; // 统计查询词出现的次数
+          count += (content.match(new RegExp(query, "gi")) || []).length;
+
+          if (count > 0) { // title.includes(query) || content.includes(query)
+            results += `
+              <div class="search-result-item">
+                <a href="${url}">${title}</a> (${count})
+              </div>`;
+          }
+        }
+
+        const searchResultsElement = document.getElementById('search-results');
+        searchResultsElement.innerHTML = results;
+        searchResultsElement.classList.add('active');
+      });
+  }
+
+  function toggleSearch() {
+    const searchOverlay = document.getElementById('search-overlay');
+    searchOverlay.style.display = searchOverlay.style.display === 'none' ? 'flex' : 'none';
+  }
+
+  function closeSearch() {
+    document.getElementById('search-overlay').style.display = 'none';
+  }
+
+  document.getElementById('search-input').addEventListener('input', function() {
+    const query = this.value;
+    performSearch(query);
+  });
+</script>
+
+<style>
+  .search-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  .search-box {
+    background: white;
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+    width: 80%;
+    max-width: 500px;
+  }
+
+  .search-results {
+    margin-top: 10px;
+    max-height: 300px;
+    overflow-y: auto;
+    background: white;
+    padding: 10px;
+    border-radius: 5px;
+    width: 100%;
+  }
+
+  .search-result-item {
+    margin: 10px 0;
+  }
+
+  .search-result-item a {
+    color: blue; /* 设置链接颜色为蓝色 */
+    text-decoration: none;
+  }
+
+  .search-result-item a:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+<script src="/js/book-toc.js"></script>
+
+
+</div>
+          </div>
+        </div>
+      </div>
+
+      <a class="off-canvas-overlay" onclick="hide_canvas()"></a>
+
+      <button class="floating-button" onclick="toggleDropdownMenu()"></button>
+
+      <div class="dropdown-menu">
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FFFFFF', '#000000')">银河白</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#C7EDCC', '#000000')">豆沙绿</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FAF9DE', '#000000')">杏仁黄</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#E3EDCD', '#000000')">青草绿</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FFF2E2', '#000000')">秋叶褐</div>
+      </div>
+  </div>
+
+  <script>
+    function toggleDropdownMenu() {
+      document.querySelector('.floating-button').classList.toggle('active');
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      var storedBackgroundColor = localStorage.getItem('blogBackgroundColor');
+      var storedColor = localStorage.getItem('blogColor');
+
+      if (storedBackgroundColor && storedColor) {
+        document.body.style.backgroundColor = storedBackgroundColor;
+        document.body.style.color = storedColor;
+      }
+    });
+
+    function changeBackgroundColor(backgroundColor, color) {
+      document.body.style.backgroundColor = backgroundColor;
+      document.body.style.color = color;
+
+      localStorage.setItem('blogBackgroundColor', backgroundColor);
+      localStorage.setItem('blogColor', color);
+
+      document.querySelector('.floating-button').classList.remove('active');
+    }
+  </script>
+</body>
+
+</html>
+
+
+<script src="/js/book.js"></script>
