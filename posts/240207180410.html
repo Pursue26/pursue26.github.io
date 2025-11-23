@@ -228,6 +228,7 @@ document.addEventListener('DOMContentLoaded', function () {
 <li><a href="/posts/2410232111015.html"> 源码解读 epoll 实现原理 </a></li>
 <li><a href="/posts/241106182619.html">Linux 文件系统 </a></li>
 <li><a href="/posts/250619154429.html">Libevent 高性能 IO 事件驱动库 </a></li>
+<li><a href="/posts/251119185833.html">Linux UDP 传输性能优化 </a></li>
 </ul>
 <h2 id="工具与命令"> 工具与命令 </h2>
 <ul>
@@ -355,7 +356,7 @@ function sidebar_toggle() {
 <p>在 C 语言程序中，会引用各种 <code>#include</code> 头文件（.h），它是如何被引用的？</p>
 <p>当我们 <code>#include</code> 头文件时，如 <code>#include &lt;stdio.h&gt;</code>，其实是告诉了 C 预处理器（C preprocessor, cpp）去指定路径 <code>/usr/include/</code> 查找特定的头文件，并将其直接插入到代码中的 <code>#include</code> 位置。</p>
 <h1 id="GCC 编译分解">GCC 编译分解</h1>
-<p>我么以下面的程序分解 GCC 编译的过程，文件名 <code>hw.c</code>。</p>
+<p>我们以下面的程序分解 GCC 编译的过程，文件名 <code>hw.c</code>。</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* header files go up here */</span></span><br><span class="line"><span class="comment">/* note that C comments are enclosed within a slash and</span></span><br><span class="line"><span class="comment">a star, and may wrap over lines */</span></span><br><span class="line"><span class="comment">// two slashes work too (and may be preferred)</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="comment">// main returns an integer</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span> &#123;</span><br><span class="line">    <span class="comment">/* printf is our output function;</span></span><br><span class="line"><span class="comment">    by default, writes to standard out */</span></span><br><span class="line">    <span class="comment">/* printf returns an integer, but we ignore that */</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;hello, world\n&quot;</span>);</span><br><span class="line">    <span class="comment">/* return 0 to indicate all went well */</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>GCC 并不是一个真正的编译器，而是一个称为「编译器驱动（compiler driver）」的程序，因此它协调了编译的许多步骤（一般为四到五步），如下图。</p>
 <img src="../images/compiler-tool/gcc.png" alt="GCC 编译过程分解" width="100%" height="100%">
