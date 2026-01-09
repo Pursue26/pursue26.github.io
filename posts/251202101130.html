@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
+
+    
+      <link rel="icon" href="/favicon.png" />
+    
+
+    <title>
+        
+          Linux 零拷贝技术 - aha&#39;s book
+        
+    </title>
+
+    <!-- Spectre.css framework -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre-exp.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.9/spectre-icons.min.css">
+
+    <!-- theme css & js -->
+    
+<link rel="stylesheet" href="/css/book.css">
+
+    
+<script src="/js/book.js"></script>
+
+
+    <!-- tocbot -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.4.2/tocbot.css">
+    
+    <!-- katex -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+
+    
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/zooming/2.1.1/zooming.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const zooming = new Zooming()
+    zooming.listen('.book-content img')
+})
+</script>
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+    <style>
+      body {
+        background-color: #FFFFFF;
+        /* color: #000000; */
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+
+      /* Floating Button Styles */
+      .floating-button {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 999;
+        background-color: #000000;
+        color: #ffffff;
+        padding: 12px;
+        border-radius: 50%;
+        cursor: pointer;
+        border: 2px solid #000000;
+      }
+
+      .floating-button:hover {
+        background-color: #FFFFFF;
+      }
+
+      /* Dropdown Menu Styles */
+      .dropdown-menu {
+        position: fixed;
+        bottom: 60px;
+        right: 10px;
+        display: none;
+        min-width: 60px;
+        padding: 2px;
+        background-color: #fff;
+        /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
+        z-index: 1000;
+      }
+
+      .floating-button.active+.dropdown-menu {
+        display: block;
+      }
+
+      .dropdown-item {
+        display: block;
+        padding: 8px 16px;
+        cursor: pointer;
+      }
+
+      .dropdown-item:hover {
+        background-color: #f5f5f5;
+      }
+    </style>
+<style>.darkmode--activated{--body-bg-color:#282828;--content-bg-color:#333;--card-bg-color:#555;--text-color:#ccc;--blockquote-color:#bbb;--link-color:#ccc;--link-hover-color:#eee;--brand-color:#ddd;--brand-hover-color:#ddd;--table-row-odd-bg-color:#282828;--table-row-hover-bg-color:#363636;--menu-item-bg-color:#555;--btn-default-bg:#222;--btn-default-color:#ccc;--btn-default-border-color:#555;--btn-default-hover-bg:#666;--btn-default-hover-color:#ccc;--btn-default-hover-border-color:#666;--highlight-background:#282b2e;--highlight-foreground:#a9b7c6;--highlight-gutter-background:#34393d;--highlight-gutter-foreground:#9ca9b6}.darkmode--activated img{opacity:.75}.darkmode--activated img:hover{opacity:.9}.darkmode--activated code{color:#69dbdc;background:0 0}button.darkmode-toggle{z-index:9999}.darkmode-ignore,img{display:flex!important}.beian img{display:inline-block!important}</style></head>
+
+<body>
+  <div class="book-container">
+    <div class="book-sidebar">
+      <div class="book-brand">
+  <a href="/">
+    <img src="/favicon.png">
+    <span>AHA&#39;S BOOK</span>
+  </a>
+</div>
+        <div id="menu" class="book-menu hide">
+  <h2 id="基础知识"> 基础知识 </h2>
+<ul>
+<li><a href="/posts/231010144856.html"> 模运算 </a></li>
+<li><a href="/posts/231014105311.html"> 异或运算 </a></li>
+<li><a href="/posts/231210181853.html"> 计算机中的寄存器 </a></li>
+<li><a href="/posts/231213183051.html"> 正则表达式基础 </a></li>
+</ul>
+<h2 id="C 语言">C 语言 </h2>
+<ul>
+<li><a href="/posts/230916171929.html">main 函数参数 </a></li>
+<li><a href="/posts/231214192113.html"> 关键字与专有名词 </a></li>
+<li><a href="/posts/240103180653.html"> 输出打印函数 </a></li>
+<li><a href="/posts/230922143003.html"> 多维数组 </a></li>
+<li><a href="/posts/230913200729.html">const 关键字 </a></li>
+<li><a href="/posts/230918174223.html">typedef 类型基础 </a></li>
+<li><a href="/posts/230920172849.html">typedef 类型实践 </a></li>
+<li><a href="/posts/240224193217.html"> 二级指针 </a></li>
+<li><a href="/posts/240307195203.html"> 代码 TOP-K 问题 </a></li>
+<li><a href="/posts/230922172626.html">uthash 哈希表基础 </a></li>
+<li><a href="/posts/230918114841.html"> 大小端知识 </a></li>
+</ul>
+<h2 id="Golang 语言">Golang 语言 </h2>
+<ul>
+<li><a href="/posts/230907162612.html"> 变量与常量 </a></li>
+<li><a href="/posts/230909120145.html"> 函数 &amp; 包 &amp; 判断 &amp; 循环 </a></li>
+<li><a href="/posts/230912152800.html"> 数组与切片 </a></li>
+<li><a href="/posts/230913161326.html"> 可变参数函数与 Map 集合 </a></li>
+<li><a href="/posts/230915155105.html"> 字符串和指针 </a></li>
+</ul>
+<h2 id="数据结构"> 数据结构 </h2>
+<ul>
+<li><a href="/posts/231007174854.html"> 链表（数组实现）</a></li>
+<li><a href="/posts/231008213450.html"> 链表（链式实现）</a></li>
+<li><a href="/posts/231016161508.html"> 堆栈（数组实现）</a></li>
+<li><a href="/posts/231016184406.html"> 堆栈（链表实现）</a></li>
+<li><a href="/posts/231127185207.html"> 单调栈 </a></li>
+<li><a href="/posts/231017105123.html"> 队列（链表实现）</a></li>
+<li><a href="/posts/231017154121.html"> 双端队列（链表实现）</a></li>
+<li><a href="/posts/231018102559.html"> 堆基础与堆结构（数组实现）</a></li>
+<li><a href="/posts/231019102311.html"> 优先队列（堆实现）</a></li>
+<li><a href="/posts/230905224335.html"> 二叉树的遍历 </a></li>
+<li><a href="/posts/231020174358.html"> 二叉搜索树 </a></li>
+<li><a href="/posts/230916094606.html"> 拓扑排序 </a></li>
+<li><a href="/posts/230925185057.html">Trie 字典树 </a></li>
+<li><a href="/posts/231023164532.html"> 并查集（数组实现）</a></li>
+<li><a href="/posts/240702200642.html">Linux 数据结构之队列 </a></li>
+</ul>
+<h2 id="数据结构算法"> 数据结构算法 </h2>
+<ul>
+<li><a href="/posts/231218181635.html"> 归并排序 </a></li>
+<li><a href="/posts/231108163339.html"> 快速排序 </a></li>
+<li><a href="/posts/231107171607.html"> 堆排序 </a></li>
+<li><a href="/posts/231124181658.html"> 二分查找 </a></li>
+<li><a href="/posts/231227190828.html"> 哈希表实现 </a></li>
+<li><a href="/posts/240313193201.html"> 字符串哈希函数 </a></li>
+<li><a href="/posts/231116150205.html">Floyd 多源最短路径 </a></li>
+<li><a href="/posts/231117095232.html">Dijkstra 单源最短路径（原理部分）</a></li>
+<li><a href="/posts/231121152713.html">Dijkstra 单源最短路径（实现部分）</a></li>
+</ul>
+<h2 id="数据库"> 数据库 </h2>
+<ul>
+<li><a href="/posts/250605180332.html">MySQL 基础 </a></li>
+</ul>
+<h2 id="计算机网络"> 计算机网络 </h2>
+<ul>
+<li><a href="/posts/231011192359.html">OSI 参考模型 </a></li>
+<li><a href="/posts/240329202000.html"> 计网 CyC2018 之概述 </a></li>
+<li><a href="/posts/240329202004.html"> 计网 CyC2018 之链路层 </a></li>
+<li><a href="/posts/240329202003.html"> 计网 CyC2018 之网络层 </a></li>
+<li><a href="/posts/240329202002.html"> 计网 CyC2018 之传输层 </a></li>
+<li><a href="/posts/240329202001.html"> 计网 CyC2018 之应用层 </a></li>
+<li><a href="/posts/240306203742.html">ACL 访问控制列表 </a></li>
+<li><a href="/posts/240130190208.html"> 路由表、转发表与快速转发工作原理 </a></li>
+<li><a href="/posts/231221200716.html">VXLAN 网络虚拟化技术 </a></li>
+<li><a href="/posts/240903191243.html">TCP/IP checksum 计算 </a></li>
+<li><a href="/posts/240911185603.html"> 抓包分析 TCP 三次握手与四次挥手过程 </a></li>
+</ul>
+<h2 id="操作系统"> 操作系统 </h2>
+<ul>
+<li><a href="/posts/230921190726.html"> 概述 </a></li>
+<li><a href="/posts/230924172528.html"> 中断 &amp; 异常 &amp; 系统调用 </a></li>
+<li><a href="/posts/231017195157.html"> 内存分层体系与地址空间生成 </a></li>
+<li><a href="/posts/231108195351.html"> 连续内存分配 </a></li>
+<li><a href="/posts/231111172507.html"> 非连续内存分配之分段与分页 </a></li>
+<li><a href="/posts/231119170537.html"> 非连续内存分配之页表 </a></li>
+<li><a href="/posts/231123184526.html"> 内存管理之覆盖技术与交换技术 </a></li>
+<li><a href="/posts/231127193658.html"> 内存管理之虚存技术 </a></li>
+<li><a href="/posts/231129182631.html"> 局部页面置换算法 </a></li>
+<li><a href="/posts/231207184239.html"> 全局页面置换算法 </a></li>
+<li><a href="/posts/231207204958.html"> 进程描述 </a></li>
+<li><a href="/posts/231210211306.html"> 进程状态 </a></li>
+<li><a href="/posts/231215213932.html"> 线程 </a></li>
+<li><a href="/posts/231218220813.html"> 进程控制 </a></li>
+<li><a href="/posts/231228193143.html"> 调度 </a></li>
+<li><a href="/posts/240104202828.html"> 同步与互斥 </a></li>
+<li><a href="/posts/240113115605.html"> 信号量与管程 </a></li>
+<li><a href="/posts/240205182643.html"> 经典同步问题 </a></li>
+<li><a href="/posts/240310162231.html"> 死锁 </a></li>
+</ul>
+<h2 id="系统与网络编程"> 系统与网络编程 </h2>
+<ul>
+<li><a href="/posts/230911151334.html">pthread 库 </a></li>
+<li><a href="/posts/230921094127.html"> 锁与原子操作 </a></li>
+<li><a href="/posts/240319195609.html"> 读者写者问题 </a></li>
+<li><a href="/posts/240527200241.html"> 网络编程卷一阅读随笔 </a></li>
+<li><a href="/posts/240414190410.html"> 进程间通信 IPC 机制 </a></li>
+<li><a href="/posts/240424200123.html"> 多进程相关练习 </a></li>
+<li><a href="/posts/240516221527.html">I/O 模式与 I/O 多路复用 </a></li>
+<li><a href="/posts/240626192803.html">Linux 内核 kfifo 环形队列 </a></li>
+<li><a href="/posts/241009203126.html">Linux 内核等待队列 </a></li>
+<li><a href="/posts/240627210637.html">DPDK 无锁环形队列 </a></li>
+<li><a href="/posts/240919200410.html"> 解密内存屏障 </a></li>
+<li><a href="/posts/240927202500.html"> 内核线程的创建 </a></li>
+<li><a href="/posts/241015195205.html">Linux 网络数据包接收过程 </a></li>
+<li><a href="/posts/2410232111015.html"> 源码解读 epoll 实现原理 </a></li>
+<li><a href="/posts/241106182619.html">Linux 文件系统 </a></li>
+<li><a href="/posts/250619154429.html">Libevent 高性能 IO 事件驱动库 </a></li>
+<li><a href="/posts/251119185833.html">Linux UDP 传输性能优化 </a></li>
+<li><a href="/posts/251202101130.html">Linux 零拷贝技术 </a></li>
+<li><a href="/posts/251124150921.html">QUIC 协议 </a></li>
+</ul>
+<h2 id="工具与命令"> 工具与命令 </h2>
+<ul>
+<li><a href="/posts/240207180410.html">GCC 编译过程分解 </a></li>
+<li><a href="/posts/240312184132.html">GDB 调试入门 </a></li>
+<li><a href="/posts/240512184921.html">Makefile 学习 </a></li>
+<li><a href="/posts/250629214430.html">CMake 学习 </a></li>
+<li><a href="/posts/240417193754.html">Linux 命令之文件权限 </a></li>
+</ul>
+<h2 id="开源项目"> 开源项目 </h2>
+<ul>
+<li><a href="/posts/240303201855.html"> 线程池原理与实现 </a></li>
+<li><a href="/posts/240507194549.html">HTTP 服务器实现 </a></li>
+<li><a href="/posts/240904203605.html"> 聊天服务器实现 </a></li>
+<li><a href="/posts/241119182636.html">Linux 文件系统 </a></li>
+</ul>
+<h2 id="Docker">Docker</h2>
+<ul>
+<li><a href="/posts/230909171809.html">Docker 学习笔记 </a></li>
+</ul>
+<h1 id="LeetCode 刷题">LeetCode 刷题 </h1>
+<h2 id="链表相关"> 链表相关 </h2>
+<ul>
+<li><a href="/posts/231025143947.html">160 相交链表 </a></li>
+<li><a href="/posts/231025185947.html">206 反转链表 </a></li>
+<li><a href="/posts/231026101239.html">21 合并两个有序链表 </a></li>
+<li><a href="/posts/231026184514.html">83 删除排序链表中的重复元素 </a></li>
+<li><a href="/posts/231027150243.html">19 删除链表的倒数第 N 个节点 </a></li>
+<li><a href="/posts/231031120718.html">2 两数相加 </a></li>
+<li><a href="/posts/231031163133.html">445 两数相加 II</a></li>
+<li><a href="/posts/231101094219.html">234 回文链表 </a></li>
+<li><a href="/posts/231101135228.html">725 分隔链表 </a></li>
+<li><a href="/posts/231102120708.html">328 奇偶链表 </a></li>
+<li><a href="/posts/231102165703.html">142 环形链表 II</a></li>
+</ul>
+<h2 id="设计"> 设计 </h2>
+<ul>
+<li><a href="/posts/231201184542.html">146 LRU 缓存 </a></li>
+</ul>
+<h2 id="贪心算法"> 贪心算法 </h2>
+<ul>
+<li><a href="/posts/231107094652.html">1029 两地调度 </a></li>
+<li><a href="/posts/231109150855.html">435 无重叠区间 </a></li>
+</ul>
+<h2 id="哈希表"> 哈希表 </h2>
+<ul>
+<li><a href="/posts/231123181539.html">1410 实体解析器 </a></li>
+</ul>
+<h2 id="树的遍历"> 树的遍历 </h2>
+<ul>
+<li><a href="/posts/231103121209.html">117 填充每个节点的下一个右侧节点指针 II</a></li>
+</ul>
+<h2 id="深度优先搜索（递归）"> 深度优先搜索（递归）</h2>
+<ul>
+<li><a href="/posts/231206201243.html">2477 达到首都的最少油耗 </a></li>
+</ul>
+<h2 id="图或路径问题"> 图或路径问题 </h2>
+<ul>
+<li><a href="/posts/231211184652.html">1631 最小体力消耗路径 </a></li>
+</ul>
+<h2 id="其它"> 其它 </h2>
+<ul>
+<li><a href="/posts/230101120000.html"> 备忘录 </a></li>
+</ul>
+
+</div>
+
+
+<script src="/js/book-menu.js"></script>
+
+    </div>
+    <div class="sidebar-toggle" onclick="sidebar_toggle()" onmouseover="add_inner()" onmouseleave="remove_inner()">
+  <div class="sidebar-toggle-inner"></div>
+</div>
+
+<script>
+function add_inner() {
+  let inner = document.querySelector('.sidebar-toggle-inner')
+  inner.classList.add('show')  
+}
+
+function remove_inner() {
+  let inner = document.querySelector('.sidebar-toggle-inner')
+  inner.classList.remove('show')
+}
+
+function sidebar_toggle() {
+    let sidebar_toggle = document.querySelector('.sidebar-toggle')
+    let sidebar = document.querySelector('.book-sidebar')
+    let content = document.querySelector('.off-canvas-content')
+    if (sidebar_toggle.classList.contains('extend')) { // show
+        sidebar_toggle.classList.remove('extend')
+        sidebar.classList.remove('hide')
+        content.classList.remove('extend')
+    }
+    else { // hide
+        sidebar_toggle.classList.add('extend')
+        sidebar.classList.add('hide')
+        content.classList.add('extend')
+    }
+}
+</script>
+
+      <div class="off-canvas-content">
+        <div class="columns">
+          <div class="column col-10 col-lg-12">
+            <div class="book-navbar">
+              <!-- For Responsive Layout -->
+
+<header class="navbar">
+  <section class="navbar-section">
+    <a onclick="open_sidebar()">
+      <i class="icon icon-menu"></i>
+    </a>
+  </section>
+</header>
+
+            </div>
+            <div class="book-content">
+              <div class="book-post">
+  <span id="more"></span>
+<h1 id="Linux-Zero-copy- 技术全面揭秘">Linux Zero-copy 技术全面揭秘</h1>
+<p>本文介绍并解析 Linux 中的 Zero-copy 技术，并给出了 Linux 对 I/O 模块的优化和改进思路。</p>
+<h2 id="零拷贝 -Zero-copy">零拷贝 (Zero-copy)</h2>
+<h3 id="Zero-copy- 是什么？">Zero-copy 是什么？</h3>
+<p>Wikipedia 的解释如下：</p>
+<blockquote>
+<p>“Zero-copy” describes computer operations in which the CPU does not perform the task of copying data from one memory area to another. This is frequently used to save CPU cycles and memory bandwidth when transmitting a file over a network.</p>
+</blockquote>
+<p>零拷贝技术是指计算机执行操作时，CPU 不需要先将数据从某处内存复制到另一个特定区域。这种技术通常用于通过网络传输文件时节省 CPU 周期和内存带宽。</p>
+<h3 id="Zero-copy- 能做什么？">Zero-copy 能做什么？</h3>
+<ul>
+<li>减少甚至完全避免操作系统内核和用户应用程序地址空间之间进行数据拷贝操作，从而减少用户态 – 内核态上下文切换带来的系统开销。</li>
+<li>减少甚至完全避免操作系统内核缓冲区之间进行数据拷贝操作。</li>
+<li>帮助用户进程绕开操作系统内核空间直接访问硬件存储接口操作数据。</li>
+<li>利用 DMA 而非 CPU 来完成硬件接口和内核缓冲区之间的数据拷贝，从而解放 CPU，使之能去执行其他的任务，提升系统性能。</li>
+</ul>
+<h3 id="Zero-copy- 的实现方式有哪些？">Zero-copy 的实现方式有哪些？</h3>
+<p>从 zero-copy 这个概念被提出以来，相关的实现技术便犹如雨后春笋，层出不穷。但是截至目前为止，并没有任何一种 zero-copy 技术能满足所有的场景需求，还是计算机领域那句无比经典的名言：“There is no silver bullet”!</p>
+<p>而在 Linux 平台上，同样也有很多的 zero-copy 技术，新旧各不同，可能存在于不同的内核版本里，很多技术可能有了很大的改进或者被更新的实现方式所替代，这些不同的实现技术按照其核心思想可以归纳成大致的以下三类：</p>
+<ul>
+<li><strong>减少甚至避免用户空间和内核空间之间的数据拷贝</strong>：在一些场景下，用户进程在数据传输过程中并不需要对数据进行访问和处理，那么数据在 Linux 的 Page Cache 和用户进程的缓冲区之间的传输就完全可以避免，让数据拷贝完全在内核里进行，甚至可以通过更巧妙的方式避免在内核里的数据拷贝。这一类实现一般是通过增加新的系统调用来完成的，比如 Linux 中的 <code>mmap()</code>，<code>sendfile()</code> 以及 <code>splice()</code> 等。</li>
+<li><strong>绕过内核的直接 I/O</strong>：允许在用户态进程绕过内核直接和硬件进行数据传输，内核在传输过程中只负责一些管理和辅助的工作。这种方式其实和第一种有点类似，也是试图避免用户空间和内核空间之间的数据传输，只是第一种方式是把数据传输过程放在内核态完成，而这种方式则是直接绕过内核和硬件通信，效果类似但原理完全不同。</li>
+<li><strong>内核缓冲区和用户缓冲区之间的传输优化</strong>：这种方式侧重于在用户进程的缓冲区和操作系统的页缓存之间的 CPU 拷贝的优化。这种方法延续了以往那种传统的通信方式，但更灵活。</li>
+</ul>
+<img src="../images/linux-zerocopy/zerocopy-stack.png" alt="Linux zerocopy-stack" width="80%" height="80%">
+<h2 id="减少甚至避免用户空间和内核空间之间的数据拷贝">减少甚至避免用户空间和内核空间之间的数据拷贝</h2>
+<h3 id="mmap">mmap()</h3>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/mman.h&gt;</span></span></span><br><span class="line"><span class="type">void</span> *<span class="title function_">mmap</span><span class="params">(<span class="type">void</span> *addr, <span class="type">size_t</span> length, <span class="type">int</span> prot, <span class="type">int</span> flags, <span class="type">int</span> fd, <span class="type">off_t</span> offset)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">munmap</span><span class="params">(<span class="type">void</span> *addr, <span class="type">size_t</span> length)</span>;</span><br></pre></td></tr></table></figure>
+<p>一种简单的实现方案是在一次读写过程中用 Linux 的另一个系统调用 <code>mmap()</code> 替换原先的 <code>read()</code>，<code>mmap()</code> 也即是内存映射（memory map）：把用户进程空间的一段内存缓冲区（user buffer）映射到文件所在的内核缓冲区（kernel buffer）上。</p>
+<img src="../images/linux-zerocopy/mmap-write.png" alt="Linux I/O mmap-write" width="80%" height="80%">
+<p>利用 <code>mmap()</code> 替换 <code>read()</code>，配合 <code>write()</code> 调用的整个流程如下：</p>
+<ol>
+<li>用户进程调用 <code>mmap()</code>，从用户态陷入内核态，将内核缓冲区映射到用户缓存区；</li>
+<li>DMA 控制器将数据从硬盘拷贝到内核缓冲区；</li>
+<li><code>mmap()</code> 返回，上下文从内核态切换回用户态；</li>
+<li>用户进程调用 <code>write()</code>，尝试把文件数据写到内核里的套接字缓冲区，再次陷入内核态；</li>
+<li>CPU 将内核缓冲区中的数据拷贝到的套接字缓冲区；</li>
+<li>DMA 控制器将数据从套接字缓冲区拷贝到网卡完成数据传输；</li>
+<li><code>write()</code> 返回，上下文从内核态切换回用户态。</li>
+</ol>
+<p>通过这种方式，有两个优点：一是节省内存空间，因为用户进程上的这一段内存是虚拟的，并不真正占据物理内存，只是映射到文件所在的内核缓冲区上，因此可以节省一半的内存占用；二是省去了一次 CPU 拷贝，对比传统的 Linux I/O 读写，数据不需要再经过用户进程进行转发了，而是直接在内核里就完成了拷贝。所以使用 <code>mmap()</code> 之后的拷贝次数是 2 次 DMA 拷贝，1 次 CPU 拷贝，加起来一共 3 次拷贝操作，比传统的 I/O 方式节省了一次 CPU 拷贝以及一半的内存，不过因为 <code>mmap()</code> 也是一个系统调用，因此用户态和内核态的切换还是 4 次。</p>
+<p><code>mmap()</code> 因为既节省 CPU 拷贝次数又节省内存，所以比较适合大文件传输的场景。虽然 <code>mmap()</code> 完全是符合 POSIX 标准的，但是它也不是完美的，因为它并不总是能达到理想的数据传输性能。首先是因为数据数据传输过程中依然需要一次 CPU 拷贝，其次是内存映射技术是一个开销很大的虚拟存储操作：这种操作需要修改页表以及用内核缓冲区里的文件数据置换掉当前 TLB 里的缓存以维持虚拟内存映射的一致性。但是，因为内存映射通常针对的是相对较大的数据区域，所以对于相同大小的数据来说，内存映射所带来的开销远远低于 CPU 拷贝所带来的开销。此外，使用 <code>mmap()</code> 还可能会遇到一些需要值得关注的特殊情况，例如，在 <code>mmap()</code> --&gt; <code>write()</code> 这两个系统调用的整个传输过程中，如果有其他的进程突然截断了这个文件，那么这时用户进程就会因为访问非法地址而被一个从总线传来的 SIGBUS 中断信号杀死并且产生一个 core dump。有两种解决办法：</p>
+<ol>
+<li>
+<p>设置一个信号处理器，专门用来处理 SIGBUS 信号，这个处理器直接返回，<code>write()</code> 就可以正常返回已写入的字节数而不会被 SIGBUS 中断，errno 错误码也会被设置成 success。然而这实际上是一个掩耳盗铃的解决方案，因为 SIGBUS 信号的带来的信息是系统发生了一些很严重的错误，而我们却选择忽略掉它，一般不建议采用这种方式。</p>
+</li>
+<li>
+<p>通过内核的文件租借锁（这是 Linux 的叫法，Windows 上称之为机会锁）来解决这个问题，这种方法相对来说更好一些。我们可以通过内核对文件描述符上读 / 写的租借锁，当另外一个进程尝试对当前用户进程正在进行传输的文件进行截断的时候，内核会发送给用户一个实时信号：RT_SIGNAL_LEASE 信号，这个信号会告诉用户内核正在破坏你加在那个文件上的读 / 写租借锁，这时 <code>write()</code> 系统调用会被中断，并且当前用户进程会被 SIGBUS 信号杀死，返回值则是中断前写的字节数，errno 同样会被设置为 success。文件租借锁需要在对文件进行内存映射之前设置，最后在用户进程结束之前释放掉。</p>
+</li>
+</ol>
+<h3 id="sendfile">sendfile()</h3>
+<p>在 Linux 内核 2.1 版本中，引入了一个新的系统调用 <code>sendfile()</code>：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/sendfile.h&gt;</span></span></span><br><span class="line"><span class="type">ssize_t</span> <span class="title function_">sendfile</span><span class="params">(<span class="type">int</span> out_fd, <span class="type">int</span> in_fd, <span class="type">off_t</span> *offset, <span class="type">size_t</span> count)</span>;</span><br><span class="line"></span><br><span class="line">sendfile() copies data between one file descriptor and another.  Because this copying is done within the kernel, sendfile() is more efficient than the combination of <span class="title function_">read</span><span class="params">(<span class="number">2</span>)</span> and <span class="title function_">write</span><span class="params">(<span class="number">2</span>)</span>, which would require transferring data to and from user space.</span><br></pre></td></tr></table></figure>
+<p>从功能上来看，这个系统调用将 <code>mmap()</code> + <code>write()</code> 这两个系统调用合二为一，实现了一样效果的同时还简化了用户接口，其他的一些 Unix-like 的系统像 BSD、Solaris 和 AIX 等也有类似的实现，甚至 Windows 上也有一个功能类似的 API 函数 TransmitFile。</p>
+<p>out_fd 和 in_fd 分别代表了写入和读出的文件描述符，in_fd 必须是一个指向文件的文件描述符，且要能支持类 <code>mmap()</code> 内存映射，不能是 Socket 类型，而 out_fd 在 Linux 内核 2.6.33 版本之前只能是一个指向 Socket 的文件描述符，从 2.6.33 之后则可以是任意类型的文件描述符。off_t 是一个代表了 in_fd 偏移量的指针，指示 <code>sendfile()</code> 该从 in_fd 的哪个位置开始读取，函数返回后，这个指针会被更新成 <code>sendfile()</code> 最后读取的字节位置处，表明此次调用共读取了多少文件数据，最后的 count 参数则是此次调用需要传输的字节总数。</p>
+<img src="../images/linux-zerocopy/sendfile.png" alt="Linux I/O sendfile" width="80%" height="80%">
+<p>使用 <code>sendfile()</code> 完成一次数据读写的流程如下：</p>
+<ol>
+<li>用户进程调用 <code>sendfile()</code> 从用户态陷入内核态；</li>
+<li>DMA 控制器将数据从硬盘拷贝到内核缓冲区；</li>
+<li>CPU 将内核缓冲区中的数据拷贝到套接字缓冲区；</li>
+<li>DMA 控制器将数据从套接字缓冲区拷贝到网卡完成数据传输；</li>
+<li><code>sendfile()</code> 返回，上下文从内核态切换回用户态。</li>
+</ol>
+<p>基于 <code>sendfile()</code>，整个数据传输过程中共发生 2 次 DMA 拷贝和 1 次 CPU 拷贝，这个和 <code>mmap()</code> + <code>write()</code> 相同，但是因为 <code>sendfile()</code> 只是一次系统调用，因此比前者少了一次用户态和内核态的上下文切换开销。读到这里，聪明的读者应该会开始提问了：“<code>sendfile()</code> 会不会遇到和 <code>mmap()</code> + <code>write()</code> 相似的文件截断问题呢？”，很不幸，答案是肯定的。<code>sendfile()</code> 一样会有文件截断的问题，但欣慰的是，<code>sendfile()</code> 不仅比 <code>mmap()</code> + <code>write()</code> 在接口使用上更加简洁，而且处理文件截断时也更加优雅：如果 <code>sendfile()</code> 过程中遭遇文件截断，则 <code>sendfile()</code> 系统调用会被中断杀死之前返回给用户进程其中断前所传输的字节数，errno 会被设置为 success，无需用户提前设置信号处理器，当然你要设置一个进行个性化处理也可以，也不需要像之前那样提前给文件描述符设置一个租借锁，因为最终结果还是一样的。</p>
+<p><code>sendfile()</code> 相较于 <code>mmap()</code> 的另一个优势在于数据在传输过程中始终没有越过用户态和内核态的边界，因此极大地减少了存储管理的开销。即便如此，<code>sendfile()</code> 依然是一个适用性很窄的技术，最适合的场景基本也就是一个静态文件服务器了。而且根据 Linus 在 2001 年和其他内核维护者的邮件列表内容，其实当初之所以决定在 Linux 上实现 <code>sendfile()</code> 仅仅是因为在其他操作系统平台上已经率先实现了，而且有大名鼎鼎的 Apache Web 服务器已经在使用了，为了兼容 Apache Web 服务器才决定在 Linux 上也实现这个技术，而且 <code>sendfile()</code> 实现上的简洁性也和 Linux 内核的其他部分集成得很好，所以 Linus 也就同意了这个提案。</p>
+<p>然而 <code>sendfile()</code> 本身是有很大问题的，从不同的角度来看的话主要是：</p>
+<ol>
+<li>首先一个是这个接口并没有进行标准化，导致 <code>sendfile()</code> 在 Linux 上的接口实现和其他类 Unix 系统的实现并不相同；</li>
+<li>其次由于网络传输的异步性，很难在接收端实现和 <code>sendfile()</code> 对接的技术，因此接收端一直没有实现对应的这种技术；</li>
+<li>最后从性能方面考量，因为 <code>sendfile()</code> 在把磁盘文件从内核缓冲区（page cache）传输到到套接字缓冲区的过程中依然需要 CPU 参与，这就很难避免 CPU 的高速缓存被传输的数据所污染。</li>
+</ol>
+<p>此外，需要说明下，<code>sendfile()</code> 的最初设计并不是用来处理大文件的，因此如果需要处理很大的文件的话，可以使用另一个系统调用 <code>sendfile64()</code>，它支持对更大的文件内容进行寻址和偏移。</p>
+<h3 id="sendfile-with-DMA-Scatter-Gather-Copy">sendfile() with DMA Scatter/Gather Copy</h3>
+<p>上一小节介绍的 <code>sendfile()</code> 技术已经把一次数据读写过程中的 CPU 拷贝的降低至只有 1 次了，但是人永远是贪心和不知足的，现在如果想要把这仅有的一次 CPU 拷贝也去除掉，有没有办法呢？</p>
+<p>当然有！通过引入一个新硬件上的支持，我们可以把这个仅剩的一次 CPU 拷贝也给抹掉：Linux 在内核 2.4 版本里引入了 DMA 的 scatter/gather – 分散 / 收集功能，并修改了 <code>sendfile()</code> 的代码使之和 DMA 适配。scatter 使得 DMA 拷贝可以不再需要把数据存储在一片连续的内存空间上，而是允许离散存储，gather 则能够让 DMA 控制器根据少量的元信息：一个包含了内存地址和数据大小的缓冲区描述符，收集存储在各处的数据，最终还原成一个完整的网络包，直接拷贝到网卡而非套接字缓冲区，避免了最后一次的 CPU 拷贝：</p>
+<img src="../images/linux-zerocopy/sendfile-with-dma.png" alt="Linux I/O sendfile with DMA" width="80%" height="80%">
+<p><code>sendfile()</code> + DMA gather 的数据传输过程如下：</p>
+<ol>
+<li>用户进程调用 <code>sendfile()</code>，从用户态陷入内核态；</li>
+<li>DMA 控制器使用 scatter 功能把数据从硬盘拷贝到内核缓冲区进行离散存储；</li>
+<li>CPU 把包含内存地址和数据长度的缓冲区描述符拷贝到套接字缓冲区，DMA 控制器能够根据这些信息生成网络包数据分组的报头和报尾；</li>
+<li>DMA 控制器根据缓冲区描述符里的内存地址和数据大小，使用 scatter-gather 功能开始从内核缓冲区收集离散的数据并组包，最后直接把网络包数据拷贝到网卡完成数据传输；</li>
+<li><code>sendfile()</code> 返回，上下文从内核态切换回用户态。</li>
+</ol>
+<p>基于这种方案，我们就可以把这仅剩的唯一一次 CPU 拷贝也给去除了（严格来说还是会有一次，但是因为这次 CPU 拷贝的只是那些微乎其微的元信息，开销几乎可以忽略不计），理论上，数据传输过程就再也没有 CPU 的参与了，也因此 CPU 的高速缓存再不会被污染了，也不再需要 CPU 来计算数据校验和了，CPU 可以去执行其他的业务计算任务，同时和 DMA 的 I/O 任务并行，此举能极大地提升系统性能。</p>
+<h3 id="splice">splice()</h3>
+<p><code>sendfile()</code> + DMA Scatter/Gather 的零拷贝方案虽然高效，但是也有两个缺点：</p>
+<ol>
+<li>这种方案需要引入新的硬件支持；</li>
+<li>虽然 <code>sendfile()</code> 的输出文件描述符在 Linux kernel 2.6.33 版本之后已经可以支持任意类型的文件描述符，但是输入文件描述符依然只能指向文件。</li>
+</ol>
+<p>这两个缺点限制了 <code>sendfile()</code> + DMA Scatter/Gather 方案的适用场景。为此，Linux 在 2.6.17 版本引入了一个新的系统调用 <code>splice()</code>，它在功能上和 <code>sendfile()</code> 非常相似，但是能够实现在任意类型的两个文件描述符时之间传输数据；而在底层实现上，<code>splice()</code> 又比 <code>sendfile()</code> 少了一次 CPU 拷贝，也就是等同于 <code>sendfile()</code> + DMA Scatter/Gather，完全去除了数据传输过程中的 CPU 拷贝。</p>
+<p><code>splice()</code> 系统调用函数定义如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;fcntl.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pipe</span><span class="params">(<span class="type">int</span> pipefd[<span class="number">2</span>])</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pipe2</span><span class="params">(<span class="type">int</span> pipefd[<span class="number">2</span>], <span class="type">int</span> flags)</span>;</span><br><span class="line"><span class="type">ssize_t</span> <span class="title function_">splice</span><span class="params">(<span class="type">int</span> fd_in, <span class="type">loff_t</span> *off_in, <span class="type">int</span> fd_out, <span class="type">loff_t</span> *off_out, <span class="type">size_t</span> len, <span class="type">unsigned</span> <span class="type">int</span> flags)</span>;</span><br><span class="line"></span><br><span class="line">splice()  moves data between two file descriptors without copying between kernel address space and user address space.  It transfers up to len bytes of data from the file descriptor fd_in to the file descriptor fd_out, where one of the file descriptors must refer to a pipe.</span><br></pre></td></tr></table></figure>
+<p>fd_in 和 fd_out 也是分别代表了输入端和输出端的文件描述符，这两个文件描述符必须有一个是指向管道设备的，这也是一个不太友好的限制，虽然 Linux 内核开发的官方从这个系统调用推出之时就承诺未来可能会重构去掉这个限制，然而他们许下这个承诺之后就如同石沉大海，如今 14 年过去了，依旧杳无音讯…</p>
+<p>off_in 和 off_out 则分别是 fd_in 和 fd_out 的偏移量指针，指示内核从哪里读取和写入数据，len 则指示了此次调用希望传输的字节数，最后的 flags 是系统调用的标记选项位掩码，用来设置系统调用的行为属性的，由以下 0 个或者多个值通过『或』操作组合而成：</p>
+<ul>
+<li><code>SPLICE_F_MOVE</code>：指示 <code>splice()</code> 尝试仅仅是移动内存页面而不是复制，设置了这个值不代表就一定不会复制内存页面，复制还是移动取决于内核能否从管道中移动内存页面，或者管道中的内存页面是否是完整的；这个标记的初始实现有很多 bug，所以从 Linux 2.6.21 版本开始就已经无效了，但还是保留了下来，因为在未来的版本里可能会重新被实现。</li>
+<li><code>SPLICE_F_NONBLOCK</code>：指示 <code>splice()</code> 不要阻塞 I/O，也就是使得 <code>splice()</code> 调用成为一个非阻塞调用，可以用来实现异步数据传输，不过需要注意的是，数据传输的两个文件描述符也最好是预先通过 O_NONBLOCK 标记成非阻塞 I/O，不然 <code>splice()</code> 调用还是有可能被阻塞。</li>
+<li><code>SPLICE_F_MORE</code>：通知内核下一个 <code>splice()</code> 系统调用将会有更多的数据传输过来，这个标记对于输出端是 socket 的场景非常有用。</li>
+</ul>
+<p><code>splice()</code> 是基于 Linux 的管道缓冲区 (pipe buffer) 机制实现的，所以 <code>splice()</code> 的两个入参文件描述符才要求必须有一个是管道设备，一个典型的 <code>splice()</code> 用法是：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> pfd[<span class="number">2</span>];</span><br><span class="line">pipe(pfd);</span><br><span class="line"><span class="comment">// 文件数据写入管道写端，然后通过管道读端写入 socket 缓冲区</span></span><br><span class="line"><span class="type">ssize_t</span> bytes = splice(file_fd, <span class="literal">NULL</span>, pfd[<span class="number">1</span>], <span class="literal">NULL</span>, <span class="number">4096</span>, SPLICE_F_MOVE);</span><br><span class="line">assert(bytes != <span class="number">-1</span>);</span><br><span class="line">bytes = splice(pfd[<span class="number">0</span>], <span class="literal">NULL</span>, socket_fd, <span class="literal">NULL</span>, bytes, SPLICE_F_MOVE | SPLICE_F_MORE);</span><br><span class="line">assert(bytes != <span class="number">-1</span>);</span><br></pre></td></tr></table></figure>
+<p>数据传输过程图：</p>
+<img src="../images/linux-zerocopy/splice.png" alt="Linux I/O splice" width="80%" height="80%">
+<p>使用 <code>splice()</code> 完成一次磁盘文件到网卡的读写过程如下：</p>
+<ol>
+<li>用户进程调用 <code>pipe()</code>，从用户态陷入内核态，创建匿名单向管道，<code>pipe()</code> 返回，上下文从内核态切换回用户态；</li>
+<li>用户进程调用 <code>splice()</code>，从用户态陷入内核态；</li>
+<li>DMA 控制器将数据从硬盘拷贝到内核缓冲区，从管道的写入端 &quot; 拷贝 &quot; 进管道，<code>splice()</code> 返回，上下文从内核态回到用户态；</li>
+<li>用户进程再次调用 <code>splice()</code>，从用户态陷入内核态；</li>
+<li>内核把数据从管道的读取端 &quot; 拷贝 &quot; 到套接字缓冲区，DMA 控制器将数据从套接字缓冲区拷贝到网卡；</li>
+<li><code>splice()</code> 返回，上下文从内核态切换回用户态。</li>
+</ol>
+<p>相信看完上面的读写流程之后，读者肯定会非常困惑：说好的 <code>splice()</code> 是 <code>sendfile()</code> 的改进版呢？<code>sendfile()</code> 好歹只需要一次系统调用，<code>splice()</code> 居然需要三次，这也就罢了，居然中间还搞出来一个管道，而且还要在内核空间拷贝两次，这算个毛的改进啊？</p>
+<p>我最开始了解 <code>splice()</code> 的时候，也是这个反应，但是深入学习它之后，才渐渐知晓个中奥妙，且听我细细道来：</p>
+<p>先来了解一下 pipe buffer 管道，管道是 Linux 上用来供进程之间通信的信道，管道有两个端：写入端和读出端，从进程的视角来看，管道表现为一个 FIFO 字节流环形队列：</p>
+<img src="../images/linux-zerocopy/pipe-buffer.png" alt="Pipe buffer underlying implementation" width="80%" height="80%">
+<p>管道本质上是一个内存中的文件，也就是本质上还是基于 Linux 的 VFS，用户进程可以通过 <code>pipe()</code> 系统调用创建一个匿名管道，创建完成之后会有两个 VFS 的 file 结构体的 inode 分别指向其写入端和读出端，并返回对应的两个文件描述符，用户进程通过这两个文件描述符读写管道；管道的容量单位是一个虚拟内存的页，也就是 4KB，总大小一般是 16 个页，基于其环形结构，管道的页可以循环使用，提高内存利用率。Linux 中以 <code>pipe_buffer</code> 结构体封装管道页，file 结构体里的 inode 字段里会保存一个 <code>pipe_inode_info</code> 结构体指代管道，其中会保存很多读写管道时所需的元信息，环形队列的头部指针页，读写时的同步机制如互斥锁、等待队列等：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">pipe_buffer</span> &#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">page</span> *<span class="title">page</span>;</span> <span class="comment">// 内存页结构</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> offset, len; <span class="comment">// 偏移量，长度</span></span><br><span class="line">    <span class="type">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">pipe_buf_operations</span> *<span class="title">ops</span>;</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> flags;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> private;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">pipe_inode_info</span> &#123;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">mutex</span> <span class="title">mutex</span>;</span></span><br><span class="line">    <span class="type">wait_queue_head_t</span> wait;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> nrbufs, curbuf, buffers;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> readers;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> writers;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> files;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> waiting_writers;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> r_counter;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> w_counter;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">page</span> *<span class="title">tmp_page</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">fasync_struct</span> *<span class="title">fasync_readers</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">fasync_struct</span> *<span class="title">fasync_writers</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">pipe_buffer</span> *<span class="title">bufs</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">user_struct</span> *<span class="title">user</span>;</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p><code>pipe_buffer</code> 中保存了数据在内存中的页、偏移量和长度，以这三个值来定位数据，注意这里的页不是虚拟内存的页，而用的是物理内存的页框，因为管道时跨进程的信道，因此不能使用虚拟内存来表示，只能使用物理内存的页框定位数据；管道的正常读写操作是通过 <code>pipe_write()</code> 和 <code>pipe_read()</code> 来完成的，通过把数据读取 / 写入环形队列的 <code>pipe_buffer</code> 来完成数据传输。</p>
+<p><code>splice()</code> 是基于 pipe buffer 实现的，<strong>但是它在通过管道传输数据的时候却是零拷贝</strong>，因为它在写入读出时并没有使用 <code>pipe_write()</code> 和 <code>pipe_read()</code> 真正地在管道缓冲区写入读出数据，而是通过把数据在内存缓冲区中的物理内存页框指针、偏移量和长度赋值给前文提及的 <code>pipe_buffer</code> 中对应的三个字段来完成数据的 &quot; 拷贝 &quot;，也就是其实只拷贝了数据的内存地址等元信息。</p>
+<p><code>splice()</code> 在 Linux 内核源码中的内部实现是 <code>do_splice()</code> 函数，而写入读出管道则分别是通过 <code>do_splice_to()</code> 和 <code>do_splice_from()</code>，这里我们重点来解析下写入管道的源码，也就是 <code>do_splice_to()</code>，我现在手头的 Linux 内核版本是 v4.8.17，我们就基于这个版本来分析，至于读出的源码函数 <code>do_splice_from()</code>，原理是相通的，大家举一反三即可。</p>
+<p><code>splice()</code> 写入数据到管道的调用链式：<code>do_splice()</code> --&gt; <code>do_splice_to()</code> --&gt; <code>splice_read()</code></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">long</span> <span class="title function_">do_splice</span><span class="params">(</span></span><br><span class="line"><span class="params">    <span class="keyword">struct</span> file *in, <span class="type">loff_t</span> __user *off_in,</span></span><br><span class="line"><span class="params">    <span class="keyword">struct</span> file *out, <span class="type">loff_t</span> __user *off_out,</span></span><br><span class="line"><span class="params">    <span class="type">size_t</span> len, <span class="type">unsigned</span> <span class="type">int</span> flags)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">    <span class="comment">// 判断写出 fd 是一个管道设备，则进入数据写入的逻辑</span></span><br><span class="line">    <span class="keyword">if</span> (opipe) &#123;</span><br><span class="line">        <span class="keyword">if</span> (off_out)</span><br><span class="line">            <span class="keyword">return</span> -ESPIPE;</span><br><span class="line">        <span class="keyword">if</span> (off_in) &#123;</span><br><span class="line">            <span class="keyword">if</span> (!(in-&gt;f_mode &amp; FMODE_PREAD))</span><br><span class="line">                <span class="keyword">return</span> -EINVAL;</span><br><span class="line">            <span class="keyword">if</span> (copy_from_user(&amp;offset, off_in, <span class="keyword">sizeof</span>(<span class="type">loff_t</span>)))</span><br><span class="line">                <span class="keyword">return</span> -EFAULT;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            offset = in-&gt;f_pos;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 调用 do_splice_to 把文件内容写入管道</span></span><br><span class="line">        ret = do_splice_to(in, &amp;offset, opipe, len, flags);</span><br><span class="line">        <span class="keyword">if</span> (!off_in)</span><br><span class="line">            in-&gt;f_pos = offset;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (copy_to_user(off_in, &amp;offset, <span class="keyword">sizeof</span>(<span class="type">loff_t</span>)))</span><br><span class="line">            ret = -EFAULT;</span><br><span class="line">        <span class="keyword">return</span> ret;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> -EINVAL;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>进入 <code>do_splice_to()</code> 之后，再调用 <code>splice_read()</code>：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">long</span> <span class="title function_">do_splice_to</span><span class="params">(</span></span><br><span class="line"><span class="params">    <span class="keyword">struct</span> file *in, <span class="type">loff_t</span> *ppos,</span></span><br><span class="line"><span class="params">    <span class="keyword">struct</span> pipe_inode_info *pipe, <span class="type">size_t</span> len,</span></span><br><span class="line"><span class="params">    <span class="type">unsigned</span> <span class="type">int</span> flags)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">ssize_t</span> (*splice_read)(<span class="keyword">struct</span> file *, <span class="type">loff_t</span> *,</span><br><span class="line">        <span class="keyword">struct</span> pipe_inode_info *, <span class="type">size_t</span>, <span class="type">unsigned</span> <span class="type">int</span>);</span><br><span class="line">    <span class="type">int</span> ret;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (unlikely(!(in-&gt;f_mode &amp; FMODE_READ)))</span><br><span class="line">        <span class="keyword">return</span> -EBADF;</span><br><span class="line">    ret = rw_verify_area(READ, in, ppos, len);</span><br><span class="line">    <span class="keyword">if</span> (unlikely(ret &lt; <span class="number">0</span>))</span><br><span class="line">        <span class="keyword">return</span> ret;</span><br><span class="line">    <span class="keyword">if</span> (unlikely(len &gt; MAX_RW_COUNT))</span><br><span class="line">        len = MAX_RW_COUNT;</span><br><span class="line">    <span class="comment">// 判断文件的 file 结构体的 f_op 中有没有可供使用的、支持 splice 的 splice_read 函数指针</span></span><br><span class="line">    <span class="comment">// 因为是 splice() 调用，因此内核会提前给这个函数指针指派一个可用的函数</span></span><br><span class="line">    <span class="keyword">if</span> (in-&gt;f_op-&gt;splice_read)</span><br><span class="line">        splice_read = in-&gt;f_op-&gt;splice_read;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        splice_read = default_file_splice_read;</span><br><span class="line">    <span class="keyword">return</span> splice_read(in, ppos, pipe, len, flags);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>in-&gt;f_op-&gt;splice_read</code> 这个函数指针根据文件描述符的类型不同有不同的实现，比如这里的 in 是一个文件，因此是 <code>generic_file_splice_read()</code>，如果是 socket 的话，则是 <code>sock_splice_read()</code>，其他的类型也会有对应的实现，总之我们这里将使用的是 <code>generic_file_splice_read()</code> 函数，这个函数会继续调用内部函数 <code>__generic_file_splice_read()</code> 完成以下工作：</p>
+<ol>
+<li>在 page cache 页缓存里进行搜寻，看看我们要读取这个文件内容是否已经在缓存里了，如果是则直接用，否则如果不存在或者只有部分数据在缓存中，则分配一些新的内存页并进行读入数据操作，同时会增加页框的引用计数；</li>
+<li>基于这些内存页，初始化 <code>splice_pipe_desc</code> 结构，这个结构保存会保存文件数据的地址元信息，包含有物理内存页框地址，偏移、数据长度，也就是 <code>pipe_buffer</code> 所需的三个定位数据的值；</li>
+<li>最后，调用 <code>splice_to_pipe()</code>，<code>splice_pipe_desc</code> 结构体实例是函数入参。</li>
+</ol>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">ssize_t</span> <span class="title function_">splice_to_pipe</span><span class="params">(</span></span><br><span class="line"><span class="params">    <span class="keyword">struct</span> pipe_inode_info *pipe,</span></span><br><span class="line"><span class="params">    <span class="keyword">struct</span> splice_pipe_desc *spd)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">    <span class="keyword">for</span> (;;) &#123;</span><br><span class="line">        <span class="keyword">if</span> (!pipe-&gt;readers) &#123;</span><br><span class="line">            send_sig(SIGPIPE, current, <span class="number">0</span>);</span><br><span class="line">            <span class="keyword">if</span> (!ret)</span><br><span class="line">                ret = -EPIPE;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (pipe-&gt;nrbufs &lt; pipe-&gt;buffers) &#123;</span><br><span class="line">            <span class="type">int</span> newbuf = (pipe-&gt;curbuf + pipe-&gt;nrbufs) &amp; (pipe-&gt;buffers - <span class="number">1</span>);</span><br><span class="line">            <span class="class"><span class="keyword">struct</span> <span class="title">pipe_buffer</span> *<span class="title">buf</span> =</span> pipe-&gt;bufs + newbuf;</span><br><span class="line">            <span class="comment">// 写入数据到管道，没有真正拷贝数据，而是内存地址指针的移动，</span></span><br><span class="line">            <span class="comment">// 把物理页框、偏移量和数据长度赋值给 pipe_buffer 完成数据入队操作</span></span><br><span class="line">            buf-&gt;page = spd-&gt;pages[page_nr];</span><br><span class="line">            buf-&gt;offset = spd-&gt;partial[page_nr].offset;</span><br><span class="line">            buf-&gt;len = spd-&gt;partial[page_nr].len;</span><br><span class="line">            buf-&gt;private = spd-&gt;partial[page_nr].private;</span><br><span class="line">            buf-&gt;ops = spd-&gt;ops;</span><br><span class="line">            <span class="keyword">if</span> (spd-&gt;flags &amp; SPLICE_F_GIFT)</span><br><span class="line">                buf-&gt;flags |= PIPE_BUF_FLAG_GIFT;</span><br><span class="line">            pipe-&gt;nrbufs++;</span><br><span class="line">            page_nr++;</span><br><span class="line">            ret += buf-&gt;len;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (pipe-&gt;files)</span><br><span class="line">                do_wakeup = <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (!--spd-&gt;nr_pages)</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">if</span> (pipe-&gt;nrbufs &lt; pipe-&gt;buffers)</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// ...</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里可以清楚地看到 <code>splice()</code> 所谓的写入数据到管道其实并没有真正地拷贝数据，而是玩了个 tricky 的操作：只进行内存地址指针的拷贝而不真正去拷贝数据。所以，数据 <code>splice()</code> 在内核中并没有进行真正的数据拷贝，因此 <code>splice()</code> 系统调用也是零拷贝。</p>
+<p>还有一点需要注意，前面说过管道的容量是 16 个内存页，也就是 16x4KB = 64 KB，也就是说一次往管道里写数据的时候最好不要超过 64 KB，否则的话会 <code>splice()</code> 会阻塞住，除非在创建管道的时候使用的是 <code>pipe2()</code> 并通过传入 O_NONBLOCK 属性将管道设置为非阻塞。</p>
+<p>即使 <code>splice()</code> 通过内存地址指针避免了真正的拷贝开销，但是算起来它还要使用额外的管道来完成数据传输，也就是比 <code>sendfile()</code> 多了两次系统调用，这不是又增加了上下文切换的开销吗？为什么不直接在内核创建管道并调用那两次 <code>splice()</code>，然后只暴露给用户一次系统调用呢？实际上因为 <code>splice()</code> 利用管道而非硬件来完成零拷贝的实现比 <code>sendfile()</code> + DMA Scatter/Gather 的门槛更低，因此后来的 <code>sendfile()</code> 的底层实现就已经替换成 <code>splice()</code> 了。</p>
+<p>至于说 <code>splice()</code> 本身的 API 为什么还是这种使用模式，那是因为 Linux 内核开发团队一直想把基于管道的这个限制去掉，但不知道因为什么一直搁置，所以这个 API 也就一直没变化，只能等内核团队哪天想起来了这一茬，然后重构一下使之不再依赖管道，在那之前，使用 <code>splice()</code> 依然还是需要额外创建管道来作为中间缓冲。</p>
+<p>如果你的业务场景很适合使用 <code>splice()</code>，但又是性能敏感的，不想频繁地创建销毁 pipe buffer 管道缓冲区，那么可以参考一下 HAProxy 使用 <code>splice()</code> 时采用的优化方案：预先分配一个 pipe buffer pool 缓存管道，每次调用 <code>splice()</code> 的时候去缓存池里取一个管道，用完就放回去，循环利用，提升性能。</p>
+<h3 id="send-with-MSG-ZEROCOPY">send() with MSG_ZEROCOPY</h3>
+<p>Linux 内核在 2017 年的 v4.14 版本接受了来自 Google 工程师 Willem de Bruijn 在 TCP 网络报文的通用发送接口 <code>send()</code> 中实现的 zero-copy 功能 (MSG_ZEROCOPY) 的 patch，通过这个新功能，用户进程就能够把用户缓冲区的数据通过零拷贝的方式经过内核空间发送到网络套接字中去。</p>
+<p>这个新技术和前文介绍的几种零拷贝方式相比更加先进，因为前面几种零拷贝技术都是要求用户进程不能处理加工数据而是直接转发到目标文件描述符中去的。Willem de Bruijn 在他的论文里给出的压测数据是：采用 netperf 大包发送测试，性能提升 39%，而线上环境的数据发送性能则提升了 5%~8%，官方文档陈述说这个特性通常只在发送 10KB 左右大包的场景下才会有显著的性能提升。一开始这个特性只支持 TCP，到内核 v5.0 版本之后才支持 UDP。</p>
+<p>这个功能的使用模式如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (setsockopt(socket_fd, SOL_SOCKET, SO_ZEROCOPY, &amp;one, <span class="keyword">sizeof</span>(one)))</span><br><span class="line">    error(<span class="number">1</span>, errno, <span class="string">&quot;setsockopt zerocopy&quot;</span>);</span><br><span class="line">ret = send(socket_fd, buffer, <span class="keyword">sizeof</span>(buffer), MSG_ZEROCOPY);</span><br></pre></td></tr></table></figure>
+<p>首先第一步，先给要发送数据的 socket 设置一个 SOCK_ZEROCOPY option，然后在调用 <code>send()</code> 发送数据时再设置一个 MSG_ZEROCOPY option，其实理论上来说只需要调用 <code>setsockopt()</code> 或者 <code>send()</code> 时传递这个 zero-copy 的 option 即可，两者选其一，但是这里却要设置同一个 option 两次，官方的说法是为了兼容 <code>send()</code> API 以前的设计上的一个错误：send() 以前的实现会忽略掉未知的 option，为了兼容那些可能已经不小心设置了 MSG_ZEROCOPY option 的程序，故而设计成了两步设置。不过我猜还有一种可能：就是给使用者提供更灵活的使用模式，因为这个新功能只在大包场景下才可能会有显著的性能提升，但是现实场景是很复杂的，不仅仅是全部大包或者全部小包的场景，有可能是大包小包混合的场景，因此使用者可以先调用 <code>setsockopt()</code> 设置 SOCK_ZEROCOPY option，然后再根据实际业务场景中的网络包尺寸选择是否要在调用 <code>send()</code> 时使用 MSG_ZEROCOPY 进行 zero-copy 传输。</p>
+<p>因为 <code>send()</code> 可能是异步发送数据，因此使用 MSG_ZEROCOPY 有一个需要特别注意的点是：调用 <code>send()</code> 之后不能立刻重用或释放 buffer，因为 buffer 中的数据不一定已经被内核读走了，所以还需要从 socket 关联的错误队列里读取一下通知消息，看看 buffer 中的数据是否已经被内核读走了：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">pfd.fd = fd;</span><br><span class="line">pfd.events = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">if</span> (poll(&amp;pfd, <span class="number">1</span>, <span class="number">-1</span>) != <span class="number">1</span> || pfd.revents &amp; POLLERR == <span class="number">0</span>)</span><br><span class="line">    error(<span class="number">1</span>, errno, <span class="string">&quot;poll&quot;</span>);</span><br><span class="line">ret = recvmsg(fd, &amp;msg, MSG_ERRQUEUE);</span><br><span class="line"><span class="keyword">if</span> (ret == <span class="number">-1</span>)</span><br><span class="line">    error(<span class="number">1</span>, errno, <span class="string">&quot;recvmsg&quot;</span>);</span><br><span class="line">read_notification(msg);</span><br><span class="line"></span><br><span class="line"><span class="type">uint32_t</span> <span class="title function_">read_notification</span><span class="params">(<span class="keyword">struct</span> msghdr *msg)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">sock_extended_err</span> *<span class="title">serr</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">cmsghdr</span> *<span class="title">cm</span>;</span></span><br><span class="line">    cm = CMSG_FIRSTHDR(msg);</span><br><span class="line">    <span class="keyword">if</span> (cm-&gt;cmsg_level != SOL_IP &amp;&amp; cm-&gt;cmsg_type != IP_RECVERR)</span><br><span class="line">        error(<span class="number">1</span>, <span class="number">0</span>, <span class="string">&quot;cmsg&quot;</span>);</span><br><span class="line">    serr = (<span class="type">void</span> *)CMSG_DATA(cm);</span><br><span class="line">    <span class="keyword">if</span> (serr-&gt;ee_errno != <span class="number">0</span> || serr-&gt;ee_origin != SO_EE_ORIGIN_ZEROCOPY)</span><br><span class="line">        error(<span class="number">1</span>, <span class="number">0</span>, <span class="string">&quot;serr&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> serr-&gt;ee_data;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这个技术是基于 redhat 红帽在 2010 年给 Linux 内核提交的 virtio-net zero-copy 技术之上实现的，<strong>至于底层原理，简单来说就是通过 <code>send()</code> 把数据在用户缓冲区中的分段指针发送到 socket 中去，利用 page pinning 页锁定机制锁住用户缓冲区的内存页，然后利用 DMA 直接在用户缓冲区通过内存地址指针进行数据读取，实现零拷贝</strong>；具体的细节可以通过阅读 Willem de Bruijn 的论文 (PDF) 深入了解。</p>
+<p>目前来说，这种技术的主要缺陷有：</p>
+<ol>
+<li>只适用于大文件 (10KB 左右) 的场景，小文件场景因为 page pinning 页锁定和等待缓冲区释放的通知消息这些机制，甚至可能比直接 CPU 拷贝更耗时；</li>
+<li>因为可能异步发送数据，需要额外调用 <code>poll()</code> 和 <code>recvmsg()</code> 系统调用等待 buffer 被释放的通知消息，增加代码复杂度，以及会导致多次用户态和内核态的上下文切换；</li>
+<li>MSG_ZEROCOPY 目前只支持发送端，接收端暂不支持。</li>
+</ol>
+<h2 id="绕过内核的直接 -I-O">绕过内核的直接 I/O</h2>
+<p>可以看出，前面种种的 zero-copy 的方法，都是在想方设法地优化减少或者去掉用户态和内核态之间以及内核态和内核态之间的数据拷贝，为了实现避免这些拷贝可谓是八仙过海，各显神通，采用了各种各样的手段，那么如果我们换个思路：其实这么费劲地去消除这些拷贝不就是因为有内核在掺和吗？如果我们绕过内核直接进行 I/O 不就没有这些烦人的拷贝问题了吗？这就是 <strong> 绕过内核直接 I/O</strong>技术：</p>
+<img src="../images/linux-zerocopy/direct-hw-control.png" alt="Direct Hardware Control from User Applications" width="80%" height="80%">
+<p>这种方案有两种实现方式：</p>
+<ol>
+<li>用户直接访问硬件</li>
+<li>内核控制访问硬件</li>
+</ol>
+<h3 id="用户直接访问硬件">用户直接访问硬件</h3>
+<p>这种技术赋予用户进程直接访问硬件设备的权限，这让用户进程能有直接读写硬件设备，在数据传输过程中只需要内核做一些虚拟内存配置相关的工作。这种无需数据拷贝和内核干预的直接 I/O，理论上是最高效的数据传输技术，但是正如前面所说的那样，并不存在能解决一切问题的银弹，这种直接 I/O 技术虽然有可能非常高效，但是它的适用性也非常窄，目前只适用于诸如 MPI 高性能通信、丛集计算系统中的远程共享内存等有限的场景。</p>
+<p>这种技术实际上破坏了现代计算机操作系统最重要的概念之一 —— 硬件抽象，我们之前提过，抽象是计算机领域最最核心的设计思路，正式由于有了抽象和分层，各个层级才能不必去关心很多底层细节从而专注于真正的工作，才使得系统的运作更加高效和快速。此外，网卡通常使用功能较弱的 CPU，例如只包含简单指令集的 MIPS 架构处理器（没有不必要的功能，如浮点数计算等），也没有太多的内存来容纳复杂的软件。因此，通常只有那些基于以太网之上的专用协议会使用这种技术，这些专用协议的设计要比远比 TCP/IP 简单得多，而且多用于局域网环境中，在这种环境中，数据包丢失和损坏很少发生，因此没有必要进行复杂的数据包确认和流量控制机制。而且这种技术还需要定制的网卡，所以它是高度依赖硬件的。</p>
+<p>与传统的通信设计相比，直接硬件访问技术给程序设计带来了各种限制：由于设备之间的数据传输是通过 DMA 完成的，因此用户空间的数据缓冲区内存页必须进行 page pinning（页锁定），这是为了防止其物理页框地址被交换到磁盘或者被移动到新的地址而导致 DMA 去拷贝数据的时候在指定的地址找不到内存页从而引发缺页错误，而页锁定的开销并不比 CPU 拷贝小，所以为了避免频繁的页锁定系统调用，应用程序必须分配和注册一个持久的内存池，用于数据缓冲。</p>
+<p>用户直接访问硬件的技术可以得到极高的 I/O 性能，但是其应用领域和适用场景也极其的有限，如集群或网络存储系统中的节点通信。它需要定制的硬件和专门设计的应用程序，但相应地对操作系统内核的改动比较小，可以很容易地以内核模块或设备驱动程序的形式实现出来。直接访问硬件还可能会带来严重的安全问题，因为用户进程拥有直接访问硬件的极高权限，所以如果你的程序设计没有做好的话，可能会消耗本来就有限的硬件资源或者进行非法地址访问，可能也会因此间接地影响其他正在使用同一设备的应用程序，而因为绕开了内核，所以也无法让内核替你去控制和管理。</p>
+<h3 id="内核控制访问硬件">内核控制访问硬件</h3>
+<p>相较于用户直接访问硬件技术，通过内核控制的直接访问硬件技术更加的安全，它比前者在数据传输过程中会多干预一点，但也仅仅是作为一个代理人这样的角色，不会参与到实际的数据传输过程，内核会控制 DMA 引擎去替用户进程做缓冲区的数据传输工作。同样的，这种方式也是高度依赖硬件的，比如一些集成了专有网络栈协议的网卡。这种技术的一个优势就是用户集成去 I/O 时的接口不会改变，就和普通的 read()/write() 系统调用那样使用即可，所有的脏活累活都在内核里完成，用户接口友好度很高，不过需要注意的是，使用这种技术的过程中如果发生了什么不可预知的意外从而导致无法使用这种技术进行数据传输的话，则内核会自动切换为最传统 I/O 模式，也就是性能最差的那种模式。</p>
+<p>这种技术也有着和用户直接访问硬件技术一样的问题：DMA 传输数据的过程中，用户进程的缓冲区内存页必须进行 page pinning 页锁定，数据传输完成后才能解锁。CPU 高速缓存内保存的多个内存地址也会被冲刷掉以保证 DMA 传输前后的数据一致性。这些机制有可能会导致数据传输的性能变得更差，因为 read()/write() 系统调用的语义并不能提前通知 CPU 用户缓冲区要参与 DMA 数据传输传输，因此也就无法像内核缓冲区那样可依提前加载进高速缓存，提高性能。</p>
+<p>由于用户缓冲区的内存页可能分布在物理内存中的任意位置，因此一些实现不好的 DMA 控制器引擎可能会有寻址限制从而导致无法访问这些内存区域。一些技术比如 AMD64 架构中的 IOMMU，允许通过将 DMA 地址重新映射到内存中的物理地址来解决这些限制，但反过来又可能会导致可移植性问题，因为其他的处理器架构，甚至是 Intel 64 位 x86 架构的变种 EM64T 都不具备这样的特性单元。此外，还可能存在其他限制，比如 DMA 传输的数据对齐问题，又会导致无法访问用户进程指定的任意缓冲区内存地址。</p>
+<h2 id="内核缓冲区和用户缓冲区之间的传输优化">内核缓冲区和用户缓冲区之间的传输优化</h2>
+<p>到目前为止，我们讨论的 zero-copy 技术都是基于减少甚至是避免用户空间和内核空间之间的 CPU 数据拷贝的，虽然有一些技术非常高效，但是大多都有适用性很窄的问题，比如 sendfile()、splice() 这些，效率很高，但是都只适用于那些用户进程不需要直接处理数据的场景，比如静态文件服务器或者是直接转发数据的代理服务器。</p>
+<p>现在我们已经知道，硬件设备之间的数据可以通过 DMA 进行传输，然而却并没有这样的传输机制可以应用于用户缓冲区和内核缓冲区之间的数据传输。不过另一方面，广泛应用在现代的 CPU 架构和操作系统上的虚拟内存机制表明，通过在不同的虚拟地址上重新映射页面可以实现在用户进程和内核之间虚拟复制和共享内存，尽管一次传输的内存颗粒度相对较大：4KB 或 8KB。</p>
+<p>因此如果要在实现在用户进程内处理数据（这种场景比直接转发数据更加常见）之后再发送出去的话，用户空间和内核空间的数据传输就是不可避免的，既然避无可避，那就只能选择优化了，因此本章节我们要介绍两种优化用户空间和内核空间数据传输的技术：</p>
+<ol>
+<li>动态重映射与写时拷贝 (Copy-on-Write)</li>
+<li>缓冲区共享 (Buffer Sharing)</li>
+</ol>
+<h3 id="动态重映射与写时拷贝 -Copy-on-Write">动态重映射与写时拷贝 (Copy-on-Write)</h3>
+<p>前面我们介绍过利用内存映射技术来减少数据在用户空间和内核空间之间的复制，通常简单模式下，用户进程是对共享的缓冲区进行同步阻塞读写的，这样不会有 data race 问题，但是这种模式下效率并不高，而提升效率的一种方法就是异步地对共享缓冲区进行读写，而这样的话就必须引入保护机制来避免数据冲突问题，写时复制 (Copy on Write) 就是这样的一种技术。</p>
+<blockquote>
+<p>写入时复制（Copy-on-write，COW）是一种计算机程序设计领域的优化策略。其核心思想是，如果有多个调用者（callers）同时请求相同资源（如内存或磁盘上的数据存储），他们会共同获取相同的指针指向相同的资源，直到某个调用者试图修改资源的内容时，系统才会真正复制一份专用副本（private copy）给该调用者，而其他调用者所见到的最初的资源仍然保持不变。这过程对其他的调用者都是透明的。此作法主要的优点是如果调用者没有修改该资源，就不会有副本（private copy）被创建，因此多个调用者只是读取操作时可以共享同一份资源。</p>
+</blockquote>
+<p>举一个例子，引入了 COW 技术之后，用户进程读取磁盘文件进行数据处理最后写到网卡，首先使用内存映射技术让用户缓冲区和内核缓冲区共享了一段内存地址并标记为只读 (read-only)，避免数据拷贝，而当要把数据写到网卡的时候，用户进程选择了异步写的方式，系统调用会直接返回，数据传输就会在内核里异步进行，而用户进程就可以继续其他的工作，并且共享缓冲区的内容可以随时再进行读取，效率很高。</p>
+<p>但是如果该进程又尝试往共享缓冲区写入数据，则会产生一个 COW 事件，让试图写入数据的进程把数据复制到自己的缓冲区去修改，这里只需要复制要修改的内存页即可，无需所有数据都复制过去，而如果其他访问该共享内存的进程不需要修改数据则可以永远不需要进行数据拷贝。</p>
+<p>COW 是一种建构在虚拟内存冲映射技术之上的技术，因此它需要 MMU 的硬件支持，MMU 会记录当前哪些内存页被标记成只读，当有进程尝试往这些内存页中写数据的时候，MMU 就会抛一个异常给操作系统内核，内核处理该异常时为该进程分配一份物理内存并复制数据到此内存地址，重新向 MMU 发出执行该进程的写操作。</p>
+<p>COW 最大的优势是节省内存和减少数据拷贝，不过却是通过增加操作系统内核 I/O 过程复杂性作为代价的。当确定采用 COW 来复制页面时，重要的是注意空闲页面的分配位置。许多操作系统为这类请求提供了一个空闲的页面池。当进程的堆栈或堆要扩展时或有写时复制页面需要管理时，通常分配这些空闲页面。操作系统分配这些页面通常采用称为 <strong> 按需填零 </strong> 的技术。按需填零页面在需要分配之前先填零，因此会清除里面旧的内容。</p>
+<p><strong>局限性</strong>：</p>
+<p>COW 这种零拷贝技术比较适用于那种多读少写从而使得 COW 事件发生较少的场景，因为 COW 事件所带来的系统开销要远远高于一次 CPU 拷贝所产生的。此外，在实际应用的过程中，为了避免频繁的内存映射，可以重复使用同一段内存缓冲区，因此，你不需要在只用过一次共享缓冲区之后就解除掉内存页的映射关系，而是重复循环使用，从而提升性能，不过这种内存页映射的持久化并不会减少由于页表往返移动和 TLB 冲刷所带来的系统开销，因为每次接收到 COW 事件之后对内存页而进行加锁或者解锁的时候，页面的只读标志 (read-ony) 都要被更改为 (write-only)。</p>
+<h3 id="缓冲区共享 -Buffer-Sharing">缓冲区共享 (Buffer Sharing)</h3>
+<p>从前面的介绍可以看出，传统的 Linux I/O 接口，都是基于复制 / 拷贝的：数据需要在操作系统内核空间和用户空间的缓冲区之间进行拷贝。在进行 I/O 操作之前，用户进程需要预先分配好一个内存缓冲区，使用 read() 系统调用时，内核会将从存储器或者网卡等设备读入的数据拷贝到这个用户缓冲区里；而使用 write() 系统调用时，则是把用户内存缓冲区的数据拷贝至内核缓冲区。</p>
+<p>为了实现这种传统的 I/O 模式，Linux 必须要在每一个 I/O 操作时都进行内存虚拟映射和解除。这种内存页重映射的机制的效率严重受限于缓存体系结构、MMU 地址转换速度和 TLB 命中率。如果能够避免处理 I/O 请求的虚拟地址转换和 TLB 刷新所带来的开销，则有可能极大地提升 I/O 性能。而缓冲区共享就是用来解决上述问题的一种技术。</p>
+<p>最早支持 Buffer Sharing 的操作系统是 Solaris。后来，Linux 也逐步支持了这种 Buffer Sharing 的技术，但时至今日依然不够完整和成熟。</p>
+<p>操作系统内核开发者们实现了一种叫 fbufs 的缓冲区共享的框架，也即 <strong> 快速缓冲区（ Fast Buffers ）</strong>，使用一个 fbuf 缓冲区作为数据传输的最小单位，使用这种技术需要调用新的操作系统 API，用户区和内核区、内核区之间的数据都必须严格地在 fbufs 这个体系下进行通信。fbufs 为每一个用户进程分配一个 buffer pool，里面会储存预分配 (也可以使用的时候再分配) 好的 buffers，这些 buffers 会被同时映射到用户内存空间和内核内存空间。fbufs 只需通过一次虚拟内存映射操作即可创建缓冲区，有效地消除那些由存储一致性维护所引发的大多数性能损耗。</p>
+<p>传统的 Linux I/O 接口是通过把数据在用户缓冲区和内核缓冲区之间进行拷贝传输来完成的，这种数据传输过程中需要进行大量的数据拷贝，同时由于虚拟内存技术的存在，I/O 过程中还需要频繁地通过 MMU 进行虚拟内存地址到物理内存地址的转换，高速缓存的汰换以及 TLB 的刷新，这些操作均会导致性能的损耗。</p>
+<p>而如果利用 fbufs 框架来实现数据传输的话，首先可以把 buffers 都缓存到 pool 里循环利用，而不需要每次都去重新分配，而且缓存下来的不止有 buffers 本身，而且还会把虚拟内存地址到物理内存地址的映射关系也缓存下来，也就可以避免每次都进行地址转换，从发送接收数据的层面来说，用户进程和 I/O 子系统比如设备驱动程序、网卡等可以直接传输整个缓冲区本身而不是其中的数据内容。</p>
+<p>也可以理解成是传输内存地址指针，这样就就避免了大量的数据内容拷贝：用户进程 / IO 子系统通过发送一个个的 fbuf 写出数据到内核而非直接传递数据内容，相对应的，用户进程 / IO 子系统通过接收一个个的 fbuf 而从内核读入数据，这样就能减少传统的 read()/write()系统调用带来的数据拷贝开销：</p>
+<ol>
+<li>发送方用户进程调用 uf_allocate 从自己的 buffer pool 获取一个 fbuf 缓冲区，往其中填充内容之后调用 uf_write 向内核区发送指向 fbuf 的文件描述符；</li>
+<li>I/O 子系统接收到 fbuf 之后，调用 uf_allocb 从接收方用户进程的 buffer pool 获取一个 fubf 并用接收到的数据进行填充，然后向用户区发送指向 fbuf 的文件描述符；</li>
+<li>接收方用户进程调用 uf_get 接收到 fbuf，读取数据进行处理，完成之后调用 uf_deallocate 把 fbuf 放回自己的 buffer pool。</li>
+</ol>
+<p><strong>fbufs 的缺陷</strong>：</p>
+<p>共享缓冲区技术的实现需要依赖于用户进程、操作系统内核、以及 I/O 子系统 (设备驱动程序，文件系统等)之间协同工作。比如，设计得不好的用户进程容易就会修改已经发送出去的 fbuf 从而污染数据，更要命的是这种问题很难 debug。虽然这个技术的设计方案非常精彩，但是它的门槛和限制却不比前面介绍的其他技术少：首先会对操作系统 API 造成变动，需要使用新的一些 API 调用，其次还需要设备驱动程序配合改动，还有由于是内存共享，内核需要很小心谨慎地实现对这部分共享的内存进行数据保护和同步的机制，而这种并发的同步机制是非常容易出 bug 的从而又增加了内核的代码复杂度，等等。因此这一类的技术还远远没有到发展成熟和广泛应用的阶段，目前大多数的实现都还处于实验阶段。</p>
+<h2 id="总结">总结</h2>
+<p>本文中我主要讲解了 Linux I/O 底层原理，然后介绍并解析了 Linux 中的 Zero-copy 技术，并给出了 Linux 对 I/O 模块的优化和改进思路。</p>
+<p>Linux 的 Zero-copy 技术可以归纳成以下三大类：</p>
+<ul>
+<li>
+<p><strong>减少甚至避免用户空间和内核空间之间的数据拷贝</strong>：在一些场景下，用户进程在数据传输过程中并不需要对数据进行访问和处理，那么数据在 Linux 的 Page Cache 和用户进程的缓冲区之间的传输就完全可以避免，让数据拷贝完全在内核里进行，甚至可以通过更巧妙的方式避免在内核里的数据拷贝。这一类实现一般是是通过增加新的系统调用来完成的，比如 Linux 中的 mmap()，sendfile() 以及 splice() 等。</p>
+</li>
+<li>
+<p><strong>绕过内核的直接 I/O</strong>：允许在用户态进程绕过内核直接和硬件进行数据传输，内核在传输过程中只负责一些管理和辅助的工作。这种方式其实和第一种有点类似，也是试图避免用户空间和内核空间之间的数据传输，只是第一种方式是把数据传输过程放在内核态完成，而这种方式则是直接绕过内核和硬件通信，效果类似但原理完全不同。</p>
+</li>
+<li>
+<p><strong>内核缓冲区和用户缓冲区之间的传输优化</strong>：这种方式侧重于在用户进程的缓冲区和操作系统的页缓存之间的 CPU 拷贝的优化。这种方法延续了以往那种传统的通信方式，但更灵活。</p>
+</li>
+</ul>
+<p>本文从虚拟内存、I/O 缓冲区，用户态 &amp; 内核态以及 I/O 模式等等知识点全面而又详尽地剖析了 Linux 系统的 I/O 底层原理，分析了 Linux 传统的 I/O 模式的弊端，进而引入 Linux Zero-copy 零拷贝技术的介绍和原理解析，通过将零拷贝技术和传统的 I/O 模式进行区分和对比，带领读者经历了 Linux I/O 的演化历史，通过帮助读者理解 Linux 内核对 I/O 模块的优化改进思路，相信不仅仅是让读者了解 Linux 底层系统的设计原理，更能对读者们在以后优化改进自己的程序设计过程中能够有所启发。</p>
+<p><strong>参考 &amp; 延伸阅读</strong>：</p>
+<ul>
+<li>MODERN OPERATING SYSTEMS</li>
+<li>Zero Copy I: User-Mode Perspective</li>
+<li>Message Passing for Gigabit/s Networks with “Zero-Copy” under Linux</li>
+<li>ZeroCopy: Techniques, Benefits and Pitfalls</li>
+<li>Zero-copy networking</li>
+<li>Driver porting: Zero-copy user-space access</li>
+<li>sendmsg copy avoidance with MSG_ZEROCOPY</li>
+<li>It’s all about buffers: zero-copy, mmap and Java NIO</li>
+<li>Linux Zero Copy</li>
+<li>Two new system calls: splice() and sync_file_range()</li>
+<li>Circular pipes</li>
+<li>The future of the page cache</li>
+<li>Provide a zero-copy method on KVM virtio-net</li>
+</ul>
+<blockquote>
+<p>参考资料：</p>
+<ol>
+<li><a target="_blank" rel="noopener" href="https://www.163.com/dy/article/FS6AS7SS0518R7MO.html">https://www.163.com/dy/article/FS6AS7SS0518R7MO.html</a></li>
+</ol>
+</blockquote>
+
+</div>
+
+
+  <div class="book-comments">
+    
+
+
+
+
+  </div>
+
+
+
+<script src="/js/book-post.js"></script>
+
+
+            </div>
+          </div>
+          <div class="column col-2 hide-lg">
+            <div class="book-post-info">
+  
+    <div class="book-post-meta">
+
+  <div class="author">
+
+    <!-- Author image -->
+    <div class="author-img">
+      
+        <figure
+          class="avatar avatar-lg"
+          data-initial="A"
+          style="background-color: #3b4351;">
+        </figure>
+      
+    </div>
+
+    <!-- Author title -->
+    <div class="author-title">
+      <div>aha</div>
+      <div>2025-12-02</div>
+    </div>
+  </div>
+
+  
+    <div class="divider"></div>
+
+    <div class="link">
+      <a class="category-link" href="/categories/%E9%9B%B6%E6%8B%B7%E8%B4%9D/">零拷贝</a>
+
+      <a class="tag-none-link" href="/tags/%E9%9B%B6%E6%8B%B7%E8%B4%9D/" rel="tag">#零拷贝</a>
+    </div>
+    
+  
+
+  <div class="divider"></div>
+</div>
+  
+
+  <div class="book-tocbot">
+</div>
+<div class="book-tocbot-menu">
+  <a class="book-toc-expand" onclick="expand_toc()">Expand all</a>
+  <a onclick="go_top()">Back to top</a>
+  <a onclick="go_bottom()">Go to bottom</a>
+  <a onclick="toggleSearch()">Search in blogs</a> <!-- 添加搜索文字的点击事件 -->
+</div>
+
+<div id="search-overlay" class="search-overlay" style="display: none;"> <!-- 初始状态为隐藏 -->
+  <div class="search-box">
+    <input type="text" id="search-input" placeholder="Search in all blogs...">
+    <button onclick="closeSearch()">Close</button> <!-- 添加关闭按钮 -->
+    <div id="search-results" class="search-results"></div>
+  </div>
+</div>
+
+<script>
+  function performSearch(query) {
+    if (!query.trim()) {
+      return;
+    }
+
+    fetch('/search.xml')
+      .then(response => response.text())
+      .then(data => {
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(data, "text/xml");
+        const entries = xmlDoc.getElementsByTagName('entry');
+        let results = '';
+
+        for (let i = 0; i < entries.length; i++) {
+          const title = entries[i].getElementsByTagName('title')[0].textContent;
+          const content = entries[i].getElementsByTagName('content')[0].textContent;
+          const url = entries[i].getElementsByTagName('url')[0].textContent;
+
+          let count = (title.match(new RegExp(query, "gi")) || []).length; // 统计查询词出现的次数
+          count += (content.match(new RegExp(query, "gi")) || []).length;
+
+          if (count > 0) { // title.includes(query) || content.includes(query)
+            results += `
+              <div class="search-result-item">
+                <a href="${url}">${title}</a> (${count})
+              </div>`;
+          }
+        }
+
+        const searchResultsElement = document.getElementById('search-results');
+        searchResultsElement.innerHTML = results;
+        searchResultsElement.classList.add('active');
+      });
+  }
+
+  function toggleSearch() {
+    const searchOverlay = document.getElementById('search-overlay');
+    searchOverlay.style.display = searchOverlay.style.display === 'none' ? 'flex' : 'none';
+  }
+
+  function closeSearch() {
+    document.getElementById('search-overlay').style.display = 'none';
+  }
+
+  document.getElementById('search-input').addEventListener('input', function() {
+    const query = this.value;
+    performSearch(query);
+  });
+</script>
+
+<style>
+  .search-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  .search-box {
+    background: white;
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+    width: 80%;
+    max-width: 500px;
+  }
+
+  .search-results {
+    margin-top: 10px;
+    max-height: 300px;
+    overflow-y: auto;
+    background: white;
+    padding: 10px;
+    border-radius: 5px;
+    width: 100%;
+  }
+
+  .search-result-item {
+    margin: 10px 0;
+  }
+
+  .search-result-item a {
+    color: blue; /* 设置链接颜色为蓝色 */
+    text-decoration: none;
+  }
+
+  .search-result-item a:hover {
+    text-decoration: underline;
+  }
+</style>
+
+
+<script src="/js/book-toc.js"></script>
+
+
+</div>
+          </div>
+        </div>
+      </div>
+
+      <a class="off-canvas-overlay" onclick="hide_canvas()"></a>
+
+      <button class="floating-button" onclick="toggleDropdownMenu()"></button>
+
+      <div class="dropdown-menu">
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FFFFFF', '#000000')">银河白</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#C7EDCC', '#000000')">豆沙绿</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FAF9DE', '#000000')">杏仁黄</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#E3EDCD', '#000000')">青草绿</div>
+        <div class="dropdown-item" onclick="changeBackgroundColor('#FFF2E2', '#000000')">秋叶褐</div>
+      </div>
+  </div>
+
+  <script>
+    function toggleDropdownMenu() {
+      document.querySelector('.floating-button').classList.toggle('active');
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      var storedBackgroundColor = localStorage.getItem('blogBackgroundColor');
+      var storedColor = localStorage.getItem('blogColor');
+
+      if (storedBackgroundColor && storedColor) {
+        document.body.style.backgroundColor = storedBackgroundColor;
+        document.body.style.color = storedColor;
+      }
+    });
+
+    function changeBackgroundColor(backgroundColor, color) {
+      document.body.style.backgroundColor = backgroundColor;
+      document.body.style.color = color;
+
+      localStorage.setItem('blogBackgroundColor', backgroundColor);
+      localStorage.setItem('blogColor', color);
+
+      document.querySelector('.floating-button').classList.remove('active');
+    }
+  </script>
+</body>
+
+</html>
+
+
+<script src="/js/book.js"></script>
