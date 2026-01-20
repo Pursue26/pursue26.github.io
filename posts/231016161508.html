@@ -232,6 +232,10 @@ document.addEventListener('DOMContentLoaded', function () {
 <li><a href="/posts/251202101130.html">Linux 零拷贝技术 </a></li>
 <li><a href="/posts/251124150921.html">QUIC 协议 </a></li>
 </ul>
+<h2 id="驱动编程"> 驱动编程 </h2>
+<ul>
+<li><a href="/posts/260109195604.html">RDMA 驱动最小化实现 </a></li>
+</ul>
 <h2 id="工具与命令"> 工具与命令 </h2>
 <ul>
 <li><a href="/posts/240207180410.html">GCC 编译过程分解 </a></li>
@@ -369,7 +373,7 @@ function sidebar_toggle() {
 <p>这篇文章将介绍使用数组实现堆栈这种数据结构。</p>
 <h2 id="数组实现堆栈">数组实现堆栈</h2>
 <h3 id="定义并初始化堆栈结构">定义并初始化堆栈结构</h3>
-<p>使用一个固定长度的数组来实现具有先进先出的堆栈结构。为了将不同的堆栈和栈顶位置对应起来，这里使用一个结构体来组合堆栈和栈顶位置。</p>
+<p>使用一个固定长度的数组来实现具有后进先出的堆栈结构。为了将不同的堆栈和栈顶位置对应起来，这里使用一个结构体来组合堆栈和栈顶位置。</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> MAX_SIZE (3)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> EXCEPTION_VALUE (-1) </span></span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">stack</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> data[MAX_SIZE];  <span class="comment">// 数组实现堆栈</span></span><br><span class="line">    <span class="type">int</span> top;  <span class="comment">// 初始化栈顶位置</span></span><br><span class="line">&#125; Stack;</span><br></pre></td></tr></table></figure>
 <h3 id="初始化堆栈">初始化堆栈</h3>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">initStack</span><span class="params">(Stack *<span class="built_in">stack</span>)</span> &#123;</span><br><span class="line">    <span class="comment">// memset(stack-&gt;data, 0, MAX_SIZE * sizeof(int));</span></span><br><span class="line">    <span class="built_in">stack</span>-&gt;top = <span class="number">-1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
